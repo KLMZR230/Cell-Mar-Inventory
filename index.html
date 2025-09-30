@@ -4,21 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cell Mar Accesorios</title>
+    <!-- Tailwind CSS CDN (for demo only - not for production) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Correct Supabase CDN that exposes window.supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        secondary: '#10b981'
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         .logo-container {
             position: relative;
@@ -194,18 +184,12 @@
     </div>
 
     <script>
-        // Initialize Supabase
+        // Initialize Supabase using the global window.supabase
         const supabaseUrl = 'https://ftcjaadsjpnzbckxevxq.supabase.co';
         const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M';
         
-        // Wait for supabase to be available
-        let supabase;
-        if (typeof supabase !== 'undefined' && supabase.createClient) {
-            supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
-        } else {
-            // Fallback if supabase is not loaded properly
-            console.error('Supabase library not loaded properly');
-        }
+        // ✅ Use window.supabase to avoid initialization errors
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
 
         // DOM Elements
         const loadingScreen = document.getElementById('loadingScreen');
@@ -225,17 +209,11 @@
         const logoImage = document.getElementById('logoImage');
         const totalProductsEl = document.getElementById('totalProducts');
 
-        // State
         let editingProduct = null;
         let currentLogo = 'https://placehold.co/100x100/3b82f6/ffffff?text=Logo';
 
         // Initialize the app
         function init() {
-            if (!supabase) {
-                errorScreen.classList.remove('hidden');
-                loadingScreen.classList.add('hidden');
-                return;
-            }
             loadProducts();
             setupEventListeners();
         }
@@ -263,7 +241,6 @@
             }
         }
 
-        // Display products in the grid
         function displayProducts(products) {
             if (products.length === 0) {
                 productsGrid.innerHTML = '';
@@ -315,23 +292,15 @@
             `).join('');
         }
 
-        // Update total products count
         function updateTotalProducts(products) {
             const total = products.reduce((sum, p) => sum + (p.quantity || 0), 0);
             totalProductsEl.textContent = total;
         }
 
-        // Setup event listeners
         function setupEventListeners() {
-            // Search functionality
-            searchInput.addEventListener('input', () => {
-                loadProducts(); // This will apply the search filter
-            });
-
-            // Retry button
+            searchInput.addEventListener('input', loadProducts);
             retryBtn.addEventListener('click', loadProducts);
 
-            // Modal controls
             addProductBtn.addEventListener('click', () => {
                 resetForm();
                 modalTitle.textContent = 'Agregar Producto';
@@ -346,20 +315,18 @@
                 productModal.classList.add('hidden');
             });
 
-            // Form submission
             productForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 await saveProduct();
             });
 
-            // Logo upload
             logoContainer.addEventListener('click', () => {
                 logoUpload.click();
             });
 
             logoUpload.addEventListener('change', async (e) => {
                 const file = e.target.files[0];
-                if (file && supabase) {
+                if (file) {
                     try {
                         const fileExt = file.name.split('.').pop();
                         const fileName = `${Math.random()}.${fileExt}`;
@@ -384,7 +351,6 @@
                 }
             });
 
-            // Product image upload
             document.getElementById('productImageUpload').addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -400,7 +366,6 @@
             });
         }
 
-        // Reset form
         function resetForm() {
             document.getElementById('productName').value = '';
             document.getElementById('productCategory').value = 'Pantallas';
@@ -412,13 +377,7 @@
             editingProduct = null;
         }
 
-        // Save product (create or update)
         async function saveProduct() {
-            if (!supabase) {
-                alert('Error: Supabase no está disponible');
-                return;
-            }
-            
             const name = document.getElementById('productName').value;
             const category = document.getElementById('productCategory').value;
             const quantity = parseInt(document.getElementById('productQuantity').value);
@@ -445,7 +404,6 @@
                 }
 
                 if (editingProduct) {
-                    // Update existing product
                     const { error } = await supabase
                         .from('products')
                         .update({ name, category, quantity, image: imageUrl || editingProduct.image })
@@ -453,7 +411,6 @@
 
                     if (error) throw error;
                 } else {
-                    // Create new product
                     const { error } = await supabase
                         .from('products')
                         .insert({ name, category, quantity, image: imageUrl });
@@ -469,13 +426,7 @@
             }
         }
 
-        // Edit product
         async function editProduct(id) {
-            if (!supabase) {
-                alert('Error: Supabase no está disponible');
-                return;
-            }
-            
             try {
                 const { data, error } = await supabase
                     .from('products')
@@ -509,13 +460,7 @@
             }
         }
 
-        // Delete product
         async function deleteProduct(id) {
-            if (!supabase) {
-                alert('Error: Supabase no está disponible');
-                return;
-            }
-            
             if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) {
                 return;
             }
@@ -535,11 +480,9 @@
             }
         }
 
-        // Make functions available globally for inline onclick handlers
         window.editProduct = editProduct;
         window.deleteProduct = deleteProduct;
 
-        // Initialize the app when the page loads
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
