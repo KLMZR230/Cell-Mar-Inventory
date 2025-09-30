@@ -3,634 +3,544 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Inventario de Accesorios 📱</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+    <title>Cell Mar Accesorios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        /* Estilos CSS BÁSICOS para la estructura */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f7f9;
-            color: #333;
+        .logo-container {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
         }
-        header {
-            background-color: #007bff; /* Azul primario para Supabase */
-            color: white;
-            padding: 15px 20px;
-            text-align: center;
-        }
-        nav {
-            background-color: #343a40;
-            padding: 10px 0;
+        .logo-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 9999px;
             display: flex;
+            align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-        nav a {
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            margin: 0 10px;
-            border-radius: 5px;
-            transition: background-color 0.3s;
+        .logo-container:hover .logo-overlay {
+            opacity: 1;
         }
-        nav a:hover, nav a.active {
-            background-color: #0056b3;
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
-        main {
-            padding: 20px;
-            max-width: 1200px;
-            margin: 20px auto;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
         }
-        .section {
-            margin-bottom: 30px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-        }
-        h2 {
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-            color: #007bff;
-        }
-        /* Estilos para formularios */
-        form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 15px;
-        }
-        .form-full-width {
-            grid-column: 1 / 3;
-            text-align: right;
-        }
-        form label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        form input[type="text"], 
-        form input[type="number"], 
-        form input[type="file"],
-        form select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box; 
-        }
-        /* Botones de Guardar */
-        #save-product-btn, #registro-venta-form button {
-            background-color: #28a745;
-            color: white;
-            padding: 12px 15px;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        #save-product-btn:hover, #registro-venta-form button:hover {
-            background-color: #218838;
-        }
-
-        /* Estilos para las tablas (Inventario y Movimientos) */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-        }
-        .product-img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-        .stock-bajo {
-            color: red; 
-            font-weight: bold;
-        }
-        /* Estilos para botones de acción en la tabla */
-        .action-btns button {
-            padding: 5px 10px;
-            margin-right: 5px;
-            border: none;
-            cursor: pointer;
-            border-radius: 3px;
-            font-size: 14px;
-        }
-        .edit-btn {
-            background-color: #ffc107; /* Amarillo */
-            color: #333;
-        }
-        .delete-btn {
-            background-color: #dc3545; /* Rojo */
-            color: white;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-600">Cargando productos...</p>
+        </div>
+    </div>
 
-    <header>
-        <h1>Gestión de Inventario de Accesorios 📱</h1>
+    <!-- Error Screen -->
+    <div id="errorScreen" class="fixed inset-0 bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-8 rounded-xl shadow-md text-center">
+            <p class="text-red-600 mb-4">Error al cargar los productos</p>
+            <button id="retryBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                Reintentar
+            </button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="logo-container" id="logoContainer">
+                        <img id="logoImage" src="https://placehold.co/100x100/3b82f6/ffffff?text=Logo" alt="CellMar Logo" class="w-16 h-16 rounded-full">
+                        <div class="logo-overlay">
+                            <i class="fas fa-upload text-white text-xs"></i>
+                        </div>
+                        <input type="file" accept="image/*" id="logoUpload" class="hidden">
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">Cell Mar Accesorios</h1>
+                        <p class="text-gray-600 mt-1">Control exacto de tus accesorios de celulares</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <p class="text-sm text-gray-600">Total Productos</p>
+                        <p id="totalProducts" class="text-2xl font-bold text-blue-600">0</p>
+                    </div>
+                    <button id="addProductBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+                        <i class="fas fa-plus"></i>
+                        Agregar Producto
+                    </button>
+                </div>
+            </div>
+        </div>
     </header>
 
-    <nav>
-        <a href="#inventario" class="active">Inventario General</a>
-        <a href="#agregar-producto">Agregar/Editar Producto</a>
-        <a href="#venta">Registro de Venta Rápida</a>
-        <a href="#movimientos">Historial de Movimientos</a>
-    </nav>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Search Bar -->
+        <div class="mb-8">
+            <div class="relative max-w-md">
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="searchInput" placeholder="Buscar productos o categorías..." class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+        </div>
 
-    <main>
-        
-        <section id="agregar-producto" class="section">
-            <h2 id="form-title">Agregar Nuevo Producto</h2>
-            <form id="producto-form">
-                <input type="hidden" id="producto-id" value="">
+        <!-- Products Grid -->
+        <div id="productsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Products will be loaded here -->
+        </div>
 
-                <div>
-                    <label for="producto-nombre">Nombre del Accesorio:</label>
-                    <input type="text" id="producto-nombre" placeholder="Ej: Protector de Pantalla iPhone 15 Pro" required>
-
-                    <label for="producto-categoria">Categoría:</label>
-                    <select id="producto-categoria" required>
-                        <option value="">Seleccione una categoría</option>
-                        <option value="Fundas">Fundas</option>
-                        <option value="Cables">Cables</option>
-                        <option value="Cargadores">Cargadores</option>
-                        <option value="Protectores">Protectores de Pantalla</option>
-                        <option value="Audifonos">Audífonos/Audio</option>
-                    </select>
-
-                    <label for="producto-foto">Foto del Producto (Máx 4MB):</label>
-                    <input type="file" id="producto-foto" accept="image/*">
-                    <p style="font-size: 12px; margin-top: -5px; color: gray;">Solo subir si desea cambiar la foto.</p>
-                </div>
-
-                <div>
-                    <label for="producto-precio-venta">Precio de Venta ($):</label>
-                    <input type="number" id="producto-precio-venta" min="0.01" step="0.01" required>
-
-                    <label for="producto-precio-compra">Costo de Compra ($):</label>
-                    <input type="number" id="producto-precio-compra" min="0.01" step="0.01" required>
-
-                    <label for="producto-stock-inicial">Cantidad Inicial Disponible (Solo al Agregar):</label>
-                    <input type="number" id="producto-stock-inicial" min="0" value="0" required>
-                    
-                    <label for="producto-stock-minimo">Alerta (Stock Mínimo):</label>
-                    <input type="number" id="producto-stock-minimo" min="1" value="5" required>
-                </div>
-                
-                <div class="form-full-width">
-                    <button type="submit" id="save-product-btn">Guardar Producto</button>
-                    <button type="button" id="cancel-edit-btn" style="display: none; background-color: #6c757d;">Cancelar Edición</button>
-                </div>
-
-            </form>
-        </section>
-
-        ---
-
-        <section id="inventario" class="section">
-            <h2>Inventario General de Productos</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Foto</th> 
-                        <th>Producto</th>
-                        <th>Categoría</th>
-                        <th>Precio Venta</th>
-                        <th>Stock Actual</th>
-                        <th>Alerta</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="inventario-body">
-                    </tbody>
-            </table>
-        </section>
-
-        ---
-
-        <section id="venta" class="section">
-            <h2>Registro de Venta Rápida (SALIDA de Stock)</h2>
-            <form id="registro-venta-form">
-                <label for="venta-producto">Nombre del Producto:</label>
-                <input type="text" id="venta-producto" placeholder="Ej: Cable Lightning 1m" required>
-
-                <label for="venta-cantidad">Cantidad Vendida:</label>
-                <input type="number" id="venta-cantidad" value="1" min="1" required>
-
-                <label for="venta-referencia">Referencia (Opcional):</label>
-                <input type="text" id="venta-referencia" placeholder="Ej: Venta #00123" >
-                
-                <button type="submit">Registrar Venta y Descontar Stock</button>
-            </form>
-        </section>
-        
-        ---
-
-        <section id="movimientos" class="section">
-            <h2>Historial de Movimientos (Entradas y Salidas)</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Tipo</th>
-                        <th>Producto</th>
-                        <th>Cantidad</th>
-                        <th>Referencia</th>
-                    </tr>
-                </thead>
-                <tbody id="movimientos-body">
-                    </tbody>
-            </table>
-        </section>
-
+        <div id="noProductsMessage" class="text-center py-12 hidden">
+            <div class="text-gray-400 mb-4">
+                <i class="fas fa-search text-6xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No se encontraron productos</h3>
+            <p class="text-gray-600">Intenta con diferentes términos de búsqueda</p>
+        </div>
     </main>
-    
+
+    <!-- Add/Edit Modal -->
+    <div id="productModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-xl max-w-md w-full max-h-screen overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 id="modalTitle" class="text-xl font-bold text-gray-900">Agregar Producto</h2>
+                    <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <form id="productForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Producto</label>
+                        <input type="text" id="productName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ej: Pantalla iPhone 13">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+                        <select id="productCategory" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="Pantallas">Pantallas</option>
+                            <option value="Jack de carga">Jack de carga</option>
+                            <option value="Flex main">Flex main</option>
+                            <option value="Plaquitas de carga">Plaquitas de carga</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad Disponible</label>
+                        <input type="number" id="productQuantity" required min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Imagen del Producto</label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                            <img id="productImagePreview" src="" alt="Preview" class="w-full h-32 object-cover rounded-lg mb-2 hidden">
+                            <div id="uploadPlaceholder" class="text-gray-400 mb-2">
+                                <i class="fas fa-image text-2xl"></i>
+                            </div>
+                            <input type="file" accept="image/*" id="productImageUpload" class="hidden">
+                            <label for="productImageUpload" id="uploadLabel" class="text-blue-600 hover:text-blue-800 cursor-pointer text-sm">
+                                Seleccionar imagen
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" id="cancelBtn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg transition-colors">
+                            Cancelar
+                        </button>
+                        <button type="submit" id="saveBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors">
+                            <i class="fas fa-save"></i>
+                            Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // =================================================================
-        // 1. CONFIGURACIÓN INICIAL DE SUPABASE (¡ORDEN CRÍTICO CORREGIDO!)
-        // =================================================================
+        // Initialize Supabase
+        const supabaseUrl = 'https://ftcjaadsjpnzbckxevxq.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M';
         
-        // 1. Define las credenciales (URL y KEY) primero.
-        const SUPABASE_URL = 'https://ftcjaadsjpnzbckxevxq.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M';
+        // Wait for supabase to be available
+        let supabase;
+        if (typeof supabase !== 'undefined' && supabase.createClient) {
+            supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
+        } else {
+            // Fallback if supabase is not loaded properly
+            console.error('Supabase library not loaded properly');
+        }
 
-        // 2. Ahora, crea el cliente usando las variables ya definidas.
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const BUCKET_NAME = 'imagenes-accesorios';
+        // DOM Elements
+        const loadingScreen = document.getElementById('loadingScreen');
+        const errorScreen = document.getElementById('errorScreen');
+        const retryBtn = document.getElementById('retryBtn');
+        const productsGrid = document.getElementById('productsGrid');
+        const noProductsMessage = document.getElementById('noProductsMessage');
+        const searchInput = document.getElementById('searchInput');
+        const addProductBtn = document.getElementById('addProductBtn');
+        const productModal = document.getElementById('productModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const productForm = document.getElementById('productForm');
+        const modalTitle = document.getElementById('modalTitle');
+        const logoContainer = document.getElementById('logoContainer');
+        const logoUpload = document.getElementById('logoUpload');
+        const logoImage = document.getElementById('logoImage');
+        const totalProductsEl = document.getElementById('totalProducts');
 
-        // =================================================================
-        // 2. LECTURA Y ACTUALIZACIÓN DE INVENTARIO (CRUD)
-        // =================================================================
+        // State
+        let editingProduct = null;
+        let currentLogo = 'https://placehold.co/100x100/3b82f6/ffffff?text=Logo';
 
-        /**
-         * Carga y muestra todos los productos en la tabla de inventario.
-         */
-        async function cargarInventario() {
-            const { data: productos, error } = await supabase
-                .from('productos')
-                .select('*')
-                .order('nombre', { ascending: true });
+        // Initialize the app
+        function init() {
+            if (!supabase) {
+                errorScreen.classList.remove('hidden');
+                loadingScreen.classList.add('hidden');
+                return;
+            }
+            loadProducts();
+            setupEventListeners();
+        }
 
-            if (error) {
-                console.error('Error al cargar inventario:', error);
-                document.getElementById('inventario-body').innerHTML = `
-                    <tr><td colspan="7" style="color:red; text-align:center;">
-                        Error de conexión. Asegúrate que RLS esté **DESACTIVADO** para las tablas.
-                    </td></tr>`;
+        // Load products from Supabase
+        async function loadProducts() {
+            try {
+                loadingScreen.classList.remove('hidden');
+                errorScreen.classList.add('hidden');
+                
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                displayProducts(data || []);
+                updateTotalProducts(data || []);
+                loadingScreen.classList.add('hidden');
+            } catch (error) {
+                console.error('Error loading products:', error);
+                loadingScreen.classList.add('hidden');
+                errorScreen.classList.remove('hidden');
+            }
+        }
+
+        // Display products in the grid
+        function displayProducts(products) {
+            if (products.length === 0) {
+                productsGrid.innerHTML = '';
+                noProductsMessage.classList.remove('hidden');
                 return;
             }
 
-            const inventarioBody = document.getElementById('inventario-body');
-            inventarioBody.innerHTML = '';
-
-            productos.forEach(producto => {
-                const isLowStock = producto.stock_actual <= producto.stock_minimo;
-                const alertStatus = isLowStock ? 'BAJO' : 'OK';
-                
-                const row = `
-                    <tr>
-                        <td><img src="${producto.imagen_url || 'placeholder.jpg'}" onerror="this.onerror=null;this.src='placeholder.jpg';" alt="${producto.nombre}" class="product-img"></td>
-                        <td>${producto.nombre}</td>
-                        <td>${producto.categoria}</td>
-                        <td>$${parseFloat(producto.precio_venta).toFixed(2)}</td>
-                        <td class="${isLowStock ? 'stock-bajo' : ''}">${producto.stock_actual}</td>
-                        <td>${alertStatus}</td>
-                        <td class="action-btns">
-                            <button class="edit-btn" data-id="${producto.id}">Editar</button>
-                            <button class="delete-btn" data-id="${producto.id}">Borrar</button>
-                        </td>
-                    </tr>
-                `;
-                inventarioBody.innerHTML += row;
+            noProductsMessage.classList.add('hidden');
+            const filteredProducts = products.filter(product => {
+                const searchTerm = searchInput.value.toLowerCase();
+                return product.name.toLowerCase().includes(searchTerm) || 
+                       product.category.toLowerCase().includes(searchTerm);
             });
-            
-            attachProductListeners(); 
-            cargarMovimientos();
+
+            if (filteredProducts.length === 0) {
+                productsGrid.innerHTML = '';
+                noProductsMessage.classList.remove('hidden');
+                return;
+            }
+
+            productsGrid.innerHTML = filteredProducts.map(product => `
+                <div class="bg-white rounded-xl shadow-md product-card transition-all duration-300 overflow-hidden">
+                    <div class="p-4">
+                        <div class="aspect-square w-full bg-gray-100 rounded-lg mb-4 overflow-hidden">
+                            <img src="${product.image || 'https://placehold.co/200x200/3b82f6/ffffff?text=Sin+Imagen'}" 
+                                 alt="${product.name}" class="w-full h-full object-cover">
+                        </div>
+                        <h3 class="font-semibold text-gray-900 text-lg mb-2">${product.name}</h3>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                ${product.category}
+                            </span>
+                            <span class="text-lg font-bold ${product.quantity <= 5 ? 'text-red-600' : 'text-gray-900'}">
+                                ${product.quantity} unidades
+                            </span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="editProduct(${product.id})" 
+                                    class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-3 rounded-lg flex items-center justify-center gap-2 transition-colors">
+                                <i class="fas fa-edit text-sm"></i> Editar
+                            </button>
+                            <button onclick="deleteProduct(${product.id})" 
+                                    class="flex-1 bg-red-100 hover:bg-red-200 text-red-700 py-2 px-3 rounded-lg flex items-center justify-center gap-2 transition-colors">
+                                <i class="fas fa-trash text-sm"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        /**
-         * Maneja la subida de un nuevo producto o la edición de uno existente.
-         */
-        async function handleSaveProduct(event) {
-            event.preventDefault();
-            const saveBtn = document.getElementById('save-product-btn');
-            saveBtn.disabled = true;
+        // Update total products count
+        function updateTotalProducts(products) {
+            const total = products.reduce((sum, p) => sum + (p.quantity || 0), 0);
+            totalProductsEl.textContent = total;
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search functionality
+            searchInput.addEventListener('input', () => {
+                loadProducts(); // This will apply the search filter
+            });
+
+            // Retry button
+            retryBtn.addEventListener('click', loadProducts);
+
+            // Modal controls
+            addProductBtn.addEventListener('click', () => {
+                resetForm();
+                modalTitle.textContent = 'Agregar Producto';
+                productModal.classList.remove('hidden');
+            });
+
+            closeModalBtn.addEventListener('click', () => {
+                productModal.classList.add('hidden');
+            });
+
+            cancelBtn.addEventListener('click', () => {
+                productModal.classList.add('hidden');
+            });
+
+            // Form submission
+            productForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveProduct();
+            });
+
+            // Logo upload
+            logoContainer.addEventListener('click', () => {
+                logoUpload.click();
+            });
+
+            logoUpload.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (file && supabase) {
+                    try {
+                        const fileExt = file.name.split('.').pop();
+                        const fileName = `${Math.random()}.${fileExt}`;
+                        const filePath = `logos/${fileName}`;
+
+                        const { error: uploadError } = await supabase.storage
+                            .from('images')
+                            .upload(filePath, file);
+
+                        if (uploadError) throw uploadError;
+
+                        const { data } = supabase.storage
+                            .from('images')
+                            .getPublicUrl(filePath);
+
+                        currentLogo = data.publicUrl;
+                        logoImage.src = data.publicUrl;
+                    } catch (error) {
+                        console.error('Error uploading logo:', error);
+                        alert('Error al subir el logo');
+                    }
+                }
+            });
+
+            // Product image upload
+            document.getElementById('productImageUpload').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        document.getElementById('productImagePreview').src = e.target.result;
+                        document.getElementById('productImagePreview').classList.remove('hidden');
+                        document.getElementById('uploadPlaceholder').classList.add('hidden');
+                        document.getElementById('uploadLabel').textContent = 'Cambiar imagen';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('productName').value = '';
+            document.getElementById('productCategory').value = 'Pantallas';
+            document.getElementById('productQuantity').value = '';
+            document.getElementById('productImagePreview').src = '';
+            document.getElementById('productImagePreview').classList.add('hidden');
+            document.getElementById('uploadPlaceholder').classList.remove('hidden');
+            document.getElementById('uploadLabel').textContent = 'Seleccionar imagen';
+            editingProduct = null;
+        }
+
+        // Save product (create or update)
+        async function saveProduct() {
+            if (!supabase) {
+                alert('Error: Supabase no está disponible');
+                return;
+            }
             
-            const productId = document.getElementById('producto-id').value;
-            const isEditing = !!productId;
-
-            const nombre = document.getElementById('producto-nombre').value;
-            const categoria = document.getElementById('producto-categoria').value;
-            const precioVenta = parseFloat(document.getElementById('producto-precio-venta').value);
-            const precioCompra = parseFloat(document.getElementById('producto-precio-compra').value);
-            const stockInicial = parseInt(document.getElementById('producto-stock-inicial').value);
-            const stockMinimo = parseInt(document.getElementById('producto-stock-minimo').value);
-            const fotoFile = document.getElementById('producto-foto').files[0];
-
-            let imagenUrl = null;
+            const name = document.getElementById('productName').value;
+            const category = document.getElementById('productCategory').value;
+            const quantity = parseInt(document.getElementById('productQuantity').value);
+            const imageFile = document.getElementById('productImageUpload').files[0];
 
             try {
-                // A. Lógica para Subir Imagen
-                if (fotoFile) {
-                    const fileName = `${Date.now()}-${fotoFile.name}`;
-                    const { data: uploadData, error: uploadError } = await supabase.storage
-                        .from(BUCKET_NAME)
-                        .upload(fileName, fotoFile);
+                let imageUrl = '';
+                if (imageFile) {
+                    const fileExt = imageFile.name.split('.').pop();
+                    const fileName = `${Math.random()}.${fileExt}`;
+                    const filePath = `products/${fileName}`;
+
+                    const { error: uploadError } = await supabase.storage
+                        .from('images')
+                        .upload(filePath, imageFile);
 
                     if (uploadError) throw uploadError;
-                    
-                    const { data: urlData } = supabase.storage
-                        .from(BUCKET_NAME)
-                        .getPublicUrl(uploadData.path);
-                    
-                    imagenUrl = urlData.publicUrl;
+
+                    const { data } = supabase.storage
+                        .from('images')
+                        .getPublicUrl(filePath);
+
+                    imageUrl = data.publicUrl;
                 }
 
-                // B. Preparar el objeto de datos
-                let productData = {
-                    nombre,
-                    categoria,
-                    precio_venta: precioVenta,
-                    precio_compra: precioCompra,
-                    stock_minimo: stockMinimo,
-                    ...(imagenUrl && { imagen_url: imagenUrl }) 
-                };
+                if (editingProduct) {
+                    // Update existing product
+                    const { error } = await supabase
+                        .from('products')
+                        .update({ name, category, quantity, image: imageUrl || editingProduct.image })
+                        .eq('id', editingProduct.id);
 
-                if (isEditing) {
-                    // C. Editar Producto (UPDATE)
-                    const { error: updateError } = await supabase
-                        .from('productos')
-                        .update(productData)
-                        .eq('id', productId);
-                    
-                    if (updateError) throw updateError;
-                    alert(`Producto "${nombre}" actualizado con éxito.`);
-                    
+                    if (error) throw error;
                 } else {
-                    // D. Agregar Nuevo Producto (INSERT)
-                    
-                    const { data: newProductData, error: insertError } = await supabase
-                        .from('productos')
-                        .insert([productData])
-                        .select();
-                        
-                    if (insertError) throw insertError;
-                    
-                    const newProductId = newProductData[0].id;
+                    // Create new product
+                    const { error } = await supabase
+                        .from('products')
+                        .insert({ name, category, quantity, image: imageUrl });
 
-                    // E. Registrar el Movimiento Inicial (activa el trigger para actualizar el stock)
-                    const { error: moveError } = await supabase
-                        .from('movimientos')
-                        .insert([{
-                            producto_id: newProductId, 
-                            tipo: 'ENTRADA',
-                            cantidad: stockInicial,
-                            referencia: 'Stock Inicial',
-                            costo_unidad: precioCompra
-                        }]);
-
-                    if (moveError) throw moveError;
-                    alert(`Producto "${nombre}" agregado con éxito.`);
+                    if (error) throw error;
                 }
-            
+
+                productModal.classList.add('hidden');
+                await loadProducts();
             } catch (error) {
-                console.error('Error en operación de producto:', error);
-                alert('Error: ' + error.message || 'Error al guardar el producto. Consulta la consola.');
-            } finally {
-                saveBtn.disabled = false;
-                resetForm(); 
-                cargarInventario(); 
+                console.error('Error saving product:', error);
+                alert('Error al guardar el producto');
             }
         }
 
-        /**
-         * Inicia el proceso de edición: carga los datos del producto al formulario.
-         */
-        async function startEditProduct(productId) {
-            resetForm(); 
-
-            document.getElementById('agregar-producto').scrollIntoView({ behavior: 'smooth' });
-
-            const { data, error } = await supabase
-                .from('productos')
-                .select('*')
-                .eq('id', productId)
-                .single();
-
-            if (error || !data) {
-                console.error('Error al obtener producto para editar:', error);
+        // Edit product
+        async function editProduct(id) {
+            if (!supabase) {
+                alert('Error: Supabase no está disponible');
                 return;
             }
-
-            // Rellenar el formulario
-            document.getElementById('form-title').innerText = 'Editar Producto Existente';
-            document.getElementById('save-product-btn').innerText = 'Actualizar Producto';
-            document.getElementById('producto-id').value = data.id;
-            document.getElementById('cancel-edit-btn').style.display = 'inline-block';
             
-            document.getElementById('producto-nombre').value = data.nombre;
-            document.getElementById('producto-categoria').value = data.categoria;
-            document.getElementById('producto-precio-venta').value = data.precio_venta;
-            document.getElementById('producto-precio-compra').value = data.precio_compra;
-            document.getElementById('producto-stock-minimo').value = data.stock_minimo;
-            
-            // Ajustar el campo de stock inicial/existente
-            document.getElementById('producto-stock-inicial').value = data.stock_actual; 
-            document.getElementById('producto-stock-inicial').closest('div').querySelector('label').innerText = 'Stock Actual (Manejar con Movimientos):';
-            document.getElementById('producto-stock-inicial').disabled = true; // Deshabilitar la modificación directa de stock
-        }
+            try {
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
 
+                if (error) throw error;
 
-        /**
-         * Elimina un producto.
-         */
-        async function deleteProduct(productId) {
-            if (!confirm('¿Estás seguro de que quieres BORRAR este producto? Esto es irreversible y eliminará todos sus movimientos.')) {
-                return;
-            }
-
-            // 1. Eliminar movimientos relacionados
-            await supabase.from('movimientos').delete().eq('producto_id', productId);
-            
-            // 2. Eliminar producto
-            const { error } = await supabase
-                .from('productos')
-                .delete()
-                .eq('id', productId);
-
-            if (error) {
-                alert('ERROR: No se pudo eliminar el producto. Consulta la consola.');
-                console.error('Error al borrar producto:', error);
-            } else {
-                alert('Producto y movimientos relacionados eliminados con éxito.');
-                cargarInventario();
-            }
-        }
-
-        // =================================================================
-        // 3. REGISTRO DE VENTA (SALIDA DE STOCK)
-        // =================================================================
-
-        /**
-         * Busca un producto por nombre y registra una venta (movimiento de SALIDA).
-         */
-        async function handleRegistroVenta(event) {
-            event.preventDefault();
-            
-            const nombreProducto = document.getElementById('venta-producto').value.trim();
-            const cantidadVendida = parseInt(document.getElementById('venta-cantidad').value);
-            const referencia = document.getElementById('venta-referencia').value || `Venta rápida ${new Date().toLocaleString()}`;
-
-            // 1. Buscar el producto por nombre
-            const { data: productos, error: searchError } = await supabase
-                .from('productos')
-                .select('id, stock_actual, precio_compra')
-                .ilike('nombre', `%${nombreProducto}%`);
-
-            if (searchError || !productos || productos.length === 0) {
-                alert('Producto no encontrado. Revisa el nombre exacto.');
-                return;
-            }
-
-            const producto = productos[0]; 
-
-            if (producto.stock_actual < cantidadVendida) {
-                alert(`Stock insuficiente. Solo quedan ${producto.stock_actual} unidades.`);
-                return;
-            }
-
-            // 2. Registrar el movimiento de SALIDA (Esto activará el trigger)
-            const { error: moveError } = await supabase
-                .from('movimientos')
-                .insert([{
-                    producto_id: producto.id,
-                    tipo: 'SALIDA',
-                    cantidad: cantidadVendida,
-                    referencia: referencia,
-                    costo_unidad: producto.precio_compra
-                }]);
-
-            if (moveError) {
-                console.error('Error al registrar venta:', moveError);
-                alert('Hubo un error al registrar la venta.');
-            } else {
-                alert(`Venta de ${cantidadVendida} unidades de ${nombreProducto} registrada. Stock actualizado.`);
-                document.getElementById('registro-venta-form').reset();
-                cargarInventario();
-            }
-        }
-
-        // =================================================================
-        // 4. HISTORIAL DE MOVIMIENTOS
-        // =================================================================
-
-        /**
-         * Carga el historial de movimientos.
-         */
-        async function cargarMovimientos() {
-            const { data: movimientos, error } = await supabase
-                .from('movimientos')
-                .select(`
-                    fecha, 
-                    tipo, 
-                    cantidad, 
-                    referencia, 
-                    productos (nombre)
-                `)
-                .order('fecha', { ascending: false });
-
-            if (error) {
-                console.error('Error al cargar movimientos:', error);
-                return;
-            }
-
-            const movimientosBody = document.getElementById('movimientos-body');
-            movimientosBody.innerHTML = '';
-
-            movimientos.forEach(mov => {
-                const isEntrada = mov.tipo === 'ENTRADA';
-                const color = isEntrada ? 'green' : 'red';
-                const signo = isEntrada ? '+' : '-';
+                editingProduct = data;
+                document.getElementById('productName').value = data.name;
+                document.getElementById('productCategory').value = data.category;
+                document.getElementById('productQuantity').value = data.quantity;
                 
-                const row = `
-                    <tr>
-                        <td>${new Date(mov.fecha).toLocaleString()}</td>
-                        <td style="color: ${color};">${mov.tipo}</td>
-                        <td>${mov.productos?.nombre || 'Producto Eliminado'}</td>
-                        <td>${signo}${mov.cantidad}</td>
-                        <td>${mov.referencia}</td>
-                    </tr>
-                `;
-                movimientosBody.innerHTML += row;
-            });
+                if (data.image) {
+                    document.getElementById('productImagePreview').src = data.image;
+                    document.getElementById('productImagePreview').classList.remove('hidden');
+                    document.getElementById('uploadPlaceholder').classList.add('hidden');
+                    document.getElementById('uploadLabel').textContent = 'Cambiar imagen';
+                } else {
+                    document.getElementById('productImagePreview').classList.add('hidden');
+                    document.getElementById('uploadPlaceholder').classList.remove('hidden');
+                    document.getElementById('uploadLabel').textContent = 'Seleccionar imagen';
+                }
+
+                modalTitle.textContent = 'Editar Producto';
+                productModal.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error loading product for edit:', error);
+                alert('Error al cargar el producto para editar');
+            }
         }
 
-        // =================================================================
-        // 5. LISTENERS y UTILIDADES
-        // =================================================================
-
-        /**
-         * Asocia los eventos click a los botones de Editar y Borrar.
-         */
-        function attachProductListeners() {
-            document.querySelectorAll('.edit-btn').forEach(button => {
-                button.onclick = () => startEditProduct(button.dataset.id); 
-            });
-
-            document.querySelectorAll('.delete-btn').forEach(button => {
-                button.onclick = () => deleteProduct(button.dataset.id);
-            });
+        // Delete product
+        async function deleteProduct(id) {
+            if (!supabase) {
+                alert('Error: Supabase no está disponible');
+                return;
+            }
             
-            // Listener para el botón Cancelar Edición
-            document.getElementById('cancel-edit-btn').onclick = resetForm;
+            if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+                return;
+            }
+
+            try {
+                const { error } = await supabase
+                    .from('products')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                await loadProducts();
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                alert('Error al eliminar el producto');
+            }
         }
 
-        /**
-         * Limpia y reinicia el formulario de agregar/editar producto.
-         */
-        function resetForm() {
-            document.getElementById('producto-form').reset();
-            document.getElementById('form-title').innerText = 'Agregar Nuevo Producto';
-            document.getElementById('save-product-btn').innerText = 'Guardar Producto';
-            document.getElementById('producto-id').value = '';
-            document.getElementById('cancel-edit-btn').style.display = 'none';
-            
-            // Restaurar etiquetas y habilitar stock inicial
-            document.getElementById('producto-stock-inicial').closest('div').querySelector('label').innerText = 'Cantidad Inicial Disponible (Solo al Agregar):';
-            document.getElementById('producto-stock-inicial').disabled = false;
-        }
+        // Make functions available globally for inline onclick handlers
+        window.editProduct = editProduct;
+        window.deleteProduct = deleteProduct;
 
-
-        // =================================================================
-        // 6. INICIALIZACIÓN
-        // =================================================================
-
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('producto-form').addEventListener('submit', handleSaveProduct);
-            document.getElementById('registro-venta-form').addEventListener('submit', handleRegistroVenta);
-            
-            cargarInventario();
-        });
+        // Initialize the app when the page loads
+        document.addEventListener('DOMContentLoaded', init);
     </script>
-
 </body>
 </html>
