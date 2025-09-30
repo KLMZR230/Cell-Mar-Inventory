@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario de Accesorios para Teléfonos</title>
+    <title>Gestión de Inventario de Accesorios 📱</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         /* Estilos CSS BÁSICOS para la estructura */
         body {
@@ -83,7 +86,7 @@
             box-sizing: border-box; 
         }
         /* Botones de Guardar */
-        #save-product-btn {
+        #save-product-btn, #registro-venta-form button {
             background-color: #28a745;
             color: white;
             padding: 12px 15px;
@@ -92,7 +95,7 @@
             border-radius: 4px;
             font-size: 16px;
         }
-        #save-product-btn:hover {
+        #save-product-btn:hover, #registro-venta-form button:hover {
             background-color: #218838;
         }
 
@@ -195,7 +198,7 @@
                 
                 <div class="form-full-width">
                     <button type="submit" id="save-product-btn">Guardar Producto</button>
-                    <button type="button" id="cancel-edit-btn" style="display: none; background-color: #6c757d;" onclick="resetForm()">Cancelar Edición</button>
+                    <button type="button" id="cancel-edit-btn" style="display: none; background-color: #6c757d;">Cancelar Edición</button>
                 </div>
 
             </form>
@@ -218,33 +221,11 @@
                     </tr>
                 </thead>
                 <tbody id="inventario-body">
-                    <tr>
-                        <td><img src="placeholder.jpg" alt="Cable" class="product-img"></td>
-                        <td>Cable Lightning 1m</td>
-                        <td>Cables</td>
-                        <td>$15.00</td>
-                        <td>120</td>
-                        <td>OK</td>
-                        <td class="action-btns">
-                            <button class="edit-btn">Editar</button>
-                            <button class="delete-btn">Borrar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><img src="placeholder.jpg" alt="Funda" class="product-img"></td>
-                        <td>Funda Samsung S24 Transparente</td>
-                        <td>Fundas</td>
-                        <td>$18.50</td>
-                        <td class="stock-bajo">8</td>
-                        <td>BAJO</td>
-                        <td class="action-btns">
-                            <button class="edit-btn">Editar</button>
-                            <button class="delete-btn">Borrar</button>
-                        </td>
-                    </tr>
-                </tbody>
+                    </tbody>
             </table>
         </section>
+
+        ---
 
         <section id="venta" class="section">
             <h2>Registro de Venta Rápida (SALIDA de Stock)</h2>
@@ -261,6 +242,8 @@
                 <button type="submit">Registrar Venta y Descontar Stock</button>
             </form>
         </section>
+        
+        ---
 
         <section id="movimientos" class="section">
             <h2>Historial de Movimientos (Entradas y Salidas)</h2>
@@ -275,34 +258,370 @@
                     </tr>
                 </thead>
                 <tbody id="movimientos-body">
-                    <tr>
-                        <td>2025-09-30 10:00</td>
-                        <td style="color: green;">ENTRADA</td>
-                        <td>Cargador Inalámbrico 30W</td>
-                        <td>+50</td>
-                        <td>Orden de Compra #45</td>
-                    </tr>
-                    <tr>
-                        <td>2025-09-30 10:35</td>
-                        <td style="color: red;">SALIDA</td>
-                        <td>Funda Samsung S24 Transparente</td>
-                        <td>-2</td>
-                        <td>Venta #00123</td>
-                    </tr>
-                </tbody>
+                    </tbody>
             </table>
         </section>
 
     </main>
     
     <script>
+        // =================================================================
+        // 1. CONFIGURACIÓN INICIAL DE SUPABASE (TUS CREDENCIALES)
+        // =================================================================
+
+        const SUPABASE_URL = 'https://ftcjaadsjpnzbckxevxq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M';
+
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const BUCKET_NAME = 'imagenes-accesorios';
+
+        // =================================================================
+        // 2. LECTURA Y ACTUALIZACIÓN DE INVENTARIO (CRUD)
+        // =================================================================
+
+        /**
+         * Carga y muestra todos los productos en la tabla de inventario.
+         */
+        async function cargarInventario() {
+            const { data: productos, error } = await supabase
+                .from('productos')
+                .select('*')
+                .order('nombre', { ascending: true });
+
+            if (error) {
+                console.error('Error al cargar inventario:', error);
+                return;
+            }
+
+            const inventarioBody = document.getElementById('inventario-body');
+            inventarioBody.innerHTML = '';
+
+            productos.forEach(producto => {
+                const isLowStock = producto.stock_actual <= producto.stock_minimo;
+                const alertStatus = isLowStock ? 'BAJO' : 'OK';
+                
+                const row = `
+                    <tr>
+                        <td><img src="${producto.imagen_url || 'placeholder.jpg'}" alt="${producto.nombre}" class="product-img"></td>
+                        <td>${producto.nombre}</td>
+                        <td>${producto.categoria}</td>
+                        <td>$${parseFloat(producto.precio_venta).toFixed(2)}</td>
+                        <td class="${isLowStock ? 'stock-bajo' : ''}">${producto.stock_actual}</td>
+                        <td>${alertStatus}</td>
+                        <td class="action-btns">
+                            <button class="edit-btn" data-id="${producto.id}">Editar</button>
+                            <button class="delete-btn" data-id="${producto.id}">Borrar</button>
+                        </td>
+                    </tr>
+                `;
+                inventarioBody.innerHTML += row;
+            });
+            
+            attachProductListeners();
+            cargarMovimientos();
+        }
+
+        /**
+         * Maneja la subida de un nuevo producto o la edición de uno existente.
+         */
+        async function handleSaveProduct(event) {
+            event.preventDefault();
+            document.getElementById('save-product-btn').disabled = true;
+            
+            const productId = document.getElementById('producto-id').value;
+            const isEditing = !!productId;
+
+            const nombre = document.getElementById('producto-nombre').value;
+            const categoria = document.getElementById('producto-categoria').value;
+            const precioVenta = parseFloat(document.getElementById('producto-precio-venta').value);
+            const precioCompra = parseFloat(document.getElementById('producto-precio-compra').value);
+            const stockInicial = parseInt(document.getElementById('producto-stock-inicial').value);
+            const stockMinimo = parseInt(document.getElementById('producto-stock-minimo').value);
+            const fotoFile = document.getElementById('producto-foto').files[0];
+
+            let imagenUrl = null;
+            let result;
+
+            try {
+                // A. Lógica para Subir Imagen
+                if (fotoFile) {
+                    const fileName = `${Date.now()}-${fotoFile.name}`;
+                    const { data: uploadData, error: uploadError } = await supabase.storage
+                        .from(BUCKET_NAME)
+                        .upload(fileName, fotoFile);
+
+                    if (uploadError) throw uploadError;
+                    
+                    const { data: urlData } = supabase.storage
+                        .from(BUCKET_NAME)
+                        .getPublicUrl(uploadData.path);
+                    
+                    imagenUrl = urlData.publicUrl;
+                }
+
+                // B. Preparar el objeto de datos
+                let productData = {
+                    nombre,
+                    categoria,
+                    precio_venta: precioVenta,
+                    precio_compra: precioCompra,
+                    stock_minimo: stockMinimo,
+                    ...(imagenUrl && { imagen_url: imagenUrl }) 
+                };
+
+                if (isEditing) {
+                    // C. Editar Producto (UPDATE)
+                    result = await supabase
+                        .from('productos')
+                        .update(productData)
+                        .eq('id', productId);
+                    
+                    if (result.error) throw result.error;
+                    alert(`Producto "${nombre}" actualizado con éxito.`);
+                    
+                } else {
+                    // D. Agregar Nuevo Producto (INSERT)
+                    productData.stock_actual = stockInicial;
+                    
+                    const { data: newProductData, error: insertError } = await supabase
+                        .from('productos')
+                        .insert([productData])
+                        .select();
+                        
+                    if (insertError) throw insertError;
+                    
+                    const newProductId = newProductData[0].id;
+
+                    // E. Registrar el Movimiento Inicial (activa el trigger)
+                    const { error: moveError } = await supabase
+                        .from('movimientos')
+                        .insert([{
+                            producto_id: newProductId, 
+                            tipo: 'ENTRADA',
+                            cantidad: stockInicial,
+                            referencia: 'Stock Inicial',
+                            costo_unidad: precioCompra
+                        }]);
+
+                    if (moveError) throw moveError;
+                    alert(`Producto "${nombre}" agregado con éxito.`);
+                }
+            
+            } catch (error) {
+                console.error('Error en operación de producto:', error);
+                alert('Error: ' + error.message || 'Error al guardar el producto. Consulta la consola.');
+            } finally {
+                document.getElementById('save-product-btn').disabled = false;
+                resetForm(); 
+                cargarInventario(); 
+            }
+        }
+
+        /**
+         * Inicia el proceso de edición.
+         */
+        async function startEditProduct(productId) {
+            // Scroll a la sección de edición
+            document.getElementById('agregar-producto').scrollIntoView({ behavior: 'smooth' });
+
+            const { data, error } = await supabase
+                .from('productos')
+                .select('*')
+                .eq('id', productId)
+                .single();
+
+            if (error || !data) {
+                console.error('Error al obtener producto para editar:', error);
+                return;
+            }
+
+            // Rellenar el formulario
+            document.getElementById('form-title').innerText = 'Editar Producto Existente';
+            document.getElementById('save-product-btn').innerText = 'Actualizar Producto';
+            document.getElementById('producto-id').value = data.id;
+            document.getElementById('cancel-edit-btn').style.display = 'inline-block';
+            
+            document.getElementById('producto-nombre').value = data.nombre;
+            document.getElementById('producto-categoria').value = data.categoria;
+            document.getElementById('producto-precio-venta').value = data.precio_venta;
+            document.getElementById('producto-precio-compra').value = data.precio_compra;
+            document.getElementById('producto-stock-minimo').value = data.stock_minimo;
+            
+            // Ocultar/ignorar stock inicial en edición
+            document.getElementById('producto-stock-inicial').value = 0; 
+            document.getElementById('producto-stock-inicial').closest('div').querySelector('label').innerText = 'Stock (Manejar con Movimientos)';
+        }
+
+
+        /**
+         * Elimina un producto.
+         */
+        async function deleteProduct(productId) {
+            if (!confirm('¿Estás seguro de que quieres BORRAR este producto? Esto es irreversible y eliminará todos sus movimientos.')) {
+                return;
+            }
+
+            // Eliminar movimientos relacionados primero
+            await supabase.from('movimientos').delete().eq('producto_id', productId);
+            
+            const { error } = await supabase
+                .from('productos')
+                .delete()
+                .eq('id', productId);
+
+            if (error) {
+                alert('ERROR: No se pudo eliminar el producto. Consulta la consola.');
+                console.error('Error al borrar producto:', error);
+            } else {
+                alert('Producto y movimientos relacionados eliminados con éxito.');
+                cargarInventario();
+            }
+        }
+
+        // =================================================================
+        // 3. REGISTRO DE VENTA (SALIDA DE STOCK)
+        // =================================================================
+
+        /**
+         * Busca un producto por nombre y registra una venta (movimiento de SALIDA).
+         */
+        async function handleRegistroVenta(event) {
+            event.preventDefault();
+            
+            const nombreProducto = document.getElementById('venta-producto').value.trim();
+            const cantidadVendida = parseInt(document.getElementById('venta-cantidad').value);
+            const referencia = document.getElementById('venta-referencia').value || `Venta rápida ${new Date().toLocaleString()}`;
+
+            // 1. Buscar el producto por nombre
+            const { data: productos, error: searchError } = await supabase
+                .from('productos')
+                .select('id, stock_actual, precio_venta, precio_compra')
+                .ilike('nombre', `%${nombreProducto}%`);
+
+            if (searchError || !productos || productos.length === 0) {
+                alert('Producto no encontrado. Revisa el nombre exacto.');
+                return;
+            }
+
+            const producto = productos[0]; 
+
+            if (producto.stock_actual < cantidadVendida) {
+                alert(`Stock insuficiente. Solo quedan ${producto.stock_actual} unidades.`);
+                return;
+            }
+
+            // 2. Registrar el movimiento de SALIDA
+            const { error: moveError } = await supabase
+                .from('movimientos')
+                .insert([{
+                    producto_id: producto.id,
+                    tipo: 'SALIDA',
+                    cantidad: cantidadVendida,
+                    referencia: referencia,
+                    costo_unidad: producto.precio_compra // Usamos precio de compra para calcular márgenes
+                }]);
+
+            if (moveError) {
+                console.error('Error al registrar venta:', moveError);
+                alert('Hubo un error al registrar la venta.');
+            } else {
+                alert(`Venta de ${cantidadVendida} unidades de ${nombreProducto} registrada. Stock actualizado.`);
+                document.getElementById('registro-venta-form').reset();
+                cargarInventario();
+            }
+        }
+
+        // =================================================================
+        // 4. HISTORIAL DE MOVIMIENTOS
+        // =================================================================
+
+        /**
+         * Carga el historial de movimientos uniendo las tablas 'movimientos' y 'productos'.
+         */
+        async function cargarMovimientos() {
+            const { data: movimientos, error } = await supabase
+                .from('movimientos')
+                .select(`
+                    fecha, 
+                    tipo, 
+                    cantidad, 
+                    referencia, 
+                    productos (nombre)
+                `)
+                .order('fecha', { ascending: false });
+
+            if (error) {
+                console.error('Error al cargar movimientos:', error);
+                return;
+            }
+
+            const movimientosBody = document.getElementById('movimientos-body');
+            movimientosBody.innerHTML = '';
+
+            movimientos.forEach(mov => {
+                const isEntrada = mov.tipo === 'ENTRADA';
+                const color = isEntrada ? 'green' : 'red';
+                const signo = isEntrada ? '+' : '-';
+                
+                const row = `
+                    <tr>
+                        <td>${new Date(mov.fecha).toLocaleString()}</td>
+                        <td style="color: ${color};">${mov.tipo}</td>
+                        <td>${mov.productos?.nombre || 'Producto Eliminado'}</td>
+                        <td>${signo}${mov.cantidad}</td>
+                        <td>${mov.referencia}</td>
+                    </tr>
+                `;
+                movimientosBody.innerHTML += row;
+            });
+        }
+
+        // =================================================================
+        // 5. LISTENERS y UTILIDADES
+        // =================================================================
+
+        /**
+         * Asocia los eventos click a los botones de Editar y Borrar.
+         */
+        function attachProductListeners() {
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.onclick = () => startEditProduct(button.dataset.id);
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.onclick = () => deleteProduct(button.dataset.id);
+            });
+            
+            // Re-asociar el evento click para Cancelar Edición
+            document.getElementById('cancel-edit-btn').onclick = resetForm;
+        }
+
+        /**
+         * Limpia y reinicia el formulario de agregar/editar producto.
+         */
         function resetForm() {
             document.getElementById('producto-form').reset();
             document.getElementById('form-title').innerText = 'Agregar Nuevo Producto';
             document.getElementById('save-product-btn').innerText = 'Guardar Producto';
             document.getElementById('producto-id').value = '';
             document.getElementById('cancel-edit-btn').style.display = 'none';
+            
+            // Restaurar la etiqueta de Stock Inicial
+            document.getElementById('producto-stock-inicial').closest('div').querySelector('label').innerText = 'Cantidad Inicial Disponible (Solo al Agregar):';
         }
+
+
+        // =================================================================
+        // 6. INICIALIZACIÓN
+        // =================================================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('producto-form').addEventListener('submit', handleSaveProduct);
+            document.getElementById('registro-venta-form').addEventListener('submit', handleRegistroVenta);
+            
+            cargarInventario();
+        });
     </script>
-    </body>
+
+</body>
 </html>
