@@ -283,6 +283,7 @@
          * Carga y muestra todos los productos en la tabla de inventario.
          */
         async function cargarInventario() {
+            // Asegúrate de que RLS esté desactivado en Supabase, ¡o esto fallará!
             const { data: productos, error } = await supabase
                 .from('productos')
                 .select('*')
@@ -290,6 +291,11 @@
 
             if (error) {
                 console.error('Error al cargar inventario:', error);
+                // Muestra un mensaje visible si falla la conexión o permisos
+                document.getElementById('inventario-body').innerHTML = `
+                    <tr><td colspan="7" style="color:red; text-align:center;">
+                        Error al cargar el inventario. Asegúrate que **RLS esté DESACTIVADO** en Supabase para las tablas.
+                    </td></tr>`;
                 return;
             }
 
@@ -302,7 +308,7 @@
                 
                 const row = `
                     <tr>
-                        <td><img src="${producto.imagen_url || 'placeholder.jpg'}" alt="${producto.nombre}" class="product-img"></td>
+                        <td><img src="${producto.imagen_url || 'placeholder.jpg'}" onerror="this.onerror=null;this.src='placeholder.jpg';" alt="${producto.nombre}" class="product-img"></td>
                         <td>${producto.nombre}</td>
                         <td>${producto.categoria}</td>
                         <td>$${parseFloat(producto.precio_venta).toFixed(2)}</td>
@@ -317,7 +323,8 @@
                 inventarioBody.innerHTML += row;
             });
             
-            attachProductListeners();
+            // ¡Clave! Llama a attachProductListeners después de renderizar el nuevo HTML.
+            attachProductListeners(); 
             cargarMovimientos();
         }
 
@@ -326,7 +333,8 @@
          */
         async function handleSaveProduct(event) {
             event.preventDefault();
-            document.getElementById('save-product-btn').disabled = true;
+            const saveBtn = document.getElementById('save-product-btn');
+            saveBtn.disabled = true;
             
             const productId = document.getElementById('producto-id').value;
             const isEditing = !!productId;
@@ -340,7 +348,6 @@
             const fotoFile = document.getElementById('producto-foto').files[0];
 
             let imagenUrl = null;
-            let result;
 
             try {
                 // A. Lógica para Subir Imagen
@@ -371,17 +378,16 @@
 
                 if (isEditing) {
                     // C. Editar Producto (UPDATE)
-                    result = await supabase
+                    const { error: updateError } = await supabase
                         .from('productos')
                         .update(productData)
                         .eq('id', productId);
                     
-                    if (result.error) throw result.error;
+                    if (updateError) throw updateError;
                     alert(`Producto "${nombre}" actualizado con éxito.`);
                     
                 } else {
                     // D. Agregar Nuevo Producto (INSERT)
-                    productData.stock_actual = stockInicial;
                     
                     const { data: newProductData, error: insertError } = await supabase
                         .from('productos')
@@ -392,7 +398,7 @@
                     
                     const newProductId = newProductData[0].id;
 
-                    // E. Registrar el Movimiento Inicial (activa el trigger)
+                    // E. Registrar el Movimiento Inicial (activa el trigger para actualizar el stock)
                     const { error: moveError } = await supabase
                         .from('movimientos')
                         .insert([{
@@ -409,19 +415,21 @@
             
             } catch (error) {
                 console.error('Error en operación de producto:', error);
-                alert('Error: ' + error.message || 'Error al guardar el producto. Consulta la consola.');
+                alert('Error: ' + error.message || 'Error al guardar el producto. Verifica la consola y el estado de tu Bucket.');
             } finally {
-                document.getElementById('save-product-btn').disabled = false;
+                saveBtn.disabled = false;
                 resetForm(); 
                 cargarInventario(); 
             }
         }
 
         /**
-         * Inicia el proceso de edición.
+         * Inicia el proceso de edición: carga los datos del producto al formulario.
          */
         async function startEditProduct(productId) {
-            // Scroll a la sección de edición
+            // Aseguramos que el formulario esté limpio antes de cargar los nuevos datos
+            resetForm(); 
+
             document.getElementById('agregar-producto').scrollIntoView({ behavior: 'smooth' });
 
             const { data, error } = await supabase
@@ -447,9 +455,10 @@
             document.getElementById('producto-precio-compra').value = data.precio_compra;
             document.getElementById('producto-stock-minimo').value = data.stock_minimo;
             
-            // Ocultar/ignorar stock inicial en edición
-            document.getElementById('producto-stock-inicial').value = 0; 
-            document.getElementById('producto-stock-inicial').closest('div').querySelector('label').innerText = 'Stock (Manejar con Movimientos)';
+            // Ajustar el campo de stock inicial/existente
+            document.getElementById('producto-stock-inicial').value = data.stock_actual; 
+            document.getElementById('producto-stock-inicial').closest('div').querySelector('label').innerText = 'Stock Actual (Manejar con Movimientos):';
+            document.getElementById('producto-stock-inicial').disabled = true; // Deshabilitar la modificación directa de stock
         }
 
 
@@ -461,9 +470,10 @@
                 return;
             }
 
-            // Eliminar movimientos relacionados primero
+            // 1. Eliminar movimientos relacionados
             await supabase.from('movimientos').delete().eq('producto_id', productId);
             
+            // 2. Eliminar producto
             const { error } = await supabase
                 .from('productos')
                 .delete()
@@ -495,7 +505,7 @@
             // 1. Buscar el producto por nombre
             const { data: productos, error: searchError } = await supabase
                 .from('productos')
-                .select('id, stock_actual, precio_venta, precio_compra')
+                .select('id, stock_actual, precio_compra')
                 .ilike('nombre', `%${nombreProducto}%`);
 
             if (searchError || !productos || productos.length === 0) {
@@ -510,7 +520,7 @@
                 return;
             }
 
-            // 2. Registrar el movimiento de SALIDA
+            // 2. Registrar el movimiento de SALIDA (Esto activará el trigger)
             const { error: moveError } = await supabase
                 .from('movimientos')
                 .insert([{
@@ -518,7 +528,7 @@
                     tipo: 'SALIDA',
                     cantidad: cantidadVendida,
                     referencia: referencia,
-                    costo_unidad: producto.precio_compra // Usamos precio de compra para calcular márgenes
+                    costo_unidad: producto.precio_compra
                 }]);
 
             if (moveError) {
@@ -536,7 +546,7 @@
         // =================================================================
 
         /**
-         * Carga el historial de movimientos uniendo las tablas 'movimientos' y 'productos'.
+         * Carga el historial de movimientos.
          */
         async function cargarMovimientos() {
             const { data: movimientos, error } = await supabase
@@ -585,14 +595,14 @@
          */
         function attachProductListeners() {
             document.querySelectorAll('.edit-btn').forEach(button => {
-                button.onclick = () => startEditProduct(button.dataset.id);
+                button.onclick = () => startEditProduct(button.dataset.id); 
             });
 
             document.querySelectorAll('.delete-btn').forEach(button => {
                 button.onclick = () => deleteProduct(button.dataset.id);
             });
             
-            // Re-asociar el evento click para Cancelar Edición
+            // Listener para el botón Cancelar Edición
             document.getElementById('cancel-edit-btn').onclick = resetForm;
         }
 
@@ -606,8 +616,9 @@
             document.getElementById('producto-id').value = '';
             document.getElementById('cancel-edit-btn').style.display = 'none';
             
-            // Restaurar la etiqueta de Stock Inicial
+            // Restaurar etiquetas y habilitar stock inicial
             document.getElementById('producto-stock-inicial').closest('div').querySelector('label').innerText = 'Cantidad Inicial Disponible (Solo al Agregar):';
+            document.getElementById('producto-stock-inicial').disabled = false;
         }
 
 
