@@ -268,7 +268,8 @@
         // =================================================================
         // 1. CONFIGURACIÓN INICIAL DE SUPABASE (TUS CREDENCIALES)
         // =================================================================
-
+        
+        // ¡ESTE ORDEN ARREGLA EL ERROR DE INICIALIZACIÓN!
         const SUPABASE_URL = 'https://ftcjaadsjpnzbckxevxq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M';
 
@@ -283,7 +284,6 @@
          * Carga y muestra todos los productos en la tabla de inventario.
          */
         async function cargarInventario() {
-            // Asegúrate de que RLS esté desactivado en Supabase, ¡o esto fallará!
             const { data: productos, error } = await supabase
                 .from('productos')
                 .select('*')
@@ -291,7 +291,6 @@
 
             if (error) {
                 console.error('Error al cargar inventario:', error);
-                // Muestra un mensaje visible si falla la conexión o permisos
                 document.getElementById('inventario-body').innerHTML = `
                     <tr><td colspan="7" style="color:red; text-align:center;">
                         Error al cargar el inventario. Asegúrate que **RLS esté DESACTIVADO** en Supabase para las tablas.
@@ -323,7 +322,6 @@
                 inventarioBody.innerHTML += row;
             });
             
-            // ¡Clave! Llama a attachProductListeners después de renderizar el nuevo HTML.
             attachProductListeners(); 
             cargarMovimientos();
         }
@@ -415,7 +413,7 @@
             
             } catch (error) {
                 console.error('Error en operación de producto:', error);
-                alert('Error: ' + error.message || 'Error al guardar el producto. Verifica la consola y el estado de tu Bucket.');
+                alert('Error: ' + error.message || 'Error al guardar el producto. Consulta la consola.');
             } finally {
                 saveBtn.disabled = false;
                 resetForm(); 
@@ -427,7 +425,6 @@
          * Inicia el proceso de edición: carga los datos del producto al formulario.
          */
         async function startEditProduct(productId) {
-            // Aseguramos que el formulario esté limpio antes de cargar los nuevos datos
             resetForm(); 
 
             document.getElementById('agregar-producto').scrollIntoView({ behavior: 'smooth' });
