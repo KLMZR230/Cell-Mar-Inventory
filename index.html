@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventario de Accesorios para Teléfonos</title>
     <style>
-        /* Estilos CSS BÁSICOS para la estructura */
+        /* Estilos CSS BÁSICOS para la estructura (Mismos que antes, con algunas adiciones) */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -56,6 +56,44 @@
             padding-bottom: 10px;
             color: #007bff;
         }
+        /* Estilos para formularios (Mejora) */
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .form-full-width {
+            grid-column: 1 / 3;
+        }
+        form label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        form input[type="text"], 
+        form input[type="number"], 
+        form input[type="file"],
+        form select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Importante para el padding */
+        }
+        form button {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        form button:hover {
+            background-color: #218838;
+        }
+
         /* Estilos para las tablas (Inventario y Movimientos) */
         table {
             width: 100%;
@@ -71,27 +109,15 @@
             background-color: #f2f2f2;
             font-weight: bold;
         }
-        /* Estilos para formularios (Registro de Venta) */
-        form label, form input, form button, form select {
-            display: block;
-            margin-bottom: 10px;
-        }
-        form input[type="text"], form input[type="number"], form select {
-            width: calc(100% - 24px);
-            padding: 10px;
-            border: 1px solid #ccc;
+        .product-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
             border-radius: 4px;
         }
-        form button {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        form button:hover {
-            background-color: #218838;
+        .stock-bajo {
+            color: red; 
+            font-weight: bold;
         }
     </style>
 </head>
@@ -108,92 +134,95 @@
     </nav>
 
     <main>
+        
+        <section id="agregar-producto" class="section">
+            <h2>Agregar/Editar Producto</h2>
+            <form id="producto-form">
+                
+                <div>
+                    <label for="producto-nombre">Nombre del Accesorio:</label>
+                    <input type="text" id="producto-nombre" placeholder="Ej: Protector de Pantalla iPhone 15 Pro" required>
+
+                    <label for="producto-sku">SKU / Código:</label>
+                    <input type="text" id="producto-sku" placeholder="Ej: PROT-IP15P-VCL" required>
+
+                    <label for="producto-categoria">Categoría:</label>
+                    <select id="producto-categoria" required>
+                        <option value="">Seleccione una categoría</option>
+                        <option value="Fundas">Fundas</option>
+                        <option value="Cables">Cables</option>
+                        <option value="Cargadores">Cargadores</option>
+                        <option value="Protectores">Protectores de Pantalla</option>
+                        <option value="Audifonos">Audífonos/Audio</option>
+                    </select>
+
+                    <label for="producto-foto">Foto del Producto:</label>
+                    <input type="file" id="producto-foto" accept="image/*">
+                </div>
+
+                <div>
+                    <label for="producto-precio-venta">Precio de Venta ($):</label>
+                    <input type="number" id="producto-precio-venta" min="0.01" step="0.01" required>
+
+                    <label for="producto-precio-compra">Costo de Compra ($):</label>
+                    <input type="number" id="producto-precio-compra" min="0.01" step="0.01" required>
+
+                    <label for="producto-stock-inicial">**Cantidad Inicial Disponible:**</label>
+                    <input type="number" id="producto-stock-inicial" min="0" value="0" required>
+                    
+                    <label for="producto-stock-minimo">Alerta (Stock Mínimo):</label>
+                    <input type="number" id="producto-stock-minimo" min="1" value="5" required>
+                </div>
+                
+                <div class="form-full-width">
+                    <button type="submit">Guardar Producto</button>
+                </div>
+
+            </form>
+        </section>
+
+        ---
 
         <section id="inventario" class="section">
             <h2>Inventario General de Productos</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>SKU</th>
+                        <th>Foto</th> <th>SKU</th>
                         <th>Producto</th>
                         <th>Categoría</th>
                         <th>Precio Venta</th>
                         <th>Stock Actual</th>
-                        <th>Stock Mínimo</th>
+                        <th>Alerta</th>
                         <th>Acción</th>
                     </tr>
                 </thead>
                 <tbody id="inventario-body">
                     <tr>
+                        <td><img src="placeholder.jpg" alt="Cable" class="product-img"></td>
                         <td>CAB-IPH-1M-BL</td>
                         <td>Cable Lightning 1m</td>
                         <td>Cables</td>
                         <td>$15.00</td>
                         <td>120</td>
-                        <td>20</td>
+                        <td>OK</td>
                         <td><button>Editar</button></td>
                     </tr>
                     <tr>
+                        <td><img src="placeholder.jpg" alt="Funda" class="product-img"></td>
                         <td>FND-S24-TR-NEG</td>
                         <td>Funda Samsung S24 Transparente</td>
                         <td>Fundas</td>
-                        <td>$18.50</td>
                         <td>8</td>
-                        <td style="color: red; font-weight: bold;">10</td>
+                        <td class="stock-bajo">10</td>
+                        <td>BAJO</td>
                         <td><button>Editar</button></td>
                     </tr>
                 </tbody>
             </table>
         </section>
 
-        <section id="venta" class="section">
-            <h2>Registro de Venta Rápida (SALIDA de Stock)</h2>
-            <form id="registro-venta-form">
-                <label for="venta-sku">SKU del Producto:</label>
-                <input type="text" id="venta-sku" placeholder="Ej: CAB-IPH-1M-BL" required>
-
-                <label for="venta-cantidad">Cantidad Vendida:</label>
-                <input type="number" id="venta-cantidad" value="1" min="1" required>
-
-                <label for="venta-referencia">Referencia (Opcional):</label>
-                <input type="text" id="venta-referencia" placeholder="Ej: Venta #00123" >
-                
-                <button type="submit">Registrar Venta y Descontar Stock</button>
-            </form>
-        </section>
-
-        <section id="movimientos" class="section">
-            <h2>Historial de Movimientos (Entradas y Salidas)</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Tipo</th>
-                        <th>Producto (SKU)</th>
-                        <th>Cantidad</th>
-                        <th>Referencia</th>
-                    </tr>
-                </thead>
-                <tbody id="movimientos-body">
-                    <tr>
-                        <td>2025-09-30 10:00</td>
-                        <td style="color: green;">ENTRADA</td>
-                        <td>CAR-IPD-30W</td>
-                        <td>+50</td>
-                        <td>Orden de Compra #45</td>
-                    </tr>
-                    <tr>
-                        <td>2025-09-30 10:35</td>
-                        <td style="color: red;">SALIDA</td>
-                        <td>FND-S24-TR-NEG</td>
-                        <td>-2</td>
-                        <td>Venta #00123</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-    </main>
+        </main>
     
     </body>
 </html>
