@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario de Accesorios para Teléfonos</title>
+    <style>
+        /* Estilos CSS BÁSICOS para la estructura */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f9;
+            color: #333;
+        }
+        header {
+            background-color: #007bff; /* Azul primario para Supabase */
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #343a40;
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        nav a:hover, nav a.active {
+            background-color: #0056b3;
+        }
+        main {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        h2 {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            color: #007bff;
+        }
+        /* Estilos para las tablas (Inventario y Movimientos) */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        /* Estilos para formularios (Registro de Venta) */
+        form label, form input, form button, form select {
+            display: block;
+            margin-bottom: 10px;
+        }
+        form input[type="text"], form input[type="number"], form select {
+            width: calc(100% - 24px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        form button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        form button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Gestión de Inventario de Accesorios 📱</h1>
+    </header>
+
+    <nav>
+        <a href="#inventario" class="active">Inventario General</a>
+        <a href="#venta">Registro de Venta Rápida</a>
+        <a href="#movimientos">Historial de Movimientos</a>
+    </nav>
+
+    <main>
+
+        <section id="inventario" class="section">
+            <h2>Inventario General de Productos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Precio Venta</th>
+                        <th>Stock Actual</th>
+                        <th>Stock Mínimo</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="inventario-body">
+                    <tr>
+                        <td>CAB-IPH-1M-BL</td>
+                        <td>Cable Lightning 1m</td>
+                        <td>Cables</td>
+                        <td>$15.00</td>
+                        <td>120</td>
+                        <td>20</td>
+                        <td><button>Editar</button></td>
+                    </tr>
+                    <tr>
+                        <td>FND-S24-TR-NEG</td>
+                        <td>Funda Samsung S24 Transparente</td>
+                        <td>Fundas</td>
+                        <td>$18.50</td>
+                        <td>8</td>
+                        <td style="color: red; font-weight: bold;">10</td>
+                        <td><button>Editar</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="venta" class="section">
+            <h2>Registro de Venta Rápida (SALIDA de Stock)</h2>
+            <form id="registro-venta-form">
+                <label for="venta-sku">SKU del Producto:</label>
+                <input type="text" id="venta-sku" placeholder="Ej: CAB-IPH-1M-BL" required>
+
+                <label for="venta-cantidad">Cantidad Vendida:</label>
+                <input type="number" id="venta-cantidad" value="1" min="1" required>
+
+                <label for="venta-referencia">Referencia (Opcional):</label>
+                <input type="text" id="venta-referencia" placeholder="Ej: Venta #00123" >
+                
+                <button type="submit">Registrar Venta y Descontar Stock</button>
+            </form>
+        </section>
+
+        <section id="movimientos" class="section">
+            <h2>Historial de Movimientos (Entradas y Salidas)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Producto (SKU)</th>
+                        <th>Cantidad</th>
+                        <th>Referencia</th>
+                    </tr>
+                </thead>
+                <tbody id="movimientos-body">
+                    <tr>
+                        <td>2025-09-30 10:00</td>
+                        <td style="color: green;">ENTRADA</td>
+                        <td>CAR-IPD-30W</td>
+                        <td>+50</td>
+                        <td>Orden de Compra #45</td>
+                    </tr>
+                    <tr>
+                        <td>2025-09-30 10:35</td>
+                        <td style="color: red;">SALIDA</td>
+                        <td>FND-S24-TR-NEG</td>
+                        <td>-2</td>
+                        <td>Venta #00123</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+    
+    </body>
+</html>
