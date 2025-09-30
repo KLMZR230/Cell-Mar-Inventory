@@ -266,10 +266,10 @@
     
     <script>
         // =================================================================
-        // 1. CONFIGURACIÓN INICIAL DE SUPABASE (TUS CREDENCIALES)
+        // 1. CONFIGURACIÓN INICIAL DE SUPABASE (¡ORDEN CORREGIDO!)
         // =================================================================
         
-        // ¡ESTE ORDEN ARREGLA EL ERROR DE INICIALIZACIÓN!
+        // El orden correcto es: 1. Definir credenciales, 2. Crear el cliente.
         const SUPABASE_URL = 'https://ftcjaadsjpnzbckxevxq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M';
 
@@ -293,7 +293,7 @@
                 console.error('Error al cargar inventario:', error);
                 document.getElementById('inventario-body').innerHTML = `
                     <tr><td colspan="7" style="color:red; text-align:center;">
-                        Error al cargar el inventario. Asegúrate que **RLS esté DESACTIVADO** en Supabase para las tablas.
+                        Error de conexión. Asegúrate que RLS esté **DESACTIVADO** para las tablas.
                     </td></tr>`;
                 return;
             }
