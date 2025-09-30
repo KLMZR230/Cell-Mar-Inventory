@@ -266,13 +266,14 @@
     
     <script>
         // =================================================================
-        // 1. CONFIGURACIÓN INICIAL DE SUPABASE (¡ORDEN CORREGIDO!)
+        // 1. CONFIGURACIÓN INICIAL DE SUPABASE (¡ORDEN CRÍTICO CORREGIDO!)
         // =================================================================
         
-        // El orden correcto es: 1. Definir credenciales, 2. Crear el cliente.
+        // 1. Define las credenciales (URL y KEY) primero.
         const SUPABASE_URL = 'https://ftcjaadsjpnzbckxevxq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M';
 
+        // 2. Ahora, crea el cliente usando las variables ya definidas.
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const BUCKET_NAME = 'imagenes-accesorios';
 
