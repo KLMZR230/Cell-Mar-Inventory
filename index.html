@@ -112,7 +112,8 @@
                 }
             } catch (error) {
                 let errorMessage = error.message;
-                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                // MEJORA: Detección de errores de red más robusta
+                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error instanceof TypeError) {
                      errorMessage = "NetworkError: No se pudo conectar a Supabase. Verifica la URL. Si la URL es correcta, puede ser un error de CORS (revisa la configuración de tu proyecto Supabase).";
                 }
                 console.error('Error en la autenticación de Supabase (General):', errorMessage);
@@ -283,6 +284,9 @@
             document.getElementById('product-price').value = product.precio;
             document.getElementById('product-stock').value = product.stock;
             document.getElementById('product-description').value = product.descripcion;
+            
+            // Limpiar el campo de foto para evitar confusiones
+            document.getElementById('product-photo').value = '';
 
             document.getElementById('product-modal-title').textContent = 'Editar Producto';
             document.getElementById('add-product-modal').classList.remove('hidden');
@@ -312,10 +316,18 @@
                 return;
             }
 
-            let fotoBase64 = id ? products.find(p => p.id == id)?.foto_base64 : null;
+            // CORRECCIÓN: Obtener la foto existente SOLO si es una edición y NO se sube una nueva foto.
+            let fotoBase64 = null;
+            if (id) {
+                // Si es edición, mantén la foto actual si no se sube una nueva
+                const existingProduct = products.find(p => p.id == id);
+                fotoBase64 = existingProduct ? existingProduct.foto_base64 : null;
+            }
+
 
             if (fotoFile) {
                 try {
+                    // Si se sube una nueva, se sobrescribe la anterior o se añade la nueva
                     fotoBase64 = await fileToBase64(fotoFile);
                 } catch (error) {
                     showNotification(`Error al cargar foto: ${error.message}`, 'error');
@@ -323,13 +335,14 @@
                 }
             }
 
+
             const productData = {
                 user_id: userId,
                 nombre,
                 precio,
                 stock,
                 descripcion,
-                foto_base64: fotoBase64
+                foto_base64: fotoBase64 // Este valor puede ser null, la base64 de la foto anterior o la nueva
             };
 
             try {
@@ -556,12 +569,9 @@
 </head>
 <body class="bg-gray-50 min-h-screen font-sans">
 
-    <!-- Contenedor de Notificaciones (flotante) -->
     <div id="notification-container" class="fixed top-4 right-4 z-50 w-full max-w-xs">
-        <!-- Las notificaciones aparecen aquí -->
-    </div>
+        </div>
 
-    <!-- Encabezado y Navegación -->
     <header class="bg-white shadow-md sticky top-0 z-10">
         <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3">
@@ -587,10 +597,8 @@
         </div>
     </header>
 
-    <!-- Contenido Principal -->
     <main class="max-w-4xl mx-auto px-4 py-8">
 
-        <!-- Pestaña 1: Gestión de Productos -->
         <div id="productos" class="tab-content">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-gray-700">Inventario de Accesorios</h2>
@@ -604,11 +612,9 @@
 
             <div id="product-list" class="space-y-4">
                 <p class="text-center text-gray-500 p-6">Cargando productos...</p>
-                <!-- Las tarjetas de productos se renderizan aquí -->
-            </div>
+                </div>
         </div>
 
-        <!-- Pestaña 2: Registrar Venta -->
         <div id="ventas" class="tab-content hidden">
             <h2 class="text-2xl font-bold text-gray-700 mb-6">Registro Rápido de Venta</h2>
             <div class="bg-white p-6 rounded-xl shadow-lg">
@@ -618,8 +624,7 @@
                             <label for="sale-product" class="block text-sm font-medium text-gray-700 mb-1">Producto Vendido</label>
                             <select id="sale-product" onchange="updateSaleFields()" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition">
                                 <option value="">-- Selecciona un producto --</option>
-                                <!-- Opciones de productos se cargan con JS -->
-                            </select>
+                                </select>
                             <p class="text-xs text-gray-500 mt-1">Solo se muestran productos con stock > 0.</p>
                         </div>
 
@@ -642,17 +647,14 @@
             </div>
         </div>
 
-        <!-- Pestaña 3: Historial de Ventas -->
         <div id="historial" class="tab-content hidden">
             <h2 class="text-2xl font-bold text-gray-700 mb-6">Historial de Ventas</h2>
 
-            <!-- Resumen de Ventas -->
             <div class="bg-white p-6 rounded-xl shadow-lg mb-6 flex justify-between items-center border-l-4 border-secondary">
                 <p class="text-lg font-semibold text-gray-600">Ganancia Total Registrada:</p>
                 <p id="total-sales-amount" class="text-3xl font-extrabold text-secondary">$0.00</p>
             </div>
 
-            <!-- Tabla de Historial -->
             <div class="bg-white rounded-xl shadow-lg overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -675,7 +677,6 @@
                         </tr>
                     </thead>
                     <tbody id="sales-history-body" class="bg-white divide-y divide-gray-200">
-                        <!-- Las filas de ventas se renderizan aquí -->
                         <tr><td colspan="5" class="text-center py-4 text-gray-500">Cargando historial...</td></tr>
                     </tbody>
                 </table>
@@ -684,7 +685,6 @@
 
     </main>
 
-    <!-- Modal para Añadir/Editar Producto -->
     <div id="add-product-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg">
             <div class="p-6">
@@ -724,7 +724,6 @@
         </div>
     </div>
 
-    <!-- Modal para Subir Logo -->
     <div id="logo-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm">
             <div class="p-6">
