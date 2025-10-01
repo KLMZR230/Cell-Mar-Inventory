@@ -5,770 +5,739 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cell Mar Accesorios Y Gestión de Ventas</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        /* Estilos personalizados para la estética */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f9fc;
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6', // blue-500
+                        secondary: '#10b981', // emerald-500
+                        accent: '#f59e0b', // amber-500
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
         }
-        .card {
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 5px 10px -5px rgba(0, 0, 0, 0.04);
-            transition: transform 0.2s;
-        }
-        .product-image {
-            object-fit: contain;
-            width: 100%;
-            height: 100%;
-            max-height: 120px;
-        }
-        input[type="number"]::-webkit-inner-spin-button, 
-        input[type="number"]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
-        }
-    </style>
-</head>
-<body class="min-h-screen">
-
-    <!-- Contenedor Principal de la Aplicación -->
-    <div id="app" class="p-4 md:p-8">
-        
-        <!-- Encabezado y Logo -->
-        <header class="bg-white p-6 rounded-xl mb-8 card flex flex-col md:flex-row items-center justify-between">
-            <div class="flex items-center space-x-4 mb-4 md:mb-0">
-                <img id="logo-display" src="https://placehold.co/60x60/4c4c4c/ffffff?text=LOGO" alt="Logo del Negocio" class="w-16 h-16 rounded-full border-2 border-indigo-500 p-1 object-cover">
-                <h1 class="text-3xl font-extrabold text-indigo-700">Cell Mar Accesorios Y Gestión de Ventas</h1>
-            </div>
-
-            <!-- Controles y Estado de Usuario -->
-            <div class="flex flex-col items-end space-y-2">
-                <div id="auth-status" class="text-sm font-medium text-gray-600">
-                    Cargando usuario...
-                </div>
-                <button onclick="handleLogoUploadTrigger()" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-full text-sm transition duration-150">
-                    <i class="fas fa-image"></i> Subir Logo
-                </button>
-                <input type="file" id="logo-upload" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
-            </div>
-        </header>
-
-        <!-- Pestañas de Navegación -->
-        <div class="mb-6 border-b border-gray-200">
-            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-                <button onclick="showTab('productos')" id="tab-productos" class="tab-button border-b-2 border-indigo-500 py-2 px-1 text-sm font-medium text-indigo-600 focus:outline-none hover:text-indigo-800 transition duration-150">
-                    <i class="fas fa-boxes"></i> Inventario de Productos
-                </button>
-                <button onclick="showTab('ventas')" id="tab-ventas" class="tab-button border-b-2 border-transparent py-2 px-1 text-sm font-medium text-gray-500 focus:outline-none hover:text-gray-700 hover:border-gray-300 transition duration-150">
-                    <i class="fas fa-cash-register"></i> Registrar Venta
-                </button>
-            </nav>
-        </div>
-        
-        <!-- Notificaciones y Mensajes -->
-        <div id="message-box" class="hidden p-4 mb-4 text-sm rounded-lg" role="alert"></div>
-
-        <!-- Vista: Inventario de Productos -->
-        <div id="productos-view" class="tab-content">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Inventario Actual</h2>
-                <button onclick="openModal('product-modal')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full transition duration-150 shadow-lg hover:shadow-xl">
-                    <i class="fas fa-plus"></i> Nuevo Producto
-                </button>
-            </div>
-
-            <!-- Listado de Productos -->
-            <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <!-- Los productos se cargarán aquí -->
-                <div class="col-span-full text-center text-gray-500 py-12" id="loading-products">Cargando productos...</div>
-            </div>
-        </div>
-
-        <!-- Vista: Registrar Venta -->
-        <div id="ventas-view" class="tab-content hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Registrar Nueva Venta</h2>
-            
-            <div id="sale-registration-form" class="bg-white p-6 rounded-xl card mb-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Selector de Producto -->
-                    <div>
-                        <label for="sale-product-id" class="block text-sm font-medium text-gray-700">Producto</label>
-                        <select id="sale-product-id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
-                            <option value="">Selecciona un producto...</option>
-                            <!-- Opciones se cargarán con JavaScript -->
-                        </select>
-                    </div>
-
-                    <!-- Cantidad -->
-                    <div>
-                        <label for="sale-quantity" class="block text-sm font-medium text-gray-700">Cantidad</label>
-                        <input type="number" id="sale-quantity" min="1" value="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
-                    </div>
-
-                    <!-- Precio de Venta (Opcional, basado en el precio del producto) -->
-                    <div>
-                        <label for="sale-price" class="block text-sm font-medium text-gray-700">Precio de Venta ($)</label>
-                        <input type="number" id="sale-price" min="0.01" step="0.01" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" placeholder="Precio final">
-                    </div>
-                </div>
-                
-                <div class="mt-6 flex justify-end">
-                    <button onclick="registerSale()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-full transition duration-150 shadow-lg hover:shadow-xl">
-                        <i class="fas fa-check"></i> Confirmar Venta
-                    </button>
-                </div>
-            </div>
-
-            <!-- Historial de Ventas (Simple) -->
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Últimas Ventas Registradas</h3>
-            <div id="sales-history" class="bg-white p-4 rounded-xl card divide-y divide-gray-100">
-                <div class="text-center text-gray-500 py-4" id="loading-sales">Cargando historial...</div>
-            </div>
-        </div>
-        
-    </div>
-
-    <!-- Modal de Producto (Añadir/Editar) -->
-    <div id="product-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-lg shadow-xl w-full max-w-lg card">
-                
-                <!-- Título del Modal -->
-                <div class="p-6 border-b">
-                    <h3 class="text-lg font-medium text-gray-900" id="modal-title">Añadir Nuevo Producto</h3>
-                </div>
-
-                <!-- Formulario -->
-                <div class="p-6">
-                    <form id="product-form">
-                        <input type="hidden" id="product-id">
-
-                        <div class="mb-4">
-                            <label for="product-name" class="block text-sm font-medium text-gray-700">Nombre del Producto (Ej: Pantalla Samsung A51)</label>
-                            <input type="text" id="product-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label for="product-price" class="block text-sm font-medium text-gray-700">Precio de Venta ($)</label>
-                                <input type="number" id="product-price" min="0.01" step="0.01" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
-                            </div>
-                            <div>
-                                <label for="product-stock" class="block text-sm font-medium text-gray-700">Stock / Cantidad</label>
-                                <input type="number" id="product-stock" min="0" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="product-description" class="block text-sm font-medium text-gray-700">Descripción (Opcional)</label>
-                            <textarea id="product-description" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border"></textarea>
-                        </div>
-
-                        <!-- Subida de Foto -->
-                        <div class="mb-6 border p-4 rounded-lg bg-gray-50">
-                            <label for="product-image" class="block text-sm font-medium text-gray-700 mb-2">Foto del Producto (Máx 1MB Base64)</label>
-                            <input type="file" id="product-image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-                            <p class="text-xs text-red-500 mt-1">¡Advertencia! Evita subir fotos muy grandes para no saturar la base de datos.</p>
-                            <div id="image-preview-container" class="mt-3 hidden">
-                                <p class="text-xs font-medium text-gray-600 mb-1">Previsualización:</p>
-                                <img id="image-preview" class="max-w-full h-24 object-contain rounded-md border p-1 mx-auto" alt="Previsualización de la imagen">
-                            </div>
-                        </div>
-
-                        <div class="flex justify-end space-x-3">
-                            <button type="button" onclick="closeModal('product-modal')" class="py-2 px-4 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition duration-150">
-                                Cancelar
-                            </button>
-                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full transition duration-150">
-                                Guardar Producto
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Confirmación para Eliminar -->
-    <div id="confirm-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden z-50" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-lg shadow-xl w-full max-w-sm card p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Confirmar Eliminación</h3>
-                <p id="confirm-message" class="text-gray-700 mb-6">¿Estás seguro de que quieres eliminar este producto?</p>
-                <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="closeModal('confirm-modal')" class="py-2 px-4 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50">
-                        No, Cancelar
-                    </button>
-                    <button id="confirm-delete-button" onclick="" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full transition duration-150">
-                        Sí, Eliminar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts de Firebase y Lógica de la App -->
+    </script>
     <script type="module">
-        // Importaciones de Firebase (URLs CDN estables)
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, query, addDoc, updateDoc, deleteDoc, where, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // ------------------------------------------------------------------------------------------
+        // --- CONFIGURACIÓN DE SUPABASE (¡CLAVES INSERTADAS!) ---
+        // ------------------------------------------------------------------------------------------
+        // URL de tu proyecto Supabase
+        const SUPABASE_URL = 'https://ftcjaadsjpnzbckxevxq.supabase.co'; 
         
-        // --- Variables Globales Proporcionadas por el Entorno ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // Clave Anónima PÚBLICA
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCVBaXzd3lmQJaNOVdD1g3M';
 
-        let app;
-        let db;
-        let auth;
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Variables globales para la aplicación
         let userId = null;
-        let products = []; // Cache local de productos
-        let isAuthReady = false;
+        let products = [];
+        let logoBase64 = null;
 
-        // --- RUTAS DE FIRESTORE ---
-        // Colección de Productos: /artifacts/{appId}/users/{userId}/products
-        const getProductsCollectionPath = (uid) => `artifacts/${appId}/users/${uid}/products`;
-        // Colección de Ventas: /artifacts/{appId}/users/{userId}/sales
-        const getSalesCollectionPath = (uid) => `artifacts/${appId}/users/${uid}/sales`;
-        // Documento de Configuración (Logo): /artifacts/{appId}/users/{userId}/settings/logo
-        const getSettingsDocPath = (uid) => `artifacts/${appId}/users/${uid}/settings/logo`;
-
-        // --- INICIALIZACIÓN DE FIREBASE Y AUTENTICACIÓN ---
-        try {
-            if (Object.keys(firebaseConfig).length > 0) {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                // setLogLevel('Debug'); // Útil para depuración
-            } else {
-                displayMessage('Error: Configuración de Firebase no disponible.', 'bg-red-100 text-red-800');
-            }
-        } catch (error) {
-            console.error("Error al inicializar Firebase:", error);
-            displayMessage('Error al inicializar Firebase. Revisa la consola.', 'bg-red-100 text-red-800');
-        }
-
-
-        /**
-         * Maneja el estado de autenticación del usuario.
-         * Después de la autenticación inicial, activa los listeners de datos.
-         */
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                userId = user.uid;
-                document.getElementById('auth-status').textContent = `Usuario ID: ${userId.substring(0, 8)}... (Conectado)`;
-                
-                // Carga el logo y los datos del negocio
-                await loadLogo();
-                setupProductListener();
-                setupSaleListener();
-
-            } else if (auth && initialAuthToken) {
-                // Intento de inicio de sesión con el token de custom auth
-                try {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } catch (error) {
-                    console.error("Error al iniciar sesión con token:", error);
-                    // Si falla el token, intentar anónimamente
-                    try {
-                        await signInAnonymously(auth);
-                    } catch (e) {
-                        console.error("Error al iniciar sesión anónimamente:", e);
-                        document.getElementById('auth-status').textContent = 'Error de conexión. Recarga la página.';
-                    }
-                }
-            } else if (auth) {
-                // Si no hay token, inicio de sesión anónimo
-                 try {
-                    await signInAnonymously(auth);
-                } catch (e) {
-                    console.error("Error al iniciar sesión anónimamente:", e);
-                    document.getElementById('auth-status').textContent = 'Error de conexión. Recarga la página.';
-                }
-            }
-            isAuthReady = true;
+        const PRODUCTS_TABLE = 'productos';
+        const SALES_TABLE = 'pedidos';
+        const SETTINGS_TABLE = 'settings';
+        
+        // Formateador de fechas
+        const dateFormatter = new Intl.DateTimeFormat('es-ES', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: '2-digit', 
+            hour: '2-digit', 
+            minute: '2-digit' 
         });
 
-        // --- FUNCIONES DE UTILIDAD DE UI ---
 
-        /** Muestra una notificación temporal. */
-        function displayMessage(message, classes = 'bg-green-100 text-green-800') {
-            const box = document.getElementById('message-box');
-            box.textContent = message;
-            box.className = `p-4 mb-4 text-sm rounded-lg transition duration-300 ${classes}`;
-            box.classList.remove('hidden');
-            setTimeout(() => {
-                box.classList.add('hidden');
-            }, 5000);
-        }
-
-        /** Abre un modal específico. */
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.remove('hidden');
-        }
-
-        /** Cierra un modal específico. */
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-        }
-        
-        /** Cambia entre las pestañas de la aplicación. */
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-button').forEach(el => {
-                el.classList.remove('border-indigo-500', 'text-indigo-600');
-                el.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
-            });
-
-            document.getElementById(`${tabName}-view`).classList.remove('hidden');
-            const activeTab = document.getElementById(`tab-${tabName}`);
-            activeTab.classList.add('border-indigo-500', 'text-indigo-600');
-            activeTab.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
-        }
-        
-        /**
-         * Convierte un archivo de imagen a una cadena Base64.
-         * @param {File} file - El archivo de imagen.
-         * @returns {Promise<string>} La promesa resuelve con la cadena Base64.
-         */
-        function fileToBase64(file) {
+        // Helper para convertir archivo a Base64
+        const fileToBase64 = (file) => {
             return new Promise((resolve, reject) => {
-                if (!file) {
-                    resolve(null);
+                if (file.size > 500 * 1024) { // Límite de 500KB antes de codificar
+                    reject(new Error("La imagen es demasiado grande. Por favor, selecciona un archivo menor a 500 KB para el logo o producto."));
                     return;
                 }
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
+                reader.onerror = (error) => reject(error);
             });
-        }
+        };
+
+        // --- AUTENTICACIÓN Y CARGA INICIAL ---
+        const initializeAuth = async () => {
+            
+            try {
+                // Autenticación anónima para obtener un ID de usuario único (necesario para RLS)
+                const { data, error } = await supabase.auth.signInAnonymously();
+
+                if (error) {
+                    // Manejo de errores de autenticación
+                    if (error.message.includes('Invalid API key') || error.message.includes('Auth config not initialized')) {
+                        // Este error ya no debería aparecer si las claves son correctas y RLS está ON
+                        document.getElementById('product-list').innerHTML = `
+                            <div class="p-6 bg-red-100 border border-red-400 text-red-700 rounded-xl">
+                                <p class="font-bold">¡ERROR CRÍTICO: Clave/URL Inválida!</p>
+                                <p>Asegúrate de haber reemplazado los marcadores de posición del ID de proyecto y la Clave Anónima.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    if (error.message.includes('Anonymous sign-ins are disabled')) {
+                        console.error('Error de configuración de Supabase:', 'Anonymous sign-ins are disabled. Debes habilitar la autenticación anónima en el panel de Supabase (Settings -> Auth -> Providers -> Anonymous) para que RLS funcione.');
+                        document.getElementById('product-list').innerHTML = `
+                            <div class="p-6 bg-red-100 border border-red-400 text-red-700 rounded-xl">
+                                <p class="font-bold">¡ERROR DE CONFIGURACIÓN DE SUPABASE!</p>
+                                <p>La autenticación anónima (Anonymous Sign-in) está deshabilitada. Por favor, habilita el proveedor **Anonymous**.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    throw error;
+                }
+
+                if (data.user) {
+                    userId = data.user.id;
+                    console.log('Usuario Supabase ID:', userId);
+                    loadLogo();
+                    subscribeToProducts(); // Carga y suscripción a productos
+                    subscribeToSales(); // Nueva carga y suscripción a ventas
+                } else {
+                    console.error('No se pudo obtener el ID de usuario anónimo.');
+                }
+            } catch (error) {
+                let errorMessage = error.message;
+                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                     errorMessage = "NetworkError: No se pudo conectar a Supabase. Verifica la URL. Si la URL es correcta, puede ser un error de CORS (revisa la configuración de tu proyecto Supabase).";
+                }
+                console.error('Error en la autenticación de Supabase (General):', errorMessage);
+                document.getElementById('product-list').innerHTML = `<p class="text-red-600 p-4 font-bold">Error de conexión o autenticación general a Supabase.</p><p class="text-sm text-red-600 px-4">${errorMessage}</p>`;
+            }
+        };
 
         // --- GESTIÓN DEL LOGO ---
-        
-        /** Carga el logo desde Firestore y lo muestra. */
-        async function loadLogo() {
-            if (!db || !userId) return;
+
+        window.openLogoModal = () => {
+            document.getElementById('logo-modal').classList.remove('hidden');
+        };
+
+        window.closeLogoModal = () => {
+            document.getElementById('logo-modal').classList.add('hidden');
+        };
+
+        const loadLogo = async () => {
+            if (!userId) return;
             try {
-                const settingsDocRef = doc(db, getSettingsDocPath(userId));
-                const docSnap = await getDoc(settingsDocRef);
-                
-                if (docSnap.exists() && docSnap.data().logoBase64) {
-                    document.getElementById('logo-display').src = docSnap.data().logoBase64;
-                } else {
-                     document.getElementById('logo-display').src = "https://placehold.co/64x64/3b82f6/ffffff?text=CM";
+                const { data, error } = await supabase
+                    .from(SETTINGS_TABLE)
+                    .select('logo_base64')
+                    .eq('user_id', userId)
+                    .limit(1);
+
+                if (error) throw error;
+
+                if (data && data.length > 0 && data[0].logo_base64) {
+                    logoBase64 = data[0].logo_base64;
+                    document.getElementById('app-logo').src = logoBase64;
+                    document.getElementById('app-logo').classList.remove('hidden');
                 }
             } catch (error) {
-                console.error("Error al cargar el logo:", error);
+                console.error('Error al cargar el logo:', error.message);
             }
-        }
-        
-        /** Activa el input de archivo del logo. */
-        function handleLogoUploadTrigger() {
-            document.getElementById('logo-upload').click();
-        }
+        };
 
-        /** Maneja la subida del archivo de logo y lo guarda en Firestore. */
-        async function handleLogoUpload(event) {
-            if (!userId) {
-                displayMessage('Esperando conexión de usuario...', 'bg-yellow-100 text-yellow-800');
-                return;
-            }
-
-            const file = event.target.files[0];
-            if (!file) return;
-
-            // --- FIX: Implementar límite de tamaño para evitar exceder el límite de 1MB de Firestore ---
-            // 500 KB es un límite seguro para el archivo original, ya que Base64 lo aumenta un 33%.
-            const MAX_FILE_SIZE_BYTES = 500 * 1024; // 500 KB
-            if (file.size > MAX_FILE_SIZE_BYTES) {
-                displayMessage(`Error: El archivo de logo es demasiado grande (${(file.size / 1024).toFixed(2)} KB). El límite del archivo es de ${MAX_FILE_SIZE_BYTES / 1024} KB.`, 'bg-red-100 text-red-800');
-                return;
-            }
-            // ---------------------------------------------------------------------------------------------
+        window.handleLogoUpload = async () => {
+            const logoFile = document.getElementById('logo-file').files[0];
+            if (!logoFile) return;
 
             try {
-                const base64 = await fileToBase64(file);
-                if (base64) {
-                    const settingsDocRef = doc(db, getSettingsDocPath(userId));
-                    await setDoc(settingsDocRef, { logoBase64: base64 }, { merge: true });
-                    document.getElementById('logo-display').src = base64;
-                    displayMessage('Logo actualizado con éxito!', 'bg-green-100 text-green-800');
-                }
+                const base64Data = await fileToBase64(logoFile);
+
+                const logoData = {
+                    user_id: userId,
+                    logo_base64: base64Data
+                };
+
+                const { error } = await supabase
+                    .from(SETTINGS_TABLE)
+                    .upsert(logoData, { onConflict: 'user_id' });
+
+                if (error) throw error;
+
+                logoBase64 = base64Data;
+                document.getElementById('app-logo').src = logoBase64;
+                document.getElementById('app-logo').classList.remove('hidden');
+                window.closeLogoModal();
+                showNotification('Logo guardado exitosamente.', 'success');
+
             } catch (error) {
-                console.error("Error al guardar el logo:", error);
-                displayMessage('Error al subir el logo. Revisa el tamaño del archivo.', 'bg-red-100 text-red-800');
+                console.error('Error al guardar el logo:', error.message);
+                showNotification(`Error al guardar: ${error.message}`, 'error');
             }
-        }
-        
+        };
+
+        // --- NOTIFICACIONES ---
+        const showNotification = (message, type) => {
+            const container = document.getElementById('notification-container');
+            const color = type === 'success' ? 'bg-secondary' : 'bg-red-600';
+
+            const notification = document.createElement('div');
+            notification.className = `p-3 rounded-lg shadow-xl text-white ${color} mb-3 transition-opacity duration-300`;
+            notification.textContent = message;
+
+            container.appendChild(notification);
+
+            // Desaparecer después de 4 segundos
+            setTimeout(() => {
+                notification.classList.add('opacity-0');
+                setTimeout(() => notification.remove(), 500);
+            }, 4000);
+        };
+
         // --- GESTIÓN DE PRODUCTOS (CRUD) ---
 
-        /**
-         * Inicializa el listener en tiempo real para la colección de productos.
-         */
-        function setupProductListener() {
-            if (!db || !userId) return;
-            const q = query(collection(db, getProductsCollectionPath(userId)));
+        const subscribeToProducts = () => {
+            if (!userId) return;
 
-            onSnapshot(q, (querySnapshot) => {
-                const productList = [];
-                querySnapshot.forEach((doc) => {
-                    productList.push({ id: doc.id, ...doc.data() });
-                });
-                products = productList; // Actualiza el cache local
-                renderProducts(products);
-                updateSaleProductSelector(products);
-            }, (error) => {
-                console.error("Error al obtener productos:", error);
-                displayMessage('Error al cargar inventario: ' + error.message, 'bg-red-100 text-red-800');
-            });
-            document.getElementById('loading-products').classList.add('hidden');
-        }
+            supabase
+                .from(PRODUCTS_TABLE)
+                .on('ANY', payload => {
+                    console.log('Cambio en productos:', payload);
+                    loadProducts();
+                })
+                .subscribe();
 
-        /**
-         * Renderiza la lista de productos en la vista.
-         * @param {Array} productArray - Lista de objetos de producto.
-         */
-        function renderProducts(productArray) {
+            loadProducts();
+        };
+
+        const loadProducts = async () => {
+            if (!userId) {
+                document.getElementById('product-list').innerHTML = `<p class="p-4 text-center text-gray-500">Cargando usuario...</p>`;
+                return;
+            }
+            try {
+                const { data, error } = await supabase
+                    .from(PRODUCTS_TABLE)
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('nombre', { ascending: true });
+
+                if (error) throw error;
+
+                products = data;
+                renderProductList(data);
+                renderSaleProductOptions(data);
+
+            } catch (error) {
+                console.error('Error al cargar productos:', error.message);
+                document.getElementById('product-list').innerHTML = `<p class="text-red-600 p-4">Error al cargar productos: ${error.message}</p>`;
+            }
+        };
+
+        const renderProductList = (productList) => {
             const listContainer = document.getElementById('product-list');
             listContainer.innerHTML = '';
 
-            if (productArray.length === 0) {
-                listContainer.innerHTML = '<div class="col-span-full text-center text-gray-500 py-12"><i class="fas fa-box-open text-3xl mb-2"></i><p>Aún no hay productos en el inventario.</p></div>';
+            if (productList.length === 0) {
+                listContainer.innerHTML = `<p class="text-center text-gray-500 p-6">No hay productos registrados. ¡Usa el botón "Añadir Producto"!</p>`;
                 return;
             }
 
-            productArray.forEach(product => {
-                const card = document.createElement('div');
-                card.className = 'bg-white p-4 rounded-xl card hover:shadow-2xl flex flex-col justify-between';
-                
-                const imageUrl = product.imageUrl || `https://placehold.co/120x120/a855f7/ffffff?text=${encodeURIComponent(product.name.substring(0, 1))}`;
-
-                card.innerHTML = `
-                    <div class="flex flex-col items-center border-b pb-3 mb-3">
-                        <img src="${imageUrl}" alt="${product.name}" class="product-image w-24 h-24 rounded-lg mb-2 border">
-                        <h3 class="text-lg font-bold text-gray-900 text-center">${product.name}</h3>
-                        <p class="text-sm text-gray-500 text-center">${product.description || 'Sin descripción'}</p>
-                    </div>
-                    
-                    <div class="space-y-1">
-                        <p class="text-sm font-semibold text-indigo-600">Precio: <span class="font-bold text-xl ml-1">$${product.price.toFixed(2)}</span></p>
-                        <p class="text-sm font-medium ${product.stock > 10 ? 'text-green-600' : product.stock > 0 ? 'text-yellow-600' : 'text-red-600'}">
-                            Stock: <span class="font-bold">${product.stock}</span> unidades
-                        </p>
-                    </div>
-
-                    <div class="flex justify-between mt-4 space-x-2">
-                        <button onclick="editProduct('${product.id}')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-1.5 rounded-full transition duration-150">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button onclick="confirmDelete('${product.id}', '${product.name}')" class="flex-1 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-1.5 rounded-full transition duration-150">
-                            <i class="fas fa-trash-alt"></i> Eliminar
+            productList.forEach(p => {
+                const productCard = document.createElement('div');
+                productCard.className = `bg-white p-4 rounded-xl shadow-md border-l-4 ${p.stock <= 5 ? 'border-accent' : 'border-primary'} transition hover:shadow-lg`;
+                productCard.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <img src="${p.foto_base64 || 'https://placehold.co/80x80/cccccc/333333?text=Sin+Foto'}"
+                             onerror="this.onerror=null; this.src='https://placehold.co/80x80/cccccc/333333?text=Sin+Foto';"
+                             class="w-16 h-16 object-cover rounded-lg flex-shrink-0">
+                        <div class="flex-grow">
+                            <h3 class="text-lg font-bold text-gray-800">${p.nombre}</h3>
+                            <p class="text-sm text-gray-600">
+                                $${p.precio.toFixed(2)} | Stock: <span class="font-semibold ${p.stock <= 5 ? 'text-red-500' : 'text-secondary'}">${p.stock}</span> unidades
+                            </p>
+                            <p class="text-xs text-gray-500 truncate">${p.descripcion || 'Sin descripción'}</p>
+                        </div>
+                        <button onclick="editProduct('${p.id}')" class="text-primary hover:text-blue-700 p-2 rounded-full transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zm-3.04 3.907L8 14.585V16h1.415l6.096-6.096-2.828-2.828-6.097 6.097z" />
+                            </svg>
                         </button>
                     </div>
                 `;
-                listContainer.appendChild(card);
+                listContainer.appendChild(productCard);
             });
-        }
-        
-        /** Maneja el envío del formulario de producto (Añadir/Editar). */
-        document.getElementById('product-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (!userId) {
-                displayMessage('Error: Usuario no autenticado. Recarga la página.', 'bg-red-100 text-red-800');
-                return;
-            }
+        };
 
-            const productId = document.getElementById('product-id').value;
-            const name = document.getElementById('product-name').value;
-            const price = parseFloat(document.getElementById('product-price').value);
-            const stock = parseInt(document.getElementById('product-stock').value);
-            const description = document.getElementById('product-description').value;
-            const imageFile = document.getElementById('product-image').files[0];
-            
-            closeModal('product-modal');
-            displayMessage('Procesando producto...', 'bg-yellow-100 text-yellow-800');
-
-            try {
-                let imageUrl = productId ? products.find(p => p.id === productId)?.imageUrl : null;
-                
-                // Si hay un archivo nuevo, convertirlo a Base64
-                if (imageFile) {
-                    imageUrl = await fileToBase64(imageFile);
-                    if (imageUrl.length > 1024 * 1024) { // Límite de 1MB (aproximado para Base64)
-                        displayMessage('La imagen es demasiado grande. Se guardará sin imagen.', 'bg-yellow-100 text-yellow-800');
-                        imageUrl = null;
-                    }
-                }
-                
-                const productData = { name, price, stock, description, imageUrl };
-                
-                if (productId) {
-                    // EDITAR Producto
-                    await updateDoc(doc(db, getProductsCollectionPath(userId), productId), productData);
-                    displayMessage(`Producto "${name}" actualizado con éxito.`, 'bg-green-100 text-green-800');
-                } else {
-                    // AÑADIR Nuevo Producto
-                    await addDoc(collection(db, getProductsCollectionPath(userId)), productData);
-                    displayMessage(`Producto "${name}" añadido al inventario.`, 'bg-green-100 text-green-800');
-                }
-                
-                document.getElementById('product-form').reset();
-                document.getElementById('image-preview-container').classList.add('hidden');
-
-            } catch (error) {
-                console.error("Error al guardar el producto:", error);
-                displayMessage(`Error al guardar el producto: ${error.message}`, 'bg-red-100 text-red-800');
-            }
-        });
-        
-        /** Prepara el modal para editar un producto existente. */
-        function editProduct(id) {
-            const product = products.find(p => p.id === id);
+        window.editProduct = (productId) => {
+            const product = products.find(p => p.id == productId);
             if (!product) return;
 
-            document.getElementById('modal-title').textContent = 'Editar Producto: ' + product.name;
             document.getElementById('product-id').value = product.id;
-            document.getElementById('product-name').value = product.name;
-            document.getElementById('product-price').value = product.price;
+            document.getElementById('product-name').value = product.nombre;
+            document.getElementById('product-price').value = product.precio;
             document.getElementById('product-stock').value = product.stock;
-            document.getElementById('product-description').value = product.description || '';
-            
-            // Mostrar previsualización de la imagen existente
-            const previewImg = document.getElementById('image-preview');
-            const previewContainer = document.getElementById('image-preview-container');
+            document.getElementById('product-description').value = product.descripcion;
 
-            if (product.imageUrl) {
-                previewImg.src = product.imageUrl;
-                previewContainer.classList.remove('hidden');
-            } else {
-                previewImg.src = '';
-                previewContainer.classList.add('hidden');
+            document.getElementById('product-modal-title').textContent = 'Editar Producto';
+            document.getElementById('add-product-modal').classList.remove('hidden');
+        };
+
+        window.openProductModal = (productId = null) => {
+            document.getElementById('product-form').reset();
+            document.getElementById('product-id').value = '';
+            document.getElementById('product-modal-title').textContent = 'Añadir Nuevo Producto';
+            document.getElementById('add-product-modal').classList.remove('hidden');
+        };
+
+        window.closeProductModal = () => {
+            document.getElementById('add-product-modal').classList.add('hidden');
+        };
+
+        window.saveProduct = async () => {
+            const id = document.getElementById('product-id').value;
+            const nombre = document.getElementById('product-name').value;
+            const precio = parseFloat(document.getElementById('product-price').value);
+            const stock = parseInt(document.getElementById('product-stock').value, 10);
+            const descripcion = document.getElementById('product-description').value;
+            const fotoFile = document.getElementById('product-photo').files[0];
+
+            if (!nombre || isNaN(precio) || isNaN(stock)) {
+                showNotification('Rellena al menos el nombre, precio y stock.', 'error');
+                return;
             }
-            
-            // Limpiar el campo de archivo
-            document.getElementById('product-image').value = ''; 
-            
-            openModal('product-modal');
-        }
-        
-        /** Abre el modal de confirmación para eliminar. */
-        function confirmDelete(id, name) {
-            document.getElementById('confirm-message').textContent = `¿Estás seguro de que quieres eliminar permanentemente el producto "${name}"?`;
-            const deleteButton = document.getElementById('confirm-delete-button');
-            deleteButton.onclick = () => deleteProduct(id);
-            openModal('confirm-modal');
-        }
 
-        /** Elimina un producto de Firestore. */
-        async function deleteProduct(id) {
-            if (!userId) return;
-            closeModal('confirm-modal');
-            displayMessage('Eliminando producto...', 'bg-yellow-100 text-yellow-800');
+            let fotoBase64 = id ? products.find(p => p.id == id)?.foto_base64 : null;
+
+            if (fotoFile) {
+                try {
+                    fotoBase64 = await fileToBase64(fotoFile);
+                } catch (error) {
+                    showNotification(`Error al cargar foto: ${error.message}`, 'error');
+                    return;
+                }
+            }
+
+            const productData = {
+                user_id: userId,
+                nombre,
+                precio,
+                stock,
+                descripcion,
+                foto_base64: fotoBase64
+            };
 
             try {
-                await deleteDoc(doc(db, getProductsCollectionPath(userId), id));
-                displayMessage('Producto eliminado con éxito.', 'bg-green-100 text-green-800');
-            } catch (error) {
-                console.error("Error al eliminar el producto:", error);
-                displayMessage(`Error al eliminar el producto: ${error.message}`, 'bg-red-100 text-red-800');
-            }
-        }
-        
-        /** Previsualiza la imagen al seleccionar un archivo en el modal de producto. */
-        document.getElementById('product-image').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            const previewImg = document.getElementById('image-preview');
-            const previewContainer = document.getElementById('image-preview-container');
+                if (id) {
+                    // Actualizar
+                    const { error } = await supabase
+                        .from(PRODUCTS_TABLE)
+                        .update(productData)
+                        .eq('id', id)
+                        .eq('user_id', userId);
 
-            if (file) {
-                const base64 = await fileToBase64(file);
-                previewImg.src = base64;
-                previewContainer.classList.remove('hidden');
-            } else {
-                previewImg.src = '';
-                previewContainer.classList.add('hidden');
+                    if (error) throw error;
+                    showNotification('Producto actualizado con éxito.', 'success');
+                } else {
+                    // Insertar
+                    const { error } = await supabase
+                        .from(PRODUCTS_TABLE)
+                        .insert([productData]);
+
+                    if (error) throw error;
+                    showNotification('Producto añadido con éxito.', 'success');
+                }
+
+                window.closeProductModal();
+                document.getElementById('product-form').reset();
+            } catch (error) {
+                console.error('Error al guardar producto:', error.message);
+                showNotification(`Error al guardar producto: ${error.message}`, 'error');
             }
-        });
+        };
 
         // --- GESTIÓN DE VENTAS ---
-        
-        /** Actualiza el selector de productos en la vista de Ventas. */
-        function updateSaleProductSelector(productList) {
-            const selector = document.getElementById('sale-product-id');
-            const currentProductId = selector.value;
-            selector.innerHTML = '<option value="">Selecciona un producto...</option>';
-            
-            productList.forEach(p => {
+
+        const renderSaleProductOptions = (productList) => {
+            const select = document.getElementById('sale-product');
+            select.innerHTML = '<option value="">-- Selecciona un producto --</option>';
+
+            productList.filter(p => p.stock > 0).forEach(p => {
                 const option = document.createElement('option');
                 option.value = p.id;
-                option.textContent = `${p.name} (Stock: ${p.stock}, $${p.price.toFixed(2)})`;
-                selector.appendChild(option);
+                option.textContent = `${p.nombre} ($${p.precio.toFixed(2)} - Stock: ${p.stock})`;
+                option.setAttribute('data-price', p.precio);
+                option.setAttribute('data-stock', p.stock);
+                select.appendChild(option);
             });
-            
-            // Restablecer el valor si todavía existe, o si no, el precio
-            if (productList.some(p => p.id === currentProductId)) {
-                 selector.value = currentProductId;
-            } else {
-                document.getElementById('sale-price').value = '';
-            }
-        }
-        
-        /** Prellena el precio de venta al seleccionar un producto. */
-        document.getElementById('sale-product-id').addEventListener('change', (e) => {
-            const productId = e.target.value;
-            const priceInput = document.getElementById('sale-price');
-            const product = products.find(p => p.id === productId);
+        };
 
-            if (product) {
-                priceInput.value = product.price.toFixed(2);
-                document.getElementById('sale-quantity').max = product.stock;
-                document.getElementById('sale-quantity').value = 1;
+        window.updateSaleFields = () => {
+            const select = document.getElementById('sale-product');
+            const selectedOption = select.options[select.selectedIndex];
+            const priceInput = document.getElementById('sale-final-price');
+
+            if (selectedOption.value) {
+                const price = parseFloat(selectedOption.getAttribute('data-price'));
+                priceInput.value = price.toFixed(2);
+                priceInput.disabled = false;
             } else {
                 priceInput.value = '';
-                document.getElementById('sale-quantity').value = 1;
-                document.getElementById('sale-quantity').removeAttribute('max');
+                priceInput.disabled = true;
             }
-        });
+        };
 
-        /** Registra una venta, actualiza el stock y guarda el registro. */
-        async function registerSale() {
-            if (!userId) return;
+        window.registerSale = async () => {
+            const productId = document.getElementById('sale-product').value;
+            const quantity = parseInt(document.getElementById('sale-quantity').value, 10);
+            const finalPrice = parseFloat(document.getElementById('sale-final-price').value);
 
-            const productId = document.getElementById('sale-product-id').value;
-            const quantity = parseInt(document.getElementById('sale-quantity').value);
-            const salePrice = parseFloat(document.getElementById('sale-price').value);
-
-            if (!productId || isNaN(quantity) || quantity <= 0 || isNaN(salePrice) || salePrice <= 0) {
-                displayMessage('Por favor, selecciona un producto, introduce una cantidad válida y un precio de venta.', 'bg-red-100 text-red-800');
+            if (!productId || isNaN(quantity) || quantity <= 0 || isNaN(finalPrice) || finalPrice <= 0) {
+                showNotification('Por favor, completa todos los campos de la venta correctamente.', 'error');
                 return;
             }
-            
-            const product = products.find(p => p.id === productId);
+
+            const product = products.find(p => p.id == productId);
             if (!product) {
-                displayMessage('Producto no encontrado.', 'bg-red-100 text-red-800');
-                return;
-            }
-            if (product.stock < quantity) {
-                displayMessage(`Error: No hay suficiente stock. Solo quedan ${product.stock} unidades.`, 'bg-red-100 text-red-800');
+                showNotification('Producto no encontrado.', 'error');
                 return;
             }
 
-            displayMessage('Registrando venta...', 'bg-yellow-100 text-yellow-800');
+            if (quantity > product.stock) {
+                showNotification(`Solo hay ${product.stock} unidades en stock.`, 'error');
+                return;
+            }
+
+            const saleData = {
+                user_id: userId,
+                product_id: productId,
+                nombre_producto: product.nombre,
+                cantidad: quantity,
+                precio_unitario_venta: finalPrice,
+                total_venta: quantity * finalPrice,
+                fecha_venta: new Date().toISOString()
+            };
+
+            const newStock = product.stock - quantity;
 
             try {
-                // 1. Actualizar Stock del Producto
-                const newStock = product.stock - quantity;
-                await updateDoc(doc(db, getProductsCollectionPath(userId), productId), {
-                    stock: newStock
-                });
+                // 1. Registrar la venta (Tabla pedidos)
+                const { error: saleError } = await supabase
+                    .from(SALES_TABLE)
+                    .insert([saleData]);
 
-                // 2. Registrar la Venta
-                await addDoc(collection(db, getSalesCollectionPath(userId)), {
-                    productId: productId,
-                    productName: product.name,
-                    quantity: quantity,
-                    salePrice: salePrice,
-                    totalSale: quantity * salePrice,
-                    timestamp: Date.now()
-                });
+                if (saleError) throw saleError;
 
-                // 3. Limpiar formulario
-                document.getElementById('sale-registration-form').reset();
-                displayMessage(`Venta de ${quantity} x ${product.name} registrada con éxito.`, 'bg-green-100 text-green-800');
+                // 2. Actualizar el stock del producto (Tabla productos)
+                const { error: updateError } = await supabase
+                    .from(PRODUCTS_TABLE)
+                    .update({ stock: newStock })
+                    .eq('id', productId)
+                    .eq('user_id', userId);
+
+                if (updateError) throw updateError;
+
+                showNotification('Venta registrada y stock actualizado con éxito.', 'success');
+                document.getElementById('sale-form').reset();
 
             } catch (error) {
-                console.error("Error al registrar venta:", error);
-                displayMessage(`Error al registrar la venta: ${error.message}`, 'bg-red-100 text-red-800');
+                console.error('Error al registrar la venta:', error.message);
+                showNotification(`Error al registrar la venta: ${error.message}`, 'error');
             }
-        }
+        };
         
-        /**
-         * Inicializa el listener en tiempo real para la colección de ventas.
-         */
-        function setupSaleListener() {
-            if (!db || !userId) return;
-            // Ojo: orderBy puede requerir un índice, pero lo omitimos por simplicidad.
-            const q = query(collection(db, getSalesCollectionPath(userId)));
+        // --- GESTIÓN DE HISTORIAL DE VENTAS ---
+        const subscribeToSales = () => {
+            if (!userId) return;
 
-            onSnapshot(q, (querySnapshot) => {
-                const sales = [];
-                querySnapshot.forEach((doc) => {
-                    sales.push({ id: doc.id, ...doc.data() });
-                });
-                renderSales(sales.sort((a, b) => b.timestamp - a.timestamp).slice(0, 10)); // Mostrar solo las últimas 10
-            }, (error) => {
-                console.error("Error al obtener ventas:", error);
-                document.getElementById('loading-sales').textContent = 'Error al cargar ventas.';
-            });
-            document.getElementById('loading-sales').classList.add('hidden');
-        }
+            supabase
+                .from(SALES_TABLE)
+                .on('ANY', payload => {
+                    console.log('Cambio en ventas:', payload);
+                    loadSales();
+                })
+                .subscribe();
 
-        /**
-         * Renderiza la lista de ventas en la vista.
-         * @param {Array} salesArray - Lista de objetos de venta.
-         */
-        function renderSales(salesArray) {
-            const historyContainer = document.getElementById('sales-history');
-            historyContainer.innerHTML = '';
-            
-            if (salesArray.length === 0) {
-                historyContainer.innerHTML = '<div class="text-center text-gray-500 py-4"><i class="fas fa-history text-xl mb-1"></i><p>Aún no hay ventas registradas.</p></div>';
+            loadSales(); // Carga inicial
+        };
+
+        const loadSales = async () => {
+            const listContainer = document.getElementById('sales-history-body');
+            const totalContainer = document.getElementById('total-sales-amount');
+            listContainer.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">Cargando historial...</td></tr>';
+            totalContainer.textContent = '$0.00';
+
+            if (!userId) { return; }
+
+            try {
+                const { data, error } = await supabase
+                    .from(SALES_TABLE)
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('fecha_venta', { ascending: false });
+
+                if (error) throw error;
+
+                renderSalesHistory(data);
+
+            } catch (error) {
+                console.error('Error al cargar ventas:', error.message);
+                listContainer.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-red-600">Error al cargar historial: ${error.message}</td></tr>`;
+            }
+        };
+
+        const renderSalesHistory = (salesList) => {
+            const listContainer = document.getElementById('sales-history-body');
+            const totalContainer = document.getElementById('total-sales-amount');
+            listContainer.innerHTML = '';
+            let grandTotal = 0;
+
+            if (salesList.length === 0) {
+                listContainer.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-gray-500">Aún no hay ventas registradas.</td></tr>';
+                totalContainer.textContent = '$0.00';
                 return;
             }
 
-            salesArray.forEach(sale => {
-                const date = new Date(sale.timestamp).toLocaleString('es-ES', { 
-                    day: 'numeric', month: 'short', year: 'numeric', 
-                    hour: '2-digit', minute: '2-digit' 
-                });
-                
-                const item = document.createElement('div');
-                item.className = 'flex justify-between items-center py-3';
-                item.innerHTML = `
-                    <div>
-                        <p class="font-semibold text-gray-800">${sale.productName}</p>
-                        <p class="text-sm text-gray-500">${sale.quantity} unidad(es) @ $${sale.salePrice.toFixed(2)}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-lg text-green-700">$${sale.totalSale.toFixed(2)}</p>
-                        <p class="text-xs text-gray-400">${date}</p>
-                    </div>
+            salesList.forEach(sale => {
+                const total = sale.total_venta;
+                grandTotal += total;
+
+                const date = new Date(sale.fecha_venta);
+
+                const row = document.createElement('tr');
+                row.className = 'border-b hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-6 py-3 text-sm font-medium text-gray-900">${sale.nombre_producto}</td>
+                    <td class="px-6 py-3 text-sm text-gray-500">${sale.cantidad}</td>
+                    <td class="px-6 py-3 text-sm text-gray-500">$${sale.precio_unitario_venta.toFixed(2)}</td>
+                    <td class="px-6 py-3 text-sm font-bold text-secondary">$${total.toFixed(2)}</td>
+                    <td class="px-6 py-3 text-xs text-gray-400">${dateFormatter.format(date)}</td>
                 `;
-                historyContainer.appendChild(item);
-            });
-        }
-        
-        // --- EXPOSICIÓN GLOBAL DE FUNCIONES PARA EL HTML (ONCLICK) ---
-        // Estas funciones se asignan al objeto 'window' para que puedan ser llamadas directamente
-        // desde los atributos 'onclick' en el HTML.
-        window.showTab = showTab;
-        window.openModal = openModal;
-        window.closeModal = closeModal;
-        window.handleLogoUpload = handleLogoUpload;
-        window.handleLogoUploadTrigger = handleLogoUploadTrigger;
-        window.editProduct = editProduct;
-        window.confirmDelete = confirmDelete;
-        window.registerSale = registerSale;
-
-
-        // --- Inicialización al cargar la página ---
-        document.addEventListener('DOMContentLoaded', () => {
-            // Configurar el comportamiento inicial del modal (al abrirse, se resetea)
-            document.getElementById('product-form').addEventListener('focusin', () => {
-                document.getElementById('modal-title').textContent = 'Añadir Nuevo Producto';
-                document.getElementById('product-id').value = '';
-                document.getElementById('product-image').value = '';
-                document.getElementById('image-preview-container').classList.add('hidden');
-                document.getElementById('product-form').reset();
+                listContainer.appendChild(row);
             });
             
-            // Mostrar la pestaña de productos por defecto
-            showTab('productos'); 
-        });
+            totalContainer.textContent = `$${grandTotal.toFixed(2)}`;
+        };
+
+
+        // --- GESTIÓN DE PESTAÑAS (TABS) ---
+        window.showTab = (tabId) => {
+            // Ocultar todos los contenidos
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Mostrar el contenido seleccionado
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // Actualizar el estilo de los botones de pestañas
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('bg-primary', 'text-white');
+                button.classList.add('bg-white', 'text-gray-600', 'hover:bg-gray-100');
+            });
+
+            // Poner el botón seleccionado como activo
+            document.querySelector(`.tab-button[onclick="showTab('${tabId}')"]`).classList.add('bg-primary', 'text-white');
+            document.querySelector(`.tab-button[onclick="showTab('${tabId}')"]`).classList.remove('bg-white', 'text-gray-600', 'hover:bg-gray-100');
+        };
+
+        // --- INICIALIZACIÓN ---
+        window.onload = () => {
+            initializeAuth();
+            window.showTab('productos');
+        };
 
     </script>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+
+    <!-- Contenedor de Notificaciones (flotante) -->
+    <div id="notification-container" class="fixed top-4 right-4 z-50 w-full max-w-xs">
+        <!-- Las notificaciones aparecen aquí -->
+    </div>
+
+    <!-- Encabezado y Navegación -->
+    <header class="bg-white shadow-md sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img id="app-logo" src="https://placehold.co/40x40/3b82f6/ffffff?text=Logo"
+                     onerror="this.onerror=null; this.src='https://placehold.co/40x40/3b82f6/ffffff?text=Logo';"
+                     class="w-10 h-10 object-cover rounded-full hidden">
+                <h1 class="text-xl font-extrabold text-gray-800">Cell Mar Accesorios</h1>
+            </div>
+            <button onclick="openLogoModal()" class="bg-accent text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-amber-600 transition shadow-md">
+                Subir Logo
+            </button>
+        </div>
+        <div class="max-w-4xl mx-auto px-4 py-2 flex space-x-2 border-t border-gray-100">
+            <button class="tab-button bg-primary text-white px-4 py-2 rounded-lg font-semibold shadow-sm transition" onclick="showTab('productos')">
+                Gestión de Productos
+            </button>
+            <button class="tab-button bg-white text-gray-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition" onclick="showTab('ventas')">
+                Registrar Venta
+            </button>
+            <button class="tab-button bg-white text-gray-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition" onclick="showTab('historial')">
+                Historial de Ventas
+            </button>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-4xl mx-auto px-4 py-8">
+
+        <!-- Pestaña 1: Gestión de Productos -->
+        <div id="productos" class="tab-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-700">Inventario de Accesorios</h2>
+                <button onclick="openProductModal()" class="bg-secondary text-white px-4 py-2 rounded-xl text-md font-semibold hover:bg-emerald-600 transition shadow-lg flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Añadir Producto</span>
+                </button>
+            </div>
+
+            <div id="product-list" class="space-y-4">
+                <p class="text-center text-gray-500 p-6">Cargando productos...</p>
+                <!-- Las tarjetas de productos se renderizan aquí -->
+            </div>
+        </div>
+
+        <!-- Pestaña 2: Registrar Venta -->
+        <div id="ventas" class="tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-700 mb-6">Registro Rápido de Venta</h2>
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <form id="sale-form" onsubmit="event.preventDefault(); registerSale();">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="sale-product" class="block text-sm font-medium text-gray-700 mb-1">Producto Vendido</label>
+                            <select id="sale-product" onchange="updateSaleFields()" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition">
+                                <option value="">-- Selecciona un producto --</option>
+                                <!-- Opciones de productos se cargan con JS -->
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Solo se muestran productos con stock > 0.</p>
+                        </div>
+
+                        <div class="flex space-x-4">
+                            <div class="w-1/2">
+                                <label for="sale-quantity" class="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
+                                <input type="number" id="sale-quantity" min="1" value="1" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition">
+                            </div>
+                            <div class="w-1/2">
+                                <label for="sale-final-price" class="block text-sm font-medium text-gray-700 mb-1">Precio Final Unitario ($)</label>
+                                <input type="number" id="sale-final-price" step="0.01" required disabled class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 focus:ring-primary focus:border-primary transition">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-primary text-white p-3 rounded-xl font-bold text-lg hover:bg-blue-600 transition shadow-lg mt-6">
+                            Confirmar Venta y Descontar Stock
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Pestaña 3: Historial de Ventas -->
+        <div id="historial" class="tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-700 mb-6">Historial de Ventas</h2>
+
+            <!-- Resumen de Ventas -->
+            <div class="bg-white p-6 rounded-xl shadow-lg mb-6 flex justify-between items-center border-l-4 border-secondary">
+                <p class="text-lg font-semibold text-gray-600">Ganancia Total Registrada:</p>
+                <p id="total-sales-amount" class="text-3xl font-extrabold text-secondary">$0.00</p>
+            </div>
+
+            <!-- Tabla de Historial -->
+            <div class="bg-white rounded-xl shadow-lg overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Producto
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Cantidad
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Precio Unitario
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Total Venta
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Fecha
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="sales-history-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Las filas de ventas se renderizan aquí -->
+                        <tr><td colspan="5" class="text-center py-4 text-gray-500">Cargando historial...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal para Añadir/Editar Producto -->
+    <div id="add-product-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg">
+            <div class="p-6">
+                <h3 id="product-modal-title" class="text-xl font-bold text-gray-800 mb-4">Añadir Nuevo Producto</h3>
+                <form id="product-form" onsubmit="event.preventDefault(); saveProduct();">
+                    <input type="hidden" id="product-id">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="product-name" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Producto (Ej: Cargador Tipo C)</label>
+                            <input type="text" id="product-name" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-secondary focus:border-secondary transition">
+                        </div>
+                        <div class="flex space-x-4">
+                            <div class="w-1/2">
+                                <label for="product-price" class="block text-sm font-medium text-gray-700 mb-1">Precio de Venta ($)</label>
+                                <input type="number" id="product-price" step="0.01" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-secondary focus:border-secondary transition">
+                            </div>
+                            <div class="w-1/2">
+                                <label for="product-stock" class="block text-sm font-medium text-gray-700 mb-1">Stock Inicial</label>
+                                <input type="number" id="product-stock" min="0" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-secondary focus:border-secondary transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="product-description" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                            <textarea id="product-description" rows="2" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-secondary focus:border-secondary transition"></textarea>
+                        </div>
+                        <div>
+                            <label for="product-photo" class="block text-sm font-medium text-gray-700 mb-1">Subir Foto del Producto (Max 500 KB)</label>
+                            <input type="file" id="product-photo" accept="image/*" class="w-full text-gray-700 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-blue-600 transition duration-150">
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button type="button" onclick="closeProductModal()" class="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition">Cancelar</button>
+                        <button type="submit" class="px-4 py-2 bg-secondary text-white font-semibold rounded-lg hover:bg-emerald-600 transition shadow-md">Guardar Producto</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Subir Logo -->
+    <div id="logo-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm">
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Cambiar Logo del Negocio</h3>
+                <p class="text-sm text-gray-600 mb-4">El logo se guardará en tu base de datos y se cargará automáticamente.</p>
+                <input type="file" id="logo-file" accept="image/*" class="w-full text-gray-700 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-white hover:file:bg-amber-600 transition duration-150">
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="closeLogoModal()" class="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition">Cancelar</button>
+                    <button type="button" onclick="handleLogoUpload()" class="px-4 py-2 bg-accent text-white font-semibold rounded-lg hover:bg-amber-600 transition shadow-md">Guardar Logo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
