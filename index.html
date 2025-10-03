@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Panel de Inventario - Tienda de Accesorios</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         .product-card {
@@ -100,15 +99,16 @@
         </footer>
     </div>
 
-    <script>
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
         // 🔑 Configuración y Conexión a Supabase
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
-        // La librería supabase.js está cargada en el <head>
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         const PRODUCT_BUCKET = "product-images";
-        const LOGO_BUCKET = "business-assets"; // <--- Tu bucket de logos
+        const LOGO_BUCKET = "business-assets"; 
 
         // --- Elementos del DOM ---
         const form = document.getElementById("product-form");
@@ -126,111 +126,42 @@
         const logoSaveButton = document.getElementById("logo-save-button");
         let selectedLogoFile = null;
 
-
         // ===========================================
-        // I. LÓGICA DEL LOGO
+        // I. FUNCIONES GLOBALES DE INVENTARIO (Ahora funcionan)
         // ===========================================
 
-        // Carga el logo guardado en localStorage
-        function loadLogo() {
-            const savedLogo = localStorage.getItem("business-logo");
-            if (savedLogo) businessLogo.src = savedLogo;
-            else businessLogo.src = "https://via.placeholder.com/60/4f46e5/ffffff?text=CM"; 
+        // Funcionalidad para cambiar la cantidad de stock
+        async function changeQty(id, delta) {
+            const { data: row } = await supabase.from("products").select("quantity").eq("id", id).single();
+            const newQty = Math.max(0, (row.quantity || 0) + delta);
+            // IMPORTANTE: Asegúrate de tener la política RLS de UPDATE para 'anon' o 'authenticated'
+            await supabase.from("products").update({ quantity: newQty }).eq("id", id);
+            fetchProducts();
         }
 
-        // 1. Manejar la selección del archivo
-        logoUpload.addEventListener("change", (e) => {
-            const files = e.target.files;
-            if (files.length > 0) {
-                selectedLogoFile = files[0];
-                
-                // Previsualizar el logo temporalmente
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    businessLogo.src = e.target.result; 
-                };
-                reader.readAsDataURL(selectedLogoFile);
-
-                logoSaveButton.disabled = false;
-                logoSaveButton.textContent = "Guardar Logo";
-            } else {
-                selectedLogoFile = null;
-                loadLogo(); // Vuelve al logo guardado
-                logoSaveButton.disabled = true;
-                logoSaveButton.textContent = "Guardar Logo";
-            }
-        });
-
-        // 2. Manejar el click del botón GUARDAR (Subida a Supabase)
-        logoSaveButton.addEventListener("click", async () => {
-            if (!selectedLogoFile) {
-                alert("Selecciona un archivo primero.");
-                return;
-            }
-
-            logoSaveButton.disabled = true;
-            logoSaveButton.textContent = "Subiendo...";
-
-            try {
-                const file = selectedLogoFile;
-                // Usamos un nombre de archivo fijo para reemplazar el logo existente
-                const filePath = `current_business_logo_${file.name}`; 
-                
-                // Subida a Supabase Storage con UPSET=TRUE
-                const { error: uploadError } = await supabase.storage.from(LOGO_BUCKET).upload(filePath, file, {
-                    cacheControl: "3600",
-                    upsert: true, // Esto es clave para reemplazar el archivo
-                });
-
-                if (uploadError) {
-                    // Muestra el error crítico de RLS aquí
-                    throw new Error(`Error: ${uploadError.message}. ¡Revisa tus políticas RLS para 'INSERT' en Supabase Storage!`);
-                }
-
-                // Obtener URL pública y actualizar
-                const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(filePath);
-                if (!data.publicUrl) throw new Error("No se pudo obtener la URL pública.");
-                
-                // Actualizar la imagen y guardar la URL en localStorage
-                businessLogo.src = data.publicUrl;
-                localStorage.setItem("business-logo", data.publicUrl); 
-                
-                alert("✅ Logo actualizado con éxito!");
-                
-                // Restablecer el estado
-                selectedLogoFile = null;
-                logoUpload.value = "";
-                logoSaveButton.textContent = "Guardado ✅";
-                
-                setTimeout(() => {
-                    logoSaveButton.disabled = true;
-                    logoSaveButton.textContent = "Guardar Logo";
-                }, 3000);
-
-            } catch (error) {
-                console.error("Fallo al guardar logo:", error);
-                alert("❌ Fallo al guardar logo: " + error.message);
-                logoSaveButton.disabled = false;
-                logoSaveButton.textContent = "Error, Reintentar";
-            }
-        });
-
-
-        // ===========================================
-        // II. LÓGICA DE PRODUCTOS
-        // ===========================================
-
-        async function fetchProducts() {
-            const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
-            if (error) {
-                console.error("Error cargando productos:", error);
-                totalCount.textContent = "Error al cargar";
-                productsEl.innerHTML = `<p class="text-red-600">Error de conexión o permisos (RLS): ${error.message}</p>`;
-                return;
-            }
-            renderProducts(data);
+        // Funcionalidad para eliminar un producto
+        async function deleteProduct(id) {
+            if (!confirm("¿Eliminar este producto? Esta acción es irreversible.")) return;
+            // IMPORTANTE: Asegúrate de tener la política RLS de DELETE para 'anon' o 'authenticated'
+            await supabase.from("products").delete().eq("id", id);
+            fetchProducts();
         }
 
+        // Función para subir imágenes de producto
+        async function uploadImage(file) {
+            if (!file) return null;
+            const ext = file.name.split(".").pop();
+            const path = `product_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+            const { error } = await supabase.storage.from(PRODUCT_BUCKET).upload(path, file); 
+            if (error) throw error;
+            const { data: urlData } = supabase.storage.from(PRODUCT_BUCKET).getPublicUrl(path);
+            return urlData?.publicUrl;
+        }
+
+        // ===========================================
+        // II. RENDERIZADO Y LÓGICA DE CARGA
+        // ===========================================
+        
         function renderProducts(items) {
             productsEl.innerHTML = "";
             totalCount.textContent = `${items.length} productos`;
@@ -268,14 +199,18 @@
 
                 const controls = document.createElement("div");
                 controls.className = "flex gap-2";
+                
+                // Botones usan la función definida arriba (changeQty, deleteProduct)
                 const dec = document.createElement("button");
                 dec.textContent = "-";
                 dec.className = "px-3 py-1 border rounded bg-gray-100 hover:bg-gray-200 transition";
                 dec.onclick = () => changeQty(p.id, -1);
+                
                 const inc = document.createElement("button");
                 inc.textContent = "+";
                 inc.className = "px-3 py-1 border rounded bg-gray-100 hover:bg-gray-200 transition";
                 inc.onclick = () => changeQty(p.id, +1);
+                
                 controls.appendChild(dec);
                 controls.appendChild(inc);
 
@@ -296,17 +231,89 @@
                 productsEl.appendChild(card);
             }
         }
-
-        async function uploadImage(file) {
-            if (!file) return null;
-            const ext = file.name.split(".").pop();
-            const path = `product_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
-            const { error } = await supabase.storage.from(PRODUCT_BUCKET).upload(path, file); 
-            if (error) throw error;
-            const { data: urlData } = supabase.storage.from(PRODUCT_BUCKET).getPublicUrl(path);
-            return urlData?.publicUrl;
+        
+        async function fetchProducts() {
+            // **IMPORTANTE:** Si esto sigue fallando, la política RLS de SELECT de la tabla 'products' está MAL.
+            const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
+            if (error) {
+                console.error("Error cargando productos:", error);
+                totalCount.textContent = "Error al cargar";
+                productsEl.innerHTML = `<p class="text-red-600">Error: No se pudo conectar a la tabla de productos. ${error.message}. ¿El problema sigue siendo la política RLS de SELECT?</p>`;
+                return;
+            }
+            renderProducts(data);
         }
 
+        // ===========================================
+        // III. LÓGICA DEL LOGO Y EVENTOS (Mantener funcional)
+        // ===========================================
+
+        function loadLogo() {
+            const savedLogo = localStorage.getItem("business-logo");
+            if (savedLogo) businessLogo.src = savedLogo;
+            else businessLogo.src = "https://via.placeholder.com/60/4f46e5/ffffff?text=CM"; 
+        }
+
+        logoUpload.addEventListener("change", (e) => {
+            const files = e.target.files;
+            if (files.length > 0) {
+                selectedLogoFile = files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => { businessLogo.src = e.target.result; };
+                reader.readAsDataURL(selectedLogoFile);
+                logoSaveButton.disabled = false;
+                logoSaveButton.textContent = "Guardar Logo";
+            } else {
+                selectedLogoFile = null;
+                loadLogo(); 
+                logoSaveButton.disabled = true;
+                logoSaveButton.textContent = "Guardar Logo";
+            }
+        });
+
+        logoSaveButton.addEventListener("click", async () => {
+             if (!selectedLogoFile) return alert("Selecciona un archivo primero.");
+
+            logoSaveButton.disabled = true;
+            logoSaveButton.textContent = "Subiendo...";
+
+            try {
+                const file = selectedLogoFile;
+                const filePath = `current_business_logo_${file.name}`; 
+                
+                const { error: uploadError } = await supabase.storage.from(LOGO_BUCKET).upload(filePath, file, {
+                    cacheControl: "3600",
+                    upsert: true,
+                });
+
+                if (uploadError) throw new Error(`Error: ${uploadError.message}. Revisa tus políticas RLS de INSERT en el bucket ${LOGO_BUCKET}.`);
+
+                const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(filePath);
+                if (!data.publicUrl) throw new Error("No se pudo obtener la URL pública.");
+                
+                businessLogo.src = data.publicUrl;
+                localStorage.setItem("business-logo", data.publicUrl); 
+                
+                alert("✅ Logo actualizado con éxito!");
+                
+                selectedLogoFile = null;
+                logoUpload.value = "";
+                logoSaveButton.textContent = "Guardado ✅";
+                
+                setTimeout(() => {
+                    logoSaveButton.disabled = true;
+                    logoSaveButton.textContent = "Guardar Logo";
+                }, 3000);
+
+            } catch (error) {
+                console.error("Fallo al guardar logo:", error);
+                alert("❌ Fallo al guardar logo: " + error.message);
+                logoSaveButton.disabled = false;
+                logoSaveButton.textContent = "Error, Reintentar";
+            }
+        });
+
+        // Eventos del Formulario de Productos
         form.addEventListener("submit", async (ev) => {
             ev.preventDefault();
             document.getElementById("submit").disabled = true;
@@ -324,7 +331,6 @@
                 
                 if (error) throw error;
                 
-                // Limpiar formulario y cargar
                 nameIn.value = "";
                 priceIn.value = "";
                 qtyIn.value = 1;
@@ -340,23 +346,10 @@
             }
         });
 
-        async function changeQty(id, delta) {
-            const { data: row } = await supabase.from("products").select("quantity").eq("id", id).single();
-            const newQty = Math.max(0, (row.quantity || 0) + delta);
-            await supabase.from("products").update({ quantity: newQty }).eq("id", id);
-            fetchProducts();
-        }
-
-        async function deleteProduct(id) {
-            if (!confirm("¿Eliminar este producto? Esta acción es irreversible.")) return;
-            await supabase.from("products").delete().eq("id", id);
-            fetchProducts();
-        }
-
         // --- INICIALIZACIÓN ---
         window.addEventListener("load", () => {
-            loadLogo(); // Carga el logo al inicio
-            fetchProducts(); // Carga el inventario al inicio
+            loadLogo(); 
+            fetchProducts(); 
         });
     </script>
 </body>
