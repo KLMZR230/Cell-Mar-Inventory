@@ -27,9 +27,9 @@
             <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Cell Mar <span class="text-indigo-600">Productos</span></h1>
         </div>
         
-        <div class="relative inline-block">
-            <label for="logo-upload" class="bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300 shadow-md cursor-pointer block text-center">
-                Cambiar Logo 🖼️
+        <div class="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg border border-gray-200">
+            <label for="logo-upload" class="bg-indigo-100 text-indigo-700 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-200 transition duration-300 cursor-pointer text-sm shadow-sm">
+                Seleccionar Logo 🖼️
             </label>
             <input 
                 type="file" 
@@ -38,6 +38,14 @@
                 title="Sube una nueva imagen para tu logo"
                 accept="image/*"
             />
+            
+            <button 
+                id="logo-save-button"
+                class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+                disabled
+            >
+                Guardar
+            </button>
         </div>
     </header>
 
@@ -99,16 +107,45 @@
         const productsList = document.getElementById("products-list");
         const logoUpload = document.getElementById("logo-upload");
         const businessLogo = document.getElementById("business-logo");
+        // Nuevo elemento: Botón de guardar logo
+        const logoSaveButton = document.getElementById("logo-save-button");
+        
+        // Variable temporal para guardar el archivo seleccionado antes de subir
+        let selectedLogoFile = null;
 
         // --- Lógica de Subir y Cargar Logo ---
+        
+        // 1. Al seleccionar un archivo, se guarda temporalmente y se habilita el botón de Guardar
+        logoUpload.addEventListener("change", (e) => {
+            selectedLogoFile = e.target.files[0];
+            if (selectedLogoFile) {
+                // Previsualizar el logo temporalmente (opcional, pero útil para UX)
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    businessLogo.src = e.target.result;
+                };
+                reader.readAsDataURL(selectedLogoFile);
 
-        // Subir logo y guardar en localStorage (Funcionalidad Preservada)
-        logoUpload.addEventListener("change", async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+                logoSaveButton.disabled = false;
+                logoSaveButton.textContent = "Guardar";
+            } else {
+                logoSaveButton.disabled = true;
+                logoSaveButton.textContent = "Guardar";
+            }
+        });
 
-            // Ruta de almacenamiento única
+        // 2. Al hacer clic en GUARDAR, se sube el archivo a Supabase
+        logoSaveButton.addEventListener("click", async () => {
+            if (!selectedLogoFile) return;
+
+            // Deshabilitar el botón y cambiar texto mientras se sube
+            logoSaveButton.disabled = true;
+            logoSaveButton.textContent = "Subiendo...";
+
+            const file = selectedLogoFile;
             const filePath = `logo-${Date.now()}-${file.name}`;
+            
+            // Subida a Supabase Storage
             const { error: uploadError } = await supabase.storage.from("business-assets").upload(filePath, file, {
                 cacheControl: "3600",
                 upsert: true,
@@ -116,22 +153,34 @@
 
             if (uploadError) {
                 alert("Error subiendo logo: " + uploadError.message);
+                logoSaveButton.disabled = false;
+                logoSaveButton.textContent = "Reintentar";
                 return;
             }
 
-            // Obtener URL pública y actualizar imagen
+            // Obtener URL pública y actualizar
             const { data } = supabase.storage.from("business-assets").getPublicUrl(filePath);
             if (data.publicUrl) {
                 businessLogo.src = data.publicUrl;
-                localStorage.setItem("business-logo", data.publicUrl);
+                localStorage.setItem("business-logo", data.publicUrl); // Guardar para persistencia
                 alert("✅ Logo actualizado con éxito!");
             }
+            
+            // Restablecer el estado
+            selectedLogoFile = null;
+            logoUpload.value = ""; // Limpiar el input file
+            logoSaveButton.textContent = "Guardado ✅";
+            
+            // Opcional: Deshabilitar el botón nuevamente después de un breve momento
+            setTimeout(() => {
+                logoSaveButton.disabled = true;
+                logoSaveButton.textContent = "Guardar";
+            }, 3000);
         });
 
         // Cargar logo guardado (Persistencia Preservada)
         window.addEventListener("load", () => {
             const savedLogo = localStorage.getItem("business-logo");
-            // Usamos un placeholder más bonito si no hay logo
             if (savedLogo) businessLogo.src = savedLogo;
             else businessLogo.src = "https://via.placeholder.com/80/6366f1/ffffff?text=CM";
         });
@@ -142,7 +191,6 @@
         productForm.addEventListener("submit", async (e) => {
             e.preventDefault();
             
-            // Obtener valores del formulario
             const name = document.getElementById("name").value;
             const price = parseFloat(document.getElementById("price").value);
             const quantity = parseInt(document.getElementById("quantity").value);
@@ -151,7 +199,6 @@
             let imageUrl = null;
             if (imageFile) {
                 const imagePath = `products/${Date.now()}-${imageFile.name}`;
-                // Usamos un bucket diferente para imágenes de productos (product-images)
                 const { error: imageError } = await supabase.storage.from("product-images").upload(imagePath, imageFile);
                 if (imageError) {
                     alert("⚠️ Error subiendo imagen: " + imageError.message);
@@ -161,7 +208,6 @@
                 imageUrl = data.publicUrl;
             }
 
-            // Insertar datos en la tabla 'products'
             const { error } = await supabase.from("products").insert([{ name, price, quantity, image_url: imageUrl }]);
             if (error) {
                 alert("❌ Error guardando producto: " + error.message);
@@ -174,7 +220,6 @@
 
         // Cargar y mostrar productos (Renderizado Mejorado)
         async function loadProducts() {
-            // Consulta de datos
             const { data: products, error } = await supabase.from("products").select("*").order("id", { ascending: false });
             if (error) {
                 console.error("Error cargando productos", error);
@@ -184,13 +229,11 @@
             
             productsList.innerHTML = "";
             
-            // Renderizar tarjetas de productos
             if (products.length === 0) {
                 productsList.innerHTML = `<div class="lg:col-span-2 p-6 text-center bg-white rounded-xl shadow-md text-gray-500">Aún no hay productos en el inventario. ¡Agrega el primero!</div>`;
             } else {
                 products.forEach((p) => {
                     const div = document.createElement("div");
-                    // Diseño de tarjeta mejorado con sombra y hover
                     div.className = "bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300 cursor-pointer";
                     div.innerHTML = `
                         <img src="${p.image_url || 'https://via.placeholder.com/400x200?text=Sin+Imagen'}" 
@@ -211,7 +254,6 @@
             }
         }
 
-        // Llamar a la función al inicio para cargar los datos
         loadProducts();
     </script>
 </body>
