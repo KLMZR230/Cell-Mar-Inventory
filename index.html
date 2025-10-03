@@ -109,7 +109,6 @@
         const businessLogo = document.getElementById("business-logo");
         const logoSaveButton = document.getElementById("logo-save-button");
         
-        // Variable para almacenar temporalmente el archivo de logo
         let selectedLogoFile = null;
 
         // --- Lógica de Subir y Cargar Logo ---
@@ -120,10 +119,9 @@
             if (files.length > 0) {
                 selectedLogoFile = files[0];
                 
-                // Previsualizar el logo temporalmente
+                // Previsualizar el logo (opcional pero bueno para UX)
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    // Solo actualizamos el 'src' si es una previsualización (no lo guardamos en localStorage aún)
                     businessLogo.src = e.target.result; 
                 };
                 reader.readAsDataURL(selectedLogoFile);
@@ -132,6 +130,9 @@
                 logoSaveButton.textContent = "Guardar";
             } else {
                 selectedLogoFile = null;
+                // Al no seleccionar archivo, regresamos el logo a su estado persistido si existe
+                const savedLogo = localStorage.getItem("business-logo");
+                businessLogo.src = savedLogo || "https://via.placeholder.com/80/6366f1/ffffff?text=CM";
                 logoSaveButton.disabled = true;
                 logoSaveButton.textContent = "Guardar";
             }
@@ -140,7 +141,7 @@
         // 2. Al hacer clic en GUARDAR, se sube el archivo a Supabase
         logoSaveButton.addEventListener("click", async () => {
             if (!selectedLogoFile) {
-                alert("Por favor, selecciona un archivo de logo primero.");
+                alert("Error: No se encontró el archivo seleccionado para subir.");
                 return;
             }
 
@@ -148,42 +149,47 @@
             logoSaveButton.disabled = true;
             logoSaveButton.textContent = "Subiendo...";
 
-            const file = selectedLogoFile;
-            // Generar una ruta de archivo única
-            const filePath = `logo-${Date.now()}-${file.name}`;
-            
-            // Subida a Supabase Storage
-            const { error: uploadError } = await supabase.storage.from("business-assets").upload(filePath, file, {
-                cacheControl: "3600",
-                upsert: true,
-            });
+            try {
+                const file = selectedLogoFile;
+                const filePath = `logo-${Date.now()}-${file.name}`;
+                
+                // Subida a Supabase Storage
+                const { error: uploadError } = await supabase.storage.from("business-assets").upload(filePath, file, {
+                    cacheControl: "3600",
+                    upsert: true,
+                });
 
-            if (uploadError) {
-                alert("Error subiendo logo: " + uploadError.message);
+                if (uploadError) {
+                    throw new Error(uploadError.message);
+                }
+
+                // Obtener URL pública y actualizar
+                const { data } = supabase.storage.from("business-assets").getPublicUrl(filePath);
+                if (data.publicUrl) {
+                    businessLogo.src = data.publicUrl;
+                    localStorage.setItem("business-logo", data.publicUrl); 
+                    alert("✅ Logo actualizado con éxito!");
+                } else {
+                    throw new Error("No se pudo obtener la URL pública después de la subida.");
+                }
+                
+                // Restablecer el estado
+                selectedLogoFile = null;
+                logoUpload.value = ""; // Limpiar el input file
+                logoSaveButton.textContent = "Guardado ✅";
+                
+                // Deshabilitar el botón después de un breve momento
+                setTimeout(() => {
+                    logoSaveButton.disabled = true;
+                    logoSaveButton.textContent = "Guardar";
+                }, 3000);
+
+            } catch (error) {
+                console.error("Fallo al guardar logo:", error);
+                alert("❌ Error al guardar logo: " + error.message + ". Revisa la consola para más detalles.");
                 logoSaveButton.disabled = false;
                 logoSaveButton.textContent = "Error, Reintentar";
-                return;
             }
-
-            // Obtener URL pública y actualizar
-            const { data } = supabase.storage.from("business-assets").getPublicUrl(filePath);
-            if (data.publicUrl) {
-                // Actualizar la imagen y guardar la URL en localStorage para persistencia
-                businessLogo.src = data.publicUrl;
-                localStorage.setItem("business-logo", data.publicUrl); 
-                alert("✅ Logo actualizado con éxito!");
-            }
-            
-            // Restablecer el estado
-            selectedLogoFile = null;
-            logoUpload.value = ""; // Limpiar el input file
-            logoSaveButton.textContent = "Guardado ✅";
-            
-            // Deshabilitar el botón después de un breve momento
-            setTimeout(() => {
-                logoSaveButton.disabled = true;
-                logoSaveButton.textContent = "Guardar";
-            }, 3000);
         });
 
         // Cargar logo guardado (Persistencia Preservada)
