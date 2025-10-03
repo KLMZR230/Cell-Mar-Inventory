@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Cell Mar Gestión De Productos</title>
+    <title>Cell Mar Gestión De Productos</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         .product-card {
@@ -54,7 +54,7 @@
         </div>
     </header>
     <div class="container mx-auto px-4 py-6">
-        <p class="text-gray-600 mb-6">Administra productos, precios, stock e imágenes. Conectado a Supabase.</p>
+        <p class="text-gray-600 mb-6">Administra productos, precios, stock e imágenes.</p>
 
         <section class="bg-white rounded-lg shadow p-6 mb-8">
             <h2 class="text-xl font-semibold mb-4">➕ Agregar producto</h2>
@@ -95,7 +95,7 @@
         </section>
 
         <footer class="mt-10 text-center text-gray-400 text-sm">
-            Panel de Inventario — Conectado a <code>Supabase</code>
+            Panel de Inventario — Cell Mar
         </footer>
     </div>
 
@@ -127,14 +127,13 @@
         let selectedLogoFile = null;
 
         // ===========================================
-        // I. FUNCIONES GLOBALES DE INVENTARIO (Ahora funcionan)
+        // I. FUNCIONES GLOBALES DE INVENTARIO
         // ===========================================
 
         // Funcionalidad para cambiar la cantidad de stock
         async function changeQty(id, delta) {
             const { data: row } = await supabase.from("products").select("quantity").eq("id", id).single();
             const newQty = Math.max(0, (row.quantity || 0) + delta);
-            // IMPORTANTE: Asegúrate de tener la política RLS de UPDATE para 'anon' o 'authenticated'
             await supabase.from("products").update({ quantity: newQty }).eq("id", id);
             fetchProducts();
         }
@@ -142,7 +141,6 @@
         // Funcionalidad para eliminar un producto
         async function deleteProduct(id) {
             if (!confirm("¿Eliminar este producto? Esta acción es irreversible.")) return;
-            // IMPORTANTE: Asegúrate de tener la política RLS de DELETE para 'anon' o 'authenticated'
             await supabase.from("products").delete().eq("id", id);
             fetchProducts();
         }
@@ -233,19 +231,18 @@
         }
         
         async function fetchProducts() {
-            // **IMPORTANTE:** Si esto sigue fallando, la política RLS de SELECT de la tabla 'products' está MAL.
             const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
             if (error) {
                 console.error("Error cargando productos:", error);
                 totalCount.textContent = "Error al cargar";
-                productsEl.innerHTML = `<p class="text-red-600">Error: No se pudo conectar a la tabla de productos. ${error.message}. ¿El problema sigue siendo la política RLS de SELECT?</p>`;
+                productsEl.innerHTML = `<p class="text-red-600">Error: No se pudo cargar el inventario. Asegúrate de tener la política RLS de SELECT activa para la tabla 'products'.</p>`;
                 return;
             }
             renderProducts(data);
         }
 
         // ===========================================
-        // III. LÓGICA DEL LOGO Y EVENTOS (Mantener funcional)
+        // III. LÓGICA DEL LOGO Y EVENTOS
         // ===========================================
 
         function loadLogo() {
