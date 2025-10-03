@@ -1,210 +1,146 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Panel de Inventario - Tienda de Accesorios</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cell Mar Productos</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 text-gray-900">
-  <div class="container mx-auto px-4 py-6">
-    <header class="mb-6">
-      <h1 class="text-3xl font-bold mb-2">📱 Panel de Inventario</h1>
-      <p class="text-gray-600">Administra productos, precios, stock e imágenes. Conectado a Supabase.</p>
-    </header>
+<body class="bg-gray-100">
+  <!-- Header con logo y nombre -->
+  <header class="bg-white shadow-md p-4 flex items-center justify-between">
+    <div class="flex items-center space-x-4">
+      <img id="business-logo" src="" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border" />
+      <h1 class="text-2xl font-bold text-gray-800">Cell Mar Productos</h1>
+    </div>
+    <!-- Subir logo -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Subir Logo</label>
+      <input type="file" id="logo-upload" class="block text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100"/>
+    </div>
+  </header>
 
-    <!-- Formulario -->
-    <section class="bg-white rounded-lg shadow p-6 mb-8">
-      <h2 class="text-xl font-semibold mb-4">➕ Agregar producto</h2>
-      <form id="product-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-        <div>
-          <label class="block text-sm font-medium">Nombre</label>
-          <input id="name" type="text" required class="mt-1 block w-full border rounded-md p-2" placeholder="Ej: Cargador USB-C" />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium">Precio (USD)</label>
-          <input id="price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2" placeholder="12.50" />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium">Cantidad</label>
-          <input id="quantity" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2" />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium">Imagen</label>
-          <input id="image" type="file" accept="image/*" class="mt-1 block w-full" />
-        </div>
-
-        <div class="md:col-span-4 text-right">
-          <button id="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar</button>
-        </div>
-      </form>
-      <p id="status" class="text-sm text-gray-500 mt-3"></p>
-    </section>
+  <!-- Formulario agregar producto -->
+  <main class="p-6 max-w-3xl mx-auto">
+    <h2 class="text-xl font-semibold text-gray-700 mb-4">Agregar Producto</h2>
+    <form id="product-form" class="space-y-4 bg-white p-6 rounded-lg shadow-md">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Nombre</label>
+        <input type="text" id="name" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Precio</label>
+        <input type="number" id="price" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Cantidad</label>
+        <input type="number" id="quantity" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Imagen</label>
+        <input type="file" id="image" class="mt-1 block w-full text-sm text-gray-500"/>
+      </div>
+      <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">
+        Guardar Producto
+      </button>
+    </form>
 
     <!-- Inventario -->
-    <section>
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-semibold">📦 Inventario</h2>
-        <span id="total-count" class="text-gray-500 text-sm">Cargando...</span>
-      </div>
-      <div id="products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-    </section>
+    <h2 class="text-xl font-semibold text-gray-700 mt-10 mb-4">Inventario</h2>
+    <div id="products-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </main>
 
-    <footer class="mt-10 text-center text-gray-400 text-sm">
-      Panel de Inventario — Conectado a <code>Supabase</code>
-    </footer>
-  </div>
-
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-    // 🔑 Conexión a Supabase
+  <script>
     const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const BUCKET = "product-images";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const form = document.getElementById("product-form");
-    const nameIn = document.getElementById("name");
-    const priceIn = document.getElementById("price");
-    const qtyIn = document.getElementById("quantity");
-    const imageIn = document.getElementById("image");
-    const status = document.getElementById("status");
-    const productsEl = document.getElementById("products");
-    const totalCount = document.getElementById("total-count");
+    const productForm = document.getElementById("product-form");
+    const productsList = document.getElementById("products-list");
+    const logoUpload = document.getElementById("logo-upload");
+    const businessLogo = document.getElementById("business-logo");
 
-    async function fetchProducts() {
-      const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
-      if (error) {
-        console.error(error);
-        totalCount.textContent = "Error al cargar";
+    // Subir logo
+    logoUpload.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const filePath = `logo-${Date.now()}-${file.name}`;
+      const { error: uploadError } = await supabase.storage.from("business-assets").upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+      if (uploadError) {
+        alert("Error subiendo logo: " + uploadError.message);
         return;
       }
-      renderProducts(data);
-    }
 
-    function renderProducts(items) {
-      productsEl.innerHTML = "";
-      totalCount.textContent = `${items.length} productos`;
-      if (items.length === 0) {
-        productsEl.innerHTML = '<p class="text-gray-500">No hay productos todavía.</p>';
-        return;
-      }
-      for (const p of items) {
-        const card = document.createElement("div");
-        card.className = "bg-white rounded-lg shadow p-4 flex flex-col";
-
-        const imgBox = document.createElement("div");
-        imgBox.className = "h-40 bg-gray-100 rounded flex items-center justify-center mb-3 overflow-hidden";
-        if (p.image_url) {
-          const img = document.createElement("img");
-          img.src = p.image_url;
-          img.className = "object-contain h-full";
-          imgBox.appendChild(img);
-        } else {
-          imgBox.innerHTML = '<span class="text-gray-400 text-sm">Sin imagen</span>';
-        }
-
-        const title = document.createElement("h3");
-        title.className = "font-semibold";
-        title.textContent = p.name;
-
-        const price = document.createElement("p");
-        price.className = "text-gray-700";
-        price.textContent = `$${Number(p.price).toFixed(2)}`;
-
-        const qty = document.createElement("p");
-        qty.className = "mt-1 text-sm";
-        qty.textContent = `Cantidad: ${p.quantity}`;
-
-        const actions = document.createElement("div");
-        actions.className = "flex justify-between mt-4";
-
-        const controls = document.createElement("div");
-        controls.className = "flex gap-2";
-        const dec = document.createElement("button");
-        dec.textContent = "-";
-        dec.className = "px-2 py-1 border rounded";
-        dec.onclick = () => changeQty(p.id, -1);
-        const inc = document.createElement("button");
-        inc.textContent = "+";
-        inc.className = "px-2 py-1 border rounded";
-        inc.onclick = () => changeQty(p.id, +1);
-        controls.appendChild(dec);
-        controls.appendChild(inc);
-
-        const del = document.createElement("button");
-        del.textContent = "Eliminar";
-        del.className = "px-3 py-1 rounded bg-red-600 text-white";
-        del.onclick = () => deleteProduct(p.id);
-
-        actions.appendChild(controls);
-        actions.appendChild(del);
-
-        card.appendChild(imgBox);
-        card.appendChild(title);
-        card.appendChild(price);
-        card.appendChild(qty);
-        card.appendChild(actions);
-
-        productsEl.appendChild(card);
-      }
-    }
-
-    async function uploadImage(file) {
-      if (!file) return null;
-      const ext = file.name.split(".").pop();
-      const path = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const { error } = await supabase.storage.from(BUCKET).upload(path, file);
-      if (error) throw error;
-      const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
-      return urlData?.publicUrl;
-    }
-
-    form.addEventListener("submit", async (ev) => {
-      ev.preventDefault();
-      status.textContent = "Guardando...";
-      try {
-        let imageUrl = null;
-        if (imageIn.files[0]) imageUrl = await uploadImage(imageIn.files[0]);
-        const { error } = await supabase.from("products").insert({
-          name: nameIn.value,
-          price: parseFloat(priceIn.value),
-          quantity: parseInt(qtyIn.value),
-          image_url: imageUrl
-        });
-        if (error) throw error;
-        nameIn.value = "";
-        priceIn.value = "";
-        qtyIn.value = 1;
-        imageIn.value = "";
-        fetchProducts();
-        status.textContent = "Producto agregado con éxito ✅";
-      } catch (err) {
-        console.error(err);
-        status.textContent = "Error: " + err.message;
-      } finally {
-        setTimeout(() => (status.textContent = ""), 3000);
+      const { data } = supabase.storage.from("business-assets").getPublicUrl(filePath);
+      if (data.publicUrl) {
+        businessLogo.src = data.publicUrl;
+        localStorage.setItem("business-logo", data.publicUrl);
       }
     });
 
-    async function changeQty(id, delta) {
-      const { data: row } = await supabase.from("products").select("*").eq("id", id).single();
-      const newQty = Math.max(0, (row.quantity || 0) + delta);
-      await supabase.from("products").update({ quantity: newQty }).eq("id", id);
-      fetchProducts();
+    // Cargar logo guardado
+    window.addEventListener("load", () => {
+      const savedLogo = localStorage.getItem("business-logo");
+      if (savedLogo) businessLogo.src = savedLogo;
+    });
+
+    // Guardar producto
+    productForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const price = parseFloat(document.getElementById("price").value);
+      const quantity = parseInt(document.getElementById("quantity").value);
+      const imageFile = document.getElementById("image").files[0];
+
+      let imageUrl = null;
+      if (imageFile) {
+        const imagePath = `products/${Date.now()}-${imageFile.name}`;
+        const { error: imageError } = await supabase.storage.from("product-images").upload(imagePath, imageFile);
+        if (imageError) {
+          alert("Error subiendo imagen");
+          return;
+        }
+        const { data } = supabase.storage.from("product-images").getPublicUrl(imagePath);
+        imageUrl = data.publicUrl;
+      }
+
+      const { error } = await supabase.from("products").insert([{ name, price, quantity, image_url: imageUrl }]);
+      if (error) {
+        alert("Error guardando producto: " + error.message);
+      } else {
+        loadProducts();
+        productForm.reset();
+      }
+    });
+
+    // Cargar productos
+    async function loadProducts() {
+      const { data: products, error } = await supabase.from("products").select("*").order("id", { ascending: false });
+      if (error) {
+        console.error("Error cargando productos", error);
+        return;
+      }
+      productsList.innerHTML = "";
+      products.forEach((p) => {
+        const div = document.createElement("div");
+        div.className = "bg-white rounded-lg shadow-md p-4";
+        div.innerHTML = `
+          <img src="${p.image_url || 'https://via.placeholder.com/150'}" class="w-full h-40 object-cover rounded-md mb-2"/>
+          <h3 class="text-lg font-bold text-gray-800">${p.name}</h3>
+          <p class="text-gray-600">Precio: $${p.price}</p>
+          <p class="text-gray-600">Cantidad: ${p.quantity}</p>
+        `;
+        productsList.appendChild(div);
+      });
     }
 
-    async function deleteProduct(id) {
-      if (!confirm("¿Eliminar este producto?")) return;
-      await supabase.from("products").delete().eq("id", id);
-      fetchProducts();
-    }
-
-    fetchProducts();
+    loadProducts();
   </script>
 </body>
 </html>
