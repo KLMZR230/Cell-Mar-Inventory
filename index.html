@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom scrollbar for a cleaner look */
+        /* Custom scrollbar para una apariencia más limpia */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -99,10 +99,12 @@
     </main>
 
     <script>
+        // CONFIGURACIÓN DE SUPABASE
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // ELEMENTOS DEL DOM
         const productForm = document.getElementById("product-form");
         const productsList = document.getElementById("products-list");
         const logoUpload = document.getElementById("logo-upload");
@@ -111,15 +113,15 @@
         
         let selectedLogoFile = null;
 
-        // --- Lógica de Subir y Cargar Logo ---
+        // --- FUNCIONES Y EVENTOS DEL LOGO ---
         
-        // 1. Al seleccionar un archivo, se guarda temporalmente y se habilita el botón de Guardar
+        // 1. Manejar la selección del archivo
         logoUpload.addEventListener("change", (e) => {
             const files = e.target.files;
             if (files.length > 0) {
                 selectedLogoFile = files[0];
                 
-                // Previsualizar el logo (opcional pero bueno para UX)
+                // Previsualizar el logo temporalmente
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     businessLogo.src = e.target.result; 
@@ -130,7 +132,7 @@
                 logoSaveButton.textContent = "Guardar";
             } else {
                 selectedLogoFile = null;
-                // Al no seleccionar archivo, regresamos el logo a su estado persistido si existe
+                // Si cancela la selección, se revierte a la imagen guardada
                 const savedLogo = localStorage.getItem("business-logo");
                 businessLogo.src = savedLogo || "https://via.placeholder.com/80/6366f1/ffffff?text=CM";
                 logoSaveButton.disabled = true;
@@ -138,14 +140,14 @@
             }
         });
 
-        // 2. Al hacer clic en GUARDAR, se sube el archivo a Supabase
+        // 2. Manejar el click del botón GUARDAR (Subida a Supabase)
         logoSaveButton.addEventListener("click", async () => {
             if (!selectedLogoFile) {
                 alert("Error: No se encontró el archivo seleccionado para subir.");
                 return;
             }
 
-            // Deshabilitar el botón y cambiar texto mientras se sube
+            // Bloquear UI
             logoSaveButton.disabled = true;
             logoSaveButton.textContent = "Subiendo...";
 
@@ -165,20 +167,20 @@
 
                 // Obtener URL pública y actualizar
                 const { data } = supabase.storage.from("business-assets").getPublicUrl(filePath);
-                if (data.publicUrl) {
-                    businessLogo.src = data.publicUrl;
-                    localStorage.setItem("business-logo", data.publicUrl); 
-                    alert("✅ Logo actualizado con éxito!");
-                } else {
+                if (!data.publicUrl) {
                     throw new Error("No se pudo obtener la URL pública después de la subida.");
                 }
                 
+                // Actualizar la imagen y guardar la URL en localStorage para persistencia
+                businessLogo.src = data.publicUrl;
+                localStorage.setItem("business-logo", data.publicUrl); 
+                alert("✅ Logo actualizado con éxito!");
+                
                 // Restablecer el estado
                 selectedLogoFile = null;
-                logoUpload.value = ""; // Limpiar el input file
+                logoUpload.value = "";
                 logoSaveButton.textContent = "Guardado ✅";
                 
-                // Deshabilitar el botón después de un breve momento
                 setTimeout(() => {
                     logoSaveButton.disabled = true;
                     logoSaveButton.textContent = "Guardar";
@@ -186,20 +188,50 @@
 
             } catch (error) {
                 console.error("Fallo al guardar logo:", error);
-                alert("❌ Error al guardar logo: " + error.message + ". Revisa la consola para más detalles.");
+                alert("❌ Error al guardar logo: " + error.message);
                 logoSaveButton.disabled = false;
                 logoSaveButton.textContent = "Error, Reintentar";
             }
         });
 
-        // Cargar logo guardado (Persistencia Preservada)
-        window.addEventListener("load", () => {
-            const savedLogo = localStorage.getItem("business-logo");
-            if (savedLogo) businessLogo.src = savedLogo;
-            else businessLogo.src = "https://via.placeholder.com/80/6366f1/ffffff?text=CM";
-        });
+        // --- LÓGICA DE PRODUCTO Y INVENTARIO ---
 
-        // --- Lógica de Producto (Funcionalidad Preservada) ---
+        // Función para cargar y mostrar productos (Renderizado Mejorado)
+        async function loadProducts() {
+            const { data: products, error } = await supabase.from("products").select("*").order("id", { ascending: false });
+            
+            if (error) {
+                console.error("Error cargando productos", error);
+                productsList.innerHTML = `<div class="lg:col-span-2 p-4 bg-red-100 text-red-700 rounded-lg">Error al cargar el inventario: ${error.message}</div>`;
+                return;
+            }
+            
+            productsList.innerHTML = "";
+            
+            if (products.length === 0) {
+                productsList.innerHTML = `<div class="lg:col-span-2 p-6 text-center bg-white rounded-xl shadow-md text-gray-500">Aún no hay productos en el inventario. ¡Agrega el primero!</div>`;
+            } else {
+                products.forEach((p) => {
+                    const div = document.createElement("div");
+                    div.className = "bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300 cursor-pointer";
+                    div.innerHTML = `
+                        <img src="${p.image_url || 'https://via.placeholder.com/400x200?text=Sin+Imagen'}" 
+                             alt="${p.name}"
+                             class="w-full h-48 object-cover transition duration-300 group-hover:opacity-90"/>
+                        <div class="p-5">
+                            <h3 class="text-xl font-extrabold text-gray-900 mb-1 truncate">${p.name}</h3>
+                            <div class="flex justify-between items-center mt-2">
+                                <p class="text-2xl font-bold text-indigo-600">$${p.price.toFixed(2)}</p>
+                                <span class="bg-gray-100 text-gray-800 text-sm font-semibold px-3 py-1 rounded-full">
+                                    Stock: ${p.quantity}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                    productsList.appendChild(div);
+                });
+            }
+        }
 
         // Guardar producto
         productForm.addEventListener("submit", async (e) => {
@@ -231,44 +263,17 @@
                 productForm.reset();
             }
         });
+        
+        // --- INICIALIZACIÓN DE LA PÁGINA (CORRECCIÓN DEL ERROR DE INICIALIZACIÓN) ---
+        window.addEventListener("load", () => {
+            // 1. Cargar el logo guardado
+            const savedLogo = localStorage.getItem("business-logo");
+            if (savedLogo) businessLogo.src = savedLogo;
+            else businessLogo.src = "https://via.placeholder.com/80/6366f1/ffffff?text=CM";
 
-        // Cargar y mostrar productos (Renderizado Mejorado)
-        async function loadProducts() {
-            const { data: products, error } = await supabase.from("products").select("*").order("id", { ascending: false });
-            if (error) {
-                console.error("Error cargando productos", error);
-                productsList.innerHTML = `<div class="md:col-span-3 p-4 bg-red-100 text-red-700 rounded-lg">Error al cargar el inventario: ${error.message}</div>`;
-                return;
-            }
-            
-            productsList.innerHTML = "";
-            
-            if (products.length === 0) {
-                productsList.innerHTML = `<div class="lg:col-span-2 p-6 text-center bg-white rounded-xl shadow-md text-gray-500">Aún no hay productos en el inventario. ¡Agrega el primero!</div>`;
-            } else {
-                products.forEach((p) => {
-                    const div = document.createElement("div");
-                    div.className = "bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300 cursor-pointer";
-                    div.innerHTML = `
-                        <img src="${p.image_url || 'https://via.placeholder.com/400x200?text=Sin+Imagen'}" 
-                             alt="${p.name}"
-                             class="w-full h-48 object-cover transition duration-300 group-hover:opacity-90"/>
-                        <div class="p-5">
-                            <h3 class="text-xl font-extrabold text-gray-900 mb-1 truncate">${p.name}</h3>
-                            <div class="flex justify-between items-center mt-2">
-                                <p class="text-2xl font-bold text-indigo-600">$${p.price.toFixed(2)}</p>
-                                <span class="bg-gray-100 text-gray-800 text-sm font-semibold px-3 py-1 rounded-full">
-                                    Stock: ${p.quantity}
-                                </span>
-                            </div>
-                        </div>
-                    `;
-                    productsList.appendChild(div);
-                });
-            }
-        }
-
-        loadProducts();
+            // 2. Cargar los productos (esto debe ocurrir DESPUÉS de inicializar 'supabase')
+            loadProducts(); 
+        });
     </script>
 </body>
 </html>
