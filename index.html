@@ -4,9 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Panel de Inventario - Tienda de Accesorios</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        /* Estilos adicionales para un diseño más moderno */
         .product-card {
             transition: transform 0.2s;
         }
@@ -14,13 +14,23 @@
             transform: translateY(-4px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
+        /* Ocultar el input type=file, manteniendo la funcionalidad */
+        #logo-upload {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            border: 0;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-900">
     
     <header class="sticky top-0 z-10 bg-white shadow-lg p-4 flex items-center justify-between border-b border-gray-200">
         <div class="flex items-center space-x-4">
-            <img id="business-logo" src="https://via.placeholder.com/60/4f46e5/ffffff?text=APP" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105" />
+            <img id="business-logo" src="https://via.placeholder.com/60/4f46e5/ffffff?text=CM" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105" />
             <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">📱 Panel de <span class="text-indigo-600">Inventario</span></h1>
         </div>
         
@@ -31,7 +41,6 @@
             <input 
                 type="file" 
                 id="logo-upload" 
-                class="absolute w-0 h-0 p-0 m-0 overflow-hidden border-0" 
                 title="Sube una nueva imagen para tu logo"
                 accept="image/*"
             />
@@ -91,15 +100,15 @@
         </footer>
     </div>
 
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
+    <script>
         // 🔑 Configuración y Conexión a Supabase
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // La librería supabase.js está cargada en el <head>
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
         const PRODUCT_BUCKET = "product-images";
-        const LOGO_BUCKET = "business-assets"; // Bucket para el logo
+        const LOGO_BUCKET = "business-assets"; // <--- Tu bucket de logos
 
         // --- Elementos del DOM ---
         const form = document.getElementById("product-form");
@@ -117,9 +126,17 @@
         const logoSaveButton = document.getElementById("logo-save-button");
         let selectedLogoFile = null;
 
+
         // ===========================================
-        // I. LÓGICA DEL LOGO (NUEVA IMPLEMENTACIÓN)
+        // I. LÓGICA DEL LOGO
         // ===========================================
+
+        // Carga el logo guardado en localStorage
+        function loadLogo() {
+            const savedLogo = localStorage.getItem("business-logo");
+            if (savedLogo) businessLogo.src = savedLogo;
+            else businessLogo.src = "https://via.placeholder.com/60/4f46e5/ffffff?text=CM"; 
+        }
 
         // 1. Manejar la selección del archivo
         logoUpload.addEventListener("change", (e) => {
@@ -138,8 +155,7 @@
                 logoSaveButton.textContent = "Guardar Logo";
             } else {
                 selectedLogoFile = null;
-                // Si cancela, vuelve al logo guardado
-                loadLogo(); 
+                loadLogo(); // Vuelve al logo guardado
                 logoSaveButton.disabled = true;
                 logoSaveButton.textContent = "Guardar Logo";
             }
@@ -157,16 +173,19 @@
 
             try {
                 const file = selectedLogoFile;
-                // Usamos un nombre de archivo único para evitar colisiones
-                const filePath = `logo-current-${file.name}`; 
+                // Usamos un nombre de archivo fijo para reemplazar el logo existente
+                const filePath = `current_business_logo_${file.name}`; 
                 
-                // Subida a Supabase Storage (usamos 'upsert: true' para reemplazar archivos con el mismo nombre)
+                // Subida a Supabase Storage con UPSET=TRUE
                 const { error: uploadError } = await supabase.storage.from(LOGO_BUCKET).upload(filePath, file, {
                     cacheControl: "3600",
-                    upsert: true,
+                    upsert: true, // Esto es clave para reemplazar el archivo
                 });
 
-                if (uploadError) throw new Error(uploadError.message);
+                if (uploadError) {
+                    // Muestra el error crítico de RLS aquí
+                    throw new Error(`Error: ${uploadError.message}. ¡Revisa tus políticas RLS para 'INSERT' en Supabase Storage!`);
+                }
 
                 // Obtener URL pública y actualizar
                 const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(filePath);
@@ -190,28 +209,21 @@
 
             } catch (error) {
                 console.error("Fallo al guardar logo:", error);
-                alert("❌ Error al guardar logo: " + error.message);
+                alert("❌ Fallo al guardar logo: " + error.message);
                 logoSaveButton.disabled = false;
                 logoSaveButton.textContent = "Error, Reintentar";
             }
         });
 
-        // Función para cargar el logo guardado
-        function loadLogo() {
-            const savedLogo = localStorage.getItem("business-logo");
-            if (savedLogo) businessLogo.src = savedLogo;
-            // Placeholder si no hay logo guardado
-            else businessLogo.src = "https://via.placeholder.com/60/4f46e5/ffffff?text=APP"; 
-        }
 
         // ===========================================
-        // II. LÓGICA DE PRODUCTOS (CÓDIGO EXISTENTE)
+        // II. LÓGICA DE PRODUCTOS
         // ===========================================
 
         async function fetchProducts() {
             const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
             if (error) {
-                console.error(error);
+                console.error("Error cargando productos:", error);
                 totalCount.textContent = "Error al cargar";
                 productsEl.innerHTML = `<p class="text-red-600">Error de conexión o permisos (RLS): ${error.message}</p>`;
                 return;
@@ -228,18 +240,16 @@
             }
             for (const p of items) {
                 const card = document.createElement("div");
-                card.className = "bg-white rounded-lg shadow p-4 flex flex-col product-card"; // Agregado product-card
+                card.className = "bg-white rounded-lg shadow p-4 flex flex-col product-card";
 
                 const imgBox = document.createElement("div");
                 imgBox.className = "h-40 bg-gray-100 rounded flex items-center justify-center mb-3 overflow-hidden";
-                if (p.image_url) {
-                    const img = document.createElement("img");
-                    img.src = p.image_url;
-                    img.className = "object-contain h-full w-full";
-                    imgBox.appendChild(img);
-                } else {
-                    imgBox.innerHTML = '<span class="text-gray-400 text-sm">Sin imagen</span>';
-                }
+                
+                const imageUrl = p.image_url || 'https://via.placeholder.com/150x100?text=Sin+Imagen';
+                const img = document.createElement("img");
+                img.src = imageUrl;
+                img.className = "object-contain h-full w-full";
+                imgBox.appendChild(img);
 
                 const title = document.createElement("h3");
                 title.className = "font-semibold";
@@ -291,7 +301,6 @@
             if (!file) return null;
             const ext = file.name.split(".").pop();
             const path = `product_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
-            // Usa el bucket de productos
             const { error } = await supabase.storage.from(PRODUCT_BUCKET).upload(path, file); 
             if (error) throw error;
             const { data: urlData } = supabase.storage.from(PRODUCT_BUCKET).getPublicUrl(path);
@@ -346,8 +355,8 @@
 
         // --- INICIALIZACIÓN ---
         window.addEventListener("load", () => {
-            loadLogo(); // Carga el logo
-            fetchProducts(); // Carga el inventario
+            loadLogo(); // Carga el logo al inicio
+            fetchProducts(); // Carga el inventario al inicio
         });
     </script>
 </body>
