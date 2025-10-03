@@ -1,149 +1,211 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cell Mar Productos</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-  <!-- Header con logo -->
-  <header class="bg-white shadow-md p-4 flex items-center space-x-4">
-    <img id="business-logo" src="" alt="Logo negocio" class="h-14 w-14 object-cover rounded-full border" />
-    <h1 class="text-2xl font-bold text-gray-800">Cell Mar Productos</h1>
-  </header>
-
-  <!-- Botón para subir logo -->
-  <div class="p-6 max-w-3xl mx-auto">
-    <label class="block text-sm font-medium text-gray-700 mb-2">Cambiar logo del negocio</label>
-    <input type="file" id="logo-upload" class="block text-sm text-gray-500 
-      file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 
-      file:text-sm file:font-semibold file:bg-indigo-50 
-      file:text-indigo-600 hover:file:bg-indigo-100"/>
-  </div>
-
-  <!-- Formulario productos -->
-  <main class="p-6 max-w-3xl mx-auto">
-    <h2 class="text-xl font-semibold text-gray-700 mb-4">Agregar Producto</h2>
-    <form id="product-form" class="space-y-4 bg-white p-6 rounded-lg shadow-md">
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Nombre</label>
-        <input type="text" id="name" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Precio</label>
-        <input type="number" id="price" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Cantidad</label>
-        <input type="number" id="quantity" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Imagen</label>
-        <input type="file" id="image" class="mt-1 block w-full text-sm text-gray-500"/>
-      </div>
-      <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">
-        Guardar Producto
-      </button>
-    </form>
-
-    <!-- Inventario -->
-    <h2 class="text-xl font-semibold text-gray-700 mt-10 mb-4">Inventario</h2>
-    <div id="products-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-  </main>
-
-  <script>
-    const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    const productForm = document.getElementById("product-form");
-    const productsList = document.getElementById("products-list");
-    const logoUpload = document.getElementById("logo-upload");
-    const businessLogo = document.getElementById("business-logo");
-
-    // Subir logo y guardar en localStorage
-    logoUpload.addEventListener("change", async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const filePath = `logo-${Date.now()}-${file.name}`;
-      const { error: uploadError } = await supabase.storage.from("business-assets").upload(filePath, file, {
-        cacheControl: "3600",
-        upsert: true,
-      });
-
-      if (uploadError) {
-        alert("Error subiendo logo: " + uploadError.message);
-        return;
-      }
-
-      const { data } = supabase.storage.from("business-assets").getPublicUrl(filePath);
-      if (data.publicUrl) {
-        businessLogo.src = data.publicUrl;
-        localStorage.setItem("business-logo", data.publicUrl);
-      }
-    });
-
-    // Cargar logo guardado
-    window.addEventListener("load", () => {
-      const savedLogo = localStorage.getItem("business-logo");
-      if (savedLogo) businessLogo.src = savedLogo;
-      else businessLogo.src = "https://via.placeholder.com/80"; // logo temporal
-    });
-
-    // Guardar producto
-    productForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const price = parseFloat(document.getElementById("price").value);
-      const quantity = parseInt(document.getElementById("quantity").value);
-      const imageFile = document.getElementById("image").files[0];
-
-      let imageUrl = null;
-      if (imageFile) {
-        const imagePath = `products/${Date.now()}-${imageFile.name}`;
-        const { error: imageError } = await supabase.storage.from("product-images").upload(imagePath, imageFile);
-        if (imageError) {
-          alert("Error subiendo imagen");
-          return;
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cell Mar Productos | Inventario</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-        const { data } = supabase.storage.from("product-images").getPublicUrl(imagePath);
-        imageUrl = data.publicUrl;
-      }
+        ::-webkit-scrollbar-thumb {
+            background: #9ca3af; /* gray-400 */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; /* gray-500 */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <header class="sticky top-0 z-10 bg-white shadow-lg p-4 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <img id="business-logo" src="https://via.placeholder.com/80" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105" />
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Cell Mar <span class="text-indigo-600">Productos</span></h1>
+        </div>
+        <div class="relative group">
+            <button id="logo-button" class="bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300 shadow-md">
+                Cambiar Logo
+            </button>
+            <input type="file" id="logo-upload" class="absolute inset-0 opacity-0 cursor-pointer" title="Sube una nueva imagen para tu logo"/>
+        </div>
+    </header>
 
-      const { error } = await supabase.from("products").insert([{ name, price, quantity, image_url: imageUrl }]);
-      if (error) {
-        alert("Error guardando producto: " + error.message);
-      } else {
+    <main class="p-8 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
+        
+        <section class="lg:col-span-1">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-indigo-300 pb-2">➕ Agregar Nuevo Producto</h2>
+            
+            <form id="product-form" class="space-y-6 bg-white p-8 rounded-xl shadow-2xl transform hover:shadow-indigo-200 transition duration-500">
+                <div>
+                    <label for="name" class="block text-sm font-semibold text-gray-700 mb-1">Nombre del Producto</label>
+                    <input type="text" id="name" required placeholder="Ej: Protector de Pantalla X1"
+                        class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
+                    />
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="price" class="block text-sm font-semibold text-gray-700 mb-1">Precio ($)</label>
+                        <input type="number" id="price" required step="0.01" min="0.01" placeholder="9.99"
+                            class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
+                        />
+                    </div>
+                    <div>
+                        <label for="quantity" class="block text-sm font-semibold text-gray-700 mb-1">Cantidad</label>
+                        <input type="number" id="quantity" required min="1" placeholder="50"
+                            class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <label for="image" class="block text-sm font-semibold text-gray-700 mb-1">Imagen del Producto</label>
+                    <input type="file" id="image"
+                        class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100 transition duration-150"
+                    />
+                </div>
+                
+                <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition duration-300 transform hover:scale-[1.01] shadow-lg hover:shadow-xl">
+                    💾 Guardar Producto
+                </button>
+            </form>
+        </section>
+
+        <section class="lg:col-span-2">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-indigo-300 pb-2">📦 Inventario de Productos</h2>
+            <div id="products-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div class="text-center p-8 text-gray-500">Cargando productos...</div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const productForm = document.getElementById("product-form");
+        const productsList = document.getElementById("products-list");
+        const logoUpload = document.getElementById("logo-upload");
+        const businessLogo = document.getElementById("business-logo");
+
+        // --- Lógica de Subir y Cargar Logo ---
+
+        // Subir logo y guardar en localStorage (Funcionalidad Preservada)
+        logoUpload.addEventListener("change", async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Ruta de almacenamiento única
+            const filePath = `logo-${Date.now()}-${file.name}`;
+            const { error: uploadError } = await supabase.storage.from("business-assets").upload(filePath, file, {
+                cacheControl: "3600",
+                upsert: true,
+            });
+
+            if (uploadError) {
+                alert("Error subiendo logo: " + uploadError.message);
+                return;
+            }
+
+            // Obtener URL pública y actualizar imagen
+            const { data } = supabase.storage.from("business-assets").getPublicUrl(filePath);
+            if (data.publicUrl) {
+                businessLogo.src = data.publicUrl;
+                localStorage.setItem("business-logo", data.publicUrl);
+                alert("✅ Logo actualizado con éxito!");
+            }
+        });
+
+        // Cargar logo guardado (Persistencia Preservada)
+        window.addEventListener("load", () => {
+            const savedLogo = localStorage.getItem("business-logo");
+            // Usamos un placeholder más bonito si no hay logo
+            if (savedLogo) businessLogo.src = savedLogo;
+            else businessLogo.src = "https://via.placeholder.com/80/6366f1/ffffff?text=CM";
+        });
+
+        // --- Lógica de Producto (Funcionalidad Preservada) ---
+
+        // Guardar producto
+        productForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            // Obtener valores del formulario
+            const name = document.getElementById("name").value;
+            const price = parseFloat(document.getElementById("price").value);
+            const quantity = parseInt(document.getElementById("quantity").value);
+            const imageFile = document.getElementById("image").files[0];
+
+            let imageUrl = null;
+            if (imageFile) {
+                const imagePath = `products/${Date.now()}-${imageFile.name}`;
+                // Usamos un bucket diferente para imágenes de productos (product-images)
+                const { error: imageError } = await supabase.storage.from("product-images").upload(imagePath, imageFile);
+                if (imageError) {
+                    alert("⚠️ Error subiendo imagen: " + imageError.message);
+                    return;
+                }
+                const { data } = supabase.storage.from("product-images").getPublicUrl(imagePath);
+                imageUrl = data.publicUrl;
+            }
+
+            // Insertar datos en la tabla 'products'
+            const { error } = await supabase.from("products").insert([{ name, price, quantity, image_url: imageUrl }]);
+            if (error) {
+                alert("❌ Error guardando producto: " + error.message);
+            } else {
+                alert("✅ Producto guardado con éxito!");
+                loadProducts();
+                productForm.reset();
+            }
+        });
+
+        // Cargar y mostrar productos (Renderizado Mejorado)
+        async function loadProducts() {
+            // Consulta de datos
+            const { data: products, error } = await supabase.from("products").select("*").order("id", { ascending: false });
+            if (error) {
+                console.error("Error cargando productos", error);
+                productsList.innerHTML = `<div class="md:col-span-3 p-4 bg-red-100 text-red-700 rounded-lg">Error al cargar el inventario: ${error.message}</div>`;
+                return;
+            }
+            
+            productsList.innerHTML = "";
+            
+            // Renderizar tarjetas de productos
+            if (products.length === 0) {
+                productsList.innerHTML = `<div class="md:col-span-3 p-6 text-center bg-white rounded-xl shadow-md text-gray-500">Aún no hay productos en el inventario. ¡Agrega el primero!</div>`;
+            } else {
+                products.forEach((p) => {
+                    const div = document.createElement("div");
+                    // Diseño de tarjeta mejorado con sombra y hover
+                    div.className = "bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300 cursor-pointer";
+                    div.innerHTML = `
+                        <img src="${p.image_url || 'https://via.placeholder.com/400x200?text=Sin+Imagen'}" 
+                             alt="${p.name}"
+                             class="w-full h-48 object-cover transition duration-300 group-hover:opacity-90"/>
+                        <div class="p-5">
+                            <h3 class="text-xl font-extrabold text-gray-900 mb-1 truncate">${p.name}</h3>
+                            <div class="flex justify-between items-center mt-2">
+                                <p class="text-2xl font-bold text-indigo-600">$${p.price.toFixed(2)}</p>
+                                <span class="bg-gray-100 text-gray-800 text-sm font-semibold px-3 py-1 rounded-full">
+                                    Stock: ${p.quantity}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                    productsList.appendChild(div);
+                });
+            }
+        }
+
+        // Llamar a la función al inicio para cargar los datos
         loadProducts();
-        productForm.reset();
-      }
-    });
-
-    // Cargar productos
-    async function loadProducts() {
-      const { data: products, error } = await supabase.from("products").select("*").order("id", { ascending: false });
-      if (error) {
-        console.error("Error cargando productos", error);
-        return;
-      }
-      productsList.innerHTML = "";
-      products.forEach((p) => {
-        const div = document.createElement("div");
-        div.className = "bg-white rounded-lg shadow-md p-4";
-        div.innerHTML = `
-          <img src="${p.image_url || 'https://via.placeholder.com/150'}" class="w-full h-40 object-cover rounded-md mb-2"/>
-          <h3 class="text-lg font-bold text-gray-800">${p.name}</h3>
-          <p class="text-gray-600">Precio: $${p.price}</p>
-          <p class="text-gray-600">Cantidad: ${p.quantity}</p>
-        `;
-        productsList.appendChild(div);
-      });
-    }
-
-    loadProducts();
-  </script>
+    </script>
 </body>
 </html>
