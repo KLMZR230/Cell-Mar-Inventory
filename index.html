@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Cell Mar Gestión De Productos</title>
+    <title>Cell Smart Gestión De Productos</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         .product-card {
@@ -33,10 +33,9 @@
     
     <header class="sticky top-0 z-10 bg-white shadow-lg p-4 flex items-center justify-between border-b border-gray-200">
         <div class="flex items-center space-x-4">
-            <img id="business-logo" src="https://via.placeholder.com/60/4f46e5/ffffff?text=CM" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105" />
+            <img id="business-logo" src="https://via.placeholder.com/60/4f46e5/ffffff?text=CS" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105" />
             <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">
-                📱 <span class="text-indigo-600">Cell Mar</span> Gestión
-            </h1>
+                📱 <span class="text-indigo-600">Cell Smart</span> Gestión De Productos </h1>
         </div>
         
         <div class="flex items-center space-x-4">
@@ -177,7 +176,7 @@
         </div>
 
         <footer class="mt-10 text-center text-gray-400 text-sm">
-            Panel de Inventario — Cell Mar
+            Panel de Inventario — Cell Smart
         </footer>
     </div>
 
@@ -192,8 +191,6 @@
         const PRODUCT_BUCKET = "product-images";
         const LOGO_BUCKET = "business-assets"; 
         const LOGO_PATH = "current_business_logo"; 
-        
-        // NUEVA TABLA
         const SALES_TABLE = "sales"; 
 
         // --- Elementos del DOM de Inventario ---
@@ -208,7 +205,7 @@
         const totalCount = document.getElementById("total-count");
         const searchInput = document.getElementById("search-input"); 
 
-        // --- Elementos del DOM de Ventas (NUEVO) ---
+        // --- Elementos del DOM de Ventas ---
         const salesForm = document.getElementById("sale-form");
         const recipientNameIn = document.getElementById("recipient-name");
         const salePriceIn = document.getElementById("sale-price");
@@ -229,12 +226,9 @@
         let currentView = 'inventory'; 
 
         // ===========================================
-        // I. FUNCIONES DE VISTA (NUEVO)
+        // I. FUNCIONES DE VISTA
         // ===========================================
 
-        /**
-         * Alterna entre la vista de Inventario y la vista de Ventas.
-         */
         function toggleView(viewName) {
             currentView = viewName;
             const inventoryView = document.getElementById('inventory-view');
@@ -253,19 +247,14 @@
                 currentViewTitle.textContent = "Vista: Ventas Registradas";
                 salesBtn.textContent = "📦 Inventario";
                 salesBtn.classList.replace('bg-indigo-600', 'bg-green-700');
-                // Al cambiar a Ventas, recargamos la lista
                 fetchSales(); 
             }
         }
         
         // ===========================================
-        // II. FUNCIONES DE VENTA (NUEVO)
+        // II. FUNCIONES DE VENTA
         // ===========================================
 
-        /**
-         * Inserta una nueva venta en la tabla 'sales'.
-         * @param {Object} data - Datos de la venta (recipient_name, price, sale_date).
-         */
         async function addSale(data) {
             const { error } = await supabase.from(SALES_TABLE).insert(data);
             
@@ -273,15 +262,11 @@
                 alert("❌ Error al registrar la venta: " + error.message);
                 console.error("Error al registrar venta:", error);
             } else {
-                fetchSales(); // Recargar lista de ventas
+                fetchSales(); 
             }
         }
 
-        /**
-         * Obtiene todas las ventas y las renderiza.
-         */
         async function fetchSales() {
-            // Ordenamos por fecha de venta descendente
             const { data, error } = await supabase
                 .from(SALES_TABLE)
                 .select("*")
@@ -297,10 +282,6 @@
             renderSales(data);
         }
 
-        /**
-         * Renderiza la lista de ventas en una tabla.
-         * @param {Array} items - Lista de registros de venta.
-         */
         function renderSales(items) {
             salesListEl.innerHTML = "";
             totalSalesCount.textContent = `${items.length} ventas`;
@@ -310,11 +291,9 @@
                 return;
             }
 
-            // Crear la estructura de la tabla
             const table = document.createElement('table');
             table.className = 'min-w-full divide-y divide-gray-200';
             
-            // Encabezado
             const thead = table.createTHead();
             thead.innerHTML = `
                 <tr>
@@ -325,14 +304,12 @@
                 </tr>
             `;
 
-            // Cuerpo de la tabla
             const tbody = document.createElement('tbody');
             tbody.className = 'bg-white divide-y divide-gray-200';
             
             items.forEach(sale => {
                 const row = tbody.insertRow();
                 
-                // Formato de fecha AAAA-MM-DD
                 const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
 
                 row.innerHTML = `
@@ -349,9 +326,6 @@
             salesListEl.appendChild(table);
         }
 
-        /**
-         * Elimina un registro de venta (Exponemos la función al scope global para el onclick en el render).
-         */
         window.deleteSale = async function(id) {
             if (!confirm("¿Eliminar este registro de venta?")) return;
             await supabase.from(SALES_TABLE).delete().eq("id", id);
@@ -359,7 +333,7 @@
         }
 
         // ===========================================
-        // III. FUNCIONES DE INVENTARIO (EXISTENTES)
+        // III. FUNCIONES DE INVENTARIO
         // ===========================================
         
         async function editProduct(id, newName, newPrice) {
@@ -410,7 +384,6 @@
             productsEl.innerHTML = ""; 
             totalCount.textContent = `${items.length} productos`;
 
-            // ... (El resto de la función renderProducts se mantiene igual) ...
             if (items.length === 0) {
                 productsEl.innerHTML = `<p class="text-gray-500">No se encontraron productos${searchInput.value ? ' para el término "' + searchInput.value + '"' : ''}.</p>`;
                 return;
@@ -562,7 +535,7 @@
             if (data.publicUrl) {
                 businessLogo.src = data.publicUrl;
             } else {
-                businessLogo.src = "https://via.placeholder.com/60/4f46e5/ffffff?text=CM"; 
+                businessLogo.src = "https://via.placeholder.com/60/4f46e5/ffffff?text=CS"; 
             }
         }
 
@@ -629,17 +602,14 @@
         // V. EVENTOS
         // ===========================================
         
-        // Listener para búsqueda
         searchInput.addEventListener("input", () => {
             filterAndRenderProducts();
         });
 
-        // Listener para alternar la vista (NUEVO)
         document.getElementById('sales-view-btn').addEventListener('click', () => {
             toggleView(currentView === 'inventory' ? 'sales' : 'inventory');
         });
 
-        // Eventos del Formulario de Productos
         form.addEventListener("submit", async (ev) => {
             ev.preventDefault();
             document.getElementById("submit").disabled = true;
@@ -675,7 +645,6 @@
             }
         });
 
-        // Eventos del Formulario de Ventas (NUEVO)
         salesForm.addEventListener("submit", async (ev) => {
             ev.preventDefault();
             document.getElementById("sale-submit").disabled = true;
@@ -691,7 +660,6 @@
 
                 recipientNameIn.value = "";
                 salePriceIn.value = "";
-                // Mantener la fecha actual o la última fecha registrada
                 
                 saleStatus.textContent = "Venta registrada con éxito ✅";
             } catch (err) {
@@ -708,7 +676,6 @@
         window.addEventListener("load", () => {
             loadLogo(); 
             fetchProducts(); 
-            // Establecer la fecha de hoy por defecto en el campo de venta
             saleDateIn.value = new Date().toISOString().split('T')[0];
         });
     </script>
