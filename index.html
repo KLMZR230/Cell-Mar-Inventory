@@ -142,12 +142,17 @@
         <div id="sales-view" class="view-section hidden">
             <section class="bg-white rounded-lg shadow p-6 mb-8">
                 <h2 class="text-xl font-semibold mb-4">✍️ Registrar Nueva Venta</h2>
-                <form id="sale-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <form id="sale-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                     <div>
                         <label class="block text-sm font-medium">Nombre de Destinatario</label>
                         <input id="recipient-name" type="text" required class="mt-1 block w-full border rounded-md p-2" placeholder="Ej: Juan Pérez" />
                     </div>
                     
+                    <div>
+                        <label class="block text-sm font-medium">Producto Vendido</label>
+                        <input id="product-name-sold" type="text" required class="mt-1 block w-full border rounded-md p-2" placeholder="Ej: Pantalla Samsung A32" />
+                    </div>
+
                     <div>
                         <label class="block text-sm font-medium">Precio Final (USD)</label>
                         <input id="sale-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2" placeholder="25.99" />
@@ -205,9 +210,10 @@
         const totalCount = document.getElementById("total-count");
         const searchInput = document.getElementById("search-input"); 
 
-        // --- Elementos del DOM de Ventas ---
+        // --- Elementos del DOM de Ventas (ACTUALIZADO) ---
         const salesForm = document.getElementById("sale-form");
         const recipientNameIn = document.getElementById("recipient-name");
+        const productNameSoldIn = document.getElementById("product-name-sold"); // NUEVO
         const salePriceIn = document.getElementById("sale-price");
         const saleDateIn = document.getElementById("sale-date");
         const salesListEl = document.getElementById("sales-list");
@@ -252,10 +258,11 @@
         }
         
         // ===========================================
-        // II. FUNCIONES DE VENTA
+        // II. FUNCIONES DE VENTA (ACTUALIZADO)
         // ===========================================
 
         async function addSale(data) {
+            // Asegúrate de que los nombres de columna coincidan con tu tabla 'sales' en Supabase.
             const { error } = await supabase.from(SALES_TABLE).insert(data);
             
             if (error) {
@@ -294,11 +301,13 @@
             const table = document.createElement('table');
             table.className = 'min-w-full divide-y divide-gray-200';
             
+            // Encabezado de la tabla con la nueva columna
             const thead = table.createTHead();
             thead.innerHTML = `
                 <tr>
                     <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
                     <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destinatario</th>
+                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto Vendido</th>
                     <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio de Venta</th>
                     <th class="px-6 py-3 bg-gray-50"></th>
                 </tr>
@@ -312,9 +321,11 @@
                 
                 const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
 
+                // Fila de la tabla con la nueva celda
                 row.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${saleDate}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale.recipient_name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale.product_name_sold || 'N/A'}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">$${Number(sale.price).toFixed(2)}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button onclick="deleteSale('${sale.id}')" class="text-red-600 hover:text-red-900 transition">Eliminar</button>
@@ -645,6 +656,7 @@
             }
         });
 
+        // Eventos del Formulario de Ventas (ACTUALIZADO)
         salesForm.addEventListener("submit", async (ev) => {
             ev.preventDefault();
             document.getElementById("sale-submit").disabled = true;
@@ -652,6 +664,7 @@
             try {
                 const saleData = {
                     recipient_name: recipientNameIn.value,
+                    product_name_sold: productNameSoldIn.value, // NUEVO DATO
                     price: parseFloat(salePriceIn.value),
                     sale_date: saleDateIn.value
                 };
@@ -659,6 +672,7 @@
                 await addSale(saleData);
 
                 recipientNameIn.value = "";
+                productNameSoldIn.value = ""; // Limpiar el nuevo campo
                 salePriceIn.value = "";
                 
                 saleStatus.textContent = "Venta registrada con éxito ✅";
