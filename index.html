@@ -4,6 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Cell Mar Gestión De Productos</title>
+    <link href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js" rel="preload" as="script">
+    <link href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm" rel="preload" as="script">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         .product-card {
@@ -145,9 +147,9 @@
         const qtyIn = document.getElementById("quantity");
         const imageIn = document.getElementById("image");
         const status = document.getElementById("status");
-        const productsEl = document.getElementById("products"); // Contenedor principal
+        const productsEl = document.getElementById("products"); 
         const totalCount = document.getElementById("total-count");
-        const searchInput = document.getElementById("search-input"); // NUEVO ELEMENTO
+        const searchInput = document.getElementById("search-input"); 
         
         // Elementos del Logo
         const logoUpload = document.getElementById("logo-upload");
@@ -160,12 +162,10 @@
         // ===========================================
 
         async function changeQty(id, delta) {
-            // Actualización de cantidad
             const { data: row } = await supabase.from("products").select("quantity").eq("id", id).single();
             const newQty = Math.max(0, (row.quantity || 0) + delta);
             await supabase.from("products").update({ quantity: newQty }).eq("id", id);
             
-            // Refrescar y aplicar búsqueda
             await fetchProducts();
             applySearchFilter(searchInput.value); 
         }
@@ -174,7 +174,6 @@
             if (!confirm("¿Eliminar este producto? Esta acción es irreversible.")) return;
             await supabase.from("products").delete().eq("id", id);
             
-            // Refrescar y aplicar búsqueda
             await fetchProducts();
             applySearchFilter(searchInput.value);
         }
@@ -193,11 +192,7 @@
         // II. LÓGICA DE BÚSQUEDA Y RENDERIZADO
         // ===========================================
         
-        /**
-         * Función central para filtrar y renderizar productos.
-         */
         function applySearchFilter(searchTerm) {
-            // Si no hay término de búsqueda, usamos todos los productos
             let filteredProducts = ALL_PRODUCTS;
 
             if (searchTerm) {
@@ -211,9 +206,6 @@
             renderProducts(filteredProducts);
         }
 
-        /**
-         * Función que toma una lista de productos y los dibuja agrupados por categoría.
-         */
         function renderProducts(items) {
             productsEl.innerHTML = ""; 
             totalCount.textContent = `${items.length} productos visibles`;
@@ -282,7 +274,6 @@
                     const dec = document.createElement("button");
                     dec.textContent = "-";
                     dec.className = "px-3 py-1 border rounded bg-gray-100 hover:bg-gray-200 transition";
-                    // Enlaza la función directamente al ID del producto
                     dec.onclick = () => changeQty(p.id, -1);
                     
                     const inc = document.createElement("button");
@@ -316,9 +307,6 @@
             });
         }
         
-        /**
-         * Función que carga todos los productos de Supabase y actualiza la variable global.
-         */
         async function fetchProducts() {
             const { data, error } = await supabase.from("products").select("*").order("category", { ascending: true }).order("created_at", { ascending: false });
             if (error) {
@@ -327,18 +315,45 @@
                 productsEl.innerHTML = `<p class="text-red-600">Error: No se pudo cargar el inventario. Asegúrate de tener la política RLS de SELECT activa para la tabla 'products'.</p>`;
                 return;
             }
-            // Guarda la lista completa en la variable global
             ALL_PRODUCTS = data; 
         }
 
         // ===========================================
-        // III. LÓGICA DEL LOGO Y EVENTOS
+        // III. LÓGICA DEL LOGO Y EVENTOS (CORREGIDA)
         // ===========================================
 
-        function loadLogo() {
-            const savedLogo = localStorage.getItem("business-logo");
-            if (savedLogo) businessLogo.src = savedLogo;
-            else businessLogo.src = "https://via.placeholder.com/60/4f46e5/ffffff?text=CM"; 
+        /**
+         * Obtiene la URL del logo directamente desde Supabase y fuerza el NO-CACHÉ.
+         */
+        async function fetchAndLoadLogo() {
+            // 1. Obtener la lista de archivos en el bucket del logo
+            const { data: files, error } = await supabase.storage.from(LOGO_BUCKET).list('', {
+                limit: 100,
+                sortBy: { column: 'updated_at', order: 'desc' },
+            });
+
+            if (error || !files || files.length === 0) {
+                businessLogo.src = "https://via.placeholder.com/60/4f46e5/ffffff?text=CM";
+                localStorage.removeItem("business-logo");
+                return;
+            }
+
+            // 2. Intentar encontrar el logo principal (o el más reciente)
+            const mainLogo = files.find(f => f.name.startsWith('current_business_logo_'));
+            const logoFile = mainLogo || files[0];
+
+            // 3. Obtener la URL pública y añadir un parámetro de versión
+            const { data: urlData } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(logoFile.name);
+            
+            if (urlData && urlData.publicUrl) {
+                // Usamos un timestamp para forzar la recarga en todos los navegadores
+                const publicUrlWithVersion = `${urlData.publicUrl}?v=${Date.now()}`;
+                businessLogo.src = publicUrlWithVersion;
+                localStorage.setItem("business-logo", publicUrlWithVersion);
+            } else {
+                businessLogo.src = "https://via.placeholder.com/60/4f46e5/ffffff?text=CM";
+                localStorage.removeItem("business-logo");
+            }
         }
 
         logoUpload.addEventListener("change", (e) => {
@@ -352,7 +367,7 @@
                 logoSaveButton.textContent = "Guardar Logo";
             } else {
                 selectedLogoFile = null;
-                loadLogo(); 
+                fetchAndLoadLogo(); 
                 logoSaveButton.disabled = true;
                 logoSaveButton.textContent = "Guardar Logo";
             }
@@ -366,7 +381,8 @@
 
             try {
                 const file = selectedLogoFile;
-                const filePath = `current_business_logo_${file.name}`; 
+                // Nombre constante para que 'upsert' funcione como actualización
+                const filePath = `current_business_logo_${file.name.replace(/\s/g, '_')}`; 
                 
                 const { error: uploadError } = await supabase.storage.from(LOGO_BUCKET).upload(filePath, file, {
                     cacheControl: "3600",
@@ -375,13 +391,10 @@
 
                 if (uploadError) throw new Error(`Error: ${uploadError.message}. Revisa tus políticas RLS de INSERT en el bucket ${LOGO_BUCKET}.`);
 
-                const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(filePath);
-                if (!data.publicUrl) throw new Error("No se pudo obtener la URL pública.");
+                // Recargar el logo para forzar la actualización en todos los navegadores
+                await fetchAndLoadLogo(); 
                 
-                businessLogo.src = data.publicUrl;
-                localStorage.setItem("business-logo", data.publicUrl); 
-                
-                alert("✅ Logo actualizado con éxito!");
+                alert("✅ Logo actualizado con éxito! Pídele a tus compañeros que recarguen la página.");
                 
                 selectedLogoFile = null;
                 logoUpload.value = "";
@@ -426,7 +439,7 @@
                 qtyIn.value = 1;
                 imageIn.value = "";
                 
-                // Recargar todos los productos y aplicar el filtro de búsqueda (si lo hay)
+                // Recargar todos los productos y aplicar el filtro
                 await fetchProducts();
                 applySearchFilter(searchInput.value);
                 
@@ -441,7 +454,7 @@
         });
 
         // ---------------------------------------------
-        // Manejador de Eventos de Búsqueda (KEY UP)
+        // Manejador de Eventos de Búsqueda
         // ---------------------------------------------
         searchInput.addEventListener('keyup', (e) => {
             applySearchFilter(e.target.value);
@@ -449,11 +462,12 @@
 
         // --- INICIALIZACIÓN ---
         window.addEventListener("load", async () => {
-            loadLogo(); 
-            // Cargar todos los productos una vez al inicio
+            // 1. Cargar todos los productos
             await fetchProducts(); 
-            // Renderizar la vista inicial sin filtro
-            renderProducts(ALL_PRODUCTS);
+            // 2. Renderizar la vista inicial sin filtro
+            applySearchFilter(searchInput.value);
+            // 3. Cargar el logo (corregido para persistencia)
+            await fetchAndLoadLogo(); 
         });
     </script>
 </body>
