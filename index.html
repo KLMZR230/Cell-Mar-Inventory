@@ -74,6 +74,8 @@
                         <option value="Jacks de Carga">Jacks de Carga</option>
                         <option value="Flex Main">Flex Main</option>
                         <option value="Placas de Carga">Placas de Carga</option>
+                        <option value="Botones Fisicos">Botones Fisicos</option>
+                        <option value="Botones Internos">Botones Internos</option>
                         <option value="Accesorios">Accesorios</option>
                         <option value="Otros">Otros</option>
                     </select>
@@ -140,7 +142,7 @@
         
         const PRODUCT_BUCKET = "product-images";
         const LOGO_BUCKET = "business-assets"; 
-        const LOGO_PATH = "current_business_logo"; // Ruta fija para el logo global
+        const LOGO_PATH = "current_business_logo"; 
 
         // --- Elementos del DOM ---
         const form = document.getElementById("product-form");
@@ -167,9 +169,6 @@
         // I. FUNCIONES GLOBALES DE INVENTARIO
         // ===========================================
         
-        /**
-         * Actualiza el nombre y precio de un producto en la base de datos de Supabase.
-         */
         async function editProduct(id, newName, newPrice) {
             const priceValue = parseFloat(newPrice);
             if (isNaN(priceValue) || priceValue < 0) {
@@ -188,7 +187,7 @@
                 alert("❌ Error al actualizar producto: " + error.message);
                 console.error("Error al actualizar producto:", error);
             } else {
-                fetchProducts(); // Refresca el inventario
+                fetchProducts(); 
             }
         }
 
@@ -343,10 +342,6 @@
             });
         }
         
-        /**
-         * Filtra los productos almacenados localmente según el término de búsqueda
-         * y luego llama a renderProducts para mostrarlos.
-         */
         function filterAndRenderProducts() {
             const searchTerm = searchInput.value || "";
             const term = searchTerm.toLowerCase().trim();
@@ -376,18 +371,12 @@
         // III. LÓGICA DEL LOGO GLOBAL
         // ===========================================
 
-        /**
-         * Carga el logo consultando la ruta fija en Supabase Storage.
-         * Esto asegura que el logo sea el mismo en todos los dispositivos.
-         */
         async function loadLogo() {
-            // Obtener la URL pública del archivo fijo en Supabase Storage
             const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(LOGO_PATH);
 
             if (data.publicUrl) {
                 businessLogo.src = data.publicUrl;
             } else {
-                // Si falla o no existe (la primera vez), usa el placeholder predeterminado
                 businessLogo.src = "https://via.placeholder.com/60/4f46e5/ffffff?text=CM"; 
             }
         }
@@ -417,12 +406,11 @@
 
             try {
                 const file = selectedLogoFile;
-                // Usamos el path fijo para SOBRESCRIBIR el logo anterior
                 const filePath = LOGO_PATH; 
                 
                 const { error: uploadError } = await supabase.storage.from(LOGO_BUCKET).upload(filePath, file, {
                     cacheControl: "3600",
-                    upsert: true, // Esto es clave para que sobrescriba el archivo si ya existe
+                    upsert: true, 
                     contentType: file.type
                 });
 
@@ -431,7 +419,6 @@
                 const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(filePath);
                 if (!data.publicUrl) throw new Error("No se pudo obtener la URL pública.");
                 
-                // Actualizar la imagen y mostrar el éxito
                 businessLogo.src = data.publicUrl;
                 
                 alert("✅ Logo actualizado con éxito! Se cargará en todos los dispositivos.");
@@ -457,12 +444,10 @@
         // IV. EVENTOS INICIALES
         // ===========================================
         
-        // Listener para búsqueda en tiempo real
         searchInput.addEventListener("input", () => {
             filterAndRenderProducts();
         });
 
-        // Eventos del Formulario de Productos
         form.addEventListener("submit", async (ev) => {
             ev.preventDefault();
             document.getElementById("submit").disabled = true;
