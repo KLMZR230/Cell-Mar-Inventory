@@ -23,10 +23,6 @@
             overflow: hidden;
             border: 0;
         }
-        /* Clases para ocultar/mostrar elementos de edición */
-        .edit-mode .display-text { display: none !important; }
-        .edit-mode .edit-input { display: block !important; }
-        .edit-input { display: none; }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-900">
@@ -104,20 +100,23 @@
             </form>
             <p id="status" class="text-sm text-gray-500 mt-3"></p>
         </section>
-        
-        <div class="mb-8">
-            <label for="search-input" class="block text-lg font-semibold mb-2">🔍 Buscar Productos</label>
-            <input 
-                type="text" 
-                id="search-input" 
-                placeholder="Escribe el nombre o categoría del producto..."
-                class="w-full border-2 border-gray-300 p-3 rounded-lg focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-150"
-            />
-        </div>
+
         <section>
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-semibold">📦 Inventario por Categoría</h2>
                 <span id="total-count" class="text-gray-500 text-sm">Cargando...</span>
+            </div>
+            
+            <div class="mb-6 flex items-center space-x-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="Buscar por nombre o categoría..." 
+                    class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500"
+                />
             </div>
             <div id="products"></div>
         </section>
@@ -130,16 +129,13 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-        // 🔑 Configuración y Conexión a Supabase (Verifica tu clave si tienes problemas de conexión)
+        // 🔑 Configuración y Conexión a Supabase
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCVBaXzd3lmQJaNOVd1g3M";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         const PRODUCT_BUCKET = "product-images";
         const LOGO_BUCKET = "business-assets"; 
-
-        // Variable global para almacenar todos los productos
-        let ALL_PRODUCTS = []; 
 
         // --- Elementos del DOM ---
         const form = document.getElementById("product-form");
@@ -149,9 +145,8 @@
         const qtyIn = document.getElementById("quantity");
         const imageIn = document.getElementById("image");
         const status = document.getElementById("status");
-        const productsEl = document.getElementById("products"); 
+        const productsEl = document.getElementById("products"); // Contenedor principal
         const totalCount = document.getElementById("total-count");
-        const searchInput = document.getElementById("search-input"); 
         
         // Elementos del Logo
         const logoUpload = document.getElementById("logo-upload");
@@ -159,25 +154,50 @@
         const logoSaveButton = document.getElementById("logo-save-button");
         let selectedLogoFile = null;
 
+        // NUEVO: Elemento de Búsqueda y Almacén de Datos
+        const searchInput = document.getElementById("search-input"); 
+        let allProducts = []; // Almacena todos los productos cargados para el filtro local
+
         // ===========================================
         // I. FUNCIONES GLOBALES DE INVENTARIO
         // ===========================================
+        
+        // NUEVA FUNCIÓN: Editar Nombre y Precio
+        async function editProduct(id, newName, newPrice) {
+            // Validación básica del precio
+            const priceValue = parseFloat(newPrice);
+            if (isNaN(priceValue) || priceValue < 0) {
+                alert("Precio inválido. Debe ser un número positivo.");
+                return;
+            }
+
+            const dataToUpdate = {
+                name: newName.trim(),
+                price: priceValue
+            };
+            
+            const { error } = await supabase.from("products").update(dataToUpdate).eq("id", id);
+            
+            if (error) {
+                alert("❌ Error al actualizar producto: " + error.message);
+                console.error("Error al actualizar producto:", error);
+            } else {
+                // Después de la edición, recargamos y filtramos para mantener el estado de la búsqueda
+                fetchProducts(); 
+            }
+        }
 
         async function changeQty(id, delta) {
             const { data: row } = await supabase.from("products").select("quantity").eq("id", id).single();
             const newQty = Math.max(0, (row.quantity || 0) + delta);
             await supabase.from("products").update({ quantity: newQty }).eq("id", id);
-            
-            await fetchProducts();
-            applySearchFilter(searchInput.value); 
+            fetchProducts();
         }
 
         async function deleteProduct(id) {
             if (!confirm("¿Eliminar este producto? Esta acción es irreversible.")) return;
             await supabase.from("products").delete().eq("id", id);
-            
-            await fetchProducts();
-            applySearchFilter(searchInput.value);
+            fetchProducts();
         }
 
         async function uploadImage(file) {
@@ -190,48 +210,16 @@
             return urlData?.publicUrl;
         }
 
-        async function updateProduct(id, newName, newPrice) {
-            const updates = {};
-            if (newName) updates.name = newName;
-            if (newPrice !== undefined) updates.price = parseFloat(newPrice);
-            
-            if (Object.keys(updates).length === 0) return;
-
-            const { error } = await supabase.from("products").update(updates).eq("id", id);
-            
-            if (error) {
-                console.error("Error al actualizar producto:", error);
-                alert(`Error al actualizar el producto: ${error.message}. Asegúrate de que RLS UPDATE esté activo.`);
-            } else {
-                await fetchProducts();
-                applySearchFilter(searchInput.value);
-            }
-        }
-
         // ===========================================
-        // II. LÓGICA DE BÚSQUEDA Y RENDERIZADO
+        // II. RENDERIZADO Y LÓGICA DE CARGA (MODIFICADA)
         // ===========================================
         
-        function applySearchFilter(searchTerm) {
-            let filteredProducts = ALL_PRODUCTS;
-
-            if (searchTerm) {
-                const lowerCaseSearch = searchTerm.toLowerCase();
-                filteredProducts = ALL_PRODUCTS.filter(p => 
-                    p.name.toLowerCase().includes(lowerCaseSearch) ||
-                    (p.category && p.category.toLowerCase().includes(lowerCaseSearch))
-                );
-            }
-            
-            renderProducts(filteredProducts);
-        }
-
         function renderProducts(items) {
-            productsEl.innerHTML = ""; 
-            totalCount.textContent = `${items.length} productos visibles`;
+            productsEl.innerHTML = ""; // Limpiar el contenedor principal
+            totalCount.textContent = `${items.length} productos`;
 
             if (items.length === 0) {
-                productsEl.innerHTML = '<p class="text-gray-500 text-center text-xl p-8">No se encontraron productos que coincidan con la búsqueda.</p>';
+                productsEl.innerHTML = `<p class="text-gray-500">No se encontraron productos${searchInput.value ? ' para el término "' + searchInput.value + '"' : ''}.</p>`;
                 return;
             }
 
@@ -245,12 +233,12 @@
                 return acc;
             }, {});
 
-            // 2. Iterar sobre las categorías
+            // 2. Iterar sobre las categorías (llaves del objeto grouped)
             Object.keys(grouped).forEach(category => {
                 const categorySection = document.createElement("div");
-                categorySection.className = "mb-10"; 
+                categorySection.className = "mb-10"; // Margen inferior para separar secciones
 
-                // Título de la Categoría
+                // Título de la Categoría en grande
                 const categoryTitle = document.createElement("h2");
                 categoryTitle.className = "text-2xl font-bold text-gray-800 border-b-2 border-indigo-400 pb-2 mb-4 uppercase tracking-wider";
                 categoryTitle.textContent = category;
@@ -259,11 +247,29 @@
                 const productsGrid = document.createElement("div");
                 productsGrid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6";
 
-                // 3. Renderizar productos
+                // 3. Renderizar productos dentro del grid de esta categoría
                 grouped[category].forEach(p => {
                     const card = document.createElement("div");
                     card.className = "bg-white rounded-lg shadow p-4 flex flex-col product-card";
-                    card.id = `product-${p.id}`; 
+                    card.style.position = "relative"; // Necesario para posicionar el botón de edición
+
+                    // NUEVO: Botón de Edición
+                    const editBtn = document.createElement("button");
+                    editBtn.className = "absolute top-2 right-2 text-gray-400 hover:text-indigo-600 transition p-1 rounded-full bg-white/70 shadow-sm";
+                    editBtn.title = "Editar nombre y precio";
+                    editBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>';
+                    editBtn.onclick = () => {
+                        const currentPrice = Number(p.price).toFixed(2);
+                        const newName = prompt("Nuevo nombre para el producto:", p.name);
+                        if (newName === null || newName.trim() === "") return;
+                        
+                        const newPrice = prompt("Nuevo precio (USD):", currentPrice);
+                        if (newPrice === null) return;
+
+                        editProduct(p.id, newName, newPrice);
+                    };
+                    card.appendChild(editBtn); 
+                    // FIN NUEVO
 
                     const imgBox = document.createElement("div");
                     imgBox.className = "h-40 bg-gray-100 rounded flex items-center justify-center mb-3 overflow-hidden";
@@ -273,39 +279,22 @@
                     img.src = imageUrl;
                     img.className = "object-contain h-full w-full";
                     imgBox.appendChild(img);
+
+                    const title = document.createElement("h3");
+                    title.className = "font-semibold";
+                    title.textContent = p.name;
                     
-                    // Contenedor del nombre (display/edit)
-                    const titleContainer = document.createElement("div");
-                    titleContainer.className = "mb-2";
-                    
-                    const titleDisplay = document.createElement("h3");
-                    titleDisplay.className = "font-semibold display-text";
-                    titleDisplay.textContent = p.name;
-                    titleContainer.appendChild(titleDisplay);
-                    
-                    const nameEditInput = document.createElement("input");
-                    nameEditInput.type = "text";
-                    nameEditInput.value = p.name;
-                    nameEditInput.className = "edit-input w-full border rounded p-1 text-sm";
-                    nameEditInput.dataset.field = 'name';
-                    titleContainer.appendChild(nameEditInput);
-                    
-                    // Contenedor del precio (display/edit)
-                    const priceContainer = document.createElement("div");
-                    priceContainer.className = "text-gray-700 font-bold text-lg mt-2 mb-1";
-                    
-                    const priceDisplay = document.createElement("span");
-                    priceDisplay.className = "display-text";
-                    priceDisplay.textContent = `$${Number(p.price).toFixed(2)}`;
-                    priceContainer.appendChild(priceDisplay);
-                    
-                    const priceEditInput = document.createElement("input");
-                    priceEditInput.type = "number";
-                    priceEditInput.step = "0.01";
-                    priceEditInput.value = Number(p.price).toFixed(2);
-                    priceEditInput.className = "edit-input w-full border rounded p-1 text-sm";
-                    priceEditInput.dataset.field = 'price';
-                    priceContainer.appendChild(priceEditInput);
+                    // Mostrar la categoría como una etiqueta pequeña si no es el título principal
+                    if (p.category !== category) {
+                        const categoryTag = document.createElement("span");
+                        categoryTag.className = "text-xs font-medium text-indigo-600 bg-indigo-100 px-2 py-0.5 rounded-full mt-1 inline-block";
+                        categoryTag.textContent = p.category;
+                        card.appendChild(categoryTag);
+                    }
+
+                    const price = document.createElement("p");
+                    price.className = "text-gray-700 font-bold text-lg mt-2"; 
+                    price.textContent = `$${Number(p.price).toFixed(2)}`;
 
                     const qty = document.createElement("p");
                     qty.className = "mt-1 text-sm text-gray-600";
@@ -329,23 +318,6 @@
                     
                     controls.appendChild(dec);
                     controls.appendChild(inc);
-                    
-                    // Botones de edición
-                    const editButton = document.createElement("button");
-                    editButton.textContent = "Editar";
-                    editButton.className = "px-3 py-1 rounded bg-indigo-500 hover:bg-indigo-600 text-white shadow-md text-sm transition edit-button";
-                    editButton.onclick = () => toggleEditMode(card, p.id);
-                    
-                    const saveButton = document.createElement("button");
-                    saveButton.textContent = "Guardar";
-                    saveButton.className = "px-3 py-1 rounded bg-green-500 hover:bg-green-600 text-white shadow-md text-sm transition save-button edit-input";
-                    saveButton.onclick = async () => {
-                        const newName = card.querySelector(`input[data-field='name']`).value;
-                        const newPrice = card.querySelector(`input[data-field='price']`).value;
-                        await updateProduct(p.id, newName, newPrice);
-                        // Sale del modo edición después de guardar
-                        card.classList.remove('edit-mode'); 
-                    };
 
                     const del = document.createElement("button");
                     del.textContent = "Eliminar";
@@ -353,13 +325,11 @@
                     del.onclick = () => deleteProduct(p.id);
 
                     actions.appendChild(controls);
-                    actions.appendChild(editButton);
-                    actions.appendChild(saveButton);
                     actions.appendChild(del);
 
                     card.appendChild(imgBox);
-                    card.appendChild(titleContainer);
-                    card.appendChild(priceContainer);
+                    card.appendChild(title);
+                    card.appendChild(price);
                     card.appendChild(qty);
                     card.appendChild(actions);
 
@@ -372,59 +342,44 @@
             });
         }
         
-        function toggleEditMode(card, productId) {
-            document.querySelectorAll('.edit-mode').forEach(c => {
-                if (c.id !== card.id) {
-                    c.classList.remove('edit-mode');
-                }
-            });
-            card.classList.toggle('edit-mode');
+        // NUEVA FUNCIÓN: Filtra los productos basándose en el término de búsqueda actual
+        function filterAndRenderProducts() {
+            const searchTerm = searchInput.value || "";
+            const term = searchTerm.toLowerCase().trim();
+            
+            const filteredProducts = allProducts.filter(p => 
+                p.name.toLowerCase().includes(term) || 
+                (p.category && p.category.toLowerCase().includes(term))
+            );
+            
+            renderProducts(filteredProducts);
         }
 
-
         async function fetchProducts() {
-            try {
-                const { data, error } = await supabase.from("products").select("*").order("category", { ascending: true }).order("created_at", { ascending: false });
-                if (error) throw error;
-                ALL_PRODUCTS = data;
-                totalCount.textContent = `${ALL_PRODUCTS.length} productos en total`;
-            } catch (error) {
-                 console.error("Error al cargar productos (fetchProducts):", error);
-                 totalCount.textContent = "⚠️ ERROR DE CONEXIÓN";
-                 productsEl.innerHTML = `<p class="text-red-600 p-8">⚠️ ERROR CRÍTICO. La página no pudo leer los productos. Por favor, revisa tus políticas RLS de **SELECT** en la tabla 'products' de Supabase.</p>`;
-                 ALL_PRODUCTS = [];
+            // Aseguramos que se carguen ordenados por categoría para una mejor agrupación visual
+            const { data, error } = await supabase.from("products").select("*").order("category", { ascending: true }).order("created_at", { ascending: false });
+            if (error) {
+                console.error("Error cargando productos:", error);
+                totalCount.textContent = "Error al cargar";
+                productsEl.innerHTML = `<p class="text-red-600">Error: No se pudo cargar el inventario. Asegúrate de tener la política RLS de SELECT activa para la tabla 'products'.</p>`;
+                return;
             }
+            
+            // 1. Almacenar todos los productos
+            allProducts = data; 
+            
+            // 2. Aplicar el filtro para renderizar (importante para refrescar sin perder la búsqueda)
+            filterAndRenderProducts(); 
         }
 
         // ===========================================
         // III. LÓGICA DEL LOGO Y EVENTOS
         // ===========================================
 
-        async function fetchAndLoadLogo() {
-            const { data: files, error } = await supabase.storage.from(LOGO_BUCKET).list('', {
-                limit: 100,
-                sortBy: { column: 'updated_at', order: 'desc' },
-            });
-
-            if (error || !files || files.length === 0) {
-                businessLogo.src = "https://via.placeholder.com/60/4f46e5/ffffff?text=CM";
-                localStorage.removeItem("business-logo");
-                return;
-            }
-
-            const mainLogo = files.find(f => f.name.startsWith('current_business_logo_'));
-            const logoFile = mainLogo || files[0];
-
-            const { data: urlData } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(logoFile.name);
-            
-            if (urlData && urlData.publicUrl) {
-                const publicUrlWithVersion = `${urlData.publicUrl}?v=${Date.now()}`;
-                businessLogo.src = publicUrlWithVersion;
-                localStorage.setItem("business-logo", publicUrlWithVersion);
-            } else {
-                businessLogo.src = "https://via.placeholder.com/60/4f46e5/ffffff?text=CM";
-                localStorage.removeItem("business-logo");
-            }
+        function loadLogo() {
+            const savedLogo = localStorage.getItem("business-logo");
+            if (savedLogo) businessLogo.src = savedLogo;
+            else businessLogo.src = "https://via.placeholder.com/60/4f46e5/ffffff?text=CM"; 
         }
 
         logoUpload.addEventListener("change", (e) => {
@@ -438,7 +393,7 @@
                 logoSaveButton.textContent = "Guardar Logo";
             } else {
                 selectedLogoFile = null;
-                fetchAndLoadLogo(); 
+                loadLogo(); 
                 logoSaveButton.disabled = true;
                 logoSaveButton.textContent = "Guardar Logo";
             }
@@ -452,7 +407,7 @@
 
             try {
                 const file = selectedLogoFile;
-                const filePath = `current_business_logo_${file.name.replace(/\s/g, '_')}`; 
+                const filePath = `current_business_logo_${file.name}`; 
                 
                 const { error: uploadError } = await supabase.storage.from(LOGO_BUCKET).upload(filePath, file, {
                     cacheControl: "3600",
@@ -461,9 +416,13 @@
 
                 if (uploadError) throw new Error(`Error: ${uploadError.message}. Revisa tus políticas RLS de INSERT en el bucket ${LOGO_BUCKET}.`);
 
-                await fetchAndLoadLogo(); 
+                const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(filePath);
+                if (!data.publicUrl) throw new Error("No se pudo obtener la URL pública.");
                 
-                alert("✅ Logo actualizado con éxito! Pídele a tus compañeros que recarguen la página.");
+                businessLogo.src = data.publicUrl;
+                localStorage.setItem("business-logo", data.publicUrl); 
+                
+                alert("✅ Logo actualizado con éxito!");
                 
                 selectedLogoFile = null;
                 logoUpload.value = "";
@@ -480,6 +439,11 @@
                 logoSaveButton.disabled = false;
                 logoSaveButton.textContent = "Error, Reintentar";
             }
+        });
+
+        // NUEVO: Listener para búsqueda en tiempo real
+        searchInput.addEventListener("input", () => {
+            filterAndRenderProducts();
         });
 
         // Eventos del Formulario de Productos
@@ -508,9 +472,8 @@
                 qtyIn.value = 1;
                 imageIn.value = "";
                 
-                await fetchProducts();
-                applySearchFilter(searchInput.value);
-                
+                // Recargar productos (lo que a su vez llama al filtro)
+                fetchProducts(); 
                 status.textContent = "Producto agregado con éxito ✅";
             } catch (err) {
                 console.error(err);
@@ -521,18 +484,10 @@
             }
         });
 
-        // ---------------------------------------------
-        // Manejador de Eventos de Búsqueda
-        // ---------------------------------------------
-        searchInput.addEventListener('keyup', (e) => {
-            applySearchFilter(e.target.value);
-        });
-
         // --- INICIALIZACIÓN ---
-        window.addEventListener("load", async () => {
-            await fetchProducts(); 
-            applySearchFilter(searchInput.value);
-            await fetchAndLoadLogo(); 
+        window.addEventListener("load", () => {
+            loadLogo(); 
+            fetchProducts(); 
         });
     </script>
 </body>
