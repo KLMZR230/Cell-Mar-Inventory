@@ -118,6 +118,7 @@
                     class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500"
                 />
             </div>
+
             <div id="products"></div>
         </section>
 
@@ -130,12 +131,16 @@
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
         // 🔑 Configuración y Conexión a Supabase
+        // **************************************************************************************
+        // IMPORTANTE: Asegúrate de reemplazar estos valores con tus propias claves de Supabase.
+        // **************************************************************************************
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         const PRODUCT_BUCKET = "product-images";
         const LOGO_BUCKET = "business-assets"; 
+        const LOGO_PATH = "current_business_logo"; // Ruta fija para el logo global
 
         // --- Elementos del DOM ---
         const form = document.getElementById("product-form");
@@ -145,7 +150,7 @@
         const qtyIn = document.getElementById("quantity");
         const imageIn = document.getElementById("image");
         const status = document.getElementById("status");
-        const productsEl = document.getElementById("products"); // Contenedor principal
+        const productsEl = document.getElementById("products");
         const totalCount = document.getElementById("total-count");
         
         // Elementos del Logo
@@ -154,17 +159,18 @@
         const logoSaveButton = document.getElementById("logo-save-button");
         let selectedLogoFile = null;
 
-        // NUEVO: Elemento de Búsqueda y Almacén de Datos
+        // Búsqueda y Almacén de Datos
         const searchInput = document.getElementById("search-input"); 
-        let allProducts = []; // Almacena todos los productos cargados para el filtro local
+        let allProducts = []; 
 
         // ===========================================
         // I. FUNCIONES GLOBALES DE INVENTARIO
         // ===========================================
         
-        // NUEVA FUNCIÓN: Editar Nombre y Precio
+        /**
+         * Actualiza el nombre y precio de un producto en la base de datos de Supabase.
+         */
         async function editProduct(id, newName, newPrice) {
-            // Validación básica del precio
             const priceValue = parseFloat(newPrice);
             if (isNaN(priceValue) || priceValue < 0) {
                 alert("Precio inválido. Debe ser un número positivo.");
@@ -182,8 +188,7 @@
                 alert("❌ Error al actualizar producto: " + error.message);
                 console.error("Error al actualizar producto:", error);
             } else {
-                // Después de la edición, recargamos y filtramos para mantener el estado de la búsqueda
-                fetchProducts(); 
+                fetchProducts(); // Refresca el inventario
             }
         }
 
@@ -211,11 +216,11 @@
         }
 
         // ===========================================
-        // II. RENDERIZADO Y LÓGICA DE CARGA (MODIFICADA)
+        // II. RENDERIZADO Y LÓGICA DE CARGA
         // ===========================================
         
         function renderProducts(items) {
-            productsEl.innerHTML = ""; // Limpiar el contenedor principal
+            productsEl.innerHTML = ""; 
             totalCount.textContent = `${items.length} productos`;
 
             if (items.length === 0) {
@@ -233,27 +238,25 @@
                 return acc;
             }, {});
 
-            // 2. Iterar sobre las categorías (llaves del objeto grouped)
+            // 2. Iterar sobre las categorías
             Object.keys(grouped).forEach(category => {
                 const categorySection = document.createElement("div");
-                categorySection.className = "mb-10"; // Margen inferior para separar secciones
+                categorySection.className = "mb-10"; 
 
-                // Título de la Categoría en grande
                 const categoryTitle = document.createElement("h2");
                 categoryTitle.className = "text-2xl font-bold text-gray-800 border-b-2 border-indigo-400 pb-2 mb-4 uppercase tracking-wider";
                 categoryTitle.textContent = category;
                 
-                // Contenedor de productos dentro de la categoría
                 const productsGrid = document.createElement("div");
                 productsGrid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6";
 
-                // 3. Renderizar productos dentro del grid de esta categoría
+                // 3. Renderizar productos dentro del grid
                 grouped[category].forEach(p => {
                     const card = document.createElement("div");
                     card.className = "bg-white rounded-lg shadow p-4 flex flex-col product-card";
-                    card.style.position = "relative"; // Necesario para posicionar el botón de edición
+                    card.style.position = "relative"; 
 
-                    // NUEVO: Botón de Edición
+                    // Botón de Edición (icono de lápiz)
                     const editBtn = document.createElement("button");
                     editBtn.className = "absolute top-2 right-2 text-gray-400 hover:text-indigo-600 transition p-1 rounded-full bg-white/70 shadow-sm";
                     editBtn.title = "Editar nombre y precio";
@@ -269,7 +272,6 @@
                         editProduct(p.id, newName, newPrice);
                     };
                     card.appendChild(editBtn); 
-                    // FIN NUEVO
 
                     const imgBox = document.createElement("div");
                     imgBox.className = "h-40 bg-gray-100 rounded flex items-center justify-center mb-3 overflow-hidden";
@@ -284,7 +286,6 @@
                     title.className = "font-semibold";
                     title.textContent = p.name;
                     
-                    // Mostrar la categoría como una etiqueta pequeña si no es el título principal
                     if (p.category !== category) {
                         const categoryTag = document.createElement("span");
                         categoryTag.className = "text-xs font-medium text-indigo-600 bg-indigo-100 px-2 py-0.5 rounded-full mt-1 inline-block";
@@ -342,7 +343,10 @@
             });
         }
         
-        // NUEVA FUNCIÓN: Filtra los productos basándose en el término de búsqueda actual
+        /**
+         * Filtra los productos almacenados localmente según el término de búsqueda
+         * y luego llama a renderProducts para mostrarlos.
+         */
         function filterAndRenderProducts() {
             const searchTerm = searchInput.value || "";
             const term = searchTerm.toLowerCase().trim();
@@ -356,30 +360,36 @@
         }
 
         async function fetchProducts() {
-            // Aseguramos que se carguen ordenados por categoría para una mejor agrupación visual
             const { data, error } = await supabase.from("products").select("*").order("category", { ascending: true }).order("created_at", { ascending: false });
             if (error) {
                 console.error("Error cargando productos:", error);
                 totalCount.textContent = "Error al cargar";
-                productsEl.innerHTML = `<p class="text-red-600">Error: No se pudo cargar el inventario. Asegúrate de tener la política RLS de SELECT activa para la tabla 'products'.</p>`;
+                productsEl.innerHTML = `<p class="text-red-600">Error: No se pudo cargar el inventario. Asegúrate de tener la política RLS de SELECT activa.</p>`;
                 return;
             }
             
-            // 1. Almacenar todos los productos
             allProducts = data; 
-            
-            // 2. Aplicar el filtro para renderizar (importante para refrescar sin perder la búsqueda)
             filterAndRenderProducts(); 
         }
 
         // ===========================================
-        // III. LÓGICA DEL LOGO Y EVENTOS
+        // III. LÓGICA DEL LOGO GLOBAL
         // ===========================================
 
-        function loadLogo() {
-            const savedLogo = localStorage.getItem("business-logo");
-            if (savedLogo) businessLogo.src = savedLogo;
-            else businessLogo.src = "https://via.placeholder.com/60/4f46e5/ffffff?text=CM"; 
+        /**
+         * Carga el logo consultando la ruta fija en Supabase Storage.
+         * Esto asegura que el logo sea el mismo en todos los dispositivos.
+         */
+        async function loadLogo() {
+            // Obtener la URL pública del archivo fijo en Supabase Storage
+            const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(LOGO_PATH);
+
+            if (data.publicUrl) {
+                businessLogo.src = data.publicUrl;
+            } else {
+                // Si falla o no existe (la primera vez), usa el placeholder predeterminado
+                businessLogo.src = "https://via.placeholder.com/60/4f46e5/ffffff?text=CM"; 
+            }
         }
 
         logoUpload.addEventListener("change", (e) => {
@@ -407,22 +417,24 @@
 
             try {
                 const file = selectedLogoFile;
-                const filePath = `current_business_logo_${file.name}`; 
+                // Usamos el path fijo para SOBRESCRIBIR el logo anterior
+                const filePath = LOGO_PATH; 
                 
                 const { error: uploadError } = await supabase.storage.from(LOGO_BUCKET).upload(filePath, file, {
                     cacheControl: "3600",
-                    upsert: true,
+                    upsert: true, // Esto es clave para que sobrescriba el archivo si ya existe
+                    contentType: file.type
                 });
 
-                if (uploadError) throw new Error(`Error: ${uploadError.message}. Revisa tus políticas RLS de INSERT en el bucket ${LOGO_BUCKET}.`);
+                if (uploadError) throw new Error(`Error: ${uploadError.message}. Revisa tus políticas RLS de INSERT/UPDATE en el bucket ${LOGO_BUCKET}.`);
 
                 const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(filePath);
                 if (!data.publicUrl) throw new Error("No se pudo obtener la URL pública.");
                 
+                // Actualizar la imagen y mostrar el éxito
                 businessLogo.src = data.publicUrl;
-                localStorage.setItem("business-logo", data.publicUrl); 
                 
-                alert("✅ Logo actualizado con éxito!");
+                alert("✅ Logo actualizado con éxito! Se cargará en todos los dispositivos.");
                 
                 selectedLogoFile = null;
                 logoUpload.value = "";
@@ -441,7 +453,11 @@
             }
         });
 
-        // NUEVO: Listener para búsqueda en tiempo real
+        // ===========================================
+        // IV. EVENTOS INICIALES
+        // ===========================================
+        
+        // Listener para búsqueda en tiempo real
         searchInput.addEventListener("input", () => {
             filterAndRenderProducts();
         });
@@ -472,7 +488,6 @@
                 qtyIn.value = 1;
                 imageIn.value = "";
                 
-                // Recargar productos (lo que a su vez llama al filtro)
                 fetchProducts(); 
                 status.textContent = "Producto agregado con éxito ✅";
             } catch (err) {
