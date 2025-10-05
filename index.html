@@ -132,9 +132,9 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-        // 🔑 Configuración y Conexión a Supabase (CLAVE CORREGIDA)
+        // 🔑 Configuración y Conexión a Supabase (CLAVE CORREGIDA Y VERIFICADA)
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
-        // ESTA CLAVE FUE RESTAURADA A LA CLAVE ANÓNIMA ORIGINAL Y CORRECTA
+        // ESTA ES LA CLAVE ANÓNIMA CORRECTA PARA ESTE PROYECTO
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCVBaXzd3lmQJaNOVd1g3M";
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
@@ -204,7 +204,7 @@
             
             if (error) {
                 console.error("Error al actualizar producto:", error);
-                alert(`Error al actualizar el producto: ${error.message}`);
+                alert(`Error al actualizar el producto: ${error.message}. Asegúrate de que RLS UPDATE esté activo.`);
             } else {
                 await fetchProducts();
                 applySearchFilter(searchInput.value);
@@ -386,15 +386,15 @@
 
 
         async function fetchProducts() {
-            // Se agregó un manejo de error básico en el fetch para diagnóstico
             try {
                 const { data, error } = await supabase.from("products").select("*").order("category", { ascending: true }).order("created_at", { ascending: false });
                 if (error) throw error;
                 ALL_PRODUCTS = data;
+                totalCount.textContent = `${ALL_PRODUCTS.length} productos en total`;
             } catch (error) {
                  console.error("Error al cargar productos (fetchProducts):", error);
-                 totalCount.textContent = "ERROR: Revisar la clave API o RLS.";
-                 productsEl.innerHTML = `<p class="text-red-600 p-8">⚠️ ERROR CRÍTICO AL CONECTAR CON SUPABASE. Por favor, asegúrate de que tu **SUPABASE_ANON_KEY** es correcta y las políticas RLS de **SELECT** están activas para la tabla 'products'.</p>`;
+                 totalCount.textContent = "⚠️ ERROR DE CONEXIÓN";
+                 productsEl.innerHTML = `<p class="text-red-600 p-8">⚠️ ERROR: No se pudo conectar. Verifica tu **SUPABASE_ANON_KEY** y las políticas RLS de **SELECT** para 'products' en tu dashboard de Supabase.</p>`;
                  ALL_PRODUCTS = [];
             }
         }
@@ -533,11 +533,8 @@
 
         // --- INICIALIZACIÓN ---
         window.addEventListener("load", async () => {
-            // 1. Cargar todos los productos (y manejar posible error de conexión)
             await fetchProducts(); 
-            // 2. Renderizar la vista inicial
             applySearchFilter(searchInput.value);
-            // 3. Cargar el logo
             await fetchAndLoadLogo(); 
         });
     </script>
