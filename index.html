@@ -9,9 +9,10 @@
         .product-card {
             transition: transform 0.2s;
         }
+        /* Ajustar la sombra y el fondo de la tarjeta al color oscuro */
         .product-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 4px, 6px, 0.05);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
         /* Ocultar el input type=file, manteniendo la funcionalidad */
         #logo-upload {
@@ -29,26 +30,26 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-gray-700 text-white">
     
-    <header class="sticky top-0 z-10 bg-white shadow-lg p-4 flex items-center justify-between border-b border-gray-200">
+    <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
         <div class="flex items-center space-x-4">
             <img id="business-logo" src="https://via.placeholder.com/60/4f46e5/ffffff?text=CS" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105" />
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">
-                📱 <span class="text-indigo-600">Cell Smart</span> Gestión De Productos
+            <h1 class="text-3xl font-extrabold tracking-tight">
+                📱 <span class="text-indigo-400">Cell Smart</span> Gestión De Productos
             </h1>
         </div>
         
         <div class="flex items-center space-x-4">
             <button 
                 id="sales-view-btn" 
-                class="bg-indigo-600 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-700 transition duration-300 text-sm shadow-md"
+                class="bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 transition duration-300 text-sm shadow-md"
             >
                 💰 Ventas
             </button>
 
-            <div class="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg border border-gray-200">
-                <label for="logo-upload" class="bg-indigo-100 text-indigo-700 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-200 transition duration-300 cursor-pointer text-sm shadow-sm">
+            <div class="flex items-center space-x-3 p-2 bg-gray-700 rounded-lg border border-gray-600">
+                <label for="logo-upload" class="bg-indigo-400 text-gray-900 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-300 transition duration-300 cursor-pointer text-sm shadow-sm">
                     Seleccionar Logo 🖼️
                 </label>
                 <input 
@@ -60,7 +61,7 @@
                 
                 <button 
                     id="logo-save-button"
-                    class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+                    class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 shadow-md disabled:bg-gray-500 disabled:cursor-not-allowed text-sm"
                     disabled
                 >
                     Guardar Logo
@@ -70,20 +71,20 @@
     </header>
     
     <div class="container mx-auto px-4 py-6">
-        <p class="text-gray-600 mb-6" id="current-view-title">Vista: Inventario</p>
+        <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario</p>
         
         <div id="inventory-view" class="view-section">
-            <section class="bg-white rounded-lg shadow p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4">➕ Agregar producto</h2>
+            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto</h2>
                 <form id="product-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                     <div>
-                        <label class="block text-sm font-medium">Nombre</label>
-                        <input id="name" type="text" required class="mt-1 block w-full border rounded-md p-2" placeholder="Ej: Flex de Botones" />
+                        <label class="block text-sm font-medium text-gray-300">Nombre</label>
+                        <input id="name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Flex de Botones" />
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium">Categoría</label>
-                        <select id="category-select" required class="mt-1 block w-full border rounded-md p-2">
+                        <label class="block text-sm font-medium text-gray-300">Categoría</label>
+                        <select id="category-select" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
                             <option value="">Seleccionar</option>
                             <option value="Pantallas">Pantallas</option>
                             <option value="Jacks de Carga">Jacks de Carga</option>
@@ -97,31 +98,31 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium">Precio (USD)</label>
-                        <input id="price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2" placeholder="12.50" />
+                        <label class="block text-sm font-medium text-gray-300">Precio (USD)</label>
+                        <input id="price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="12.50" />
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium">Cantidad</label>
-                        <input id="quantity" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2" />
+                        <label class="block text-sm font-medium text-gray-300">Cantidad</label>
+                        <input id="quantity" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium">Imagen</label>
-                        <input id="image" type="file" accept="image/*" class="mt-1 block w-full" />
+                        <label class="block text-sm font-medium text-gray-300">Imagen</label>
+                        <input id="image" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" />
                     </div>
 
                     <div class="md:col-span-5 text-right">
                         <button id="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button>
                     </div>
                 </form>
-                <p id="status" class="text-sm text-gray-500 mt-3"></p>
+                <p id="status" class="text-sm text-gray-400 mt-3"></p>
             </section>
 
             <section>
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold">📦 Inventario por Categoría</h2>
-                    <span id="total-count" class="text-gray-500 text-sm">Cargando...</span>
+                    <h2 class="text-xl font-semibold text-indigo-300">📦 Inventario por Categoría</h2>
+                    <span id="total-count" class="text-gray-400 text-sm">Cargando...</span>
                 </div>
                 
                 <div class="mb-6 flex items-center space-x-3">
@@ -132,7 +133,7 @@
                         type="text" 
                         id="search-input" 
                         placeholder="Buscar por nombre o categoría..." 
-                        class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500"
+                        class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white"
                     />
                 </div>
 
@@ -141,32 +142,32 @@
         </div>
         
         <div id="sales-view" class="view-section hidden">
-            <section class="bg-white rounded-lg shadow p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4">✍️ Registrar Nueva Venta</h2>
+            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-indigo-300">✍️ Registrar Nueva Venta</h2>
                 <form id="sale-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                     <div>
-                        <label class="block text-sm font-medium">Nombre de Destinatario</label>
-                        <input id="recipient-name" type="text" required class="mt-1 block w-full border rounded-md p-2" placeholder="Ej: Juan Pérez" />
+                        <label class="block text-sm font-medium text-gray-300">Nombre de Destinatario</label>
+                        <input id="recipient-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Juan Pérez" />
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium">Producto Vendido</label>
-                        <input id="product-name-sold" type="text" required class="mt-1 block w-full border rounded-md p-2" placeholder="Ej: Pantalla Samsung A32" />
+                        <label class="block text-sm font-medium text-gray-300">Producto Vendido</label>
+                        <input id="product-name-sold" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Pantalla Samsung A32" />
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium">Precio (USD)</label>
-                        <input id="sale-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2" placeholder="25.99" />
+                        <label class="block text-sm font-medium text-gray-300">Precio (USD)</label>
+                        <input id="sale-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="25.99" />
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium">Fecha de Venta</label>
-                        <input id="sale-date" type="date" required class="mt-1 block w-full border rounded-md p-2" />
+                        <label class="block text-sm font-medium text-gray-300">Fecha de Venta</label>
+                        <input id="sale-date" type="date" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium">Estado</label>
-                        <select id="sale-status-input" required class="mt-1 block w-full border rounded-md p-2">
+                        <label class="block text-sm font-medium text-gray-300">Estado</label>
+                        <select id="sale-status-input" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
                             <option value="Pendiente">Pendiente</option>
                             <option value="Pagado">Pagado</option>
                             <option value="Devuelto">Devuelto</option>
@@ -177,15 +178,15 @@
                         <button id="sale-submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow w-full">Registrar Venta</button>
                     </div>
                 </form>
-                <p id="sale-status" class="text-sm text-gray-500 mt-3"></p>
+                <p id="sale-status" class="text-sm text-gray-400 mt-3"></p>
             </section>
             
             <section>
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold">📊 Historial de Ventas</h2>
-                    <span id="total-sales-count" class="text-gray-500 text-sm">Cargando...</span>
+                    <h2 class="text-xl font-semibold text-indigo-300">📊 Historial de Ventas</h2>
+                    <span id="total-sales-count" class="text-gray-400 text-sm">Cargando...</span>
                 </div>
-                <div id="sales-list" class="bg-white rounded-lg shadow overflow-hidden">
+                <div id="sales-list" class="bg-gray-800 rounded-lg shadow overflow-hidden">
                     </div>
             </section>
         </div>
@@ -210,9 +211,9 @@
         
         // Colores de estado
         const STATUS_COLORS = {
-            'Pendiente': 'bg-yellow-100 text-yellow-800 border-yellow-300',
-            'Pagado': 'bg-green-100 text-green-800 border-green-300',
-            'Devuelto': 'bg-red-100 text-red-800 border-red-300'
+            'Pendiente': 'bg-yellow-600 text-gray-900 border-yellow-700',
+            'Pagado': 'bg-green-600 text-white border-green-700',
+            'Devuelto': 'bg-red-600 text-white border-red-700'
         };
 
         // --- Elementos del DOM de Inventario ---
@@ -264,13 +265,13 @@
                 salesView.classList.add('hidden');
                 currentViewTitle.textContent = "Vista: Inventario";
                 salesBtn.textContent = "💰 Ventas";
-                salesBtn.classList.replace('bg-green-700', 'bg-indigo-600');
+                salesBtn.classList.replace('bg-green-700', 'bg-indigo-500');
             } else if (viewName === 'sales') {
                 inventoryView.classList.add('hidden');
                 salesView.classList.remove('hidden');
                 currentViewTitle.textContent = "Vista: Ventas Registradas";
                 salesBtn.textContent = "📦 Inventario";
-                salesBtn.classList.replace('bg-indigo-600', 'bg-green-700');
+                salesBtn.classList.replace('bg-indigo-500', 'bg-green-700');
                 fetchSales(); 
             }
         }
@@ -283,7 +284,6 @@
             const { error } = await supabase.from(SALES_TABLE).insert(data);
             
             if (error) {
-                // El error más común aquí es no haber ejecutado el SQL para agregar la columna.
                 alert("❌ Error al registrar la venta: " + error.message + ". Asegúrate de haber ejecutado el SQL para agregar las columnas 'product_name_sold' y 'status' a la tabla 'sales'.");
                 console.error("Error al registrar venta:", error);
             } else {
@@ -328,40 +328,41 @@
             totalSalesCount.textContent = `${items.length} ventas`;
 
             if (items.length === 0) {
-                salesListEl.innerHTML = `<p class="p-4 text-gray-500">No hay ventas registradas.</p>`;
+                salesListEl.innerHTML = `<p class="p-4 text-gray-400">No hay ventas registradas.</p>`;
                 return;
             }
 
             const table = document.createElement('table');
-            table.className = 'min-w-full divide-y divide-gray-200';
+            table.className = 'min-w-full divide-y divide-gray-700';
             
             // Encabezado de la tabla con la nueva columna
             const thead = table.createTHead();
+            // CAMBIO: Ajustar colores de thead
             thead.innerHTML = `
                 <tr>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destinatario</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto Vendido</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio de Venta</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                    <th class="px-6 py-3 bg-gray-50"></th>
+                    <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
+                    <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destinatario</th>
+                    <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto Vendido</th>
+                    <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio de Venta</th>
+                    <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 bg-gray-700"></th>
                 </tr>
             `;
 
             const tbody = document.createElement('tbody');
-            tbody.className = 'bg-white divide-y divide-gray-200';
+            // CAMBIO: Fondo del body de la tabla
+            tbody.className = 'bg-gray-800 divide-y divide-gray-700';
             
             items.forEach(sale => {
                 const row = tbody.insertRow();
                 
                 const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
-                // Si el estado no existe (porque no se ejecutó el SQL), usa 'Pendiente'
                 const currentStatus = sale.status || 'Pendiente'; 
                 const statusClass = STATUS_COLORS[currentStatus] || STATUS_COLORS['Pendiente'];
                 
                 // Generar el select para cambiar el estado
                 const statusSelectHtml = `
-                    <select onchange="changeSaleStatus('${sale.id}', this.value)" class="p-1 border rounded text-xs font-medium ${statusClass}">
+                    <select onchange="changeSaleStatus('${sale.id}', this.value)" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer">
                         <option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option>
                         <option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
                         <option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option>
@@ -370,15 +371,15 @@
 
 
                 row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${saleDate}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale.recipient_name}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale.product_name_sold || 'N/A'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">$${Number(sale.price).toFixed(2)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${saleDate}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.recipient_name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.product_name_sold || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500">$${Number(sale.price).toFixed(2)}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                         ${statusSelectHtml}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button onclick="deleteSale('${sale.id}')" class="text-red-600 hover:text-red-900 transition">Eliminar</button>
+                        <button onclick="deleteSale('${sale.id}')" class="text-red-500 hover:text-red-300 transition">Eliminar</button>
                     </td>
                 `;
             });
@@ -394,7 +395,7 @@
         }
 
         // ===========================================
-        // III. FUNCIONES DE INVENTARIO (RECUPERADAS)
+        // III. FUNCIONES DE INVENTARIO
         // ===========================================
         
         async function editProduct(id, newName, newPrice) {
@@ -446,7 +447,7 @@
             totalCount.textContent = `${items.length} productos`;
 
             if (items.length === 0) {
-                productsEl.innerHTML = `<p class="text-gray-500">No se encontraron productos${searchInput.value ? ' para el término "' + searchInput.value + '"' : ''}.</p>`;
+                productsEl.innerHTML = `<p class="text-gray-400">No se encontraron productos${searchInput.value ? ' para el término "' + searchInput.value + '"' : ''}.</p>`;
                 return;
             }
 
@@ -464,7 +465,7 @@
                 categorySection.className = "mb-10"; 
 
                 const categoryTitle = document.createElement("h2");
-                categoryTitle.className = "text-2xl font-bold text-gray-800 border-b-2 border-indigo-400 pb-2 mb-4 uppercase tracking-wider";
+                categoryTitle.className = "text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider";
                 categoryTitle.textContent = category;
                 
                 const productsGrid = document.createElement("div");
@@ -472,11 +473,12 @@
 
                 grouped[category].forEach(p => {
                     const card = document.createElement("div");
-                    card.className = "bg-white rounded-lg shadow p-4 flex flex-col product-card";
+                    // CAMBIO: Fondo de la tarjeta y sombra
+                    card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700";
                     card.style.position = "relative"; 
 
                     const editBtn = document.createElement("button");
-                    editBtn.className = "absolute top-2 right-2 text-gray-400 hover:text-indigo-600 transition p-1 rounded-full bg-white/70 shadow-sm";
+                    editBtn.className = "absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm";
                     editBtn.title = "Editar nombre y precio";
                     editBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>';
                     editBtn.onclick = () => {
@@ -492,47 +494,49 @@
                     card.appendChild(editBtn); 
 
                     const imgBox = document.createElement("div");
-                    imgBox.className = "h-40 bg-gray-100 rounded flex items-center justify-center mb-3 overflow-hidden";
+                    // CAMBIO: Fondo de la caja de imagen
+                    imgBox.className = "h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden";
                     
-                    const imageUrl = p.image_url || 'https://via.placeholder.com/150x100?text=Sin+Imagen';
+                    const imageUrl = p.image_url || 'https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen';
                     const img = document.createElement("img");
                     img.src = imageUrl;
                     img.className = "object-contain h-full w-full";
                     imgBox.appendChild(img);
 
                     const title = document.createElement("h3");
-                    title.className = "font-semibold";
+                    title.className = "font-semibold text-white";
                     title.textContent = p.name;
                     
                     if (p.category !== category) {
                         const categoryTag = document.createElement("span");
-                        categoryTag.className = "text-xs font-medium text-indigo-600 bg-indigo-100 px-2 py-0.5 rounded-full mt-1 inline-block";
+                        categoryTag.className = "text-xs font-medium text-indigo-400 bg-indigo-900 px-2 py-0.5 rounded-full mt-1 inline-block";
                         categoryTag.textContent = p.category;
                         card.appendChild(categoryTag);
                     }
 
                     const price = document.createElement("p");
-                    price.className = "text-gray-700 font-bold text-lg mt-2"; 
+                    price.className = "text-green-400 font-bold text-lg mt-2"; 
                     price.textContent = `$${Number(p.price).toFixed(2)}`;
 
                     const qty = document.createElement("p");
-                    qty.className = "mt-1 text-sm text-gray-600";
+                    qty.className = "mt-1 text-sm text-gray-400";
                     qty.textContent = `Stock: ${p.quantity}`;
 
                     const actions = document.createElement("div");
-                    actions.className = "flex justify-between items-center mt-4 pt-3 border-t";
+                    actions.className = "flex justify-between items-center mt-4 pt-3 border-t border-gray-700";
 
                     const controls = document.createElement("div");
                     controls.className = "flex gap-2";
                     
                     const dec = document.createElement("button");
+                    // CAMBIO: Ajustar colores de los botones de stock
                     dec.textContent = "-";
-                    dec.className = "px-3 py-1 border rounded bg-gray-100 hover:bg-gray-200 transition";
+                    dec.className = "px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white";
                     dec.onclick = () => changeQty(p.id, -1);
                     
                     const inc = document.createElement("button");
                     inc.textContent = "+";
-                    inc.className = "px-3 py-1 border rounded bg-gray-100 hover:bg-gray-200 transition";
+                    inc.className = "px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white";
                     inc.onclick = () => changeQty(p.id, +1);
                     
                     controls.appendChild(dec);
@@ -578,7 +582,7 @@
             if (error) {
                 console.error("Error cargando productos:", error);
                 totalCount.textContent = "Error al cargar";
-                productsEl.innerHTML = `<p class="text-red-600">Error: No se pudo cargar el inventario. Asegúrate de tener la política RLS de SELECT activa.</p>`;
+                productsEl.innerHTML = `<p class="text-red-500">Error: No se pudo cargar el inventario. Asegúrate de tener la política RLS de SELECT activa.</p>`;
                 return;
             }
             
@@ -587,7 +591,7 @@
         }
 
         // ===========================================
-        // IV. LÓGICA DEL LOGO GLOBAL (RECUPERADAS)
+        // IV. LÓGICA DEL LOGO GLOBAL
         // ===========================================
 
         async function loadLogo() {
