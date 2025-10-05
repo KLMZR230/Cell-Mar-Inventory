@@ -100,7 +100,16 @@
             </form>
             <p id="status" class="text-sm text-gray-500 mt-3"></p>
         </section>
-
+        
+        <div class="mb-8">
+            <label for="search-input" class="block text-lg font-semibold mb-2">🔍 Buscar Productos</label>
+            <input 
+                type="text" 
+                id="search-input" 
+                placeholder="Escribe el nombre o categoría del producto..."
+                class="w-full border-2 border-gray-300 p-3 rounded-lg focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-150"
+            />
+        </div>
         <section>
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-semibold">📦 Inventario por Categoría</h2>
@@ -125,6 +134,9 @@
         const PRODUCT_BUCKET = "product-images";
         const LOGO_BUCKET = "business-assets"; 
 
+        // Variable global para almacenar todos los productos
+        let ALL_PRODUCTS = []; 
+
         // --- Elementos del DOM ---
         const form = document.getElementById("product-form");
         const nameIn = document.getElementById("name");
@@ -135,6 +147,7 @@
         const status = document.getElementById("status");
         const productsEl = document.getElementById("products"); // Contenedor principal
         const totalCount = document.getElementById("total-count");
+        const searchInput = document.getElementById("search-input"); // NUEVO ELEMENTO
         
         // Elementos del Logo
         const logoUpload = document.getElementById("logo-upload");
@@ -147,16 +160,23 @@
         // ===========================================
 
         async function changeQty(id, delta) {
+            // Actualización de cantidad
             const { data: row } = await supabase.from("products").select("quantity").eq("id", id).single();
             const newQty = Math.max(0, (row.quantity || 0) + delta);
             await supabase.from("products").update({ quantity: newQty }).eq("id", id);
-            fetchProducts();
+            
+            // Refrescar y aplicar búsqueda
+            await fetchProducts();
+            applySearchFilter(searchInput.value); 
         }
 
         async function deleteProduct(id) {
             if (!confirm("¿Eliminar este producto? Esta acción es irreversible.")) return;
             await supabase.from("products").delete().eq("id", id);
-            fetchProducts();
+            
+            // Refrescar y aplicar búsqueda
+            await fetchProducts();
+            applySearchFilter(searchInput.value);
         }
 
         async function uploadImage(file) {
@@ -170,15 +190,36 @@
         }
 
         // ===========================================
-        // II. RENDERIZADO Y LÓGICA DE CARGA (MODIFICADA)
+        // II. LÓGICA DE BÚSQUEDA Y RENDERIZADO
         // ===========================================
         
+        /**
+         * Función central para filtrar y renderizar productos.
+         */
+        function applySearchFilter(searchTerm) {
+            // Si no hay término de búsqueda, usamos todos los productos
+            let filteredProducts = ALL_PRODUCTS;
+
+            if (searchTerm) {
+                const lowerCaseSearch = searchTerm.toLowerCase();
+                filteredProducts = ALL_PRODUCTS.filter(p => 
+                    p.name.toLowerCase().includes(lowerCaseSearch) ||
+                    (p.category && p.category.toLowerCase().includes(lowerCaseSearch))
+                );
+            }
+            
+            renderProducts(filteredProducts);
+        }
+
+        /**
+         * Función que toma una lista de productos y los dibuja agrupados por categoría.
+         */
         function renderProducts(items) {
-            productsEl.innerHTML = ""; // Limpiar el contenedor principal
-            totalCount.textContent = `${items.length} productos`;
+            productsEl.innerHTML = ""; 
+            totalCount.textContent = `${items.length} productos visibles`;
 
             if (items.length === 0) {
-                productsEl.innerHTML = '<p class="text-gray-500">No hay productos todavía.</p>';
+                productsEl.innerHTML = '<p class="text-gray-500 text-center text-xl p-8">No se encontraron productos que coincidan con la búsqueda.</p>';
                 return;
             }
 
@@ -192,12 +233,12 @@
                 return acc;
             }, {});
 
-            // 2. Iterar sobre las categorías (llaves del objeto grouped)
+            // 2. Iterar sobre las categorías
             Object.keys(grouped).forEach(category => {
                 const categorySection = document.createElement("div");
-                categorySection.className = "mb-10"; // Margen inferior para separar secciones
+                categorySection.className = "mb-10"; 
 
-                // Título de la Categoría en grande
+                // Título de la Categoría
                 const categoryTitle = document.createElement("h2");
                 categoryTitle.className = "text-2xl font-bold text-gray-800 border-b-2 border-indigo-400 pb-2 mb-4 uppercase tracking-wider";
                 categoryTitle.textContent = category;
@@ -206,7 +247,7 @@
                 const productsGrid = document.createElement("div");
                 productsGrid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6";
 
-                // 3. Renderizar productos dentro del grid de esta categoría
+                // 3. Renderizar productos
                 grouped[category].forEach(p => {
                     const card = document.createElement("div");
                     card.className = "bg-white rounded-lg shadow p-4 flex flex-col product-card";
@@ -224,14 +265,6 @@
                     title.className = "font-semibold";
                     title.textContent = p.name;
                     
-                    // Mostrar la categoría como una etiqueta pequeña si no es el título principal
-                    if (p.category !== category) {
-                        const categoryTag = document.createElement("span");
-                        categoryTag.className = "text-xs font-medium text-indigo-600 bg-indigo-100 px-2 py-0.5 rounded-full mt-1 inline-block";
-                        categoryTag.textContent = p.category;
-                        card.appendChild(categoryTag);
-                    }
-
                     const price = document.createElement("p");
                     price.className = "text-gray-700 font-bold text-lg mt-2"; 
                     price.textContent = `$${Number(p.price).toFixed(2)}`;
@@ -249,6 +282,7 @@
                     const dec = document.createElement("button");
                     dec.textContent = "-";
                     dec.className = "px-3 py-1 border rounded bg-gray-100 hover:bg-gray-200 transition";
+                    // Enlaza la función directamente al ID del producto
                     dec.onclick = () => changeQty(p.id, -1);
                     
                     const inc = document.createElement("button");
@@ -282,8 +316,10 @@
             });
         }
         
+        /**
+         * Función que carga todos los productos de Supabase y actualiza la variable global.
+         */
         async function fetchProducts() {
-            // Aseguramos que se carguen ordenados por categoría para una mejor agrupación visual
             const { data, error } = await supabase.from("products").select("*").order("category", { ascending: true }).order("created_at", { ascending: false });
             if (error) {
                 console.error("Error cargando productos:", error);
@@ -291,7 +327,8 @@
                 productsEl.innerHTML = `<p class="text-red-600">Error: No se pudo cargar el inventario. Asegúrate de tener la política RLS de SELECT activa para la tabla 'products'.</p>`;
                 return;
             }
-            renderProducts(data);
+            // Guarda la lista completa en la variable global
+            ALL_PRODUCTS = data; 
         }
 
         // ===========================================
@@ -388,7 +425,11 @@
                 priceIn.value = "";
                 qtyIn.value = 1;
                 imageIn.value = "";
-                fetchProducts();
+                
+                // Recargar todos los productos y aplicar el filtro de búsqueda (si lo hay)
+                await fetchProducts();
+                applySearchFilter(searchInput.value);
+                
                 status.textContent = "Producto agregado con éxito ✅";
             } catch (err) {
                 console.error(err);
@@ -399,10 +440,20 @@
             }
         });
 
+        // ---------------------------------------------
+        // Manejador de Eventos de Búsqueda (KEY UP)
+        // ---------------------------------------------
+        searchInput.addEventListener('keyup', (e) => {
+            applySearchFilter(e.target.value);
+        });
+
         // --- INICIALIZACIÓN ---
-        window.addEventListener("load", () => {
+        window.addEventListener("load", async () => {
             loadLogo(); 
-            fetchProducts(); 
+            // Cargar todos los productos una vez al inicio
+            await fetchProducts(); 
+            // Renderizar la vista inicial sin filtro
+            renderProducts(ALL_PRODUCTS);
         });
     </script>
 </body>
