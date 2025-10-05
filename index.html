@@ -23,6 +23,10 @@
             overflow: hidden;
             border: 0;
         }
+        /* Estilo para ocultar las vistas */
+        .view-section.hidden {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-900">
@@ -31,98 +35,146 @@
         <div class="flex items-center space-x-4">
             <img id="business-logo" src="https://via.placeholder.com/60/4f46e5/ffffff?text=CM" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105" />
             <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">
-                📱 <span class="text-indigo-600">Cell Mar</span> Gestión De Productos
+                📱 <span class="text-indigo-600">Cell Mar</span> Gestión
             </h1>
         </div>
         
-        <div class="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg border border-gray-200">
-            <label for="logo-upload" class="bg-indigo-100 text-indigo-700 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-200 transition duration-300 cursor-pointer text-sm shadow-sm">
-                Seleccionar Logo 🖼️
-            </label>
-            <input 
-                type="file" 
-                id="logo-upload" 
-                title="Sube una nueva imagen para tu logo"
-                accept="image/*"
-            />
-            
+        <div class="flex items-center space-x-4">
             <button 
-                id="logo-save-button"
-                class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
-                disabled
+                id="sales-view-btn" 
+                class="bg-indigo-600 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-700 transition duration-300 text-sm shadow-md"
             >
-                Guardar Logo
+                💰 Ventas
             </button>
+
+            <div class="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg border border-gray-200">
+                <label for="logo-upload" class="bg-indigo-100 text-indigo-700 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-200 transition duration-300 cursor-pointer text-sm shadow-sm">
+                    Seleccionar Logo 🖼️
+                </label>
+                <input 
+                    type="file" 
+                    id="logo-upload" 
+                    title="Sube una nueva imagen para tu logo"
+                    accept="image/*"
+                />
+                
+                <button 
+                    id="logo-save-button"
+                    class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+                    disabled
+                >
+                    Guardar Logo
+                </button>
+            </div>
         </div>
     </header>
+    
     <div class="container mx-auto px-4 py-6">
-        <p class="text-gray-600 mb-6">Administra productos, precios, stock e imágenes.</p>
+        <p class="text-gray-600 mb-6" id="current-view-title">Vista: Inventario</p>
+        
+        <div id="inventory-view" class="view-section">
+            <section class="bg-white rounded-lg shadow p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4">➕ Agregar producto</h2>
+                <form id="product-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                    <div>
+                        <label class="block text-sm font-medium">Nombre</label>
+                        <input id="name" type="text" required class="mt-1 block w-full border rounded-md p-2" placeholder="Ej: Flex de Botones" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium">Categoría</label>
+                        <select id="category-select" required class="mt-1 block w-full border rounded-md p-2">
+                            <option value="">Seleccionar</option>
+                            <option value="Pantallas">Pantallas</option>
+                            <option value="Jacks de Carga">Jacks de Carga</option>
+                            <option value="Flex Main">Flex Main</option>
+                            <option value="Placas de Carga">Placas de Carga</option>
+                            <option value="Botones Fisicos">Botones Fisicos</option>
+                            <option value="Botones Internos">Botones Internos</option>
+                            <option value="Accesorios">Accesorios</option>
+                            <option value="Otros">Otros</option>
+                        </select>
+                    </div>
 
-        <section class="bg-white rounded-lg shadow p-6 mb-8">
-            <h2 class="text-xl font-semibold mb-4">➕ Agregar producto</h2>
-            <form id="product-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-                <div>
-                    <label class="block text-sm font-medium">Nombre</label>
-                    <input id="name" type="text" required class="mt-1 block w-full border rounded-md p-2" placeholder="Ej: Flex de Botones" />
+                    <div>
+                        <label class="block text-sm font-medium">Precio (USD)</label>
+                        <input id="price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2" placeholder="12.50" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium">Cantidad</label>
+                        <input id="quantity" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium">Imagen</label>
+                        <input id="image" type="file" accept="image/*" class="mt-1 block w-full" />
+                    </div>
+
+                    <div class="md:col-span-5 text-right">
+                        <button id="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button>
+                    </div>
+                </form>
+                <p id="status" class="text-sm text-gray-500 mt-3"></p>
+            </section>
+
+            <section>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold">📦 Inventario por Categoría</h2>
+                    <span id="total-count" class="text-gray-500 text-sm">Cargando...</span>
                 </div>
                 
-                <div>
-                    <label class="block text-sm font-medium">Categoría</label>
-                    <select id="category-select" required class="mt-1 block w-full border rounded-md p-2">
-                        <option value="">Seleccionar</option>
-                        <option value="Pantallas">Pantallas</option>
-                        <option value="Jacks de Carga">Jacks de Carga</option>
-                        <option value="Flex Main">Flex Main</option>
-                        <option value="Placas de Carga">Placas de Carga</option>
-                        <option value="Botones Fisicos">Botones Fisicos</option>
-                        <option value="Botones Internos">Botones Internos</option>
-                        <option value="Accesorios">Accesorios</option>
-                        <option value="Otros">Otros</option>
-                    </select>
+                <div class="mb-6 flex items-center space-x-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        placeholder="Buscar por nombre o categoría..." 
+                        class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500"
+                    />
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium">Precio (USD)</label>
-                    <input id="price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2" placeholder="12.50" />
-                </div>
+                <div id="products"></div>
+            </section>
+        </div>
+        
+        <div id="sales-view" class="view-section hidden">
+            <section class="bg-white rounded-lg shadow p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4">✍️ Registrar Nueva Venta</h2>
+                <form id="sale-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <div>
+                        <label class="block text-sm font-medium">Nombre de Destinatario</label>
+                        <input id="recipient-name" type="text" required class="mt-1 block w-full border rounded-md p-2" placeholder="Ej: Juan Pérez" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium">Precio Final (USD)</label>
+                        <input id="sale-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2" placeholder="25.99" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium">Fecha de Venta</label>
+                        <input id="sale-date" type="date" required class="mt-1 block w-full border rounded-md p-2" />
+                    </div>
 
-                <div>
-                    <label class="block text-sm font-medium">Cantidad</label>
-                    <input id="quantity" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2" />
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium">Imagen</label>
-                    <input id="image" type="file" accept="image/*" class="mt-1 block w-full" />
-                </div>
-
-                <div class="md:col-span-5 text-right">
-                    <button id="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button>
-                </div>
-            </form>
-            <p id="status" class="text-sm text-gray-500 mt-3"></p>
-        </section>
-
-        <section>
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-semibold">📦 Inventario por Categoría</h2>
-                <span id="total-count" class="text-gray-500 text-sm">Cargando...</span>
-            </div>
+                    <div class="text-right">
+                        <button id="sale-submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow w-full">Registrar Venta</button>
+                    </div>
+                </form>
+                <p id="sale-status" class="text-sm text-gray-500 mt-3"></p>
+            </section>
             
-            <div class="mb-6 flex items-center space-x-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input 
-                    type="text" 
-                    id="search-input" 
-                    placeholder="Buscar por nombre o categoría..." 
-                    class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500"
-                />
-            </div>
-
-            <div id="products"></div>
-        </section>
+            <section>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold">📊 Historial de Ventas</h2>
+                    <span id="total-sales-count" class="text-gray-500 text-sm">Cargando...</span>
+                </div>
+                <div id="sales-list" class="bg-white rounded-lg shadow overflow-hidden">
+                    </div>
+            </section>
+        </div>
 
         <footer class="mt-10 text-center text-gray-400 text-sm">
             Panel de Inventario — Cell Mar
@@ -133,9 +185,6 @@
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
         // 🔑 Configuración y Conexión a Supabase
-        // **************************************************************************************
-        // IMPORTANTE: Asegúrate de reemplazar estos valores con tus propias claves de Supabase.
-        // **************************************************************************************
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -143,8 +192,11 @@
         const PRODUCT_BUCKET = "product-images";
         const LOGO_BUCKET = "business-assets"; 
         const LOGO_PATH = "current_business_logo"; 
+        
+        // NUEVA TABLA
+        const SALES_TABLE = "sales"; 
 
-        // --- Elementos del DOM ---
+        // --- Elementos del DOM de Inventario ---
         const form = document.getElementById("product-form");
         const nameIn = document.getElementById("name");
         const categoryIn = document.getElementById("category-select"); 
@@ -154,19 +206,160 @@
         const status = document.getElementById("status");
         const productsEl = document.getElementById("products");
         const totalCount = document.getElementById("total-count");
+        const searchInput = document.getElementById("search-input"); 
+
+        // --- Elementos del DOM de Ventas (NUEVO) ---
+        const salesForm = document.getElementById("sale-form");
+        const recipientNameIn = document.getElementById("recipient-name");
+        const salePriceIn = document.getElementById("sale-price");
+        const saleDateIn = document.getElementById("sale-date");
+        const salesListEl = document.getElementById("sales-list");
+        const saleStatus = document.getElementById("sale-status");
+        const totalSalesCount = document.getElementById("total-sales-count");
+        const currentViewTitle = document.getElementById("current-view-title");
         
-        // Elementos del Logo
+        // --- Elementos del Logo ---
         const logoUpload = document.getElementById("logo-upload");
         const businessLogo = document.getElementById("business-logo");
         const logoSaveButton = document.getElementById("logo-save-button");
         let selectedLogoFile = null;
 
-        // Búsqueda y Almacén de Datos
-        const searchInput = document.getElementById("search-input"); 
+        // --- Variables de Estado ---
         let allProducts = []; 
+        let currentView = 'inventory'; 
 
         // ===========================================
-        // I. FUNCIONES GLOBALES DE INVENTARIO
+        // I. FUNCIONES DE VISTA (NUEVO)
+        // ===========================================
+
+        /**
+         * Alterna entre la vista de Inventario y la vista de Ventas.
+         */
+        function toggleView(viewName) {
+            currentView = viewName;
+            const inventoryView = document.getElementById('inventory-view');
+            const salesView = document.getElementById('sales-view');
+            const salesBtn = document.getElementById('sales-view-btn');
+
+            if (viewName === 'inventory') {
+                inventoryView.classList.remove('hidden');
+                salesView.classList.add('hidden');
+                currentViewTitle.textContent = "Vista: Inventario";
+                salesBtn.textContent = "💰 Ventas";
+                salesBtn.classList.replace('bg-green-700', 'bg-indigo-600');
+            } else if (viewName === 'sales') {
+                inventoryView.classList.add('hidden');
+                salesView.classList.remove('hidden');
+                currentViewTitle.textContent = "Vista: Ventas Registradas";
+                salesBtn.textContent = "📦 Inventario";
+                salesBtn.classList.replace('bg-indigo-600', 'bg-green-700');
+                // Al cambiar a Ventas, recargamos la lista
+                fetchSales(); 
+            }
+        }
+        
+        // ===========================================
+        // II. FUNCIONES DE VENTA (NUEVO)
+        // ===========================================
+
+        /**
+         * Inserta una nueva venta en la tabla 'sales'.
+         * @param {Object} data - Datos de la venta (recipient_name, price, sale_date).
+         */
+        async function addSale(data) {
+            const { error } = await supabase.from(SALES_TABLE).insert(data);
+            
+            if (error) {
+                alert("❌ Error al registrar la venta: " + error.message);
+                console.error("Error al registrar venta:", error);
+            } else {
+                fetchSales(); // Recargar lista de ventas
+            }
+        }
+
+        /**
+         * Obtiene todas las ventas y las renderiza.
+         */
+        async function fetchSales() {
+            // Ordenamos por fecha de venta descendente
+            const { data, error } = await supabase
+                .from(SALES_TABLE)
+                .select("*")
+                .order("sale_date", { ascending: false }) 
+                .order("created_at", { ascending: false });
+
+            if (error) {
+                console.error("Error cargando ventas:", error);
+                totalSalesCount.textContent = "Error al cargar";
+                return;
+            }
+            
+            renderSales(data);
+        }
+
+        /**
+         * Renderiza la lista de ventas en una tabla.
+         * @param {Array} items - Lista de registros de venta.
+         */
+        function renderSales(items) {
+            salesListEl.innerHTML = "";
+            totalSalesCount.textContent = `${items.length} ventas`;
+
+            if (items.length === 0) {
+                salesListEl.innerHTML = `<p class="p-4 text-gray-500">No hay ventas registradas.</p>`;
+                return;
+            }
+
+            // Crear la estructura de la tabla
+            const table = document.createElement('table');
+            table.className = 'min-w-full divide-y divide-gray-200';
+            
+            // Encabezado
+            const thead = table.createTHead();
+            thead.innerHTML = `
+                <tr>
+                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destinatario</th>
+                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio de Venta</th>
+                    <th class="px-6 py-3 bg-gray-50"></th>
+                </tr>
+            `;
+
+            // Cuerpo de la tabla
+            const tbody = document.createElement('tbody');
+            tbody.className = 'bg-white divide-y divide-gray-200';
+            
+            items.forEach(sale => {
+                const row = tbody.insertRow();
+                
+                // Formato de fecha AAAA-MM-DD
+                const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${saleDate}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale.recipient_name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">$${Number(sale.price).toFixed(2)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="deleteSale('${sale.id}')" class="text-red-600 hover:text-red-900 transition">Eliminar</button>
+                    </td>
+                `;
+            });
+            
+            table.appendChild(tbody);
+            salesListEl.appendChild(table);
+        }
+
+        /**
+         * Elimina un registro de venta (Exponemos la función al scope global para el onclick en el render).
+         */
+        window.deleteSale = async function(id) {
+            if (!confirm("¿Eliminar este registro de venta?")) return;
+            await supabase.from(SALES_TABLE).delete().eq("id", id);
+            fetchSales();
+        }
+
+        // ===========================================
+        // III. FUNCIONES DE INVENTARIO (EXISTENTES)
         // ===========================================
         
         async function editProduct(id, newName, newPrice) {
@@ -185,7 +378,6 @@
             
             if (error) {
                 alert("❌ Error al actualizar producto: " + error.message);
-                console.error("Error al actualizar producto:", error);
             } else {
                 fetchProducts(); 
             }
@@ -214,20 +406,16 @@
             return urlData?.publicUrl;
         }
 
-        // ===========================================
-        // II. RENDERIZADO Y LÓGICA DE CARGA
-        // ===========================================
-        
         function renderProducts(items) {
             productsEl.innerHTML = ""; 
             totalCount.textContent = `${items.length} productos`;
 
+            // ... (El resto de la función renderProducts se mantiene igual) ...
             if (items.length === 0) {
                 productsEl.innerHTML = `<p class="text-gray-500">No se encontraron productos${searchInput.value ? ' para el término "' + searchInput.value + '"' : ''}.</p>`;
                 return;
             }
 
-            // 1. Agrupar productos por categoría
             const grouped = items.reduce((acc, product) => {
                 const category = product.category || 'Sin Categoría';
                 if (!acc[category]) {
@@ -237,7 +425,6 @@
                 return acc;
             }, {});
 
-            // 2. Iterar sobre las categorías
             Object.keys(grouped).forEach(category => {
                 const categorySection = document.createElement("div");
                 categorySection.className = "mb-10"; 
@@ -249,13 +436,11 @@
                 const productsGrid = document.createElement("div");
                 productsGrid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6";
 
-                // 3. Renderizar productos dentro del grid
                 grouped[category].forEach(p => {
                     const card = document.createElement("div");
                     card.className = "bg-white rounded-lg shadow p-4 flex flex-col product-card";
                     card.style.position = "relative"; 
 
-                    // Botón de Edición (icono de lápiz)
                     const editBtn = document.createElement("button");
                     editBtn.className = "absolute top-2 right-2 text-gray-400 hover:text-indigo-600 transition p-1 rounded-full bg-white/70 shadow-sm";
                     editBtn.title = "Editar nombre y precio";
@@ -368,7 +553,7 @@
         }
 
         // ===========================================
-        // III. LÓGICA DEL LOGO GLOBAL
+        // IV. LÓGICA DEL LOGO GLOBAL
         // ===========================================
 
         async function loadLogo() {
@@ -441,13 +626,20 @@
         });
 
         // ===========================================
-        // IV. EVENTOS INICIALES
+        // V. EVENTOS
         // ===========================================
         
+        // Listener para búsqueda
         searchInput.addEventListener("input", () => {
             filterAndRenderProducts();
         });
 
+        // Listener para alternar la vista (NUEVO)
+        document.getElementById('sales-view-btn').addEventListener('click', () => {
+            toggleView(currentView === 'inventory' ? 'sales' : 'inventory');
+        });
+
+        // Eventos del Formulario de Productos
         form.addEventListener("submit", async (ev) => {
             ev.preventDefault();
             document.getElementById("submit").disabled = true;
@@ -466,7 +658,6 @@
                 
                 if (error) throw error;
                 
-                // Limpiar formulario
                 nameIn.value = "";
                 categoryIn.value = ""; 
                 priceIn.value = "";
@@ -484,10 +675,41 @@
             }
         });
 
+        // Eventos del Formulario de Ventas (NUEVO)
+        salesForm.addEventListener("submit", async (ev) => {
+            ev.preventDefault();
+            document.getElementById("sale-submit").disabled = true;
+            saleStatus.textContent = "Registrando venta...";
+            try {
+                const saleData = {
+                    recipient_name: recipientNameIn.value,
+                    price: parseFloat(salePriceIn.value),
+                    sale_date: saleDateIn.value
+                };
+
+                await addSale(saleData);
+
+                recipientNameIn.value = "";
+                salePriceIn.value = "";
+                // Mantener la fecha actual o la última fecha registrada
+                
+                saleStatus.textContent = "Venta registrada con éxito ✅";
+            } catch (err) {
+                console.error(err);
+                saleStatus.textContent = "Error al registrar venta: " + err.message;
+            } finally {
+                document.getElementById("sale-submit").disabled = false;
+                setTimeout(() => (saleStatus.textContent = ""), 3000);
+            }
+        });
+
+
         // --- INICIALIZACIÓN ---
         window.addEventListener("load", () => {
             loadLogo(); 
             fetchProducts(); 
+            // Establecer la fecha de hoy por defecto en el campo de venta
+            saleDateIn.value = new Date().toISOString().split('T')[0];
         });
     </script>
 </body>
