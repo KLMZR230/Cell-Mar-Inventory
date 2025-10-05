@@ -132,9 +132,9 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-        // 🔑 Configuración y Conexión a Supabase (CLAVE CORREGIDA Y VERIFICADA)
+        // 🔑 Configuración y Conexión a Supabase (CORREGIDA)
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
-        // ESTA ES LA CLAVE ANÓNIMA CORRECTA PARA ESTE PROYECTO
+        // CLAVE ANÓNIMA: SI CAMBIASTE ESTA CLAVE EN SUPABASE, DEBES CAMBIARLA AQUÍ TAMBIÉN.
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCVBaXzd3lmQJaNOVd1g3M";
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
@@ -394,7 +394,8 @@
             } catch (error) {
                  console.error("Error al cargar productos (fetchProducts):", error);
                  totalCount.textContent = "⚠️ ERROR DE CONEXIÓN";
-                 productsEl.innerHTML = `<p class="text-red-600 p-8">⚠️ ERROR: No se pudo conectar. Verifica tu **SUPABASE_ANON_KEY** y las políticas RLS de **SELECT** para 'products' en tu dashboard de Supabase.</p>`;
+                 // Mensaje claro para el usuario sobre qué revisar
+                 productsEl.innerHTML = `<p class="text-red-600 p-8">⚠️ ERROR CRÍTICO. La página no pudo leer los productos. Por favor, revisa tus políticas RLS de **SELECT** en la tabla 'products' de Supabase.</p>`;
                  ALL_PRODUCTS = [];
             }
         }
