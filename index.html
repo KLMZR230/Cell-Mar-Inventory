@@ -25,6 +25,10 @@
             overflow: hidden;
             border: 0;
         }
+        /* Clases para ocultar/mostrar elementos de edición */
+        .edit-mode .display-text { display: none !important; }
+        .edit-mode .edit-input { display: block !important; }
+        .edit-input { display: none; }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-900">
@@ -130,7 +134,7 @@
 
         // 🔑 Configuración y Conexión a Supabase
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyYpbdDCvVBaXzd3lmQJaNOVd1g3M";
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         const PRODUCT_BUCKET = "product-images";
@@ -188,6 +192,29 @@
             return urlData?.publicUrl;
         }
 
+        /**
+         * NUEVA FUNCIÓN: Actualiza el nombre y/o precio del producto.
+         * Requiere que el RLS de UPDATE esté activo en Supabase.
+         */
+        async function updateProduct(id, newName, newPrice) {
+            const updates = {};
+            if (newName) updates.name = newName;
+            if (newPrice !== undefined) updates.price = parseFloat(newPrice);
+            
+            if (Object.keys(updates).length === 0) return;
+
+            const { error } = await supabase.from("products").update(updates).eq("id", id);
+            
+            if (error) {
+                console.error("Error al actualizar producto:", error);
+                alert(`Error al actualizar el producto: ${error.message}`);
+            } else {
+                // Recargar y filtrar después de la actualización
+                await fetchProducts();
+                applySearchFilter(searchInput.value);
+            }
+        }
+
         // ===========================================
         // II. LÓGICA DE BÚSQUEDA Y RENDERIZADO
         // ===========================================
@@ -243,6 +270,7 @@
                 grouped[category].forEach(p => {
                     const card = document.createElement("div");
                     card.className = "bg-white rounded-lg shadow p-4 flex flex-col product-card";
+                    card.id = `product-${p.id}`; // ID para el modo edición
 
                     const imgBox = document.createElement("div");
                     imgBox.className = "h-40 bg-gray-100 rounded flex items-center justify-center mb-3 overflow-hidden";
@@ -252,14 +280,39 @@
                     img.src = imageUrl;
                     img.className = "object-contain h-full w-full";
                     imgBox.appendChild(img);
-
-                    const title = document.createElement("h3");
-                    title.className = "font-semibold";
-                    title.textContent = p.name;
                     
-                    const price = document.createElement("p");
-                    price.className = "text-gray-700 font-bold text-lg mt-2"; 
-                    price.textContent = `$${Number(p.price).toFixed(2)}`;
+                    // Contenedor del nombre (display/edit)
+                    const titleContainer = document.createElement("div");
+                    titleContainer.className = "mb-2";
+                    
+                    const titleDisplay = document.createElement("h3");
+                    titleDisplay.className = "font-semibold display-text";
+                    titleDisplay.textContent = p.name;
+                    titleContainer.appendChild(titleDisplay);
+                    
+                    const nameEditInput = document.createElement("input");
+                    nameEditInput.type = "text";
+                    nameEditInput.value = p.name;
+                    nameEditInput.className = "edit-input w-full border rounded p-1 text-sm";
+                    nameEditInput.dataset.field = 'name';
+                    titleContainer.appendChild(nameEditInput);
+                    
+                    // Contenedor del precio (display/edit)
+                    const priceContainer = document.createElement("div");
+                    priceContainer.className = "text-gray-700 font-bold text-lg mt-2 mb-1";
+                    
+                    const priceDisplay = document.createElement("span");
+                    priceDisplay.className = "display-text";
+                    priceDisplay.textContent = `$${Number(p.price).toFixed(2)}`;
+                    priceContainer.appendChild(priceDisplay);
+                    
+                    const priceEditInput = document.createElement("input");
+                    priceEditInput.type = "number";
+                    priceEditInput.step = "0.01";
+                    priceEditInput.value = Number(p.price).toFixed(2);
+                    priceEditInput.className = "edit-input w-full border rounded p-1 text-sm";
+                    priceEditInput.dataset.field = 'price';
+                    priceContainer.appendChild(priceEditInput);
 
                     const qty = document.createElement("p");
                     qty.className = "mt-1 text-sm text-gray-600";
@@ -283,6 +336,23 @@
                     
                     controls.appendChild(dec);
                     controls.appendChild(inc);
+                    
+                    // Botones de edición
+                    const editButton = document.createElement("button");
+                    editButton.textContent = "Editar";
+                    editButton.className = "px-3 py-1 rounded bg-indigo-500 hover:bg-indigo-600 text-white shadow-md text-sm transition edit-button";
+                    editButton.onclick = () => toggleEditMode(card, p.id);
+                    
+                    const saveButton = document.createElement("button");
+                    saveButton.textContent = "Guardar";
+                    saveButton.className = "px-3 py-1 rounded bg-green-500 hover:bg-green-600 text-white shadow-md text-sm transition save-button edit-input";
+                    saveButton.onclick = async () => {
+                        const newName = card.querySelector(`input[data-field='name']`).value;
+                        const newPrice = card.querySelector(`input[data-field='price']`).value;
+                        await updateProduct(p.id, newName, newPrice);
+                        // Sale del modo edición después de guardar
+                        card.classList.remove('edit-mode'); 
+                    };
 
                     const del = document.createElement("button");
                     del.textContent = "Eliminar";
@@ -290,11 +360,13 @@
                     del.onclick = () => deleteProduct(p.id);
 
                     actions.appendChild(controls);
+                    actions.appendChild(editButton);
+                    actions.appendChild(saveButton);
                     actions.appendChild(del);
 
                     card.appendChild(imgBox);
-                    card.appendChild(title);
-                    card.appendChild(price);
+                    card.appendChild(titleContainer);
+                    card.appendChild(priceContainer);
                     card.appendChild(qty);
                     card.appendChild(actions);
 
@@ -307,6 +379,18 @@
             });
         }
         
+        // Función para alternar el modo de edición en la tarjeta
+        function toggleEditMode(card, productId) {
+            // Asegura que solo se edite una tarjeta a la vez
+            document.querySelectorAll('.edit-mode').forEach(c => {
+                if (c.id !== card.id) {
+                    c.classList.remove('edit-mode');
+                }
+            });
+            card.classList.toggle('edit-mode');
+        }
+
+
         async function fetchProducts() {
             const { data, error } = await supabase.from("products").select("*").order("category", { ascending: true }).order("created_at", { ascending: false });
             if (error) {
@@ -319,14 +403,10 @@
         }
 
         // ===========================================
-        // III. LÓGICA DEL LOGO Y EVENTOS (CORREGIDA)
+        // III. LÓGICA DEL LOGO Y EVENTOS
         // ===========================================
 
-        /**
-         * Obtiene la URL del logo directamente desde Supabase y fuerza el NO-CACHÉ.
-         */
         async function fetchAndLoadLogo() {
-            // 1. Obtener la lista de archivos en el bucket del logo
             const { data: files, error } = await supabase.storage.from(LOGO_BUCKET).list('', {
                 limit: 100,
                 sortBy: { column: 'updated_at', order: 'desc' },
@@ -338,15 +418,12 @@
                 return;
             }
 
-            // 2. Intentar encontrar el logo principal (o el más reciente)
             const mainLogo = files.find(f => f.name.startsWith('current_business_logo_'));
             const logoFile = mainLogo || files[0];
 
-            // 3. Obtener la URL pública y añadir un parámetro de versión
             const { data: urlData } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(logoFile.name);
             
             if (urlData && urlData.publicUrl) {
-                // Usamos un timestamp para forzar la recarga en todos los navegadores
                 const publicUrlWithVersion = `${urlData.publicUrl}?v=${Date.now()}`;
                 businessLogo.src = publicUrlWithVersion;
                 localStorage.setItem("business-logo", publicUrlWithVersion);
@@ -381,7 +458,6 @@
 
             try {
                 const file = selectedLogoFile;
-                // Nombre constante para que 'upsert' funcione como actualización
                 const filePath = `current_business_logo_${file.name.replace(/\s/g, '_')}`; 
                 
                 const { error: uploadError } = await supabase.storage.from(LOGO_BUCKET).upload(filePath, file, {
@@ -391,7 +467,6 @@
 
                 if (uploadError) throw new Error(`Error: ${uploadError.message}. Revisa tus políticas RLS de INSERT en el bucket ${LOGO_BUCKET}.`);
 
-                // Recargar el logo para forzar la actualización en todos los navegadores
                 await fetchAndLoadLogo(); 
                 
                 alert("✅ Logo actualizado con éxito! Pídele a tus compañeros que recarguen la página.");
@@ -439,7 +514,6 @@
                 qtyIn.value = 1;
                 imageIn.value = "";
                 
-                // Recargar todos los productos y aplicar el filtro
                 await fetchProducts();
                 applySearchFilter(searchInput.value);
                 
@@ -462,11 +536,8 @@
 
         // --- INICIALIZACIÓN ---
         window.addEventListener("load", async () => {
-            // 1. Cargar todos los productos
             await fetchProducts(); 
-            // 2. Renderizar la vista inicial sin filtro
             applySearchFilter(searchInput.value);
-            // 3. Cargar el logo (corregido para persistencia)
             await fetchAndLoadLogo(); 
         });
     </script>
