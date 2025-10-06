@@ -307,6 +307,34 @@
             }
         }
 
+        // ⭐ NUEVA FUNCIÓN: Editar el precio de una venta
+        window.editSalePrice = async function(id, currentPrice) {
+            const newPriceRaw = prompt("Ingrese el nuevo precio de venta (USD):", currentPrice);
+
+            if (newPriceRaw === null || newPriceRaw.trim() === "") {
+                return; // El usuario canceló o no ingresó nada
+            }
+
+            const newPrice = parseFloat(newPriceRaw);
+
+            if (isNaN(newPrice) || newPrice < 0) {
+                alert("❌ Precio inválido. Por favor, ingrese un número positivo.");
+                return;
+            }
+
+            const { error } = await supabase
+                .from(SALES_TABLE)
+                .update({ price: newPrice })
+                .eq("id", id);
+
+            if (error) {
+                alert("❌ Error al actualizar el precio: " + error.message);
+                console.error("Error al actualizar el precio:", error);
+            } else {
+                fetchSales(); // Recargar la lista de ventas para mostrar el cambio
+            }
+        }
+
         async function fetchSales() {
             const { data, error } = await supabase
                 .from(SALES_TABLE)
@@ -335,9 +363,7 @@
             const table = document.createElement('table');
             table.className = 'min-w-full divide-y divide-gray-700';
             
-            // Encabezado de la tabla con la nueva columna
             const thead = table.createTHead();
-            // CAMBIO: Ajustar colores de thead
             thead.innerHTML = `
                 <tr>
                     <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
@@ -350,7 +376,6 @@
             `;
 
             const tbody = document.createElement('tbody');
-            // CAMBIO: Fondo del body de la tabla
             tbody.className = 'bg-gray-800 divide-y divide-gray-700';
             
             items.forEach(sale => {
@@ -360,7 +385,6 @@
                 const currentStatus = sale.status || 'Pendiente'; 
                 const statusClass = STATUS_COLORS[currentStatus] || STATUS_COLORS['Pendiente'];
                 
-                // Generar el select para cambiar el estado
                 const statusSelectHtml = `
                     <select onchange="changeSaleStatus('${sale.id}', this.value)" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer">
                         <option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option>
@@ -368,13 +392,16 @@
                         <option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option>
                     </select>
                 `;
-
-
+                
+                // ⭐ CAMBIO: Se agregó el botón de editar precio
                 row.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${saleDate}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.recipient_name}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.product_name_sold || 'N/A'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500">$${Number(sale.price).toFixed(2)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500">
+                        $${Number(sale.price).toFixed(2)}
+                        <button onclick="editSalePrice('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                         ${statusSelectHtml}
                     </td>
@@ -473,7 +500,6 @@
 
                 grouped[category].forEach(p => {
                     const card = document.createElement("div");
-                    // CAMBIO: Fondo de la tarjeta y sombra
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700";
                     card.style.position = "relative"; 
 
@@ -494,7 +520,6 @@
                     card.appendChild(editBtn); 
 
                     const imgBox = document.createElement("div");
-                    // CAMBIO: Fondo de la caja de imagen
                     imgBox.className = "h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden";
                     
                     const imageUrl = p.image_url || 'https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen';
@@ -529,7 +554,6 @@
                     controls.className = "flex gap-2";
                     
                     const dec = document.createElement("button");
-                    // CAMBIO: Ajustar colores de los botones de stock
                     dec.textContent = "-";
                     dec.className = "px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white";
                     dec.onclick = () => changeQty(p.id, -1);
