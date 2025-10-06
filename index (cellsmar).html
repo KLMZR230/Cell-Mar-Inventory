@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Cell Smar Gestion De Productos</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .product-card {
+            transition: transform 0.2s;
+        }
+        /* Ajustar la sombra y el fondo de la tarjeta al color oscuro */
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Ocultar el input type=file, manteniendo la funcionalidad */
+        #logo-upload {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            border: 0;
+        }
+        /* Estilo para ocultar las vistas */
+        .view-section.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-700 text-white">
+    
+    <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
+        <div class="flex items-center space-x-4">
+            <img id="business-logo" src="https://via.placeholder.com/60/4f46e5/ffffff?text=CS" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105" />
+            <h1 class="text-3xl font-extrabold tracking-tight">
+                📱 <span class="text-indigo-400">Cell Smar</span> Gestion De Productos
+            </h1>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <button 
+                id="sales-view-btn" 
+                class="bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 transition duration-300 text-sm shadow-md"
+            >
+                💰 Ventas
+            </button>
+
+            <div class="flex items-center space-x-3 p-2 bg-gray-700 rounded-lg border border-gray-600">
+                <label for="logo-upload" class="bg-indigo-400 text-gray-900 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-300 transition duration-300 cursor-pointer text-sm shadow-sm">
+                    Seleccionar Logo 🖼️
+                </label>
+                <input 
+                    type="file" 
+                    id="logo-upload" 
+                    title="Sube una nueva imagen para tu logo"
+                    accept="image/*"
+                />
+                
+                <button 
+                    id="logo-save-button"
+                    class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 shadow-md disabled:bg-gray-500 disabled:cursor-not-allowed text-sm"
+                    disabled
+                >
+                    Guardar Logo
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container mx-auto px-4 py-6">
+        <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario</p>
+        
+        <div id="inventory-view" class="view-section">
+            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto</h2>
+                <form id="product-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Nombre</label>
+                        <input id="name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Flex de Botones" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Categoría</label>
+                        <select id="category-select" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
+                            <option value="">Seleccionar</option>
+                            <option value="Pantallas">Pantallas</option>
+                            <option value="Jacks de Carga">Jacks de Carga</option>
+                            <option value="Flex Main">Flex Main</option>
+                            <option value="Placas de Carga">Placas de Carga</option>
+                            <option value="Botones Fisicos">Botones Fisicos</option>
+                            <option value="Botones Internos">Botones Internos</option>
+                            <option value="Accesorios">Accesorios</option>
+                            <option value="Otros">Otros</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Precio (USD)</label>
+                        <input id="price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="12.50" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Cantidad</label>
+                        <input id="quantity" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Imagen</label>
+                        <input id="image" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" />
+                    </div>
+
+                    <div class="md:col-span-5 text-right">
+                        <button id="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button>
+                    </div>
+                </form>
+                <p id="status" class="text-sm text-gray-400 mt-3"></p>
+            </section>
+
+            <section>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-indigo-300">📦 Inventario por Categoría</h2>
+                    <span id="total-count" class="text-gray-400 text-sm">Cargando...</span>
+                </div>
+                
+                <div class="mb-6 flex items-center space-x-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        placeholder="Buscar por nombre o categoría..." 
+                        class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white"
+                    />
+                </div>
+
+                <div id="products"></div>
+            </section>
+        </div>
+        
+        <div id="sales-view" class="view-section hidden">
+            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-indigo-300">✍️ Registrar Nueva Venta</h2>
+                <form id="sale-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Nombre de Destinatario</label>
+                        <input id="recipient-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Juan Pérez" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Producto Vendido</label>
+                        <input id="product-name-sold" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Pantalla Samsung A32" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Precio (USD)</label>
+                        <input id="sale-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="25.99" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Fecha de Venta</label>
+                        <input id="sale-date" type="date" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Estado</label>
+                        <select id="sale-status-input" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="Pagado">Pagado</option>
+                            <option value="Devuelto">Devuelto</option>
+                        </select>
+                    </div>
+
+                    <div class="text-right">
+                        <button id="sale-submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow w-full">Registrar Venta</button>
+                    </div>
+                </form>
+                <p id="sale-status" class="text-sm text-gray-400 mt-3"></p>
+            </section>
+            
+            <section>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-indigo-300">📊 Historial de Ventas</h2>
+                    <span id="total-sales-count" class="text-gray-400 text-sm">Cargando...</span>
+                </div>
+                <div id="sales-list" class="bg-gray-800 rounded-lg shadow overflow-hidden">
+                    </div>
+            </section>
+        </div>
+
+        <footer class="mt-10 text-center text-gray-400 text-sm">
+            Panel de Inventario — Cell Smart
+        </footer>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // 🔑 Configuración y Conexión a Supabase
+        const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        const PRODUCT_BUCKET = "product-images";
+        const LOGO_BUCKET = "business-assets"; 
+        const LOGO_PATH = "current_business_logo"; 
+        const SALES_TABLE = "sales"; 
+        
+        // Colores de estado
+        const STATUS_COLORS = {
+            'Pendiente': 'bg-yellow-600 text-gray-900 border-yellow-700',
+            'Pagado': 'bg-green-600 text-white border-green-700',
+            'Devuelto': 'bg-red-600 text-white border-red-700'
+        };
+
+        // --- Elementos del DOM de Inventario ---
+        const form = document.getElementById("product-form");
+        const nameIn = document.getElementById("name");
+        const categoryIn = document.getElementById("category-select"); 
+        const priceIn = document.getElementById("price");
+        const qtyIn = document.getElementById("quantity");
+        const imageIn = document.getElementById("image");
+        const status = document.getElementById("status");
+        const productsEl = document.getElementById("products");
+        const totalCount = document.getElementById("total-count");
+        const searchInput = document.getElementById("search-input"); 
+
+        // --- Elementos del DOM de Ventas ---
+        const salesForm = document.getElementById("sale-form");
+        const recipientNameIn = document.getElementById("recipient-name");
+        const productNameSoldIn = document.getElementById("product-name-sold"); 
+        const salePriceIn = document.getElementById("sale-price");
+        const saleDateIn = document.getElementById("sale-date");
+        const saleStatusInput = document.getElementById("sale-status-input");
+        const salesListEl = document.getElementById("sales-list");
+        const saleStatus = document.getElementById("sale-status");
+        const totalSalesCount = document.getElementById("total-sales-count");
+        const currentViewTitle = document.getElementById("current-view-title");
+        
+        // --- Elementos del Logo ---
+        const logoUpload = document.getElementById("logo-upload");
+        const businessLogo = document.getElementById("business-logo");
+        const logoSaveButton = document.getElementById("logo-save-button");
+        let selectedLogoFile = null;
+
+        // --- Variables de Estado ---
+        let allProducts = []; 
+        let currentView = 'inventory'; 
+
+        // ===========================================
+        // I. FUNCIONES DE VISTA
+        // ===========================================
+
+        function toggleView(viewName) {
+            currentView = viewName;
+            const inventoryView = document.getElementById('inventory-view');
+            const salesView = document.getElementById('sales-view');
+            const salesBtn = document.getElementById('sales-view-btn');
+
+            if (viewName === 'inventory') {
+                inventoryView.classList.remove('hidden');
+                salesView.classList.add('hidden');
+                currentViewTitle.textContent = "Vista: Inventario";
+                salesBtn.textContent = "💰 Ventas";
+                salesBtn.classList.replace('bg-green-700', 'bg-indigo-500');
+            } else if (viewName === 'sales') {
+                inventoryView.classList.add('hidden');
+                salesView.classList.remove('hidden');
+                currentViewTitle.textContent = "Vista: Ventas Registradas";
+                salesBtn.textContent = "📦 Inventario";
+                salesBtn.classList.replace('bg-indigo-500', 'bg-green-700');
+                fetchSales(); 
+            }
+        }
+        
+        // ===========================================
+        // II. FUNCIONES DE VENTA
+        // ===========================================
+
+        async function addSale(data) {
+            const { error } = await supabase.from(SALES_TABLE).insert(data);
+            
+            if (error) {
+                alert("❌ Error al registrar la venta: " + error.message + ". Asegúrate de haber ejecutado el SQL para agregar las columnas 'product_name_sold' y 'status' a la tabla 'sales'.");
+                console.error("Error al registrar venta:", error);
+            } else {
+                fetchSales(); 
+            }
+        }
+        
+        // Función: Cambiar el estado de una venta
+        window.changeSaleStatus = async function(id, newStatus) {
+            if (!confirm(`¿Cambiar el estado de esta venta a "${newStatus}"?`)) return;
+            
+            const { error } = await supabase
+                .from(SALES_TABLE)
+                .update({ status: newStatus })
+                .eq("id", id);
+            
+            if (error) {
+                alert("❌ Error al actualizar el estado: " + error.message);
+            } else {
+                fetchSales(); 
+            }
+        }
+
+        // ⭐ NUEVA FUNCIÓN: Editar el precio de una venta
+        window.editSalePrice = async function(id, currentPrice) {
+            const newPriceRaw = prompt("Ingrese el nuevo precio de venta (USD):", currentPrice);
+
+            if (newPriceRaw === null || newPriceRaw.trim() === "") {
+                return; // El usuario canceló o no ingresó nada
+            }
+
+            const newPrice = parseFloat(newPriceRaw);
+
+            if (isNaN(newPrice) || newPrice < 0) {
+                alert("❌ Precio inválido. Por favor, ingrese un número positivo.");
+                return;
+            }
+
+            const { error } = await supabase
+                .from(SALES_TABLE)
+                .update({ price: newPrice })
+                .eq("id", id);
+
+            if (error) {
+                alert("❌ Error al actualizar el precio: " + error.message);
+                console.error("Error al actualizar el precio:", error);
+            } else {
+                fetchSales(); // Recargar la lista de ventas para mostrar el cambio
+            }
+        }
+
+        async function fetchSales() {
+            const { data, error } = await supabase
+                .from(SALES_TABLE)
+                .select("*")
+                .order("sale_date", { ascending: false }) 
+                .order("created_at", { ascending: false });
+
+            if (error) {
+                console.error("Error cargando ventas:", error);
+                totalSalesCount.textContent = "Error al cargar";
+                return;
+            }
+            
+            renderSales(data);
+        }
+
+        function renderSales(items) {
+            salesListEl.innerHTML = "";
+            totalSalesCount.textContent = `${items.length} ventas`;
+
+            if (items.length === 0) {
+                salesListEl.innerHTML = `<p class="p-4 text-gray-400">No hay ventas registradas.</p>`;
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.className = 'min-w-full divide-y divide-gray-700';
+            
+            const thead = table.createTHead();
+            thead.innerHTML = `
+                <tr>
+                    <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
+                    <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destinatario</th>
+                    <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto Vendido</th>
+                    <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio de Venta</th>
+                    <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 bg-gray-700"></th>
+                </tr>
+            `;
+
+            const tbody = document.createElement('tbody');
+            tbody.className = 'bg-gray-800 divide-y divide-gray-700';
+            
+            items.forEach(sale => {
+                const row = tbody.insertRow();
+                
+                const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
+                const currentStatus = sale.status || 'Pendiente'; 
+                const statusClass = STATUS_COLORS[currentStatus] || STATUS_COLORS['Pendiente'];
+                
+                const statusSelectHtml = `
+                    <select onchange="changeSaleStatus('${sale.id}', this.value)" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer">
+                        <option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option>
+                        <option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                        <option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option>
+                    </select>
+                `;
+                
+                // ⭐ CAMBIO: Se agregó el botón de editar precio
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${saleDate}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.recipient_name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.product_name_sold || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500">
+                        $${Number(sale.price).toFixed(2)}
+                        <button onclick="editSalePrice('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        ${statusSelectHtml}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="deleteSale('${sale.id}')" class="text-red-500 hover:text-red-300 transition">Eliminar</button>
+                    </td>
+                `;
+            });
+            
+            table.appendChild(tbody);
+            salesListEl.appendChild(table);
+        }
+
+        window.deleteSale = async function(id) {
+            if (!confirm("¿Eliminar este registro de venta?")) return;
+            await supabase.from(SALES_TABLE).delete().eq("id", id);
+            fetchSales();
+        }
+
+        // ===========================================
+        // III. FUNCIONES DE INVENTARIO
+        // ===========================================
+        
+        async function editProduct(id, newName, newPrice) {
+            const priceValue = parseFloat(newPrice);
+            if (isNaN(priceValue) || priceValue < 0) {
+                alert("Precio inválido. Debe ser un número positivo.");
+                return;
+            }
+
+            const dataToUpdate = {
+                name: newName.trim(),
+                price: priceValue
+            };
+            
+            const { error } = await supabase.from("products").update(dataToUpdate).eq("id", id);
+            
+            if (error) {
+                alert("❌ Error al actualizar producto: " + error.message);
+            } else {
+                fetchProducts(); 
+            }
+        }
+
+        async function changeQty(id, delta) {
+            const { data: row } = await supabase.from("products").select("quantity").eq("id", id).single();
+            const newQty = Math.max(0, (row.quantity || 0) + delta);
+            await supabase.from("products").update({ quantity: newQty }).eq("id", id);
+            fetchProducts();
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm("¿Eliminar este producto? Esta acción es irreversible.")) return;
+            await supabase.from("products").delete().eq("id", id);
+            fetchProducts();
+        }
+
+        async function uploadImage(file) {
+            if (!file) return null;
+            const ext = file.name.split(".").pop();
+            const path = `product_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+            const { error } = await supabase.storage.from(PRODUCT_BUCKET).upload(path, file); 
+            if (error) throw error;
+            const { data: urlData } = supabase.storage.from(PRODUCT_BUCKET).getPublicUrl(path);
+            return urlData?.publicUrl;
+        }
+
+        function renderProducts(items) {
+            productsEl.innerHTML = ""; 
+            totalCount.textContent = `${items.length} productos`;
+
+            if (items.length === 0) {
+                productsEl.innerHTML = `<p class="text-gray-400">No se encontraron productos${searchInput.value ? ' para el término "' + searchInput.value + '"' : ''}.</p>`;
+                return;
+            }
+
+            const grouped = items.reduce((acc, product) => {
+                const category = product.category || 'Sin Categoría';
+                if (!acc[category]) {
+                    acc[category] = [];
+                }
+                acc[category].push(product);
+                return acc;
+            }, {});
+
+            Object.keys(grouped).forEach(category => {
+                const categorySection = document.createElement("div");
+                categorySection.className = "mb-10"; 
+
+                const categoryTitle = document.createElement("h2");
+                categoryTitle.className = "text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider";
+                categoryTitle.textContent = category;
+                
+                const productsGrid = document.createElement("div");
+                productsGrid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6";
+
+                grouped[category].forEach(p => {
+                    const card = document.createElement("div");
+                    card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700";
+                    card.style.position = "relative"; 
+
+                    const editBtn = document.createElement("button");
+                    editBtn.className = "absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm";
+                    editBtn.title = "Editar nombre y precio";
+                    editBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>';
+                    editBtn.onclick = () => {
+                        const currentPrice = Number(p.price).toFixed(2);
+                        const newName = prompt("Nuevo nombre para el producto:", p.name);
+                        if (newName === null || newName.trim() === "") return;
+                        
+                        const newPrice = prompt("Nuevo precio (USD):", currentPrice);
+                        if (newPrice === null) return;
+
+                        editProduct(p.id, newName, newPrice);
+                    };
+                    card.appendChild(editBtn); 
+
+                    const imgBox = document.createElement("div");
+                    imgBox.className = "h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden";
+                    
+                    const imageUrl = p.image_url || 'https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen';
+                    const img = document.createElement("img");
+                    img.src = imageUrl;
+                    img.className = "object-contain h-full w-full";
+                    imgBox.appendChild(img);
+
+                    const title = document.createElement("h3");
+                    title.className = "font-semibold text-white";
+                    title.textContent = p.name;
+                    
+                    if (p.category !== category) {
+                        const categoryTag = document.createElement("span");
+                        categoryTag.className = "text-xs font-medium text-indigo-400 bg-indigo-900 px-2 py-0.5 rounded-full mt-1 inline-block";
+                        categoryTag.textContent = p.category;
+                        card.appendChild(categoryTag);
+                    }
+
+                    const price = document.createElement("p");
+                    price.className = "text-green-400 font-bold text-lg mt-2"; 
+                    price.textContent = `$${Number(p.price).toFixed(2)}`;
+
+                    const qty = document.createElement("p");
+                    qty.className = "mt-1 text-sm text-gray-400";
+                    qty.textContent = `Stock: ${p.quantity}`;
+
+                    const actions = document.createElement("div");
+                    actions.className = "flex justify-between items-center mt-4 pt-3 border-t border-gray-700";
+
+                    const controls = document.createElement("div");
+                    controls.className = "flex gap-2";
+                    
+                    const dec = document.createElement("button");
+                    dec.textContent = "-";
+                    dec.className = "px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white";
+                    dec.onclick = () => changeQty(p.id, -1);
+                    
+                    const inc = document.createElement("button");
+                    inc.textContent = "+";
+                    inc.className = "px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white";
+                    inc.onclick = () => changeQty(p.id, +1);
+                    
+                    controls.appendChild(dec);
+                    controls.appendChild(inc);
+
+                    const del = document.createElement("button");
+                    del.textContent = "Eliminar";
+                    del.className = "px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition";
+                    del.onclick = () => deleteProduct(p.id);
+
+                    actions.appendChild(controls);
+                    actions.appendChild(del);
+
+                    card.appendChild(imgBox);
+                    card.appendChild(title);
+                    card.appendChild(price);
+                    card.appendChild(qty);
+                    card.appendChild(actions);
+
+                    productsGrid.appendChild(card);
+                });
+
+                categorySection.appendChild(categoryTitle);
+                categorySection.appendChild(productsGrid);
+                productsEl.appendChild(categorySection);
+            });
+        }
+        
+        function filterAndRenderProducts() {
+            const searchTerm = searchInput.value || "";
+            const term = searchTerm.toLowerCase().trim();
+            
+            const filteredProducts = allProducts.filter(p => 
+                p.name.toLowerCase().includes(term) || 
+                (p.category && p.category.toLowerCase().includes(term))
+            );
+            
+            renderProducts(filteredProducts);
+        }
+
+        async function fetchProducts() {
+            const { data, error } = await supabase.from("products").select("*").order("category", { ascending: true }).order("created_at", { ascending: false });
+            if (error) {
+                console.error("Error cargando productos:", error);
+                totalCount.textContent = "Error al cargar";
+                productsEl.innerHTML = `<p class="text-red-500">Error: No se pudo cargar el inventario. Asegúrate de tener la política RLS de SELECT activa.</p>`;
+                return;
+            }
+            
+            allProducts = data; 
+            filterAndRenderProducts(); 
+        }
+
+        // ===========================================
+        // IV. LÓGICA DEL LOGO GLOBAL
+        // ===========================================
+
+        async function loadLogo() {
+            const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(LOGO_PATH);
+
+            if (data.publicUrl) {
+                businessLogo.src = data.publicUrl;
+            } else {
+                businessLogo.src = "https://via.placeholder.com/60/4f46e5/ffffff?text=CS"; 
+            }
+        }
+
+        logoUpload.addEventListener("change", (e) => {
+            const files = e.target.files;
+            if (files.length > 0) {
+                selectedLogoFile = files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => { businessLogo.src = e.target.result; };
+                reader.readAsDataURL(selectedLogoFile);
+                logoSaveButton.disabled = false;
+                logoSaveButton.textContent = "Guardar Logo";
+            } else {
+                selectedLogoFile = null;
+                loadLogo(); 
+                logoSaveButton.disabled = true;
+                logoSaveButton.textContent = "Guardar Logo";
+            }
+        });
+
+        logoSaveButton.addEventListener("click", async () => {
+             if (!selectedLogoFile) return alert("Selecciona un archivo primero.");
+
+            logoSaveButton.disabled = true;
+            logoSaveButton.textContent = "Subiendo...";
+
+            try {
+                const file = selectedLogoFile;
+                const filePath = LOGO_PATH; 
+                
+                const { error: uploadError } = await supabase.storage.from(LOGO_BUCKET).upload(filePath, file, {
+                    cacheControl: "3600",
+                    upsert: true, 
+                    contentType: file.type
+                });
+
+                if (uploadError) throw new Error(`Error: ${uploadError.message}. Revisa tus políticas RLS de INSERT/UPDATE en el bucket ${LOGO_BUCKET}.`);
+
+                const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(filePath);
+                if (!data.publicUrl) throw new Error("No se pudo obtener la URL pública.");
+                
+                businessLogo.src = data.publicUrl;
+                
+                alert("✅ Logo actualizado con éxito! Se cargará en todos los dispositivos.");
+                
+                selectedLogoFile = null;
+                logoUpload.value = "";
+                logoSaveButton.textContent = "Guardado ✅";
+                
+                setTimeout(() => {
+                    logoSaveButton.disabled = true;
+                    logoSaveButton.textContent = "Guardar Logo";
+                }, 3000);
+
+            } catch (error) {
+                console.error("Fallo al guardar logo:", error);
+                alert("❌ Fallo al guardar logo: " + error.message);
+                logoSaveButton.disabled = false;
+                logoSaveButton.textContent = "Error, Reintentar";
+            }
+        });
+
+
+        // ===========================================
+        // V. EVENTOS
+        // ===========================================
+        
+        searchInput.addEventListener("input", () => {
+            filterAndRenderProducts();
+        });
+
+        document.getElementById('sales-view-btn').addEventListener('click', () => {
+            toggleView(currentView === 'inventory' ? 'sales' : 'inventory');
+        });
+
+        // Eventos del Formulario de Productos
+        form.addEventListener("submit", async (ev) => {
+            ev.preventDefault();
+            document.getElementById("submit").disabled = true;
+            status.textContent = "Guardando...";
+            try {
+                let imageUrl = null;
+                if (imageIn.files[0]) imageUrl = await uploadImage(imageIn.files[0]);
+                
+                const { error } = await supabase.from("products").insert({
+                    name: nameIn.value,
+                    category: categoryIn.value,
+                    price: parseFloat(priceIn.value),
+                    quantity: parseInt(qtyIn.value),
+                    image_url: imageUrl
+                });
+                
+                if (error) throw error;
+                
+                nameIn.value = "";
+                categoryIn.value = ""; 
+                priceIn.value = "";
+                qtyIn.value = 1;
+                imageIn.value = "";
+                
+                fetchProducts(); 
+                status.textContent = "Producto agregado con éxito ✅";
+            } catch (err) {
+                console.error(err);
+                status.textContent = "Error: " + err.message;
+            } finally {
+                document.getElementById("submit").disabled = false;
+                setTimeout(() => (status.textContent = ""), 3000);
+            }
+        });
+
+        // Eventos del Formulario de Ventas
+        salesForm.addEventListener("submit", async (ev) => {
+            ev.preventDefault();
+            document.getElementById("sale-submit").disabled = true;
+            saleStatus.textContent = "Registrando venta...";
+            try {
+                const saleData = {
+                    recipient_name: recipientNameIn.value,
+                    product_name_sold: productNameSoldIn.value,
+                    price: parseFloat(salePriceIn.value),
+                    sale_date: saleDateIn.value,
+                    status: saleStatusInput.value 
+                };
+
+                await addSale(saleData);
+
+                recipientNameIn.value = "";
+                productNameSoldIn.value = ""; 
+                salePriceIn.value = "";
+                saleStatusInput.value = "Pendiente"; 
+                
+                saleStatus.textContent = "Venta registrada con éxito ✅";
+            } catch (err) {
+                console.error(err);
+                saleStatus.textContent = "Error al registrar venta: " + err.message;
+            } finally {
+                document.getElementById("sale-submit").disabled = false;
+                setTimeout(() => (saleStatus.textContent = ""), 3000);
+            }
+        });
+
+
+        // --- INICIALIZACIÓN ---
+        window.addEventListener("load", () => {
+            loadLogo(); 
+            fetchProducts(); 
+            saleDateIn.value = new Date().toISOString().split('T')[0];
+        });
+    </script>
+</body>
+</html>
