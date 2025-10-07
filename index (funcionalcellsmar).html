@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Cell Smar Gestion De Productos</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .product-card { transition: transform 0.2s; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
+        .view-section.hidden { display: none; }
+        .skeleton-card { background-color: #374151; border-radius: 0.5rem; padding: 1rem; display: flex; flex-direction: column; }
+        .skeleton-line { background-color: #4B5563; border-radius: 0.25rem; animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 50% { opacity: .5; } }
+    </style>
+</head>
+<body class="bg-gray-700 text-white">
+    
+    <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
+        <div class="flex items-center space-x-4">
+            <img id="business-logo" src="https://via.placeholder.com/60/4f46e5/ffffff?text=CS" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105" />
+            <h1 class="text-3xl font-extrabold tracking-tight">
+                📱 <span class="text-indigo-400">Cell Smar</span> Gestion
+            </h1>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <div id="view-buttons" class="flex items-center space-x-2 bg-gray-700 p-1 rounded-lg border border-gray-600">
+                 <button data-view="inventory" class="view-btn bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg text-sm shadow-md transition duration-300">📦 Inventario</button>
+                 <button data-view="inventory_el_transito" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🚚 Inventario El Transito</button>
+                 <button data-view="sales" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">💰 Ventas</button>
+                 <button data-view="sales_el_transito" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🚚 Ventas El Transito</button>
+                 <button data-view="missing" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🔔 Faltantes</button>
+            </div>
+            <div class="flex items-center space-x-3">
+                <label for="logo-upload" class="bg-indigo-400 text-gray-900 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-300 transition duration-300 cursor-pointer text-sm shadow-sm">Logo 🖼️</label>
+                <input type="file" id="logo-upload" title="Sube una nueva imagen para tu logo" accept="image/*" />
+                <button id="logo-save-button" class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 shadow-md disabled:bg-gray-500 disabled:cursor-not-allowed text-sm" disabled>Guardar</button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container mx-auto px-4 py-6">
+        <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario</p>
+        
+        <div id="inventory-view" class="view-section">
+            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto</h2>
+                <form id="product-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                    <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Flex de Botones" /></div>
+                    <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="">Seleccionar</option><option value="Pantallas">Pantallas</option><option value="Jacks de Carga">Jacks de Carga</option><option value="Flex Main">Flex Main</option><option value="Placas de Carga">Placas de Carga</option><option value="Botones Fisicos">Botones Fisicos</option><option value="Botones Internos">Botones Internos</option><option value="Accesorios">Accesorios</option><option value="Otros">Otros</option></select></div>
+                    <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="12.50" /></div>
+                    <div><label class="block text-sm font-medium text-gray-300">Cantidad</label><input id="quantity" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
+                    <div><label class="block text-sm font-medium text-gray-300">Imagen</label><input id="image" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" /></div>
+                    <div class="md:col-span-5 text-right"><button id="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
+                </form>
+                <p id="status" class="text-sm text-gray-400 mt-3"></p>
+            </section>
+            <section>
+                <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">📦 Inventario por Categoría</h2><span id="total-count" class="text-gray-400 text-sm"></span></div>
+                <div class="mb-6 flex items-center space-x-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" id="search-input" placeholder="Buscar por nombre o categoría..." class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" /></div>
+                <div id="products-loader" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+                <div id="products"></div>
+            </section>
+        </div>
+
+        <div id="inventory-el-transito-view" class="view-section hidden">
+            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (El Transito)</h2>
+                <form id="product-form-et" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                    <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name-et" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Flex de Botones" /></div>
+                    <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select-et" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="">Seleccionar</option><option value="Pantallas">Pantallas</option><option value="Jacks de Carga">Jacks de Carga</option><option value="Flex Main">Flex Main</option><option value="Placas de Carga">Placas de Carga</option><option value="Botones Fisicos">Botones Fisicos</option><option value="Botones Internos">Botones Internos</option><option value="Accesorios">Accesorios</option><option value="Otros">Otros</option></select></div>
+                    <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="price-et" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="12.50" /></div>
+                    <div><label class="block text-sm font-medium text-gray-300">Cantidad</label><input id="quantity-et" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
+                    <div><label class="block text-sm font-medium text-gray-300">Imagen</label><input id="image-et" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" /></div>
+                    <div class="md:col-span-5 text-right"><button id="submit-et" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
+                </form>
+                <p id="status-et" class="text-sm text-gray-400 mt-3"></p>
+            </section>
+            <section>
+                <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">🚚 Inventario por Categoría (El Transito)</h2><span id="total-count-et" class="text-gray-400 text-sm"></span></div>
+                <div class="mb-6 flex items-center space-x-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" id="search-input-et" placeholder="Buscar por nombre o categoría..." class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" /></div>
+                <div id="products-loader-et" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+                <div id="products-et"></div>
+            </section>
+        </div>
+        
+        <div id="sales-view" class="view-section hidden">
+            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-indigo-300">✍️ Registrar Nueva Venta</h2>
+                <form id="sale-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+                    <div><label class="block text-sm font-medium text-gray-300">Nombre de Destinatario</label><input id="recipient-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Juan Pérez" /></div>
+                    <div><label class="block text-sm font-medium text-gray-300">Producto Vendido</label><input id="product-name-sold" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Pantalla Samsung A32" /></div>
+                    <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="sale-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="25.99" /></div>
+                    <div><label class="block text-sm font-medium text-gray-300">Fecha de Venta</label><input id="sale-date" type="date" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
+                    <div><label class="block text-sm font-medium text-gray-300">Estado</label><select id="sale-status-input" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="Pendiente">Pendiente</option><option value="Pagado">Pagado</option><option value="Devuelto">Devuelto</option></select></div>
+                    <div class="text-right"><button id="sale-submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow w-full">Registrar Venta</button></div>
+                </form>
+                <p id="sale-status" class="text-sm text-gray-400 mt-3"></p>
+            </section>
+            <section>
+                <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">📊 Historial de Ventas</h2><span id="total-sales-count" class="text-gray-400 text-sm"></span></div>
+                <div id="sales-list-loader" class="space-y-2"></div>
+                <div id="sales-list" class="bg-gray-800 rounded-lg shadow overflow-hidden"></div>
+            </section>
+        </div>
+
+        <div id="sales-el-transito-view" class="view-section hidden">
+            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-indigo-300">✍️ Registrar Nueva Venta (El Transito)</h2>
+                <form id="sale-el-transito-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+                    <div><label class="block text-sm font-medium text-gray-300">Nombre de Destinatario</label><input id="recipient-name-et" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Ana Gómez" /></div>
+                    <div><label class="block text-sm font-medium text-gray-300">Producto Vendido</label><input id="product-name-sold-et" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Batería iPhone 11" /></div>
+                    <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="sale-price-et" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="35.00" /></div>
+                    <div><label class="block text-sm font-medium text-gray-300">Fecha de Venta</label><input id="sale-date-et" type="date" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
+                    <div><label class="block text-sm font-medium text-gray-300">Estado</label><select id="sale-status-input-et" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="Pendiente">Pendiente</option><option value="Pagado">Pagado</option><option value="Devuelto">Devuelto</option></select></div>
+                    <div class="text-right"><button id="sale-submit-et" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow w-full">Registrar Venta</button></div>
+                </form>
+                <p id="sale-status-et" class="text-sm text-gray-400 mt-3"></p>
+            </section>
+            <section>
+                <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">📊 Historial de Ventas (El Transito)</h2><span id="total-sales-count-et" class="text-gray-400 text-sm"></span></div>
+                <div id="sales-list-loader-et" class="space-y-2"></div>
+                <div id="sales-list-et" class="bg-gray-800 rounded-lg shadow overflow-hidden"></div>
+            </section>
+        </div>
+
+        <div id="missing-view" class="view-section hidden">
+            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 max-w-4xl mx-auto">
+                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Registrar Producto Faltante</h2>
+                <form id="missing-product-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Nombre del Producto</label>
+                        <input id="missing-product-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Batería para iPhone X" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Notas (Opcional)</label>
+                        <input id="missing-product-notes" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Pedir al proveedor A" />
+                    </div>
+                    <div>
+                        <button id="missing-product-submit" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded shadow w-full">Agregar a la Lista</button>
+                    </div>
+                </form>
+                <p id="missing-product-status" class="text-sm text-gray-400 mt-3"></p>
+            </section>
+            <section class="max-w-4xl mx-auto">
+                <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">📋 Lista de Productos Faltantes</h2><span id="total-missing-count" class="text-gray-400 text-sm"></span></div>
+                <div id="missing-list-loader" class="space-y-2"></div>
+                <div id="missing-list" class="bg-gray-800 rounded-lg shadow overflow-hidden"></div>
+            </section>
+        </div>
+
+        <footer class="mt-10 text-center text-gray-400 text-sm">Panel de Inventario — Cell Smart</footer>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // Configuración y Conexión a Supabase
+        const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Constantes de la Aplicación
+        const PRODUCTS_TABLE = "products";
+        const PRODUCTS_EL_TRANSITO_TABLE = "products_el_transito";
+        const PRODUCT_BUCKET = "product-images";
+        const LOGO_BUCKET = "business-assets"; 
+        const LOGO_PATH = "current_business_logo"; 
+        const SALES_TABLE = "sales";
+        const SALES_EL_TRANSITO_TABLE = "sales_el_transito"; 
+        const MISSING_PRODUCTS_TABLE = "missing_products"; 
+
+        const STATUS_COLORS = { 'Pendiente': 'bg-yellow-600 text-gray-900 border-yellow-700', 'Pagado': 'bg-green-600 text-white border-green-700', 'Devuelto': 'bg-red-600 text-white border-red-700' };
+
+        // Elementos del DOM
+        const form = document.getElementById("product-form"), nameIn = document.getElementById("name"), categoryIn = document.getElementById("category-select"), priceIn = document.getElementById("price"), qtyIn = document.getElementById("quantity"), imageIn = document.getElementById("image"), status = document.getElementById("status"), productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader");
+        const salesForm = document.getElementById("sale-form"), recipientNameIn = document.getElementById("recipient-name"), productNameSoldIn = document.getElementById("product-name-sold"), salePriceIn = document.getElementById("sale-price"), saleDateIn = document.getElementById("sale-date"), saleStatusInput = document.getElementById("sale-status-input"), salesListEl = document.getElementById("sales-list"), saleStatus = document.getElementById("sale-status"), totalSalesCount = document.getElementById("total-sales-count"), salesListLoader = document.getElementById("sales-list-loader");
+        const salesFormET = document.getElementById("sale-el-transito-form"), recipientNameInET = document.getElementById("recipient-name-et"), productNameSoldInET = document.getElementById("product-name-sold-et"), salePriceInET = document.getElementById("sale-price-et"), saleDateInET = document.getElementById("sale-date-et"), saleStatusInputET = document.getElementById("sale-status-input-et"), salesListElET = document.getElementById("sales-list-et"), saleStatusET = document.getElementById("sale-status-et"), totalSalesCountET = document.getElementById("total-sales-count-et"), salesListLoaderET = document.getElementById("sales-list-loader-et");
+        const missingProductForm = document.getElementById("missing-product-form"), missingProductNameIn = document.getElementById("missing-product-name"), missingProductNotesIn = document.getElementById("missing-product-notes"), missingProductStatus = document.getElementById("missing-product-status"), missingListEl = document.getElementById("missing-list"), totalMissingCount = document.getElementById("total-missing-count"), missingListLoader = document.getElementById("missing-list-loader");
+        const logoUpload = document.getElementById("logo-upload"), businessLogo = document.getElementById("business-logo"), logoSaveButton = document.getElementById("logo-save-button");
+        const currentViewTitle = document.getElementById("current-view-title");
+        const formET = document.getElementById("product-form-et"), nameInET = document.getElementById("name-et"), categoryInET = document.getElementById("category-select-et"), priceInET = document.getElementById("price-et"), qtyInET = document.getElementById("quantity-et"), imageInET = document.getElementById("image-et"), statusET = document.getElementById("status-et"), productsElET = document.getElementById("products-et"), totalCountET = document.getElementById("total-count-et"), searchInputET = document.getElementById("search-input-et"), productsLoaderET = document.getElementById("products-loader-et");
+
+        let allProducts = [], allProductsElTransito = [], allSales = [], allSalesElTransito = [], allMissingProducts = [], selectedLogoFile = null;
+
+        // I. GESTIÓN DE VISTAS Y CARGA
+        const views = { 
+            inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario' }, 
+            inventory_el_transito: { el: document.getElementById('inventory-el-transito-view'), title: 'Vista: Inventario El Transito' },
+            sales: { el: document.getElementById('sales-view'), title: 'Vista: Ventas Registradas' },
+            sales_el_transito: { el: document.getElementById('sales-el-transito-view'), title: 'Vista: Ventas El Transito' },
+            missing: { el: document.getElementById('missing-view'), title: 'Vista: Productos Faltantes' } 
+        };
+        function toggleView(viewName) { Object.keys(views).forEach(key => { const isCurrent = key === viewName; views[key].el.classList.toggle('hidden', !isCurrent); const btn = document.querySelector(`.view-btn[data-view="${key}"]`); btn.classList.toggle('bg-indigo-500', isCurrent); btn.classList.toggle('text-white', isCurrent); btn.classList.toggle('bg-transparent', !isCurrent); btn.classList.toggle('text-gray-300', !isCurrent); }); currentViewTitle.textContent = views[viewName].title; }
+        function showSkeletonLoaders() { 
+            const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div><div class="h-4 w-1/2 skeleton-line"></div><div class="h-8 w-1/4 skeleton-line"></div></div>`).join('');
+            productsLoader.innerHTML = cardSkeleton;
+            productsLoaderET.innerHTML = cardSkeleton;
+            const tableSkeleton = Array(3).fill('').map(() => `<div class="h-12 skeleton-line"></div>`).join(''); 
+            salesListLoader.innerHTML = tableSkeleton; 
+            salesListLoaderET.innerHTML = tableSkeleton;
+            missingListLoader.innerHTML = tableSkeleton; 
+        }
+
+        // II. FUNCIONES DE VENTA
+        async function fetchSales() { const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false }); if (error) { console.error("Error cargando ventas:", error); totalSalesCount.textContent = "Error al cargar"; return; } allSales = data; renderSales(allSales); }
+        function renderSales(items) { salesListLoader.innerHTML = ""; salesListEl.innerHTML = ""; totalSalesCount.textContent = `${items.length} ventas`; if (items.length === 0) { salesListEl.innerHTML = `<p class="p-4 text-gray-400">No hay ventas registradas.</p>`; return; } const table = document.createElement('table'); table.className = 'min-w-full divide-y divide-gray-700'; table.innerHTML = `<thead><tr><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destinatario</th><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto Vendido</th><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th><th class="px-6 py-3 bg-gray-700"></th></tr></thead>`; const tbody = document.createElement('tbody'); tbody.className = 'bg-gray-800 divide-y divide-gray-700'; items.forEach(sale => { const row = tbody.insertRow(); const saleDate = new Date(sale.sale_date).toISOString().split('T')[0]; const currentStatus = sale.status || 'Pendiente'; const statusClass = STATUS_COLORS[currentStatus] || STATUS_COLORS['Pendiente']; const statusSelectHtml = `<select onchange="changeSaleStatus('${sale.id}', this.value)" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option><option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option><option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option></select>`; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${saleDate}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.recipient_name}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.product_name_sold || 'N/A'}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500">$${Number(sale.price).toFixed(2)} <button onclick="editSalePrice('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button></td><td class="px-6 py-4 whitespace-nowrap text-sm">${statusSelectHtml}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteSale('${sale.id}')" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td>`; }); table.appendChild(tbody); salesListEl.appendChild(table); }
+        window.changeSaleStatus = async function(id, newStatus) { if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) return; const { error } = await supabase.from(SALES_TABLE).update({ status: newStatus }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSales(); }
+        window.editSalePrice = async function(id, currentPrice) { const newPriceRaw = prompt("Ingrese el nuevo precio (USD):", currentPrice); if (newPriceRaw === null || newPriceRaw.trim() === "") return; const newPrice = parseFloat(newPriceRaw); if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } const { error } = await supabase.from(SALES_TABLE).update({ price: newPrice }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSales(); }
+        window.deleteSale = async function(id) { if (!confirm("¿Eliminar este registro de venta?")) return; await supabase.from(SALES_TABLE).delete().eq("id", id); fetchSales(); }
+
+        // III. FUNCIONES DE VENTA (EL TRANSITO)
+        async function fetchSalesElTransito() { const { data, error } = await supabase.from(SALES_EL_TRANSITO_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false }); if (error) { console.error("Error cargando ventas (El Transito):", error); totalSalesCountET.textContent = "Error al cargar"; return; } allSalesElTransito = data; renderSalesElTransito(allSalesElTransito); }
+        function renderSalesElTransito(items) { salesListLoaderET.innerHTML = ""; salesListElET.innerHTML = ""; totalSalesCountET.textContent = `${items.length} ventas`; if (items.length === 0) { salesListElET.innerHTML = `<p class="p-4 text-gray-400">No hay ventas registradas en El Transito.</p>`; return; } const table = document.createElement('table'); table.className = 'min-w-full divide-y divide-gray-700'; table.innerHTML = `<thead><tr><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destinatario</th><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto Vendido</th><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th><th class="px-6 py-3 bg-gray-700"></th></tr></thead>`; const tbody = document.createElement('tbody'); tbody.className = 'bg-gray-800 divide-y divide-gray-700'; items.forEach(sale => { const row = tbody.insertRow(); const saleDate = new Date(sale.sale_date).toISOString().split('T')[0]; const currentStatus = sale.status || 'Pendiente'; const statusClass = STATUS_COLORS[currentStatus] || STATUS_COLORS['Pendiente']; const statusSelectHtml = `<select onchange="changeSaleStatusET('${sale.id}', this.value)" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option><option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option><option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option></select>`; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${saleDate}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.recipient_name}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.product_name_sold || 'N/A'}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500">$${Number(sale.price).toFixed(2)} <button onclick="editSalePriceET('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button></td><td class="px-6 py-4 whitespace-nowrap text-sm">${statusSelectHtml}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteSaleET('${sale.id}')" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td>`; }); table.appendChild(tbody); salesListElET.appendChild(table); }
+        window.changeSaleStatusET = async function(id, newStatus) { if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) return; const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ status: newStatus }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSalesElTransito(); }
+        window.editSalePriceET = async function(id, currentPrice) { const newPriceRaw = prompt("Ingrese el nuevo precio (USD):", currentPrice); if (newPriceRaw === null || newPriceRaw.trim() === "") return; const newPrice = parseFloat(newPriceRaw); if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ price: newPrice }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSalesElTransito(); }
+        window.deleteSaleET = async function(id) { if (!confirm("¿Eliminar este registro de venta?")) return; await supabase.from(SALES_EL_TRANSITO_TABLE).delete().eq("id", id); fetchSalesElTransito(); }
+
+        // IV. FUNCIONES DE PRODUCTOS FALTANTES
+        async function fetchMissingProducts() { const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false }); if (error) { console.error("Error cargando productos faltantes:", error); totalMissingCount.textContent = "Error al cargar"; return; } allMissingProducts = data; renderMissingProducts(allMissingProducts); }
+        function renderMissingProducts(items) { missingListLoader.innerHTML = ""; missingListEl.innerHTML = ""; totalMissingCount.textContent = `${items.length} productos`; if (items.length === 0) { missingListEl.innerHTML = `<p class="p-4 text-gray-400">No hay productos faltantes registrados.</p>`; return; } const table = document.createElement('table'); table.className = 'min-w-full divide-y divide-gray-700'; table.innerHTML = `<thead><tr><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto y Notas</th><th class="px-6 py-3 bg-gray-700"></th></tr></thead>`; const tbody = document.createElement('tbody'); tbody.className = 'bg-gray-800 divide-y divide-gray-700'; items.forEach(item => { const row = tbody.insertRow(); const notesHtml = item.notes ? `<p class="text-xs text-gray-400 mt-1">${item.notes}</p>` : ''; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm"><span class="font-medium text-white">${item.product_name}</span>${notesHtml}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteMissingProduct('${item.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded shadow text-xs transition">Conseguido ✔</button></td>`; }); table.appendChild(tbody); missingListEl.appendChild(table); }
+        window.deleteMissingProduct = async function(id) { if (!confirm("¿Marcar este producto como conseguido? Se eliminará de la lista.")) return; await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq("id", id); fetchMissingProducts(); }
+
+        // V. FUNCIONES DE INVENTARIO (PRINCIPAL)
+        function escapeJsString(str) {
+            if (typeof str !== 'string') return '';
+            return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        }
+        async function fetchProducts() { const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); if (error) { console.error("Error cargando productos:", error); totalCount.textContent = "Error al cargar"; productsEl.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } allProducts = data; filterAndRenderProducts(); }
+        function filterAndRenderProducts() { const term = (searchInput.value || "").toLowerCase().trim(); const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProducts(filtered); }
+        function renderProducts(items) { productsLoader.innerHTML = ""; productsEl.innerHTML = ""; totalCount.textContent = `${items.length} productos`; if (items.length === 0) { productsEl.innerHTML = `<p class="text-gray-400">No se encontraron productos${searchInput.value ? ' para "' + searchInput.value + '"' : ''}.</p>`; return; } const grouped = items.reduce((acc, p) => { const cat = p.category || 'Sin Categoría'; if (!acc[cat]) acc[cat] = []; acc[cat].push(p); return acc; }, {}); Object.keys(grouped).forEach(category => { const section = document.createElement("div"); section.className = "mb-10"; section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; const grid = document.createElement("div"); grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; grouped[category].forEach(p => { const card = document.createElement("div"); card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; const imageUrl = p.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; card.innerHTML = `<button onclick="handleEditClick('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div><h3 class="font-semibold text-white">${p.name}</h3><p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p><p class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700"><div class="flex gap-2"><button onclick="changeQty('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button><button onclick="changeQty('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button></div><button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button></div>`; grid.appendChild(card); }); section.appendChild(grid); productsEl.appendChild(section); }); }
+        window.handleEditClick = (id, name, price) => { const newName = prompt("Nuevo nombre:", name); if (newName === null || newName.trim() === "") return; const newPrice = prompt("Nuevo precio (USD):", Number(price).toFixed(2)); if (newPrice === null) return; editProduct(id, newName, newPrice); }; async function editProduct(id, newName, newPrice) { const priceValue = parseFloat(newPrice); if (isNaN(priceValue) || priceValue < 0) { alert("Precio inválido."); return; } const { error } = await supabase.from(PRODUCTS_TABLE).update({ name: newName.trim(), price: priceValue }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchProducts(); }
+        // **INICIO CORRECCIÓN**
+        window.changeQty = async function(id, delta) { const { data } = await supabase.from(PRODUCTS_TABLE).select("quantity").eq("id", id).single(); const newQty = Math.max(0, (data.quantity || 0) + delta); await supabase.from(PRODUCTS_TABLE).update({ quantity: newQty }).eq("id", id); fetchProducts(); }
+        // **FIN CORRECCIÓN**
+        async function deleteProduct(id) { if (!confirm("¿Eliminar este producto?")) return; await supabase.from(PRODUCTS_TABLE).delete().eq("id", id); fetchProducts(); }
+        
+        // VI. FUNCIONES DE INVENTARIO (EL TRANSITO)
+        async function fetchProductsET() { const { data, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); if (error) { console.error("Error cargando productos (El Transito):", error); totalCountET.textContent = "Error al cargar"; productsElET.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } allProductsElTransito = data; filterAndRenderProductsET(); }
+        function filterAndRenderProductsET() { const term = (searchInputET.value || "").toLowerCase().trim(); const filtered = allProductsElTransito.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProductsET(filtered); }
+        function renderProductsET(items) { productsLoaderET.innerHTML = ""; productsElET.innerHTML = ""; totalCountET.textContent = `${items.length} productos`; if (items.length === 0) { productsElET.innerHTML = `<p class="text-gray-400">No se encontraron productos${searchInputET.value ? ' para "' + searchInputET.value + '"' : ''}.</p>`; return; } const grouped = items.reduce((acc, p) => { const cat = p.category || 'Sin Categoría'; if (!acc[cat]) acc[cat] = []; acc[cat].push(p); return acc; }, {}); Object.keys(grouped).forEach(category => { const section = document.createElement("div"); section.className = "mb-10"; section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; const grid = document.createElement("div"); grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; grouped[category].forEach(p => { const card = document.createElement("div"); card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; const imageUrl = p.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; card.innerHTML = `<button onclick="handleEditClickET('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div><h3 class="font-semibold text-white">${p.name}</h3><p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p><p class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700"><div class="flex gap-2"><button onclick="changeQtyET('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button><button onclick="changeQtyET('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button></div><button onclick="deleteProductET('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button></div>`; grid.appendChild(card); }); section.appendChild(grid); productsElET.appendChild(section); }); }
+        window.handleEditClickET = (id, name, price) => { const newName = prompt("Nuevo nombre (El Transito):", name); if (newName === null || newName.trim() === "") return; const newPrice = prompt("Nuevo precio (USD) (El Transito):", Number(price).toFixed(2)); if (newPrice === null) return; editProductET(id, newName, newPrice); }; async function editProductET(id, newName, newPrice) { const priceValue = parseFloat(newPrice); if (isNaN(priceValue) || priceValue < 0) { alert("Precio inválido."); return; } const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ name: newName.trim(), price: priceValue }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchProductsET(); }
+        // **INICIO CORRECCIÓN**
+        window.changeQtyET = async function(id, delta) { const { data } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("quantity").eq("id", id).single(); const newQty = Math.max(0, (data.quantity || 0) + delta); await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ quantity: newQty }).eq("id", id); fetchProductsET(); }
+        // **FIN CORRECCIÓN**
+        window.deleteProductET = async function(id) { if (!confirm("¿Eliminar este producto de Inventario El Transito?")) return; await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).delete().eq("id", id); fetchProductsET(); }
+
+        // Función general para subir imágenes, reutilizable
+        async function uploadImage(file, bucket) { if (!file) return null; const ext = file.name.split(".").pop(); const path = `product_${Date.now()}.${ext}`; const { error } = await supabase.storage.from(bucket).upload(path, file); if (error) throw error; const { data } = supabase.storage.from(bucket).getPublicUrl(path); return data?.publicUrl; }
+
+        // VII. LÓGICA DEL LOGO
+        async function loadLogo() {
+            const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(LOGO_PATH);
+            
+            if (data && data.publicUrl) {
+                businessLogo.src = `${data.publicUrl}?t=${new Date().getTime()}`;
+            } else {
+                console.error("No se pudo obtener la URL pública para el logo.");
+            }
+        }
+        logoUpload.addEventListener("change", (e) => { const file = e.target.files[0]; if (file) { selectedLogoFile = file; const reader = new FileReader(); reader.onload = (ev) => { businessLogo.src = ev.target.result; }; reader.readAsDataURL(file); logoSaveButton.disabled = false; } });
+        logoSaveButton.addEventListener("click", async () => { if (!selectedLogoFile) return; logoSaveButton.disabled = true; logoSaveButton.textContent = "Subiendo..."; try { const { error } = await supabase.storage.from(LOGO_BUCKET).upload(LOGO_PATH, selectedLogoFile, { cacheControl: "3600", upsert: true }); if (error) throw error; await loadLogo(); alert("✅ Logo actualizado."); selectedLogoFile = null; logoUpload.value = ""; } catch (error) { alert("❌ Fallo al guardar logo: " + error.message); } finally { logoSaveButton.disabled = true; logoSaveButton.textContent = "Guardar"; } });
+
+        // VIII. EVENTOS Y INICIALIZACIÓN
+        function setStatusMessage(el, msg, success = true) { el.textContent = msg; el.className = `text-sm mt-3 ${success ? 'text-green-400' : 'text-red-400'}`; setTimeout(() => (el.textContent = ""), 3000); }
+        
+        searchInput.addEventListener("input", filterAndRenderProducts);
+        form.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("submit"); submitBtn.disabled = true; setStatusMessage(status, "Guardando...", true); try { const imageUrl = imageIn.files[0] ? await uploadImage(imageIn.files[0], PRODUCT_BUCKET) : null; const { error } = await supabase.from(PRODUCTS_TABLE).insert({ name: nameIn.value, category: categoryIn.value, price: parseFloat(priceIn.value), quantity: parseInt(qtyIn.value), image_url: imageUrl }); if (error) throw error; form.reset(); qtyIn.value = 1; fetchProducts(); setStatusMessage(status, "Producto agregado con éxito ✅", true); } catch (err) { setStatusMessage(status, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
+
+        searchInputET.addEventListener("input", filterAndRenderProductsET);
+        formET.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("submit-et"); submitBtn.disabled = true; setStatusMessage(statusET, "Guardando...", true); try { const imageUrl = imageInET.files[0] ? await uploadImage(imageInET.files[0], PRODUCT_BUCKET) : null; const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).insert({ name: nameInET.value, category: categoryInET.value, price: parseFloat(priceInET.value), quantity: parseInt(qtyInET.value), image_url: imageUrl }); if (error) throw error; formET.reset(); qtyInET.value = 1; fetchProductsET(); setStatusMessage(statusET, "Producto agregado con éxito (El Transito) ✅", true); } catch (err) { setStatusMessage(statusET, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
+
+        salesForm.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("sale-submit"); submitBtn.disabled = true; try { await supabase.from(SALES_TABLE).insert({ recipient_name: recipientNameIn.value, product_name_sold: productNameSoldIn.value, price: parseFloat(salePriceIn.value), sale_date: saleDateIn.value, status: saleStatusInput.value }); salesForm.reset(); saleDateIn.value = new Date().toISOString().split('T')[0]; fetchSales(); setStatusMessage(saleStatus, "Venta registrada con éxito ✅", true); } catch (err) { setStatusMessage(saleStatus, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
+        salesFormET.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("sale-submit-et"); submitBtn.disabled = true; try { await supabase.from(SALES_EL_TRANSITO_TABLE).insert({ recipient_name: recipientNameInET.value, product_name_sold: productNameSoldInET.value, price: parseFloat(salePriceInET.value), sale_date: saleDateInET.value, status: saleStatusInputET.value }); salesFormET.reset(); saleDateInET.value = new Date().toISOString().split('T')[0]; fetchSalesElTransito(); setStatusMessage(saleStatusET, "Venta (El Transito) registrada con éxito ✅", true); } catch (err) { setStatusMessage(saleStatusET, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
+        
+        missingProductForm.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("missing-product-submit"); submitBtn.disabled = true; try { await supabase.from(MISSING_PRODUCTS_TABLE).insert({ product_name: missingProductNameIn.value, notes: missingProductNotesIn.value || null }); missingProductForm.reset(); fetchMissingProducts(); setStatusMessage(missingProductStatus, "Producto agregado a la lista ✅", true); } catch (err) { setStatusMessage(missingProductStatus, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
+        
+        document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', () => toggleView(btn.dataset.view)));
+        window.addEventListener("load", () => {
+            saleDateIn.value = new Date().toISOString().split('T')[0];
+            saleDateInET.value = new Date().toISOString().split('T')[0];
+            toggleView('inventory');
+            showSkeletonLoaders();
+            loadLogo(); 
+            fetchProducts(); 
+            fetchProductsET();
+            fetchSales(); 
+            fetchSalesElTransito();
+            fetchMissingProducts();
+        });
+    </script>
+</body>
+</html>
