@@ -105,11 +105,11 @@
                     <div class="flex items-center space-x-4 text-sm bg-gray-900/50 p-2 rounded-lg">
                         <span id="total-sales-count" class="text-gray-400 pr-2 border-r border-gray-600"></span>
                         <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Total Vendido:</span>
+                            <span class="font-medium text-gray-300">Total General Vendido:</span>
                             <span id="total-sold-amount" class="font-bold text-green-400">$0.00</span>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Total Pagado:</span>
+                            <span class="font-medium text-gray-300">Total General Pagado:</span>
                             <span id="total-paid-amount" class="font-bold text-green-500">$0.00</span>
                         </div>
                         <div class="flex items-center space-x-2">
@@ -119,7 +119,7 @@
                     </div>
                 </div>
                 <div id="sales-list-loader" class="space-y-2"></div>
-                <div id="sales-list" class="bg-gray-800 rounded-lg shadow overflow-hidden"></div>
+                <div id="sales-list"></div>
             </section>
         </div>
 
@@ -142,11 +142,11 @@
                     <div class="flex items-center space-x-4 text-sm bg-gray-900/50 p-2 rounded-lg">
                         <span id="total-sales-count-et" class="text-gray-400 pr-2 border-r border-gray-600"></span>
                         <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Total Vendido:</span>
+                            <span class="font-medium text-gray-300">Total General Vendido:</span>
                             <span id="total-sold-amount-et" class="font-bold text-green-400">$0.00</span>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Total Pagado:</span>
+                            <span class="font-medium text-gray-300">Total General Pagado:</span>
                             <span id="total-paid-amount-et" class="font-bold text-green-500">$0.00</span>
                         </div>
                         <div class="flex items-center space-x-2">
@@ -156,7 +156,7 @@
                     </div>
                 </div>
                 <div id="sales-list-loader-et" class="space-y-2"></div>
-                <div id="sales-list-et" class="bg-gray-800 rounded-lg shadow overflow-hidden"></div>
+                <div id="sales-list-et"></div>
             </section>
         </div>
 
@@ -245,19 +245,59 @@
         function renderSales(items) {
             salesListLoader.innerHTML = ""; salesListEl.innerHTML = ""; totalSalesCount.textContent = `${items.length} ventas`;
 
-            // Calcular totales
+            // 1. Calcular totales generales (se mantiene igual)
             const totalSold = items.reduce((sum, sale) => sum + Number(sale.price), 0);
             const totalPaid = items.filter(sale => sale.status === 'Pagado').reduce((sum, sale) => sum + Number(sale.price), 0);
             const percentagePaid = totalSold > 0 ? (totalPaid / totalSold) * 100 : 0;
-
-            // Actualizar elementos del DOM con los totales
             document.getElementById('total-sold-amount').textContent = `$${totalSold.toFixed(2)}`;
             document.getElementById('total-paid-amount').textContent = `$${totalPaid.toFixed(2)}`;
             document.getElementById('paid-percentage').textContent = `${percentagePaid.toFixed(1)}%`;
 
             if (items.length === 0) { salesListEl.innerHTML = `<p class="p-4 text-gray-400">No hay ventas registradas.</p>`; return; } 
-            
-            const table = document.createElement('table'); table.className = 'min-w-full divide-y divide-gray-700'; table.innerHTML = `<thead><tr><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destinatario</th><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto Vendido</th><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th><th class="px-6 py-3 bg-gray-700"></th></tr></thead>`; const tbody = document.createElement('tbody'); tbody.className = 'bg-gray-800 divide-y divide-gray-700'; items.forEach(sale => { const row = tbody.insertRow(); const saleDate = new Date(sale.sale_date).toISOString().split('T')[0]; const currentStatus = sale.status || 'Pendiente'; const statusClass = STATUS_COLORS[currentStatus] || STATUS_COLORS['Pendiente']; const statusSelectHtml = `<select onchange="changeSaleStatus('${sale.id}', this.value)" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option><option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option><option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option></select>`; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${saleDate}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.recipient_name}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.product_name_sold || 'N/A'}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500">$${Number(sale.price).toFixed(2)} <button onclick="editSalePrice('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button></td><td class="px-6 py-4 whitespace-nowrap text-sm">${statusSelectHtml}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteSale('${sale.id}')" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td>`; }); table.appendChild(tbody); salesListEl.appendChild(table); 
+
+            // 2. Agrupar ventas por fecha
+            const groupedByDate = items.reduce((acc, sale) => {
+                const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
+                if (!acc[saleDate]) acc[saleDate] = [];
+                acc[saleDate].push(sale);
+                return acc;
+            }, {});
+
+            // 3. Renderizar cada grupo de fechas
+            const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
+            sortedDates.forEach(date => {
+                const dailySales = groupedByDate[date];
+                const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
+                const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
+
+                // Crear encabezado para la fecha con subtotales diarios
+                const dateHeader = document.createElement('div');
+                dateHeader.className = 'bg-gray-900 p-3 rounded-t-lg mt-6 flex justify-between items-center';
+                const displayDate = new Date(date).toLocaleDateString('es-SV', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+                dateHeader.innerHTML = `
+                    <h3 class="font-bold text-lg text-white">${displayDate}</h3>
+                    <div class="text-sm font-semibold">
+                        <span class="mr-4">Vendido (día): <span class="text-green-400">$${dailyTotalSold.toFixed(2)}</span></span>
+                        <span>Pagado (día): <span class="text-green-500">$${dailyTotalPaid.toFixed(2)}</span></span>
+                    </div>`;
+                salesListEl.appendChild(dateHeader);
+
+                // Crear tabla para las ventas de esa fecha
+                const table = document.createElement('table');
+                table.className = 'min-w-full divide-y divide-gray-700 shadow-md';
+                table.innerHTML = `<thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead>`;
+                const tbody = document.createElement('tbody');
+                tbody.className = 'bg-gray-800 divide-y divide-gray-700';
+                dailySales.forEach(sale => {
+                    const row = tbody.insertRow();
+                    const currentStatus = sale.status || 'Pendiente';
+                    const statusClass = STATUS_COLORS[currentStatus] || STATUS_COLORS['Pendiente'];
+                    const statusSelectHtml = `<select onchange="changeSaleStatus('${sale.id}', this.value)" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option><option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option><option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option></select>`;
+                    row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.recipient_name}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.product_name_sold || 'N/A'}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500">$${Number(sale.price).toFixed(2)} <button onclick="editSalePrice('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button></td><td class="px-6 py-4 whitespace-nowrap text-sm">${statusSelectHtml}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteSale('${sale.id}')" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td>`;
+                });
+                table.appendChild(tbody);
+                salesListEl.appendChild(table);
+            });
         }
         // **FIN FUNCIÓN MODIFICADA**
 
@@ -272,18 +312,57 @@
         function renderSalesElTransito(items) {
             salesListLoaderET.innerHTML = ""; salesListElET.innerHTML = ""; totalSalesCountET.textContent = `${items.length} ventas`;
 
-            // Calcular totales
+            // 1. Calcular totales generales
             const totalSold = items.reduce((sum, sale) => sum + Number(sale.price), 0);
             const totalPaid = items.filter(sale => sale.status === 'Pagado').reduce((sum, sale) => sum + Number(sale.price), 0);
             const percentagePaid = totalSold > 0 ? (totalPaid / totalSold) * 100 : 0;
-
-            // Actualizar elementos del DOM con los totales
             document.getElementById('total-sold-amount-et').textContent = `$${totalSold.toFixed(2)}`;
             document.getElementById('total-paid-amount-et').textContent = `$${totalPaid.toFixed(2)}`;
             document.getElementById('paid-percentage-et').textContent = `${percentagePaid.toFixed(1)}%`;
 
             if (items.length === 0) { salesListElET.innerHTML = `<p class="p-4 text-gray-400">No hay ventas registradas en El Transito.</p>`; return; }
-            const table = document.createElement('table'); table.className = 'min-w-full divide-y divide-gray-700'; table.innerHTML = `<thead><tr><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destinatario</th><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto Vendido</th><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th><th class="px-6 py-3 bg-gray-700"></th></tr></thead>`; const tbody = document.createElement('tbody'); tbody.className = 'bg-gray-800 divide-y divide-gray-700'; items.forEach(sale => { const row = tbody.insertRow(); const saleDate = new Date(sale.sale_date).toISOString().split('T')[0]; const currentStatus = sale.status || 'Pendiente'; const statusClass = STATUS_COLORS[currentStatus] || STATUS_COLORS['Pendiente']; const statusSelectHtml = `<select onchange="changeSaleStatusET('${sale.id}', this.value)" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option><option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option><option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option></select>`; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${saleDate}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.recipient_name}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.product_name_sold || 'N/A'}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500">$${Number(sale.price).toFixed(2)} <button onclick="editSalePriceET('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button></td><td class="px-6 py-4 whitespace-nowrap text-sm">${statusSelectHtml}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteSaleET('${sale.id}')" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td>`; }); table.appendChild(tbody); salesListElET.appendChild(table);
+
+            // 2. Agrupar ventas por fecha
+            const groupedByDate = items.reduce((acc, sale) => {
+                const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
+                if (!acc[saleDate]) acc[saleDate] = [];
+                acc[saleDate].push(sale);
+                return acc;
+            }, {});
+
+            // 3. Renderizar cada grupo
+            const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
+            sortedDates.forEach(date => {
+                const dailySales = groupedByDate[date];
+                const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
+                const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
+
+                const dateHeader = document.createElement('div');
+                dateHeader.className = 'bg-gray-900 p-3 rounded-t-lg mt-6 flex justify-between items-center';
+                const displayDate = new Date(date).toLocaleDateString('es-SV', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+                dateHeader.innerHTML = `
+                    <h3 class="font-bold text-lg text-white">${displayDate}</h3>
+                    <div class="text-sm font-semibold">
+                        <span class="mr-4">Vendido (día): <span class="text-green-400">$${dailyTotalSold.toFixed(2)}</span></span>
+                        <span>Pagado (día): <span class="text-green-500">$${dailyTotalPaid.toFixed(2)}</span></span>
+                    </div>`;
+                salesListElET.appendChild(dateHeader);
+                
+                const table = document.createElement('table');
+                table.className = 'min-w-full divide-y divide-gray-700 shadow-md';
+                table.innerHTML = `<thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead>`;
+                const tbody = document.createElement('tbody');
+                tbody.className = 'bg-gray-800 divide-y divide-gray-700';
+                dailySales.forEach(sale => {
+                    const row = tbody.insertRow();
+                    const currentStatus = sale.status || 'Pendiente';
+                    const statusClass = STATUS_COLORS[currentStatus] || STATUS_COLORS['Pendiente'];
+                    const statusSelectHtml = `<select onchange="changeSaleStatusET('${sale.id}', this.value)" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option><option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option><option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option></select>`;
+                    row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.recipient_name}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.product_name_sold || 'N/A'}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500">$${Number(sale.price).toFixed(2)} <button onclick="editSalePriceET('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button></td><td class="px-6 py-4 whitespace-nowrap text-sm">${statusSelectHtml}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteSaleET('${sale.id}')" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td>`;
+                });
+                table.appendChild(tbody);
+                salesListElET.appendChild(table);
+            });
         }
         // **FIN FUNCIÓN MODIFICADA**
 
