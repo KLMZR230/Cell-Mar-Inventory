@@ -244,7 +244,6 @@
         function renderSales(items) {
             salesListLoader.innerHTML = ""; salesListEl.innerHTML = ""; totalSalesCount.textContent = `${items.length} ventas`;
 
-            // 1. Calcular totales generales (se mantiene igual)
             const totalSold = items.reduce((sum, sale) => sum + Number(sale.price), 0);
             const totalPaid = items.filter(sale => sale.status === 'Pagado').reduce((sum, sale) => sum + Number(sale.price), 0);
             const percentagePaid = totalSold > 0 ? (totalPaid / totalSold) * 100 : 0;
@@ -254,7 +253,6 @@
 
             if (items.length === 0) { salesListEl.innerHTML = `<p class="p-4 text-gray-400">No hay ventas registradas.</p>`; return; } 
 
-            // 2. Agrupar ventas por fecha
             const groupedByDate = items.reduce((acc, sale) => {
                 const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
                 if (!acc[saleDate]) acc[saleDate] = [];
@@ -262,14 +260,12 @@
                 return acc;
             }, {});
 
-            // 3. Renderizar cada grupo de fechas
             const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
             sortedDates.forEach(date => {
                 const dailySales = groupedByDate[date];
                 const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
                 const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
 
-                // Crear encabezado para la fecha con subtotales diarios
                 const dateHeader = document.createElement('div');
                 dateHeader.className = 'bg-gray-900 p-3 rounded-t-lg mt-6 flex justify-between items-center';
                 const displayDate = new Date(date).toLocaleDateString('es-SV', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
@@ -281,7 +277,6 @@
                     </div>`;
                 salesListEl.appendChild(dateHeader);
 
-                // Crear tabla para las ventas de esa fecha
                 const table = document.createElement('table');
                 table.className = 'min-w-full divide-y divide-gray-700 shadow-md';
                 table.innerHTML = `<thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead>`;
@@ -309,7 +304,6 @@
         function renderSalesElTransito(items) {
             salesListLoaderET.innerHTML = ""; salesListElET.innerHTML = ""; totalSalesCountET.textContent = `${items.length} ventas`;
 
-            // 1. Calcular totales generales
             const totalSold = items.reduce((sum, sale) => sum + Number(sale.price), 0);
             const totalPaid = items.filter(sale => sale.status === 'Pagado').reduce((sum, sale) => sum + Number(sale.price), 0);
             const percentagePaid = totalSold > 0 ? (totalPaid / totalSold) * 100 : 0;
@@ -319,7 +313,6 @@
 
             if (items.length === 0) { salesListElET.innerHTML = `<p class="p-4 text-gray-400">No hay ventas registradas en El Transito.</p>`; return; }
 
-            // 2. Agrupar ventas por fecha
             const groupedByDate = items.reduce((acc, sale) => {
                 const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
                 if (!acc[saleDate]) acc[saleDate] = [];
@@ -327,7 +320,6 @@
                 return acc;
             }, {});
 
-            // 3. Renderizar cada grupo
             const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
             sortedDates.forEach(date => {
                 const dailySales = groupedByDate[date];
@@ -422,18 +414,33 @@
         missingProductForm.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("missing-product-submit"); submitBtn.disabled = true; try { await supabase.from(MISSING_PRODUCTS_TABLE).insert({ product_name: missingProductNameIn.value, notes: missingProductNotesIn.value || null }); missingProductForm.reset(); fetchMissingProducts(); setStatusMessage(missingProductStatus, "Producto agregado a la lista ✅", true); } catch (err) { setStatusMessage(missingProductStatus, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
         
         document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', () => toggleView(btn.dataset.view)));
-        window.addEventListener("load", () => {
+        
+        // **INICIO BLOQUE MODIFICADO**
+        window.addEventListener("load", async () => {
+            // Configurar valores iniciales
             saleDateIn.value = new Date().toISOString().split('T')[0];
-            saleDateInET.value = new Date().toISOString().split('T')[-1];
+            saleDateInET.value = new Date().toISOString().split('T')[0]; // Corregido
             toggleView('inventory');
             showSkeletonLoaders();
+            
+            // Cargar logo (no necesita esperar a los demás)
             loadLogo(); 
-            fetchProducts(); 
-            fetchProductsET();
-            fetchSales(); 
-            fetchSalesElTransito();
-            fetchMissingProducts();
+            
+            // Ejecutar todas las cargas de datos en paralelo para mayor fluidez
+            try {
+                await Promise.all([
+                    fetchProducts(), 
+                    fetchProductsET(),
+                    fetchSales(), 
+                    fetchSalesElTransito(),
+                    fetchMissingProducts()
+                ]);
+            } catch (error) {
+                console.error("Error durante la carga de datos inicial:", error);
+                // Opcional: Mostrar un mensaje de error general al usuario
+            }
         });
+        // **FIN BLOQUE MODIFICADO**
     </script>
 </body>
 </html>
