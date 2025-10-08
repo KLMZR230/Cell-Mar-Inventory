@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Cell Smar Gestion De Productos</title>
+    <title>Cell Smar Gestion De Ventas</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         .product-card { transition: transform 0.2s; }
@@ -21,7 +21,7 @@
         <div class="flex items-center space-x-4">
             <img id="business-logo" src="https://via.placeholder.com/60/4f46e5/ffffff?text=CS" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105" />
             <h1 class="text-3xl font-extrabold tracking-tight">
-                📱 <span class="text-indigo-400">Cell Smar</span> Gestion
+                📱 <span class="text-indigo-400">Cell Smar</span> Gestion De Ventas
             </h1>
         </div>
         
@@ -241,7 +241,6 @@
         // II. FUNCIONES DE VENTA
         async function fetchSales() { const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false }); if (error) { console.error("Error cargando ventas:", error); totalSalesCount.textContent = "Error al cargar"; return; } allSales = data; renderSales(allSales); }
         
-        // **INICIO FUNCIÓN MODIFICADA**
         function renderSales(items) {
             salesListLoader.innerHTML = ""; salesListEl.innerHTML = ""; totalSalesCount.textContent = `${items.length} ventas`;
 
@@ -299,7 +298,6 @@
                 salesListEl.appendChild(table);
             });
         }
-        // **FIN FUNCIÓN MODIFICADA**
 
         window.changeSaleStatus = async function(id, newStatus) { if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) return; const { error } = await supabase.from(SALES_TABLE).update({ status: newStatus }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSales(); }
         window.editSalePrice = async function(id, currentPrice) { const newPriceRaw = prompt("Ingrese el nuevo precio (USD):", currentPrice); if (newPriceRaw === null || newPriceRaw.trim() === "") return; const newPrice = parseFloat(newPriceRaw); if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } const { error } = await supabase.from(SALES_TABLE).update({ price: newPrice }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSales(); }
@@ -308,7 +306,6 @@
         // III. FUNCIONES DE VENTA (EL TRANSITO)
         async function fetchSalesElTransito() { const { data, error } = await supabase.from(SALES_EL_TRANSITO_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false }); if (error) { console.error("Error cargando ventas (El Transito):", error); totalSalesCountET.textContent = "Error al cargar"; return; } allSalesElTransito = data; renderSalesElTransito(allSalesElTransito); }
         
-        // **INICIO FUNCIÓN MODIFICADA**
         function renderSalesElTransito(items) {
             salesListLoaderET.innerHTML = ""; salesListElET.innerHTML = ""; totalSalesCountET.textContent = `${items.length} ventas`;
 
@@ -364,7 +361,6 @@
                 salesListElET.appendChild(table);
             });
         }
-        // **FIN FUNCIÓN MODIFICADA**
 
         window.changeSaleStatusET = async function(id, newStatus) { if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) return; const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ status: newStatus }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSalesElTransito(); }
         window.editSalePriceET = async function(id, currentPrice) { const newPriceRaw = prompt("Ingrese el nuevo precio (USD):", currentPrice); if (newPriceRaw === null || newPriceRaw.trim() === "") return; const newPrice = parseFloat(newPriceRaw); if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ price: newPrice }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSalesElTransito(); }
@@ -428,7 +424,7 @@
         document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', () => toggleView(btn.dataset.view)));
         window.addEventListener("load", () => {
             saleDateIn.value = new Date().toISOString().split('T')[0];
-            saleDateInET.value = new Date().toISOString().split('T')[0];
+            saleDateInET.value = new Date().toISOString().split('T')[-1];
             toggleView('inventory');
             showSkeletonLoaders();
             loadLogo(); 
