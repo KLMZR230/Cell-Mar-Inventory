@@ -77,7 +77,7 @@
             --font-main: 'Poppins', sans-serif;
             --font-headings: 'Playfair Display', serif;
         }
-        .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
+        .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
         .theme-gold .product-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
         .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
         .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
@@ -116,6 +116,25 @@
         }
         .bg-blue-600, .bg-green-600 { background-color: var(--accent-color-dark); }
         .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover { background-color: var(--accent-color); }
+
+        /********************************/
+        /* ESTILOS FIJOS PARA ESTADOS DE VENTA */
+        /********************************/
+        .status-paid {
+            background-color: #16a34a !important; /* Verde */
+            color: #ffffff !important;
+            border-color: #15803d !important;
+        }
+        .status-pending {
+            background-color: #f59e0b !important; /* Naranja/Amarillo */
+            color: #1f2937 !important;
+            border-color: #d97706 !important;
+        }
+        .status-returned {
+            background-color: #dc2626 !important; /* Rojo */
+            color: #ffffff !important;
+            border-color: #b91c1c !important;
+        }
     </style>
 </head>
 <body class=""> <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
@@ -336,7 +355,12 @@
         const SALES_EL_TRANSITO_TABLE = "sales_el_transito"; 
         const MISSING_PRODUCTS_TABLE = "missing_products"; 
 
-        const STATUS_COLORS = { 'Pendiente': 'bg-yellow-600 text-gray-900 border-yellow-700', 'Pagado': 'bg-green-600 text-white border-green-700', 'Devuelto': 'bg-red-600 text-white border-red-700' };
+        // Objeto de colores de estado MODIFICADO
+        const STATUS_COLORS = { 
+            'Pagado': 'status-paid', 
+            'Pendiente': 'status-pending', 
+            'Devuelto': 'status-returned' 
+        };
 
         // Elementos del DOM
         const form = document.getElementById("product-form"), nameIn = document.getElementById("name"), categoryIn = document.getElementById("category-select"), priceIn = document.getElementById("price"), qtyIn = document.getElementById("quantity"), imageIn = document.getElementById("image"), status = document.getElementById("status"), productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader");
