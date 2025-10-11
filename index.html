@@ -7,75 +7,127 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
     <style>
+        /********************************/
+        /* Estilos Base (Comunes a todos los temas) */
+        /********************************/
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #000000;
-            background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%);
+            transition: background-color 0.5s ease;
         }
-
-        /* Colores Base */
-        .bg-gray-700 { background-color: transparent; }
-        .bg-gray-800 { background-color: rgba(17, 7, 0, 0.6); border: 1px solid rgba(255, 100, 0, 0.2); backdrop-filter: blur(8px); }
-        .bg-gray-900\/50 { background-color: rgba(0,0,0,0.5); }
-        .text-white { color: #f9fafb; }
-        .text-gray-300 { color: #d1d5db; }
-        .text-gray-400 { color: #9ca3af; }
-
-        /* Acentos de Fuego (Naranja/Rojo) */
-        .text-indigo-400, .text-indigo-300 { color: #ff4500; }
-        .border-indigo-500 { border-color: #ff4500; }
-        .bg-indigo-500 { background-color: #ff4500; color: #ffffff; font-weight: bold; }
-        .hover\:bg-indigo-600:hover { background-color: #e63e00; }
-        .focus\:ring-indigo-500:focus { --tw-ring-color: #ff4500; }
-
-        /* Botones y Elementos de Interfaz */
-        .bg-blue-600, .bg-green-600 { background-color: #c0392b; border: 1px solid #ff4500; }
-        .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover { background-color: #e74c3c; box-shadow: 0 0 15px rgba(255, 69, 0, 0.6); }
-
-        /* Tarjeta de Producto */
-        .product-card {
-            transition: transform 0.2s, box-shadow 0.3s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        }
-        .product-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 0 25px rgba(255, 69, 0, 0.5);
-            border-color: rgba(255, 69, 0, 0.7);
-        }
-        
-        /* Inputs y Selects */
-        .bg-gray-600 { background-color: #1c0a0a !important; }
-        .border-gray-500, .border-gray-600, .border-gray-700 { border-color: #571e1e; }
-        input:focus, select:focus {
-            border-color: #ff4500 !important;
-            box-shadow: 0 0 0 1px #ff4500;
-            outline: none;
-        }
-
-        /* Skeleton Loader */
-        .skeleton-card { background-color: #2d1a1a; border-radius: 0.5rem; }
-        .skeleton-line { background-color: #4b2a2a; border-radius: 0.25rem; animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 50% { opacity: .5; } }
-
-        /* Funcionalidad Core (No tocar) */
+        .product-card { transition: transform 0.2s, box-shadow 0.3s; }
+        .product-card:hover { transform: translateY(-5px); }
         #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
         .view-section.hidden { display: none; }
+        
+        .skeleton-card { background-color: #374151; border-radius: 0.5rem; padding: 1rem; display: flex; flex-direction: column; }
+        .skeleton-line { background-color: #4B5563; border-radius: 0.25rem; animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 50% { opacity: .5; } }
+
+        /********************************/
+        /* TEMA 1: Dark (Predeterminado) */
+        /********************************/
+        .theme-dark {
+            --bg-primary: #1f2937;
+            --bg-secondary: #374151;
+            --bg-header: rgba(31, 41, 55, 0.8);
+            --text-primary: #e5e7eb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --border-color: #4b5563;
+            --accent-color: #818cf8;
+            --accent-color-dark: #6366f1;
+            --font-main: 'Poppins', sans-serif;
+            --font-headings: 'Poppins', sans-serif;
+        }
+
+        /********************************/
+        /* TEMA 2: Fuego Infernal */
+        /********************************/
+        .theme-infernal {
+            --bg-primary: #000000;
+            --bg-secondary: #1c0a0a;
+            --bg-header: rgba(17, 7, 0, 0.6);
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --border-color: #571e1e;
+            --accent-color: #ff4500;
+            --accent-color-dark: #e63e00;
+            --font-main: 'Roboto', sans-serif;
+            --font-headings: 'Roboto', sans-serif;
+        }
+        .theme-infernal { background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
+        .theme-infernal .product-card:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.5); border-color: rgba(255, 69, 0, 0.7); }
+
+        /********************************/
+        /* TEMA 3: Luxury Gold */
+        /********************************/
+        .theme-gold {
+            --bg-primary: #121212;
+            --bg-secondary: #222222;
+            --bg-header: rgba(18, 18, 18, 0.85);
+            --text-primary: #f1f1f1;
+            --text-secondary: #cccccc;
+            --text-muted: #a0a0a0;
+            --border-color: #444444;
+            --accent-color: #D4AF37;
+            --accent-color-dark: #B8860B;
+            --font-main: 'Poppins', sans-serif;
+            --font-headings: 'Playfair Display', serif;
+        }
+        .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
+        .theme-gold .product-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
+        .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
+        .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
+
+
+        /********************************/
+        /* Aplicación de Variables CSS */
+        /********************************/
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+        }
+        h1, h2, h3, h4, h5, h6 { font-family: var(--font-headings); }
+
+        .bg-gray-800, .bg-gray-900\/50 {
+            background-color: var(--bg-header);
+            border: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+            backdrop-filter: blur(10px);
+        }
+        .text-gray-300 { color: var(--text-secondary); }
+        .text-gray-400 { color: var(--text-muted); }
+        .bg-gray-600 { background-color: var(--bg-secondary) !important; }
+        .border-gray-500, .border-gray-600, .border-gray-700 { border-color: var(--border-color); }
+        
+        /* Acentos */
+        .text-indigo-400, .text-indigo-300 { color: var(--accent-color); }
+        .border-indigo-500 { border-color: var(--accent-color); }
+        .bg-indigo-500 { background-color: var(--accent-color-dark); color: var(--text-primary); }
+        .hover\:bg-indigo-600:hover { background-color: var(--accent-color); }
+        .focus\:ring-indigo-500:focus { --tw-ring-color: var(--accent-color); }
+        input:focus, select:focus {
+            border-color: var(--accent-color) !important;
+            box-shadow: 0 0 0 1px var(--accent-color);
+            outline: none;
+        }
+        .bg-blue-600, .bg-green-600 { background-color: var(--accent-color-dark); }
+        .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover { background-color: var(--accent-color); }
     </style>
 </head>
-<body class="bg-black text-white">
-    
-    <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-red-900">
+<body class=""> <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
         <div class="flex items-center space-x-4">
-            <img id="business-logo" src="https://via.placeholder.com/60/ff4500/000000?text=CS" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105" />
+            <img id="business-logo" src="https://via.placeholder.com/60/4f46e5/ffffff?text=CS" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105" />
             <h1 class="text-3xl font-extrabold tracking-tight">
                 📱 <span class="text-indigo-400">Cell Smar</span> Gestion De Ventas
             </h1>
         </div>
         
         <div class="flex items-center space-x-4">
-            <div id="view-buttons" class="flex items-center space-x-2 bg-gray-700 p-1 rounded-lg border border-red-800">
+            <div id="view-buttons" class="flex items-center space-x-2 bg-black/20 p-1 rounded-lg border border-gray-700">
                  <button data-view="inventory" class="view-btn bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg text-sm shadow-md transition duration-300">📦 Inventario</button>
                  <button data-view="inventory_el_transito" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🚚 Inventario El Transito</button>
                  <button data-view="sales" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">💰 Ventas</button>
@@ -83,7 +135,15 @@
                  <button data-view="missing" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🔔 Faltantes</button>
             </div>
             <div class="flex items-center space-x-3">
-                <label for="logo-upload" class="bg-orange-500 text-gray-900 font-medium py-1.5 px-3 rounded-lg hover:bg-orange-400 transition duration-300 cursor-pointer text-sm shadow-sm">Logo 🖼️</label>
+                <div class="flex items-center space-x-2">
+                    <label for="theme-selector" class="text-sm text-gray-400">Tema:</label>
+                    <select id="theme-selector" class="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg p-1.5">
+                        <option value="theme-dark">Predeterminado</option>
+                        <option value="theme-infernal">Fuego Infernal</option>
+                        <option value="theme-gold">Luxury Gold</option>
+                    </select>
+                </div>
+                <label for="logo-upload" class="bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 transition duration-300 cursor-pointer text-sm shadow-sm">Logo 🖼️</label>
                 <input type="file" id="logo-upload" title="Sube una nueva imagen para tu logo" accept="image/*" />
                 <button id="logo-save-button" class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 shadow-md disabled:bg-gray-500 disabled:cursor-not-allowed text-sm" disabled>Guardar</button>
             </div>
@@ -233,7 +293,6 @@
                 <div id="missing-list" class="bg-gray-800 rounded-lg shadow overflow-hidden"></div>
             </section>
         </div>
-
         <footer class="mt-10 text-center text-gray-400 text-sm">Panel de Inventario — Cell Smart</footer>
     </div>
     
@@ -245,6 +304,28 @@
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
+        // --- INICIO DE LÓGICA DE TEMAS ---
+        const themeSelector = document.getElementById('theme-selector');
+        const body = document.body;
+        const allThemes = ['theme-dark', 'theme-infernal', 'theme-gold'];
+
+        function applyTheme(theme) {
+            // Remover cualquier clase de tema existente
+            body.classList.remove(...allThemes);
+            // Añadir la clase del tema seleccionado
+            body.classList.add(theme);
+            // Guardar la preferencia en el almacenamiento local
+            localStorage.setItem('selectedTheme', theme);
+            // Sincronizar el selector
+            themeSelector.value = theme;
+        }
+
+        themeSelector.addEventListener('change', (e) => {
+            applyTheme(e.target.value);
+        });
+        // --- FIN DE LÓGICA DE TEMAS ---
+
+
         // Constantes de la Aplicación
         const PRODUCTS_TABLE = "products";
         const PRODUCTS_EL_TRANSITO_TABLE = "products_el_transito";
@@ -464,11 +545,14 @@
         
         document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', () => toggleView(btn.dataset.view)));
         
-        // **INICIO BLOQUE MODIFICADO**
         window.addEventListener("load", async () => {
+            // Cargar y aplicar el tema guardado o el predeterminado
+            const savedTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
+            applyTheme(savedTheme);
+
             // Configurar valores iniciales
             saleDateIn.value = new Date().toISOString().split('T')[0];
-            saleDateInET.value = new Date().toISOString().split('T')[0]; // Corregido
+            saleDateInET.value = new Date().toISOString().split('T')[0];
             toggleView('inventory');
             showSkeletonLoaders();
             
@@ -486,10 +570,8 @@
                 ]);
             } catch (error) {
                 console.error("Error durante la carga de datos inicial:", error);
-                // Opcional: Mostrar un mensaje de error general al usuario
             }
         });
-        // **FIN BLOQUE MODIFICADO**
     </script>
 </body>
 </html>
