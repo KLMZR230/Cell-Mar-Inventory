@@ -21,9 +21,14 @@
         #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
         .view-section.hidden { display: none; }
         
-        .skeleton-card { background-color: #374151; border-radius: 0.5rem; padding: 1rem; display: flex; flex-direction: column; }
-        .skeleton-line { background-color: #4B5563; border-radius: 0.25rem; animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 50% { opacity: .5; } }
+        .skeleton-card { background-color: transparent; border-radius: 0.5rem; padding: 1rem; display: flex; flex-direction: column; }
+        .skeleton-line {
+            background-color: var(--bg-secondary);
+            opacity: 0.7;
+            border-radius: 0.25rem;
+            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse { 50% { opacity: .4; } }
 
         /********************************/
         /* TEMA 1: Dark (Predeterminado) */
@@ -47,7 +52,7 @@
         /********************************/
         .theme-infernal {
             --bg-primary: #000000;
-            --bg-secondary: #1c0a0a;
+            --bg-secondary: #2d1a1a;
             --bg-header: rgba(17, 7, 0, 0.6);
             --text-primary: #f9fafb;
             --text-secondary: #d1d5db;
@@ -66,7 +71,7 @@
         /********************************/
         .theme-gold {
             --bg-primary: #121212;
-            --bg-secondary: #222222;
+            --bg-secondary: #2b2b2b;
             --bg-header: rgba(18, 18, 18, 0.85);
             --text-primary: #f1f1f1;
             --text-secondary: #cccccc;
@@ -136,7 +141,22 @@
             border-color: #b91c1c !important;
         }
     </style>
-</head>
+
+    <script>
+        (function() {
+            try {
+                const theme = localStorage.getItem('selectedTheme');
+                if (theme && ['theme-dark', 'theme-infernal', 'theme-gold'].includes(theme)) {
+                    document.documentElement.className = theme; // Aplicar al <html> para máxima prioridad
+                } else {
+                    document.documentElement.className = 'theme-dark'; // Fallback
+                }
+            } catch (e) {
+                document.documentElement.className = 'theme-dark';
+            }
+        })();
+    </script>
+    </head>
 <body class=""> <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
         <div class="flex items-center space-x-4">
             <img id="business-logo" src="https://via.placeholder.com/60/4f46e5/ffffff?text=CS" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105" />
@@ -325,17 +345,11 @@
         
         // --- INICIO DE LÓGICA DE TEMAS ---
         const themeSelector = document.getElementById('theme-selector');
-        const body = document.body;
-        const allThemes = ['theme-dark', 'theme-infernal', 'theme-gold'];
+        const root = document.documentElement;
 
         function applyTheme(theme) {
-            // Remover cualquier clase de tema existente
-            body.classList.remove(...allThemes);
-            // Añadir la clase del tema seleccionado
-            body.classList.add(theme);
-            // Guardar la preferencia en el almacenamiento local
+            root.className = theme;
             localStorage.setItem('selectedTheme', theme);
-            // Sincronizar el selector
             themeSelector.value = theme;
         }
 
@@ -570,9 +584,8 @@
         document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', () => toggleView(btn.dataset.view)));
         
         window.addEventListener("load", async () => {
-            // Cargar y aplicar el tema guardado o el predeterminado
-            const savedTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
-            applyTheme(savedTheme);
+            // Sincronizar el selector con el tema ya aplicado por el script del <head>
+            themeSelector.value = root.className;
 
             // Configurar valores iniciales
             saleDateIn.value = new Date().toISOString().split('T')[0];
