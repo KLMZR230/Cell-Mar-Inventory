@@ -593,21 +593,43 @@
 
         // VII. LÓGICA DEL LOGO (MODIFICADA PARA R2 CON EDGE FUNCTION)
         async function loadLogo() {
+            // Carga la imagen desde el servidor, añadiendo un timestamp para evitar la caché del navegador.
             businessLogo.src = `${R2_PUBLIC_URL}/${LOGO_KEY}?t=${new Date().getTime()}`;
         }
-        logoUpload.addEventListener("change", (e) => { const file = e.target.files[0]; if (file) { selectedLogoFile = file; const reader = new FileReader(); reader.onload = (ev) => { businessLogo.src = ev.target.result; }; reader.readAsDataURL(file); logoSaveButton.disabled = false; } });
+        
+        logoUpload.addEventListener("change", (e) => { 
+            const file = e.target.files[0]; 
+            if (file) { 
+                selectedLogoFile = file; 
+                const reader = new FileReader(); 
+                // Muestra una vista previa local inmediata de la imagen seleccionada.
+                reader.onload = (ev) => { businessLogo.src = ev.target.result; }; 
+                reader.readAsDataURL(file); 
+                logoSaveButton.disabled = false; 
+            } 
+        });
+
         logoSaveButton.addEventListener("click", async () => { 
             if (!selectedLogoFile) return; 
             logoSaveButton.disabled = true; 
             logoSaveButton.textContent = "Subiendo..."; 
             try {
+                // Sube el archivo al servidor.
                 await uploadImage(selectedLogoFile, { customKey: LOGO_KEY });
-                await loadLogo();
+                
+                // === CORRECCIÓN CLAVE ===
+                // Se elimina la llamada a `await loadLogo()` de aquí.
+                // La vista previa que se muestra gracias al FileReader es suficiente y da una respuesta visual instantánea.
+                // Al eliminar la recarga inmediata desde el servidor, evitamos que la caché nos devuelva la imagen antigua.
+                // La próxima vez que se recargue la página, `loadLogo()` se ejecutará al inicio y traerá la versión correcta del servidor.
+                
                 alert("✅ Logo actualizado."); 
                 selectedLogoFile = null; 
                 logoUpload.value = ""; 
             } catch (error) { 
                 alert("❌ Fallo al guardar logo: " + error.message); 
+                // Si falla, recargamos el logo original del servidor para no dejar una vista previa falsa.
+                loadLogo();
             } finally { 
                 logoSaveButton.disabled = true; 
                 logoSaveButton.textContent = "Guardar"; 
@@ -688,3 +710,5 @@
     </script>
 </body>
 </html>
+    
+    
