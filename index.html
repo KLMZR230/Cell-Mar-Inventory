@@ -67,7 +67,7 @@
         /* CORRECCIÓN: Se aplica el fondo al body cuando el tema está activo para cubrir toda la pantalla */
         .theme-infernal body { 
             background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%);
-            background-attachment: fixed; /* Opcional: mejora la estética al mantener el fondo fijo */
+            background-attachment: fixed;
         }
         .theme-infernal .product-card:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.5); border-color: rgba(255, 69, 0, 0.7); }
 
@@ -90,7 +90,7 @@
         /* CORRECCIÓN: Se aplica el fondo al body cuando el tema está activo para cubrir toda la pantalla */
         .theme-gold body { 
             background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
-            background-attachment: fixed; /* Opcional: mejora la estética al mantener el fondo fijo */
+            background-attachment: fixed;
         }
         .theme-gold .product-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
         .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
@@ -618,17 +618,15 @@
                 await uploadImage(selectedLogoFile, { customKey: LOGO_KEY });
                 
                 // === CORRECCIÓN CLAVE ===
-                // Se elimina la llamada a `await loadLogo()` de aquí.
-                // La vista previa que se muestra gracias al FileReader es suficiente y da una respuesta visual instantánea.
-                // Al eliminar la recarga inmediata desde el servidor, evitamos que la caché nos devuelva la imagen antigua.
-                // La próxima vez que se recargue la página, `loadLogo()` se ejecutará al inicio y traerá la versión correcta del servidor.
+                // La vista previa del FileReader da una respuesta visual instantánea.
+                // No recargamos desde el servidor para evitar problemas de caché.
                 
                 alert("✅ Logo actualizado."); 
                 selectedLogoFile = null; 
                 logoUpload.value = ""; 
             } catch (error) { 
                 alert("❌ Fallo al guardar logo: " + error.message); 
-                // Si falla, recargamos el logo original del servidor para no dejar una vista previa falsa.
+                // Si falla, recargamos el logo original del servidor.
                 loadLogo();
             } finally { 
                 logoSaveButton.disabled = true; 
@@ -650,7 +648,7 @@
                 const { error } = await supabase.from(PRODUCTS_TABLE).insert({ name: nameIn.value, category: categoryIn.value, price: parseFloat(priceIn.value), quantity: parseInt(qtyIn.value), image_url: imageUrl }); 
                 if (error) throw error; 
                 form.reset(); qtyIn.value = 1; 
-                fetchProducts(); 
+                await fetchProducts(); 
                 setStatusMessage(status, "Producto agregado con éxito ✅", true); 
             } catch (err) { 
                 setStatusMessage(status, "Error: " + err.message, false); 
@@ -670,7 +668,7 @@
                 const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).insert({ name: nameInET.value, category: categoryInET.value, price: parseFloat(priceInET.value), quantity: parseInt(qtyInET.value), image_url: imageUrl }); 
                 if (error) throw error; 
                 formET.reset(); qtyInET.value = 1; 
-                fetchProductsET(); 
+                await fetchProductsET(); 
                 setStatusMessage(statusET, "Producto agregado con éxito (El Transito) ✅", true); 
             } catch (err) { 
                 setStatusMessage(statusET, "Error: " + err.message, false); 
@@ -679,10 +677,10 @@
             } 
         });
 
-        salesForm.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("sale-submit"); submitBtn.disabled = true; try { await supabase.from(SALES_TABLE).insert({ recipient_name: recipientNameIn.value, product_name_sold: productNameSoldIn.value, price: parseFloat(salePriceIn.value), sale_date: saleDateIn.value, status: saleStatusInput.value }); salesForm.reset(); saleDateIn.value = new Date().toISOString().split('T')[0]; fetchSales(); setStatusMessage(saleStatus, "Venta registrada con éxito ✅", true); } catch (err) { setStatusMessage(saleStatus, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
-        salesFormET.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("sale-submit-et"); submitBtn.disabled = true; try { await supabase.from(SALES_EL_TRANSITO_TABLE).insert({ recipient_name: recipientNameInET.value, product_name_sold: productNameSoldInET.value, price: parseFloat(salePriceInET.value), sale_date: saleDateInET.value, status: saleStatusInputET.value }); salesFormET.reset(); saleDateInET.value = new Date().toISOString().split('T')[0]; fetchSalesElTransito(); setStatusMessage(saleStatusET, "Venta (El Transito) registrada con éxito ✅", true); } catch (err) { setStatusMessage(saleStatusET, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
+        salesForm.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("sale-submit"); submitBtn.disabled = true; try { const { error } = await supabase.from(SALES_TABLE).insert({ recipient_name: recipientNameIn.value, product_name_sold: productNameSoldIn.value, price: parseFloat(salePriceIn.value), sale_date: saleDateIn.value, status: saleStatusInput.value }); if(error) throw error; salesForm.reset(); saleDateIn.value = new Date().toISOString().split('T')[0]; await fetchSales(); setStatusMessage(saleStatus, "Venta registrada con éxito ✅", true); } catch (err) { setStatusMessage(saleStatus, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
+        salesFormET.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("sale-submit-et"); submitBtn.disabled = true; try { const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).insert({ recipient_name: recipientNameInET.value, product_name_sold: productNameSoldInET.value, price: parseFloat(salePriceInET.value), sale_date: saleDateInET.value, status: saleStatusInputET.value }); if(error) throw error; salesFormET.reset(); saleDateInET.value = new Date().toISOString().split('T')[0]; await fetchSalesElTransito(); setStatusMessage(saleStatusET, "Venta (El Transito) registrada con éxito ✅", true); } catch (err) { setStatusMessage(saleStatusET, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
         
-        missingProductForm.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("missing-product-submit"); submitBtn.disabled = true; try { await supabase.from(MISSING_PRODUCTS_TABLE).insert({ product_name: missingProductNameIn.value, notes: missingProductNotesIn.value || null }); missingProductForm.reset(); fetchMissingProducts(); setStatusMessage(missingProductStatus, "Producto agregado a la lista ✅", true); } catch (err) { setStatusMessage(missingProductStatus, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
+        missingProductForm.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("missing-product-submit"); submitBtn.disabled = true; try { const { error } = await supabase.from(MISSING_PRODUCTS_TABLE).insert({ product_name: missingProductNameIn.value, notes: missingProductNotesIn.value || null }); if(error) throw error; missingProductForm.reset(); await fetchMissingProducts(); setStatusMessage(missingProductStatus, "Producto agregado a la lista ✅", true); } catch (err) { setStatusMessage(missingProductStatus, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
         
         document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', () => toggleView(btn.dataset.view)));
         
@@ -710,5 +708,3 @@
     </script>
 </body>
 </html>
-    
-    
