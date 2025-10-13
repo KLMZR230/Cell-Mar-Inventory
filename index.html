@@ -604,23 +604,49 @@
             businessLogo.src = `${R2_PUBLIC_URL}/${LOGO_KEY}?t=${new Date().getTime()}`;
         }
         logoUpload.addEventListener("change", (e) => { const file = e.target.files[0]; if (file) { selectedLogoFile = file; const reader = new FileReader(); reader.onload = (ev) => { businessLogo.src = ev.target.result; }; reader.readAsDataURL(file); logoSaveButton.disabled = false; } });
+        
+        // ============================
+        // == INICIO CÓDIGO CORREGIDO ==
+        // ============================
         logoSaveButton.addEventListener("click", async () => { 
             if (!selectedLogoFile) return; 
+            
             logoSaveButton.disabled = true; 
             logoSaveButton.textContent = "Subiendo..."; 
+            
             try {
+                // 1. La subida de la imagen a R2 funciona correctamente.
                 await uploadImage(selectedLogoFile, { customKey: LOGO_KEY });
-                await loadLogo();
-                alert("✅ Logo actualizado."); 
+
+                // 2. Limpiamos el input y el estado de la variable inmediatamente.
                 selectedLogoFile = null; 
                 logoUpload.value = ""; 
+                
+                // 3. Notificamos al usuario que la subida fue exitosa.
+                alert("✅ Logo subido. La imagen se actualizará en unos segundos."); 
+                
+                // 4. Agregamos un retraso de 2 segundos (2000 milisegundos).
+                //    Esto le da tiempo al caché de R2/Cloudflare para propagar el nuevo archivo.
+                //    Sin este retraso, la función loadLogo() se ejecuta tan rápido que
+                //    todavía obtiene la versión antigua del caché del servidor.
+                setTimeout(() => {
+                    loadLogo(); // Recargamos la imagen DESPUÉS del retraso.
+                }, 2000);
+
             } catch (error) { 
                 alert("❌ Fallo al guardar logo: " + error.message); 
+                // Si hay un error, volvemos a habilitar el botón.
+                logoSaveButton.disabled = false; 
             } finally { 
-                logoSaveButton.disabled = true; 
+                // Dejamos el botón deshabilitado pero con su texto original,
+                // ya que se volverá a activar solo cuando el usuario elija un nuevo archivo.
                 logoSaveButton.textContent = "Guardar"; 
             } 
         });
+        // ============================
+        // ==   FIN CÓDIGO CORREGIDO  ==
+        // ============================
+
 
         // VIII. EVENTOS Y INICIALIZACIÓN
         function setStatusMessage(el, msg, success = true) { el.textContent = msg; el.className = `text-sm mt-3 ${success ? 'text-green-400' : 'text-red-400'}`; setTimeout(() => (el.textContent = ""), 3000); }
