@@ -22,7 +22,6 @@
             flex-direction: column;
             transition: background-color 0.5s ease;
         }
-        /* Hace que el contenedor principal crezca para ocupar el espacio disponible */
         .container.mx-auto {
             flex-grow: 1;
         }
@@ -157,9 +156,9 @@
             try {
                 const theme = localStorage.getItem('selectedTheme');
                 if (theme && ['theme-dark', 'theme-infernal', 'theme-gold'].includes(theme)) {
-                    document.documentElement.className = theme; // Aplicar al <html> para máxima prioridad
+                    document.documentElement.className = theme;
                 } else {
-                    document.documentElement.className = 'theme-dark'; // Fallback
+                    document.documentElement.className = 'theme-dark';
                 }
             } catch (e) {
                 document.documentElement.className = 'theme-dark';
@@ -362,11 +361,8 @@
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        // URL de la Edge Function desplegada
         const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
-        
         const R2_PUBLIC_URL = "https://pub-fe5f394fc3964a61bd3fd84a7a44fb3f.r2.dev";
-        const LOGO_KEY = "current_business_logo";
 
         // --- INICIO DE LÓGICA DE TEMAS ---
         const themeSelector = document.getElementById('theme-selector');
@@ -389,7 +385,8 @@
         const PRODUCTS_EL_TRANSITO_TABLE = "products_el_transito";
         const SALES_TABLE = "sales";
         const SALES_EL_TRANSITO_TABLE = "sales_el_transito"; 
-        const MISSING_PRODUCTS_TABLE = "missing_products"; 
+        const MISSING_PRODUCTS_TABLE = "missing_products";
+        const CONFIG_TABLE = "config"; // <-- NUEVA TABLA PARA EL LOGO
 
         const STATUS_COLORS = { 
             'Pagado': 'status-paid', 
@@ -599,53 +596,84 @@
             return data.url;
         }
 
-        // VII. LÓGICA DEL LOGO (MODIFICADA PARA R2 CON EDGE FUNCTION)
+        // ============================================================================
+        // == VII. LÓGICA DEL LOGO (CORREGIDA PARA USAR NOMBRES ÚNICOS Y BASE DE DATOS) ==
+        // ============================================================================
+        const LOGO_CONFIG_KEY = "current_logo_name";
+
         async function loadLogo() {
-            businessLogo.src = `${R2_PUBLIC_URL}/${LOGO_KEY}?t=${new Date().getTime()}`;
-        }
-        logoUpload.addEventListener("change", (e) => { const file = e.target.files[0]; if (file) { selectedLogoFile = file; const reader = new FileReader(); reader.onload = (ev) => { businessLogo.src = ev.target.result; }; reader.readAsDataURL(file); logoSaveButton.disabled = false; } });
-        
-        // ============================
-        // == INICIO CÓDIGO CORREGIDO ==
-        // ============================
-        logoSaveButton.addEventListener("click", async () => { 
-            if (!selectedLogoFile) return; 
-            
-            logoSaveButton.disabled = true; 
-            logoSaveButton.textContent = "Subiendo..."; 
-            
             try {
-                // 1. La subida de la imagen a R2 funciona correctamente.
-                await uploadImage(selectedLogoFile, { customKey: LOGO_KEY });
+                // 1. Obtener el nombre del archivo del logo actual desde la base de datos
+                const { data, error } = await supabase
+                    .from(CONFIG_TABLE)
+                    .select("value")
+                    .eq("key", LOGO_CONFIG_KEY)
+                    .single();
 
-                // 2. Limpiamos el input y el estado de la variable inmediatamente.
-                selectedLogoFile = null; 
-                logoUpload.value = ""; 
+                if (error || !data) {
+                    console.error("No se pudo cargar el nombre del logo:", error);
+                    businessLogo.src = `https://via.placeholder.com/60/4f46e5/ffffff?text=CS`;
+                    return;
+                }
                 
-                // 3. Notificamos al usuario que la subida fue exitosa.
-                alert("✅ Logo subido. La imagen se actualizará en unos segundos."); 
-                
-                // 4. Agregamos un retraso de 2 segundos (2000 milisegundos).
-                //    Esto le da tiempo al caché de R2/Cloudflare para propagar el nuevo archivo.
-                //    Sin este retraso, la función loadLogo() se ejecuta tan rápido que
-                //    todavía obtiene la versión antigua del caché del servidor.
-                setTimeout(() => {
-                    loadLogo(); // Recargamos la imagen DESPUÉS del retraso.
-                }, 2000);
+                const logoFileName = data.value;
+                // 2. Construir la URL con el nombre de archivo único y un timestamp para evitar caché
+                businessLogo.src = `${R2_PUBLIC_URL}/${logoFileName}?t=${new Date().getTime()}`;
 
-            } catch (error) { 
-                alert("❌ Fallo al guardar logo: " + error.message); 
-                // Si hay un error, volvemos a habilitar el botón.
-                logoSaveButton.disabled = false; 
-            } finally { 
-                // Dejamos el botón deshabilitado pero con su texto original,
-                // ya que se volverá a activar solo cuando el usuario elija un nuevo archivo.
-                logoSaveButton.textContent = "Guardar"; 
-            } 
+            } catch (err) {
+                console.error("Error en loadLogo:", err);
+                businessLogo.src = `https://via.placeholder.com/60/4f46e5/ffffff?text=E`; // 'E' de Error
+            }
+        }
+
+        logoUpload.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                selectedLogoFile = file;
+                const reader = new FileReader();
+                reader.onload = (ev) => { businessLogo.src = ev.target.result; };
+                reader.readAsDataURL(file);
+                logoSaveButton.disabled = false;
+            }
         });
-        // ============================
-        // ==   FIN CÓDIGO CORREGIDO  ==
-        // ============================
+
+        logoSaveButton.addEventListener("click", async () => {
+            if (!selectedLogoFile) return;
+
+            logoSaveButton.disabled = true;
+            logoSaveButton.textContent = "Subiendo...";
+
+            try {
+                // 1. Crear un nombre de archivo único para el nuevo logo
+                const fileExtension = selectedLogoFile.name.split('.').pop();
+                const newLogoName = `logo_${Date.now()}.${fileExtension}`;
+
+                // 2. Subir la imagen a R2 con el nuevo nombre único
+                await uploadImage(selectedLogoFile, { customKey: newLogoName });
+
+                // 3. Actualizar la tabla de configuración en Supabase con el nuevo nombre
+                const { error: updateError } = await supabase
+                    .from(CONFIG_TABLE)
+                    .update({ value: newLogoName })
+                    .eq("key", LOGO_CONFIG_KEY);
+
+                if (updateError) throw updateError;
+                
+                alert("✅ Logo actualizado correctamente.");
+                
+                // 4. Recargar la imagen del logo en la página para mostrar la nueva versión
+                await loadLogo();
+
+                selectedLogoFile = null;
+                logoUpload.value = "";
+
+            } catch (error) {
+                alert("❌ Fallo al guardar logo: " + error.message);
+            } finally {
+                logoSaveButton.disabled = true;
+                logoSaveButton.textContent = "Guardar";
+            }
+        });
 
 
         // VIII. EVENTOS Y INICIALIZACIÓN
@@ -705,6 +733,7 @@
             toggleView('inventory');
             showSkeletonLoaders();
             
+            // Carga el logo al iniciar
             loadLogo(); 
             
             try {
