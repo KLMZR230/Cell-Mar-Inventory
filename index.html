@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-t" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Cell Smar Gestion De Ventas</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -13,8 +13,18 @@
         /********************************/
         /* Estilos Base (Comunes a todos los temas) */
         /********************************/
+        html {
+            height: 100%;
+        }
         body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             transition: background-color 0.5s ease;
+        }
+        /* Hace que el contenedor principal crezca para ocupar el espacio disponible */
+        .container.mx-auto {
+            flex-grow: 1;
         }
         .product-card { transition: transform 0.2s, box-shadow 0.3s; }
         .product-card:hover { transform: translateY(-5px); }
