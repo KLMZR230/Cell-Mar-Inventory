@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <meta charset="utf-t" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Cell Smar Gestion De Ventas</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -167,9 +167,16 @@
         })();
     </script>
     </head>
-<body class=""> <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
+<body class=""> 
+    <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
         <div class="flex items-center space-x-4">
-            <img id="business-logo" src="https://via.placeholder.com/60/4f46e5/ffffff?text=CS" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105" />
+            <img 
+                id="business-logo" 
+                src="https://via.placeholder.com/60/4f46e5/ffffff?text=CS" 
+                alt="Logo negocio" 
+                class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105"
+                onerror="this.onerror=null; this.src='https://via.placeholder.com/60/4f46e5/ffffff?text=CS';"
+            />
             <h1 class="text-3xl font-extrabold tracking-tight">
                 📱 <span class="text-indigo-400">Cell Smar</span> Gestion De Ventas
             </h1>
@@ -348,11 +355,19 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-        // Configuración y Conexión a Supabase
+        // =================================================================================
+        // == Configuración de Supabase y Edge Function para R2                          ==
+        // =================================================================================
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
+        // URL de la Edge Function desplegada
+        const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
+        
+        const R2_PUBLIC_URL = "https://pub-fe5f394fc3964a61bd3fd84a7a44fb3f.r2.dev";
+        const LOGO_KEY = "current_business_logo";
+
         // --- INICIO DE LÓGICA DE TEMAS ---
         const themeSelector = document.getElementById('theme-selector');
         const root = document.documentElement;
@@ -369,17 +384,13 @@
         // --- FIN DE LÓGICA DE TEMAS ---
 
 
-        // Constantes de la Aplicación
+        // Constantes de la Aplicación (Tablas de Supabase)
         const PRODUCTS_TABLE = "products";
         const PRODUCTS_EL_TRANSITO_TABLE = "products_el_transito";
-        const PRODUCT_BUCKET = "product-images";
-        const LOGO_BUCKET = "business-assets"; 
-        const LOGO_PATH = "current_business_logo"; 
         const SALES_TABLE = "sales";
         const SALES_EL_TRANSITO_TABLE = "sales_el_transito"; 
         const MISSING_PRODUCTS_TABLE = "missing_products"; 
 
-        // Objeto de colores de estado MODIFICADO
         const STATUS_COLORS = { 
             'Pagado': 'status-paid', 
             'Pendiente': 'status-pending', 
@@ -548,43 +559,111 @@
         }
         async function fetchProducts() { const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); if (error) { console.error("Error cargando productos:", error); totalCount.textContent = "Error al cargar"; productsEl.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } allProducts = data; filterAndRenderProducts(); }
         function filterAndRenderProducts() { const term = (searchInput.value || "").toLowerCase().trim(); const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProducts(filtered); }
-        function renderProducts(items) { productsLoader.innerHTML = ""; productsEl.innerHTML = ""; totalCount.textContent = `${items.length} productos`; if (items.length === 0) { productsEl.innerHTML = `<p class="text-gray-400">No se encontraron productos${searchInput.value ? ' para "' + searchInput.value + '"' : ''}.</p>`; return; } const grouped = items.reduce((acc, p) => { const cat = p.category || 'Sin Categoría'; if (!acc[cat]) acc[cat] = []; acc[cat].push(p); return acc; }, {}); Object.keys(grouped).forEach(category => { const section = document.createElement("div"); section.className = "mb-10"; section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; const grid = document.createElement("div"); grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; grouped[category].forEach(p => { const card = document.createElement("div"); card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; const imageUrl = p.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; card.innerHTML = `<button onclick="handleEditClick('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div><h3 class="font-semibold text-white">${p.name}</h3><p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p><p class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700"><div class="flex gap-2"><button onclick="changeQty('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button><button onclick="changeQty('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button></div><button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button></div>`; grid.appendChild(card); }); section.appendChild(grid); productsEl.appendChild(section); }); }
+        function renderProducts(items) { productsLoader.innerHTML = ""; productsEl.innerHTML = ""; totalCount.textContent = `${items.length} productos`; if (items.length === 0) { productsEl.innerHTML = `<p class="text-gray-400">No se encontraron productos${searchInput.value ? ' para "' + searchInput.value + '"' : ''}.</p>`; return; } const grouped = items.reduce((acc, p) => { const cat = p.category || 'Sin Categoría'; if (!acc[cat]) acc[cat] = []; acc[cat].push(p); return acc; }, {}); Object.keys(grouped).sort().forEach(category => { const section = document.createElement("div"); section.className = "mb-10"; section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; const grid = document.createElement("div"); grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; grouped[category].forEach(p => { const card = document.createElement("div"); card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; card.innerHTML = `<button onclick="handleEditClick('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div><h3 class="font-semibold text-white">${p.name}</h3><p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p><p class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700"><div class="flex gap-2"><button onclick="changeQty('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button><button onclick="changeQty('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button></div><button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button></div>`; grid.appendChild(card); }); section.appendChild(grid); productsEl.appendChild(section); }); }
         window.handleEditClick = (id, name, price) => { const newName = prompt("Nuevo nombre:", name); if (newName === null || newName.trim() === "") return; const newPrice = prompt("Nuevo precio (USD):", Number(price).toFixed(2)); if (newPrice === null) return; editProduct(id, newName, newPrice); }; async function editProduct(id, newName, newPrice) { const priceValue = parseFloat(newPrice); if (isNaN(priceValue) || priceValue < 0) { alert("Precio inválido."); return; } const { error } = await supabase.from(PRODUCTS_TABLE).update({ name: newName.trim(), price: priceValue }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchProducts(); }
         window.changeQty = async function(id, delta) { const { data } = await supabase.from(PRODUCTS_TABLE).select("quantity").eq("id", id).single(); const newQty = Math.max(0, (data.quantity || 0) + delta); await supabase.from(PRODUCTS_TABLE).update({ quantity: newQty }).eq("id", id); fetchProducts(); }
-        async function deleteProduct(id) { if (!confirm("¿Eliminar este producto?")) return; await supabase.from(PRODUCTS_TABLE).delete().eq("id", id); fetchProducts(); }
+        window.deleteProduct = async function(id) { if (!confirm("¿Eliminar este producto?")) return; await supabase.from(PRODUCTS_TABLE).delete().eq("id", id); fetchProducts(); }
         
         // VI. FUNCIONES DE INVENTARIO (EL TRANSITO)
         async function fetchProductsET() { const { data, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); if (error) { console.error("Error cargando productos (El Transito):", error); totalCountET.textContent = "Error al cargar"; productsElET.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } allProductsElTransito = data; filterAndRenderProductsET(); }
         function filterAndRenderProductsET() { const term = (searchInputET.value || "").toLowerCase().trim(); const filtered = allProductsElTransito.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProductsET(filtered); }
-        function renderProductsET(items) { productsLoaderET.innerHTML = ""; productsElET.innerHTML = ""; totalCountET.textContent = `${items.length} productos`; if (items.length === 0) { productsElET.innerHTML = `<p class="text-gray-400">No se encontraron productos${searchInputET.value ? ' para "' + searchInputET.value + '"' : ''}.</p>`; return; } const grouped = items.reduce((acc, p) => { const cat = p.category || 'Sin Categoría'; if (!acc[cat]) acc[cat] = []; acc[cat].push(p); return acc; }, {}); Object.keys(grouped).forEach(category => { const section = document.createElement("div"); section.className = "mb-10"; section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; const grid = document.createElement("div"); grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; grouped[category].forEach(p => { const card = document.createElement("div"); card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; const imageUrl = p.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; card.innerHTML = `<button onclick="handleEditClickET('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div><h3 class="font-semibold text-white">${p.name}</h3><p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p><p class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700"><div class="flex gap-2"><button onclick="changeQtyET('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button><button onclick="changeQtyET('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button></div><button onclick="deleteProductET('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button></div>`; grid.appendChild(card); }); section.appendChild(grid); productsElET.appendChild(section); }); }
+        function renderProductsET(items) { productsLoaderET.innerHTML = ""; productsElET.innerHTML = ""; totalCountET.textContent = `${items.length} productos`; if (items.length === 0) { productsElET.innerHTML = `<p class="text-gray-400">No se encontraron productos${searchInputET.value ? ' para "' + searchInputET.value + '"' : ''}.</p>`; return; } const grouped = items.reduce((acc, p) => { const cat = p.category || 'Sin Categoría'; if (!acc[cat]) acc[cat] = []; acc[cat].push(p); return acc; }, {}); Object.keys(grouped).sort().forEach(category => { const section = document.createElement("div"); section.className = "mb-10"; section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; const grid = document.createElement("div"); grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; grouped[category].forEach(p => { const card = document.createElement("div"); card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; card.innerHTML = `<button onclick="handleEditClickET('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div><h3 class="font-semibold text-white">${p.name}</h3><p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p><p class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700"><div class="flex gap-2"><button onclick="changeQtyET('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button><button onclick="changeQtyET('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button></div><button onclick="deleteProductET('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button></div>`; grid.appendChild(card); }); section.appendChild(grid); productsElET.appendChild(section); }); }
         window.handleEditClickET = (id, name, price) => { const newName = prompt("Nuevo nombre (El Transito):", name); if (newName === null || newName.trim() === "") return; const newPrice = prompt("Nuevo precio (USD) (El Transito):", Number(price).toFixed(2)); if (newPrice === null) return; editProductET(id, newName, newPrice); }; async function editProductET(id, newName, newPrice) { const priceValue = parseFloat(newPrice); if (isNaN(priceValue) || priceValue < 0) { alert("Precio inválido."); return; } const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ name: newName.trim(), price: priceValue }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchProductsET(); }
         window.changeQtyET = async function(id, delta) { const { data } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("quantity").eq("id", id).single(); const newQty = Math.max(0, (data.quantity || 0) + delta); await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ quantity: newQty }).eq("id", id); fetchProductsET(); }
         window.deleteProductET = async function(id) { if (!confirm("¿Eliminar este producto de Inventario El Transito?")) return; await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).delete().eq("id", id); fetchProductsET(); }
 
-        // Función general para subir imágenes, reutilizable
-        async function uploadImage(file, bucket) { if (!file) return null; const ext = file.name.split(".").pop(); const path = `product_${Date.now()}.${ext}`; const { error } = await supabase.storage.from(bucket).upload(path, file); if (error) throw error; const { data } = supabase.storage.from(bucket).getPublicUrl(path); return data?.publicUrl; }
-
-        // VII. LÓGICA DEL LOGO
-        async function loadLogo() {
-            const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(LOGO_PATH);
+        // =================================================================================
+        // == Lógica de subida de imágenes a R2 a través de Edge Function                ==
+        // =================================================================================
+        async function uploadImage(file, options = {}) {
+            if (!file) return null;
             
-            if (data && data.publicUrl) {
-                businessLogo.src = `${data.publicUrl}?t=${new Date().getTime()}`;
-            } else {
-                console.error("No se pudo obtener la URL pública para el logo.");
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            if (options.customKey) {
+                formData.append('customKey', options.customKey);
             }
+
+            const response = await fetch(SUPABASE_FUNCTION_URL, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'La subida del archivo falló.');
+            }
+
+            return data.url;
+        }
+
+        // VII. LÓGICA DEL LOGO (MODIFICADA PARA R2 CON EDGE FUNCTION)
+        async function loadLogo() {
+            businessLogo.src = `${R2_PUBLIC_URL}/${LOGO_KEY}?t=${new Date().getTime()}`;
         }
         logoUpload.addEventListener("change", (e) => { const file = e.target.files[0]; if (file) { selectedLogoFile = file; const reader = new FileReader(); reader.onload = (ev) => { businessLogo.src = ev.target.result; }; reader.readAsDataURL(file); logoSaveButton.disabled = false; } });
-        logoSaveButton.addEventListener("click", async () => { if (!selectedLogoFile) return; logoSaveButton.disabled = true; logoSaveButton.textContent = "Subiendo..."; try { const { error } = await supabase.storage.from(LOGO_BUCKET).upload(LOGO_PATH, selectedLogoFile, { cacheControl: "3600", upsert: true }); if (error) throw error; await loadLogo(); alert("✅ Logo actualizado."); selectedLogoFile = null; logoUpload.value = ""; } catch (error) { alert("❌ Fallo al guardar logo: " + error.message); } finally { logoSaveButton.disabled = true; logoSaveButton.textContent = "Guardar"; } });
+        logoSaveButton.addEventListener("click", async () => { 
+            if (!selectedLogoFile) return; 
+            logoSaveButton.disabled = true; 
+            logoSaveButton.textContent = "Subiendo..."; 
+            try {
+                await uploadImage(selectedLogoFile, { customKey: LOGO_KEY });
+                await loadLogo();
+                alert("✅ Logo actualizado."); 
+                selectedLogoFile = null; 
+                logoUpload.value = ""; 
+            } catch (error) { 
+                alert("❌ Fallo al guardar logo: " + error.message); 
+            } finally { 
+                logoSaveButton.disabled = true; 
+                logoSaveButton.textContent = "Guardar"; 
+            } 
+        });
 
         // VIII. EVENTOS Y INICIALIZACIÓN
         function setStatusMessage(el, msg, success = true) { el.textContent = msg; el.className = `text-sm mt-3 ${success ? 'text-green-400' : 'text-red-400'}`; setTimeout(() => (el.textContent = ""), 3000); }
         
         searchInput.addEventListener("input", filterAndRenderProducts);
-        form.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("submit"); submitBtn.disabled = true; setStatusMessage(status, "Guardando...", true); try { const imageUrl = imageIn.files[0] ? await uploadImage(imageIn.files[0], PRODUCT_BUCKET) : null; const { error } = await supabase.from(PRODUCTS_TABLE).insert({ name: nameIn.value, category: categoryIn.value, price: parseFloat(priceIn.value), quantity: parseInt(qtyIn.value), image_url: imageUrl }); if (error) throw error; form.reset(); qtyIn.value = 1; fetchProducts(); setStatusMessage(status, "Producto agregado con éxito ✅", true); } catch (err) { setStatusMessage(status, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
+        form.addEventListener("submit", async (ev) => { 
+            ev.preventDefault(); 
+            const submitBtn = document.getElementById("submit"); 
+            submitBtn.disabled = true; 
+            setStatusMessage(status, "Guardando...", true); 
+            try { 
+                const imageUrl = imageIn.files[0] ? await uploadImage(imageIn.files[0]) : null; 
+                const { error } = await supabase.from(PRODUCTS_TABLE).insert({ name: nameIn.value, category: categoryIn.value, price: parseFloat(priceIn.value), quantity: parseInt(qtyIn.value), image_url: imageUrl }); 
+                if (error) throw error; 
+                form.reset(); qtyIn.value = 1; 
+                fetchProducts(); 
+                setStatusMessage(status, "Producto agregado con éxito ✅", true); 
+            } catch (err) { 
+                setStatusMessage(status, "Error: " + err.message, false); 
+            } finally { 
+                submitBtn.disabled = false; 
+            } 
+        });
 
         searchInputET.addEventListener("input", filterAndRenderProductsET);
-        formET.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("submit-et"); submitBtn.disabled = true; setStatusMessage(statusET, "Guardando...", true); try { const imageUrl = imageInET.files[0] ? await uploadImage(imageInET.files[0], PRODUCT_BUCKET) : null; const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).insert({ name: nameInET.value, category: categoryInET.value, price: parseFloat(priceInET.value), quantity: parseInt(qtyInET.value), image_url: imageUrl }); if (error) throw error; formET.reset(); qtyInET.value = 1; fetchProductsET(); setStatusMessage(statusET, "Producto agregado con éxito (El Transito) ✅", true); } catch (err) { setStatusMessage(statusET, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
+        formET.addEventListener("submit", async (ev) => { 
+            ev.preventDefault(); 
+            const submitBtn = document.getElementById("submit-et"); 
+            submitBtn.disabled = true; 
+            setStatusMessage(statusET, "Guardando...", true); 
+            try { 
+                const imageUrl = imageInET.files[0] ? await uploadImage(imageInET.files[0]) : null; 
+                const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).insert({ name: nameInET.value, category: categoryInET.value, price: parseFloat(priceInET.value), quantity: parseInt(qtyInET.value), image_url: imageUrl }); 
+                if (error) throw error; 
+                formET.reset(); qtyInET.value = 1; 
+                fetchProductsET(); 
+                setStatusMessage(statusET, "Producto agregado con éxito (El Transito) ✅", true); 
+            } catch (err) { 
+                setStatusMessage(statusET, "Error: " + err.message, false); 
+            } finally { 
+                submitBtn.disabled = false; 
+            } 
+        });
 
         salesForm.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("sale-submit"); submitBtn.disabled = true; try { await supabase.from(SALES_TABLE).insert({ recipient_name: recipientNameIn.value, product_name_sold: productNameSoldIn.value, price: parseFloat(salePriceIn.value), sale_date: saleDateIn.value, status: saleStatusInput.value }); salesForm.reset(); saleDateIn.value = new Date().toISOString().split('T')[0]; fetchSales(); setStatusMessage(saleStatus, "Venta registrada con éxito ✅", true); } catch (err) { setStatusMessage(saleStatus, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
         salesFormET.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("sale-submit-et"); submitBtn.disabled = true; try { await supabase.from(SALES_EL_TRANSITO_TABLE).insert({ recipient_name: recipientNameInET.value, product_name_sold: productNameSoldInET.value, price: parseFloat(salePriceInET.value), sale_date: saleDateInET.value, status: saleStatusInputET.value }); salesFormET.reset(); saleDateInET.value = new Date().toISOString().split('T')[0]; fetchSalesElTransito(); setStatusMessage(saleStatusET, "Venta (El Transito) registrada con éxito ✅", true); } catch (err) { setStatusMessage(saleStatusET, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
@@ -594,19 +673,14 @@
         document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', () => toggleView(btn.dataset.view)));
         
         window.addEventListener("load", async () => {
-            // Sincronizar el selector con el tema ya aplicado por el script del <head>
             themeSelector.value = root.className;
-
-            // Configurar valores iniciales
             saleDateIn.value = new Date().toISOString().split('T')[0];
             saleDateInET.value = new Date().toISOString().split('T')[0];
             toggleView('inventory');
             showSkeletonLoaders();
             
-            // Cargar logo (no necesita esperar a los demás)
             loadLogo(); 
             
-            // Ejecutar todas las cargas de datos en paralelo para mayor fluidez
             try {
                 await Promise.all([
                     fetchProducts(), 
