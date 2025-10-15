@@ -25,8 +25,8 @@
         .container.mx-auto {
             flex-grow: 1;
         }
-        .product-card { transition: transform 0.2s, box-shadow 0.3s; }
-        .product-card:hover { transform: translateY(-5px); }
+        .product-card, .tool-card { transition: transform 0.2s, box-shadow 0.3s; }
+        .product-card:hover, .tool-card:hover { transform: translateY(-5px); }
         #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
         .view-section.hidden { display: none; }
         
@@ -73,7 +73,7 @@
             --font-headings: 'Roboto', sans-serif;
         }
         .theme-infernal { background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
-        .theme-infernal .product-card:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.5); border-color: rgba(255, 69, 0, 0.7); }
+        .theme-infernal .product-card:hover, .theme-infernal .tool-card:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.5); border-color: rgba(255, 69, 0, 0.7); }
 
         /********************************/
         /* TEMA 3: Luxury Gold */
@@ -92,7 +92,7 @@
             --font-headings: 'Playfair Display', serif;
         }
         .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
-        .theme-gold .product-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
+        .theme-gold .product-card:hover, .theme-gold .tool-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
         .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
         .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
 
@@ -123,7 +123,7 @@
         .bg-indigo-500 { background-color: var(--accent-color-dark); color: var(--text-primary); }
         .hover\:bg-indigo-600:hover { background-color: var(--accent-color); }
         .focus\:ring-indigo-500:focus { --tw-ring-color: var(--accent-color); }
-        input:focus, select:focus {
+        input:focus, select:focus, textarea:focus {
             border-color: var(--accent-color) !important;
             box-shadow: 0 0 0 1px var(--accent-color);
             outline: none;
@@ -188,6 +188,7 @@
                  <button data-view="sales" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">💰 Ventas</button>
                  <button data-view="sales_el_transito" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🚚 Ventas El Transito</button>
                  <button data-view="missing" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🔔 Faltantes</button>
+                 <button data-view="tools" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🛠️ Herramientas</button>
             </div>
             <div class="flex items-center space-x-3">
                 <div class="flex items-center space-x-2">
@@ -348,8 +349,46 @@
                 <div id="missing-list" class="bg-gray-800 rounded-lg shadow overflow-hidden"></div>
             </section>
         </div>
+        
+        <div id="tools-view" class="view-section hidden">
+            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar Nueva Herramienta / Tutorial</h2>
+                <form id="tool-form" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300">Título</label>
+                            <input id="tool-title" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Test Point iPhone 12" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300">Descripción / Pasos</label>
+                            <textarea id="tool-description" rows="4" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Describe los pasos o información relevante aquí..."></textarea>
+                        </div>
+                    </div>
+                     <div>
+                        <label class="block text-sm font-medium text-gray-300">Imagen (Tutorial)</label>
+                        <input id="tool-image" type="file" accept="image/*" class="mt-1 block w-full p-1.5 border rounded-md bg-gray-600 border-gray-500 text-white" />
+                        <p class="text-xs text-gray-400 mt-2">Sube una imagen clara que ilustre el procedimiento.</p>
+                    </div>
+                    <div class="md:col-span-2 text-right">
+                        <button id="tool-submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow-lg">Guardar Herramienta</button>
+                    </div>
+                </form>
+                <p id="tool-status" class="text-sm text-gray-400 mt-3"></p>
+            </section>
+            <section>
+                 <div class="flex items-center justify-between mb-4">
+                     <h2 class="text-xl font-semibold text-indigo-300">📚 Base de Conocimiento de Herramientas</h2>
+                     <span id="total-tools-count" class="text-gray-400 text-sm"></span>
+                 </div>
+                 <div id="tools-loader" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+                 <div id="tools-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </section>
+        </div>
+
         <footer class="mt-10 text-center text-gray-400 text-sm">Panel de Inventario — Cell Smart</footer>
     </div>
+    
+    <input type="file" id="tool-image-editor-input" class="hidden" accept="image/*" />
     
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
@@ -385,7 +424,8 @@
         const SALES_TABLE = "sales";
         const SALES_EL_TRANSITO_TABLE = "sales_el_transito"; 
         const MISSING_PRODUCTS_TABLE = "missing_products";
-        const CONFIG_TABLE = "config"; // <-- Tabla para la URL del logo
+        const TOOLS_TABLE = "tools"; 
+        const CONFIG_TABLE = "config"; 
 
         const STATUS_COLORS = { 
             'Pagado': 'status-paid', 
@@ -401,8 +441,11 @@
         const logoUpload = document.getElementById("logo-upload"), businessLogo = document.getElementById("business-logo"), logoSaveButton = document.getElementById("logo-save-button");
         const currentViewTitle = document.getElementById("current-view-title");
         const formET = document.getElementById("product-form-et"), nameInET = document.getElementById("name-et"), categoryInET = document.getElementById("category-select-et"), priceInET = document.getElementById("price-et"), qtyInET = document.getElementById("quantity-et"), imageInET = document.getElementById("image-et"), statusET = document.getElementById("status-et"), productsElET = document.getElementById("products-et"), totalCountET = document.getElementById("total-count-et"), searchInputET = document.getElementById("search-input-et"), productsLoaderET = document.getElementById("products-loader-et");
+        const toolForm = document.getElementById("tool-form"), toolTitleIn = document.getElementById("tool-title"), toolDescriptionIn = document.getElementById("tool-description"), toolImageIn = document.getElementById("tool-image"), toolStatus = document.getElementById("tool-status"), toolsListEl = document.getElementById("tools-list"), totalToolsCount = document.getElementById("total-tools-count"), toolsLoader = document.getElementById("tools-loader");
+        const toolImageEditorInput = document.getElementById('tool-image-editor-input'); // NUEVO: Input para editar imagen
 
-        let allProducts = [], allProductsElTransito = [], allSales = [], allSalesElTransito = [], allMissingProducts = [], selectedLogoFile = null;
+        let allProducts = [], allProductsElTransito = [], allSales = [], allSalesElTransito = [], allMissingProducts = [], allTools = [], selectedLogoFile = null;
+        let editingToolId = null; // NUEVO: Variable para guardar el ID de la herramienta que se está editando
 
         // I. GESTIÓN DE VISTAS Y CARGA
         const views = { 
@@ -410,13 +453,15 @@
             inventory_el_transito: { el: document.getElementById('inventory-el-transito-view'), title: 'Vista: Inventario El Transito' },
             sales: { el: document.getElementById('sales-view'), title: 'Vista: Ventas Registradas' },
             sales_el_transito: { el: document.getElementById('sales-el-transito-view'), title: 'Vista: Ventas El Transito' },
-            missing: { el: document.getElementById('missing-view'), title: 'Vista: Productos Faltantes' } 
+            missing: { el: document.getElementById('missing-view'), title: 'Vista: Productos Faltantes' },
+            tools: { el: document.getElementById('tools-view'), title: 'Vista: Herramientas y Tutoriales' } 
         };
         function toggleView(viewName) { Object.keys(views).forEach(key => { const isCurrent = key === viewName; views[key].el.classList.toggle('hidden', !isCurrent); const btn = document.querySelector(`.view-btn[data-view="${key}"]`); btn.classList.toggle('bg-indigo-500', isCurrent); btn.classList.toggle('text-white', isCurrent); btn.classList.toggle('bg-transparent', !isCurrent); btn.classList.toggle('text-gray-300', !isCurrent); }); currentViewTitle.textContent = views[viewName].title; }
         function showSkeletonLoaders() { 
             const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div><div class="h-4 w-1/2 skeleton-line"></div><div class="h-8 w-1/4 skeleton-line"></div></div>`).join('');
             productsLoader.innerHTML = cardSkeleton;
             productsLoaderET.innerHTML = cardSkeleton;
+            toolsLoader.innerHTML = cardSkeleton;
             const tableSkeleton = Array(3).fill('').map(() => `<div class="h-12 skeleton-line"></div>`).join(''); 
             salesListLoader.innerHTML = tableSkeleton; 
             salesListLoaderET.innerHTML = tableSkeleton;
@@ -588,11 +633,11 @@
                 throw new Error(data.error || 'La subida del archivo falló.');
             }
 
-            return data.url; // Devuelve la URL completa y única generada por el servidor
+            return data.url; 
         }
 
         // ============================================================================
-        // == VII. LÓGICA DEL LOGO (CORREGIDA CON EL MÉTODO DEL SITIO FUNCIONAL)      ==
+        // == VII. LÓGICA DEL LOGO                                                  ==
         // ============================================================================
         const LOGO_CONFIG_KEY = "current_logo_url";
 
@@ -605,14 +650,14 @@
                     .single();
 
                 if (error || !data || !data.value) {
-                    if (error && error.code !== 'PGRST116') { // Ignora el error "no rows found"
+                    if (error && error.code !== 'PGRST116') { 
                        console.error("Error cargando la URL del logo:", error);
                     }
-                    return; // No hace nada si no hay URL guardada
+                    return; 
                 }
                 
                 const logoUrl = data.value;
-                businessLogo.src = `${logoUrl}?t=${new Date().getTime()}`; // Añade timestamp por si acaso
+                businessLogo.src = `${logoUrl}?t=${new Date().getTime()}`;
 
             } catch (err) {
                 console.error("Error en loadLogo:", err);
@@ -637,15 +682,12 @@
             logoSaveButton.textContent = "Subiendo...";
 
             try {
-                // 1. Sube el archivo a R2. La función de Supabase le dará un nombre único.
                 const newLogoUrl = await uploadImage(selectedLogoFile);
 
                 if (!newLogoUrl) {
                     throw new Error("La función de subida no devolvió una URL.");
                 }
 
-                // 2. Guarda la URL COMPLETA en la tabla de configuración.
-                // upsert: crea la fila si no existe, o la actualiza si ya existe.
                 const { error: updateError } = await supabase
                     .from(CONFIG_TABLE)
                     .upsert({ key: LOGO_CONFIG_KEY, value: newLogoUrl }, { onConflict: 'key' });
@@ -654,7 +696,6 @@
                 
                 alert("✅ Logo actualizado correctamente.");
                 
-                // 3. Vuelve a cargar el logo desde la URL recién guardada.
                 await loadLogo();
 
                 selectedLogoFile = null;
@@ -668,8 +709,63 @@
             }
         });
 
+        // ============================================================================
+        // == VIII. FUNCIONES DE HERRAMIENTAS / TUTORIALES                           ==
+        // ============================================================================
+        async function fetchTools() {
+            const { data, error } = await supabase.from(TOOLS_TABLE).select("*").order("created_at", { ascending: false });
+            if (error) {
+                console.error("Error cargando herramientas:", error);
+                totalToolsCount.textContent = "Error al cargar";
+                return;
+            }
+            allTools = data;
+            renderTools(allTools);
+        }
 
-        // VIII. EVENTOS Y INICIALIZACIÓN
+        function renderTools(items) {
+            toolsLoader.innerHTML = "";
+            toolsListEl.innerHTML = "";
+            totalToolsCount.textContent = `${items.length} herramientas`;
+            if (items.length === 0) {
+                toolsListEl.innerHTML = `<p class="text-gray-400 md:col-span-3">No hay herramientas o tutoriales guardados.</p>`;
+                return;
+            }
+
+            items.forEach(tool => {
+                const card = document.createElement("div");
+                card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col tool-card border border-gray-700 relative";
+                const imageUrl = tool.image_url ? `${tool.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/6366f1/ffffff?text=Tutorial`;
+                const descriptionHtml = tool.description ? `<p class="text-gray-400 text-sm mt-2 flex-grow">${tool.description.replace(/\n/g, '<br>')}</p>` : '<div class="flex-grow"></div>';
+                
+                card.innerHTML = `
+                    <div class="h-48 bg-gray-700 rounded flex items-center justify-center mb-3 overflow-hidden">
+                        <img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${tool.title}">
+                    </div>
+                    <h3 class="font-bold text-lg text-white">${tool.title}</h3>
+                    ${descriptionHtml}
+                    <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
+                        <button onclick="editToolImage('${tool.id}')" class="px-3 py-1 rounded bg-indigo-500 hover:bg-indigo-600 text-white shadow-md text-sm transition mr-2">Editar Foto</button>
+                        <button onclick="deleteTool('${tool.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
+                    </div>`;
+                toolsListEl.appendChild(card);
+            });
+        }
+        
+        // NUEVO: Función para iniciar la edición de la imagen de una herramienta
+        window.editToolImage = function(id) {
+            editingToolId = id; // Guarda el ID de la herramienta que queremos editar
+            toolImageEditorInput.click(); // Dispara el click en el input de archivo oculto
+        }
+
+        window.deleteTool = async function(id) {
+            if (!confirm("¿Estás seguro de que quieres eliminar esta herramienta? Esta acción es irreversible.")) return;
+            await supabase.from(TOOLS_TABLE).delete().eq("id", id);
+            fetchTools();
+        }
+
+
+        // IX. EVENTOS Y INICIALIZACIÓN
         function setStatusMessage(el, msg, success = true) { el.textContent = msg; el.className = `text-sm mt-3 ${success ? 'text-green-400' : 'text-red-400'}`; setTimeout(() => (el.textContent = ""), 3000); }
         
         searchInput.addEventListener("input", filterAndRenderProducts);
@@ -717,6 +813,63 @@
         
         missingProductForm.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("missing-product-submit"); submitBtn.disabled = true; try { await supabase.from(MISSING_PRODUCTS_TABLE).insert({ product_name: missingProductNameIn.value, notes: missingProductNotesIn.value || null }); missingProductForm.reset(); fetchMissingProducts(); setStatusMessage(missingProductStatus, "Producto agregado a la lista ✅", true); } catch (err) { setStatusMessage(missingProductStatus, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
         
+        toolForm.addEventListener("submit", async (ev) => {
+            ev.preventDefault();
+            const submitBtn = document.getElementById("tool-submit");
+            submitBtn.disabled = true;
+            setStatusMessage(toolStatus, "Guardando herramienta...", true);
+            try {
+                const imageUrl = toolImageIn.files[0] ? await uploadImage(toolImageIn.files[0]) : null;
+                const { error } = await supabase.from(TOOLS_TABLE).insert({
+                    title: toolTitleIn.value,
+                    description: toolDescriptionIn.value || null,
+                    image_url: imageUrl
+                });
+                if (error) throw error;
+                toolForm.reset();
+                fetchTools();
+                setStatusMessage(toolStatus, "Herramienta guardada con éxito ✅", true);
+            } catch (err) {
+                setStatusMessage(toolStatus, "Error: " + err.message, false);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+        
+        // NUEVO: Event Listener para cuando se selecciona un archivo en el editor de imágenes oculto
+        toolImageEditorInput.addEventListener('change', async (event) => {
+            if (!editingToolId) return; // No hacer nada si no hay un ID guardado
+            const file = event.target.files[0];
+            if (!file) return; // No hacer nada si el usuario cancela la selección
+
+            alert('Subiendo nueva imagen... La página se refrescará al terminar.');
+
+            try {
+                const newImageUrl = await uploadImage(file);
+                if (!newImageUrl) {
+                    throw new Error("La subida de la imagen falló.");
+                }
+
+                const { error } = await supabase
+                    .from(TOOLS_TABLE)
+                    .update({ image_url: newImageUrl })
+                    .eq('id', editingToolId);
+
+                if (error) throw error;
+
+                await fetchTools(); // Refresca la lista de herramientas para mostrar la nueva imagen
+                alert('✅ Imagen actualizada correctamente.');
+
+            } catch (error) {
+                console.error('Error al actualizar la imagen de la herramienta:', error);
+                alert('❌ Error: ' + error.message);
+            } finally {
+                // Limpiar el estado para futuras ediciones
+                editingToolId = null;
+                toolImageEditorInput.value = '';
+            }
+        });
+
         document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', () => toggleView(btn.dataset.view)));
         
         window.addEventListener("load", async () => {
@@ -726,7 +879,6 @@
             toggleView('inventory');
             showSkeletonLoaders();
             
-            // Carga el logo al iniciar
             await loadLogo(); 
             
             try {
@@ -735,7 +887,8 @@
                     fetchProductsET(),
                     fetchSales(), 
                     fetchSalesElTransito(),
-                    fetchMissingProducts()
+                    fetchMissingProducts(),
+                    fetchTools() 
                 ]);
             } catch (error) {
                 console.error("Error durante la carga de datos inicial:", error);
