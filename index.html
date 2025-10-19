@@ -256,7 +256,11 @@
                 <h2 class="text-xl font-semibold mb-4 text-indigo-300">✍️ Registrar Nueva Venta</h2>
                 <form id="sale-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                     <div><label class="block text-sm font-medium text-gray-300">Nombre de Destinatario</label><input id="recipient-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Juan Pérez" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Producto Vendido</label><input id="product-name-sold" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Pantalla Samsung A32" /></div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Producto Vendido</label>
+                        <input id="product-name-sold" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Pantalla Samsung A32" list="inventory-suggestions" />
+                        <datalist id="inventory-suggestions"></datalist>
+                    </div>
                     <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="sale-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="25.99" /></div>
                     <div><label class="block text-sm font-medium text-gray-300">Fecha de Venta</label><input id="sale-date" type="date" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
                     <div><label class="block text-sm font-medium text-gray-300">Estado</label><select id="sale-status-input" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="Pendiente">Pendiente</option><option value="Pagado">Pagado</option><option value="Devuelto">Devuelto</option></select></div>
@@ -293,7 +297,11 @@
                 <h2 class="text-xl font-semibold mb-4 text-indigo-300">✍️ Registrar Nueva Venta (El Transito)</h2>
                 <form id="sale-el-transito-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                     <div><label class="block text-sm font-medium text-gray-300">Nombre de Destinatario</label><input id="recipient-name-et" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Ana Gómez" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Producto Vendido</label><input id="product-name-sold-et" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Batería iPhone 11" /></div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Producto Vendido</label>
+                        <input id="product-name-sold-et" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Batería iPhone 11" list="inventory-suggestions-et" />
+                        <datalist id="inventory-suggestions-et"></datalist>
+                    </div>
                     <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="sale-price-et" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="35.00" /></div>
                     <div><label class="block text-sm font-medium text-gray-300">Fecha de Venta</label><input id="sale-date-et" type="date" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
                     <div><label class="block text-sm font-medium text-gray-300">Estado</label><select id="sale-status-input-et" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="Pendiente">Pendiente</option><option value="Pagado">Pagado</option><option value="Devuelto">Devuelto</option></select></div>
@@ -443,9 +451,14 @@
         const formET = document.getElementById("product-form-et"), nameInET = document.getElementById("name-et"), categoryInET = document.getElementById("category-select-et"), priceInET = document.getElementById("price-et"), qtyInET = document.getElementById("quantity-et"), imageInET = document.getElementById("image-et"), statusET = document.getElementById("status-et"), productsElET = document.getElementById("products-et"), totalCountET = document.getElementById("total-count-et"), searchInputET = document.getElementById("search-input-et"), productsLoaderET = document.getElementById("products-loader-et");
         const toolForm = document.getElementById("tool-form"), toolTitleIn = document.getElementById("tool-title"), toolDescriptionIn = document.getElementById("tool-description"), toolImageIn = document.getElementById("tool-image"), toolStatus = document.getElementById("tool-status"), toolsListEl = document.getElementById("tools-list"), totalToolsCount = document.getElementById("total-tools-count"), toolsLoader = document.getElementById("tools-loader");
         const toolImageEditorInput = document.getElementById('tool-image-editor-input'); // NUEVO: Input para editar imagen
+        
+        // Elementos Datalist
+        const inventorySuggestions = document.getElementById('inventory-suggestions');
+        const inventorySuggestionsET = document.getElementById('inventory-suggestions-et');
+
 
         let allProducts = [], allProductsElTransito = [], allSales = [], allSalesElTransito = [], allMissingProducts = [], allTools = [], selectedLogoFile = null;
-        let editingToolId = null; // NUEVO: Variable para guardar el ID de la herramienta que se está editando
+        let editingToolId = null; 
 
         // I. GESTIÓN DE VISTAS Y CARGA
         const views = { 
@@ -456,7 +469,18 @@
             missing: { el: document.getElementById('missing-view'), title: 'Vista: Productos Faltantes' },
             tools: { el: document.getElementById('tools-view'), title: 'Vista: Herramientas y Tutoriales' } 
         };
-        function toggleView(viewName) { Object.keys(views).forEach(key => { const isCurrent = key === viewName; views[key].el.classList.toggle('hidden', !isCurrent); const btn = document.querySelector(`.view-btn[data-view="${key}"]`); btn.classList.toggle('bg-indigo-500', isCurrent); btn.classList.toggle('text-white', isCurrent); btn.classList.toggle('bg-transparent', !isCurrent); btn.classList.toggle('text-gray-300', !isCurrent); }); currentViewTitle.textContent = views[viewName].title; }
+        function toggleView(viewName) { 
+            Object.keys(views).forEach(key => { 
+                const isCurrent = key === viewName; 
+                views[key].el.classList.toggle('hidden', !isCurrent); 
+                const btn = document.querySelector(`.view-btn[data-view="${key}"]`); 
+                btn.classList.toggle('bg-indigo-500', isCurrent); 
+                btn.classList.toggle('text-white', isCurrent); 
+                btn.classList.toggle('bg-transparent', !isCurrent); 
+                btn.classList.toggle('text-gray-300', !isCurrent); 
+            }); 
+            currentViewTitle.textContent = views[viewName].title; 
+        }
         function showSkeletonLoaders() { 
             const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div><div class="h-4 w-1/2 skeleton-line"></div><div class="h-8 w-1/4 skeleton-line"></div></div>`).join('');
             productsLoader.innerHTML = cardSkeleton;
@@ -584,13 +608,12 @@
             });
         }
 
-        window.changeSaleStatusET = async function(id, newStatus) { if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) return; const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ status: newStatus }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSalesElTransito(); }
-        window.editSalePriceET = async function(id, currentPrice) { const newPriceRaw = prompt("Ingrese el nuevo precio (USD):", currentPrice); if (newPriceRaw === null || newPriceRaw.trim() === "") return; const newPrice = parseFloat(newPriceRaw); if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ price: newPrice }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSalesElTransito(); }
+        window.changeSaleStatusET = async function(id, currentPrice) { const newPriceRaw = prompt("Ingrese el nuevo precio (USD) (El Transito):", currentPrice); if (newPriceRaw === null || newPriceRaw.trim() === "") return; const newPrice = parseFloat(newPriceRaw); if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ price: newPrice }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSalesElTransito(); }
         window.deleteSaleET = async function(id) { if (!confirm("¿Eliminar este registro de venta?")) return; await supabase.from(SALES_EL_TRANSITO_TABLE).delete().eq("id", id); fetchSalesElTransito(); }
 
         // IV. FUNCIONES DE PRODUCTOS FALTANTES
         async function fetchMissingProducts() { const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false }); if (error) { console.error("Error cargando productos faltantes:", error); totalMissingCount.textContent = "Error al cargar"; return; } allMissingProducts = data; renderMissingProducts(allMissingProducts); }
-        function renderMissingProducts(items) { missingListLoader.innerHTML = ""; missingListEl.innerHTML = ""; totalMissingCount.textContent = `${items.length} productos`; if (items.length === 0) { missingListEl.innerHTML = `<p class="p-4 text-gray-400">No hay productos faltantes registrados.</p>`; return; } const table = document.createElement('table'); table.className = 'min-w-full divide-y divide-gray-700'; table.innerHTML = `<thead><tr><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto y Notas</th><th class="px-6 py-3 bg-gray-700"></th></tr></thead>`; const tbody = document.createElement('tbody'); tbody.className = 'bg-gray-800 divide-y divide-gray-700'; items.forEach(item => { const row = tbody.insertCell(); const notesHtml = item.notes ? `<p class="text-xs text-gray-400 mt-1">${item.notes}</p>` : ''; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm"><span class="font-medium text-white">${item.product_name}</span>${notesHtml}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteMissingProduct('${item.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded shadow text-xs transition">Conseguido ✔</button></td>`; }); table.appendChild(tbody); missingListEl.appendChild(table); }
+        function renderMissingProducts(items) { missingListLoader.innerHTML = ""; missingListEl.innerHTML = ""; totalMissingCount.textContent = `${items.length} productos`; if (items.length === 0) { missingListEl.innerHTML = `<p class="p-4 text-gray-400">No hay productos faltantes registrados.</p>`; return; } const table = document.createElement('table'); table.className = 'min-w-full divide-y divide-gray-700'; table.innerHTML = `<thead><tr><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto y Notas</th><th class="px-6 py-3 bg-gray-700"></th></tr></thead>`; const tbody = document.createElement('tbody'); tbody.className = 'bg-gray-800 divide-y divide-gray-700'; items.forEach(item => { const row = tbody.insertRow(); const notesHtml = item.notes ? `<p class="text-xs text-gray-400 mt-1">${item.notes}</p>` : ''; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm"><span class="font-medium text-white">${item.product_name}</span>${notesHtml}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteMissingProduct('${item.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded shadow text-xs transition">Conseguido ✔</button></td>`; }); table.appendChild(tbody); missingListEl.appendChild(table); }
         window.deleteMissingProduct = async function(id) { if (!confirm("¿Marcar este producto como conseguido? Se eliminará de la lista.")) return; await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq("id", id); fetchMissingProducts(); }
 
         // V. FUNCIONES DE INVENTARIO (PRINCIPAL)
@@ -598,7 +621,13 @@
             if (typeof str !== 'string') return '';
             return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         }
-        async function fetchProducts() { const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); if (error) { console.error("Error cargando productos:", error); totalCount.textContent = "Error al cargar"; productsEl.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } allProducts = data; filterAndRenderProducts(); }
+        async function fetchProducts() { 
+            const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
+            if (error) { console.error("Error cargando productos:", error); totalCount.textContent = "Error al cargar"; productsEl.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
+            allProducts = data; 
+            filterAndRenderProducts(); 
+            updateAutocompleteList(allProducts, inventorySuggestions); // Actualiza la lista de autocompletado principal
+        }
         function filterAndRenderProducts() { const term = (searchInput.value || "").toLowerCase().trim(); const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProducts(filtered); }
         function renderProducts(items) { productsLoader.innerHTML = ""; productsEl.innerHTML = ""; totalCount.textContent = `${items.length} productos`; if (items.length === 0) { productsEl.innerHTML = `<p class="text-gray-400">No se encontraron productos${searchInput.value ? ' para "' + searchInput.value + '"' : ''}.</p>`; return; } const grouped = items.reduce((acc, p) => { const cat = p.category || 'Sin Categoría'; if (!acc[cat]) acc[cat] = []; acc[cat].push(p); return acc; }, {}); Object.keys(grouped).sort().forEach(category => { const section = document.createElement("div"); section.className = "mb-10"; section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; const grid = document.createElement("div"); grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; grouped[category].forEach(p => { const card = document.createElement("div"); card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; card.innerHTML = `<button onclick="handleEditClick('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div><h3 class="font-semibold text-white">${p.name}</h3><p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p><p class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700"><div class="flex gap-2"><button onclick="changeQty('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button><button onclick="changeQty('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button></div><button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button></div>`; grid.appendChild(card); }); section.appendChild(grid); productsEl.appendChild(section); }); }
         window.handleEditClick = (id, name, price) => { const newName = prompt("Nuevo nombre:", name); if (newName === null || newName.trim() === "") return; const newPrice = prompt("Nuevo precio (USD):", Number(price).toFixed(2)); if (newPrice === null) return; editProduct(id, newName, newPrice); }; async function editProduct(id, newName, newPrice) { const priceValue = parseFloat(newPrice); if (isNaN(priceValue) || priceValue < 0) { alert("Precio inválido."); return; } const { error } = await supabase.from(PRODUCTS_TABLE).update({ name: newName.trim(), price: priceValue }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchProducts(); }
@@ -606,12 +635,32 @@
         window.deleteProduct = async function(id) { if (!confirm("¿Eliminar este producto?")) return; await supabase.from(PRODUCTS_TABLE).delete().eq("id", id); fetchProducts(); }
         
         // VI. FUNCIONES DE INVENTARIO (EL TRANSITO)
-        async function fetchProductsET() { const { data, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); if (error) { console.error("Error cargando productos (El Transito):", error); totalCountET.textContent = "Error al cargar"; productsElET.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } allProductsElTransito = data; filterAndRenderProductsET(); }
+        async function fetchProductsET() { 
+            const { data, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
+            if (error) { console.error("Error cargando productos (El Transito):", error); totalCountET.textContent = "Error al cargar"; productsElET.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
+            allProductsElTransito = data; 
+            filterAndRenderProductsET(); 
+            updateAutocompleteList(allProductsElTransito, inventorySuggestionsET); // Actualiza la lista de autocompletado El Transito
+        }
         function filterAndRenderProductsET() { const term = (searchInputET.value || "").toLowerCase().trim(); const filtered = allProductsElTransito.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProductsET(filtered); }
         function renderProductsET(items) { productsLoaderET.innerHTML = ""; productsElET.innerHTML = ""; totalCountET.textContent = `${items.length} productos`; if (items.length === 0) { productsElET.innerHTML = `<p class="text-gray-400">No se encontraron productos${searchInputET.value ? ' para "' + searchInputET.value + '"' : ''}.</p>`; return; } const grouped = items.reduce((acc, p) => { const cat = p.category || 'Sin Categoría'; if (!acc[cat]) acc[cat] = []; acc[cat].push(p); return acc; }, {}); Object.keys(grouped).sort().forEach(category => { const section = document.createElement("div"); section.className = "mb-10"; section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; const grid = document.createElement("div"); grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; grouped[category].forEach(p => { const card = document.createElement("div"); card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; card.innerHTML = `<button onclick="handleEditClickET('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div><h3 class="font-semibold text-white">${p.name}</h3><p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p><p class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700"><div class="flex gap-2"><button onclick="changeQtyET('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button><button onclick="changeQtyET('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button></div><button onclick="deleteProductET('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button></div>`; grid.appendChild(card); }); section.appendChild(grid); productsElET.appendChild(section); }); }
         window.handleEditClickET = (id, name, price) => { const newName = prompt("Nuevo nombre (El Transito):", name); if (newName === null || newName.trim() === "") return; const newPrice = prompt("Nuevo precio (USD) (El Transito):", Number(price).toFixed(2)); if (newPrice === null) return; editProductET(id, newName, newPrice); }; async function editProductET(id, newName, newPrice) { const priceValue = parseFloat(newPrice); if (isNaN(priceValue) || priceValue < 0) { alert("Precio inválido."); return; } const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ name: newName.trim(), price: priceValue }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchProductsET(); }
         window.changeQtyET = async function(id, delta) { const { data } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("quantity").eq("id", id).single(); const newQty = Math.max(0, (data.quantity || 0) + delta); await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ quantity: newQty }).eq("id", id); fetchProductsET(); }
         window.deleteProductET = async function(id) { if (!confirm("¿Eliminar este producto de Inventario El Transito?")) return; await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).delete().eq("id", id); fetchProductsET(); }
+
+        // =================================================================================
+        // == Funciones para Autocompletado                                              ==
+        // =================================================================================
+        function updateAutocompleteList(productsArray, datalistElement) {
+            // Limpia la lista actual
+            datalistElement.innerHTML = '';
+            // Agrega una opción por cada producto con stock > 0
+            productsArray.filter(p => p.quantity > 0).forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.name;
+                datalistElement.appendChild(option);
+            });
+        }
 
         // =================================================================================
         // == Lógica de subida de imágenes a R2 a través de Edge Function                ==
@@ -809,16 +858,18 @@
         });
 
         // =========================================================================
-        // MODIFICACIÓN: Descuento de stock en la venta principal
+        // LÓGICA DE VENTA PRINCIPAL (con validación de producto y descuento de stock)
         // =========================================================================
         salesForm.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("sale-submit"); 
             submitBtn.disabled = true; 
+            const soldProductName = productNameSoldIn.value.trim();
+            
             try { 
                 const newSale = {
                     recipient_name: recipientNameIn.value,
-                    product_name_sold: productNameSoldIn.value.trim(),
+                    product_name_sold: soldProductName,
                     price: parseFloat(salePriceIn.value),
                     sale_date: saleDateIn.value,
                     status: saleStatusInput.value
@@ -830,34 +881,30 @@
 
                 // 2. Lógica para descontar stock si el estado es 'Pagado'
                 if (newSale.status === 'Pagado') {
-                    // Buscar el producto en el inventario principal por nombre (búsqueda insensible a mayúsculas/minúsculas)
-                    const { data: productData, error: productError } = await supabase
-                        .from(PRODUCTS_TABLE)
-                        .select("id, quantity")
-                        .ilike("name", newSale.product_name_sold)
-                        .limit(1)
-                        .single();
+                    // Buscar el producto en el array de inventario (coincidencia exacta)
+                    const productToUpdate = allProducts.find(p => p.name.trim() === soldProductName);
 
-                    if (productError && productError.code !== 'PGRST116') { // PGRST116 es 'No rows found'
-                         console.warn("⚠️ Advertencia: Error al buscar producto para stock, continuando con el registro de venta.", productError.message);
-                    }
-                    
-                    if (productData) {
-                        const newQty = Math.max(0, (productData.quantity || 0) - 1);
-                        // Descontar la cantidad
-                        const { error: updateError } = await supabase
-                            .from(PRODUCTS_TABLE)
-                            .update({ quantity: newQty })
-                            .eq("id", productData.id);
-
-                        if (updateError) {
-                            console.error("❌ Error al descontar stock:", updateError.message);
+                    if (productToUpdate) {
+                        if (productToUpdate.quantity <= 0) {
+                            console.warn(`⚠️ Advertencia: El stock de ${soldProductName} es 0. No se puede descontar.`);
                         } else {
-                            console.log(`✅ Stock descontado para: ${newSale.product_name_sold}. Nuevo stock: ${newQty}`);
-                            fetchProducts(); // Refrescar inventario principal
+                            const newQty = Math.max(0, productToUpdate.quantity - 1);
+                            
+                            // Descontar la cantidad en la base de datos
+                            const { error: updateError } = await supabase
+                                .from(PRODUCTS_TABLE)
+                                .update({ quantity: newQty })
+                                .eq("id", productToUpdate.id);
+
+                            if (updateError) {
+                                console.error("❌ Error al descontar stock:", updateError.message);
+                            } else {
+                                console.log(`✅ Stock descontado para: ${soldProductName}. Nuevo stock: ${newQty}`);
+                                fetchProducts(); // Refrescar inventario principal y lista de autocompletado
+                            }
                         }
                     } else {
-                        console.log(`ℹ️ Producto no encontrado en Inventario Principal: ${newSale.product_name_sold}. No se descontó stock.`);
+                        console.warn(`ℹ️ Producto no encontrado en Inventario Principal: ${soldProductName}. No se descontó stock. Asegúrese de seleccionar de la lista de sugerencias.`);
                     }
                 }
 
@@ -873,16 +920,18 @@
         });
 
         // =========================================================================
-        // MODIFICACIÓN: Descuento de stock en la venta El Transito
+        // LÓGICA DE VENTA EL TRANSITO (con validación de producto y descuento de stock)
         // =========================================================================
         salesFormET.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("sale-submit-et"); 
             submitBtn.disabled = true; 
+            const soldProductNameET = productNameSoldInET.value.trim();
+
             try { 
                 const newSaleET = {
                     recipient_name: recipientNameInET.value,
-                    product_name_sold: productNameSoldInET.value.trim(),
+                    product_name_sold: soldProductNameET,
                     price: parseFloat(salePriceInET.value),
                     sale_date: saleDateInET.value,
                     status: saleStatusInputET.value
@@ -894,34 +943,30 @@
 
                 // 2. Lógica para descontar stock si el estado es 'Pagado'
                 if (newSaleET.status === 'Pagado') {
-                    // Buscar el producto en el inventario El Transito por nombre (búsqueda insensible a mayúsculas/minúsculas)
-                    const { data: productDataET, error: productErrorET } = await supabase
-                        .from(PRODUCTS_EL_TRANSITO_TABLE)
-                        .select("id, quantity")
-                        .ilike("name", newSaleET.product_name_sold)
-                        .limit(1)
-                        .single();
-
-                    if (productErrorET && productErrorET.code !== 'PGRST116') {
-                         console.warn("⚠️ Advertencia: Error al buscar producto para stock (ET), continuando con el registro de venta.", productErrorET.message);
-                    }
+                    // Buscar el producto en el array de inventario El Transito (coincidencia exacta)
+                    const productToUpdateET = allProductsElTransito.find(p => p.name.trim() === soldProductNameET);
                     
-                    if (productDataET) {
-                        const newQtyET = Math.max(0, (productDataET.quantity || 0) - 1);
-                        // Descontar la cantidad
-                        const { error: updateErrorET } = await supabase
-                            .from(PRODUCTS_EL_TRANSITO_TABLE)
-                            .update({ quantity: newQtyET })
-                            .eq("id", productDataET.id);
-
-                        if (updateErrorET) {
-                            console.error("❌ Error al descontar stock (ET):", updateErrorET.message);
+                    if (productToUpdateET) {
+                        if (productToUpdateET.quantity <= 0) {
+                            console.warn(`⚠️ Advertencia: El stock (ET) de ${soldProductNameET} es 0. No se puede descontar.`);
                         } else {
-                            console.log(`✅ Stock (ET) descontado para: ${newSaleET.product_name_sold}. Nuevo stock: ${newQtyET}`);
-                            fetchProductsET(); // Refrescar inventario El Transito
+                            const newQtyET = Math.max(0, productToUpdateET.quantity - 1);
+                            
+                            // Descontar la cantidad en la base de datos
+                            const { error: updateErrorET } = await supabase
+                                .from(PRODUCTS_EL_TRANSITO_TABLE)
+                                .update({ quantity: newQtyET })
+                                .eq("id", productToUpdateET.id);
+
+                            if (updateErrorET) {
+                                console.error("❌ Error al descontar stock (ET):", updateErrorET.message);
+                            } else {
+                                console.log(`✅ Stock (ET) descontado para: ${soldProductNameET}. Nuevo stock: ${newQtyET}`);
+                                fetchProductsET(); // Refrescar inventario El Transito y lista de autocompletado
+                            }
                         }
                     } else {
-                        console.log(`ℹ️ Producto no encontrado en Inventario El Transito: ${newSaleET.product_name_sold}. No se descontó stock.`);
+                        console.warn(`ℹ️ Producto no encontrado en Inventario El Transito: ${soldProductNameET}. No se descontó stock. Asegúrese de seleccionar de la lista de sugerencias.`);
                     }
                 }
 
@@ -963,9 +1008,9 @@
         
         // NUEVO: Event Listener para cuando se selecciona un archivo en el editor de imágenes oculto
         toolImageEditorInput.addEventListener('change', async (event) => {
-            if (!editingToolId) return; // No hacer nada si no hay un ID guardado
+            if (!editingToolId) return; 
             const file = event.target.files[0];
-            if (!file) return; // No hacer nada si el usuario cancela la selección
+            if (!file) return; 
 
             alert('Subiendo nueva imagen... La página se refrescará al terminar.');
 
@@ -982,14 +1027,13 @@
 
                 if (error) throw error;
 
-                await fetchTools(); // Refresca la lista de herramientas para mostrar la nueva imagen
+                await fetchTools(); 
                 alert('✅ Imagen actualizada correctamente.');
 
             } catch (error) {
                 console.error('Error al actualizar la imagen de la herramienta:', error);
                 alert('❌ Error: ' + error.message);
             } finally {
-                // Limpiar el estado para futuras ediciones
                 editingToolId = null;
                 toolImageEditorInput.value = '';
             }
