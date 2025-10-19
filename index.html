@@ -40,7 +40,7 @@
         @keyframes pulse { 50% { opacity: .4; } }
 
         /********************************/
-        /* Estilos del Modal (Lightbox) - CORREGIDOS */
+        /* Estilos del Modal (Lightbox) */
         /********************************/
         .modal-backdrop {
             position: fixed;
@@ -58,7 +58,6 @@
         .modal-content {
             max-width: 90%;
             max-height: 90%;
-            /* Quitar pointer-events: none para permitir que el clic en el fondo cierre el modal */
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
             border-radius: 0.5rem;
             overflow: hidden;
@@ -66,7 +65,7 @@
         .modal-content img {
             display: block;
             width: auto;
-            max-height: 90vh; /* Ajuste para que se vea bien en pantallas grandes/pequeñas */
+            max-height: 90vh; 
             max-width: 90vw;
             object-fit: contain;
         }
@@ -504,7 +503,7 @@
         // == Funciones del Modal (Lightbox) - CORREGIDO                                 ==
         // =================================================================================
         window.openModal = function(imageUrl) {
-            // Se debe usar la URL sin el parámetro de tiempo para que no se vea como un nuevo archivo
+            // Se usa la URL sin el parámetro de tiempo para que la URL sea más limpia en el modal
             const cleanUrl = imageUrl.split('?')[0]; 
             modalImage.src = cleanUrl;
             imageModal.classList.remove('hidden');
