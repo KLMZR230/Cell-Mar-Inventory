@@ -201,7 +201,7 @@
                 </div>
                 <label for="logo-upload" class="bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 transition duration-300 cursor-pointer text-sm shadow-sm">Logo 🖼️</label>
                 <input type="file" id="logo-upload" title="Sube una nueva imagen para tu logo" accept="image/*" />
-                <button id="logo-save-button" class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 shadow-md disabled:bg-gray-500 disabled:cursor-not-allowed text-sm" disabled>Guardar</button>
+                <button id="logo-save-button" class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed text-sm" disabled>Guardar</button>
             </div>
         </div>
     </header>
@@ -381,7 +381,7 @@
                      <span id="total-tools-count" class="text-gray-400 text-sm"></span>
                  </div>
                  <div id="tools-loader" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
-                 <div id="tools-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                 <div id="tools-list" class="grid grid-cols-1 md:col-cols-2 lg:grid-cols-3 gap-6"></div>
             </section>
         </div>
 
@@ -590,7 +590,7 @@
 
         // IV. FUNCIONES DE PRODUCTOS FALTANTES
         async function fetchMissingProducts() { const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false }); if (error) { console.error("Error cargando productos faltantes:", error); totalMissingCount.textContent = "Error al cargar"; return; } allMissingProducts = data; renderMissingProducts(allMissingProducts); }
-        function renderMissingProducts(items) { missingListLoader.innerHTML = ""; missingListEl.innerHTML = ""; totalMissingCount.textContent = `${items.length} productos`; if (items.length === 0) { missingListEl.innerHTML = `<p class="p-4 text-gray-400">No hay productos faltantes registrados.</p>`; return; } const table = document.createElement('table'); table.className = 'min-w-full divide-y divide-gray-700'; table.innerHTML = `<thead><tr><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto y Notas</th><th class="px-6 py-3 bg-gray-700"></th></tr></thead>`; const tbody = document.createElement('tbody'); tbody.className = 'bg-gray-800 divide-y divide-gray-700'; items.forEach(item => { const row = tbody.insertRow(); const notesHtml = item.notes ? `<p class="text-xs text-gray-400 mt-1">${item.notes}</p>` : ''; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm"><span class="font-medium text-white">${item.product_name}</span>${notesHtml}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteMissingProduct('${item.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded shadow text-xs transition">Conseguido ✔</button></td>`; }); table.appendChild(tbody); missingListEl.appendChild(table); }
+        function renderMissingProducts(items) { missingListLoader.innerHTML = ""; missingListEl.innerHTML = ""; totalMissingCount.textContent = `${items.length} productos`; if (items.length === 0) { missingListEl.innerHTML = `<p class="p-4 text-gray-400">No hay productos faltantes registrados.</p>`; return; } const table = document.createElement('table'); table.className = 'min-w-full divide-y divide-gray-700'; table.innerHTML = `<thead><tr><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto y Notas</th><th class="px-6 py-3 bg-gray-700"></th></tr></thead>`; const tbody = document.createElement('tbody'); tbody.className = 'bg-gray-800 divide-y divide-gray-700'; items.forEach(item => { const row = tbody.insertCell(); const notesHtml = item.notes ? `<p class="text-xs text-gray-400 mt-1">${item.notes}</p>` : ''; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm"><span class="font-medium text-white">${item.product_name}</span>${notesHtml}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteMissingProduct('${item.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded shadow text-xs transition">Conseguido ✔</button></td>`; }); table.appendChild(tbody); missingListEl.appendChild(table); }
         window.deleteMissingProduct = async function(id) { if (!confirm("¿Marcar este producto como conseguido? Se eliminará de la lista.")) return; await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq("id", id); fetchMissingProducts(); }
 
         // V. FUNCIONES DE INVENTARIO (PRINCIPAL)
@@ -808,9 +808,134 @@
             } 
         });
 
-        salesForm.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("sale-submit"); submitBtn.disabled = true; try { await supabase.from(SALES_TABLE).insert({ recipient_name: recipientNameIn.value, product_name_sold: productNameSoldIn.value, price: parseFloat(salePriceIn.value), sale_date: saleDateIn.value, status: saleStatusInput.value }); salesForm.reset(); saleDateIn.value = new Date().toISOString().split('T')[0]; fetchSales(); setStatusMessage(saleStatus, "Venta registrada con éxito ✅", true); } catch (err) { setStatusMessage(saleStatus, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
-        salesFormET.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("sale-submit-et"); submitBtn.disabled = true; try { await supabase.from(SALES_EL_TRANSITO_TABLE).insert({ recipient_name: recipientNameInET.value, product_name_sold: productNameSoldInET.value, price: parseFloat(salePriceInET.value), sale_date: saleDateInET.value, status: saleStatusInputET.value }); salesFormET.reset(); saleDateInET.value = new Date().toISOString().split('T')[0]; fetchSalesElTransito(); setStatusMessage(saleStatusET, "Venta (El Transito) registrada con éxito ✅", true); } catch (err) { setStatusMessage(saleStatusET, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
-        
+        // =========================================================================
+        // MODIFICACIÓN: Descuento de stock en la venta principal
+        // =========================================================================
+        salesForm.addEventListener("submit", async (ev) => { 
+            ev.preventDefault(); 
+            const submitBtn = document.getElementById("sale-submit"); 
+            submitBtn.disabled = true; 
+            try { 
+                const newSale = {
+                    recipient_name: recipientNameIn.value,
+                    product_name_sold: productNameSoldIn.value.trim(),
+                    price: parseFloat(salePriceIn.value),
+                    sale_date: saleDateIn.value,
+                    status: saleStatusInput.value
+                };
+
+                // 1. Registrar la venta
+                const { error: saleError } = await supabase.from(SALES_TABLE).insert(newSale); 
+                if (saleError) throw saleError;
+
+                // 2. Lógica para descontar stock si el estado es 'Pagado'
+                if (newSale.status === 'Pagado') {
+                    // Buscar el producto en el inventario principal por nombre (búsqueda insensible a mayúsculas/minúsculas)
+                    const { data: productData, error: productError } = await supabase
+                        .from(PRODUCTS_TABLE)
+                        .select("id, quantity")
+                        .ilike("name", newSale.product_name_sold)
+                        .limit(1)
+                        .single();
+
+                    if (productError && productError.code !== 'PGRST116') { // PGRST116 es 'No rows found'
+                         console.warn("⚠️ Advertencia: Error al buscar producto para stock, continuando con el registro de venta.", productError.message);
+                    }
+                    
+                    if (productData) {
+                        const newQty = Math.max(0, (productData.quantity || 0) - 1);
+                        // Descontar la cantidad
+                        const { error: updateError } = await supabase
+                            .from(PRODUCTS_TABLE)
+                            .update({ quantity: newQty })
+                            .eq("id", productData.id);
+
+                        if (updateError) {
+                            console.error("❌ Error al descontar stock:", updateError.message);
+                        } else {
+                            console.log(`✅ Stock descontado para: ${newSale.product_name_sold}. Nuevo stock: ${newQty}`);
+                            fetchProducts(); // Refrescar inventario principal
+                        }
+                    } else {
+                        console.log(`ℹ️ Producto no encontrado en Inventario Principal: ${newSale.product_name_sold}. No se descontó stock.`);
+                    }
+                }
+
+                salesForm.reset(); 
+                saleDateIn.value = new Date().toISOString().split('T')[0]; 
+                fetchSales(); 
+                setStatusMessage(saleStatus, "Venta registrada con éxito ✅", true); 
+            } catch (err) { 
+                setStatusMessage(saleStatus, "Error: " + err.message, false); 
+            } finally { 
+                submitBtn.disabled = false; 
+            } 
+        });
+
+        // =========================================================================
+        // MODIFICACIÓN: Descuento de stock en la venta El Transito
+        // =========================================================================
+        salesFormET.addEventListener("submit", async (ev) => { 
+            ev.preventDefault(); 
+            const submitBtn = document.getElementById("sale-submit-et"); 
+            submitBtn.disabled = true; 
+            try { 
+                const newSaleET = {
+                    recipient_name: recipientNameInET.value,
+                    product_name_sold: productNameSoldInET.value.trim(),
+                    price: parseFloat(salePriceInET.value),
+                    sale_date: saleDateInET.value,
+                    status: saleStatusInputET.value
+                };
+
+                // 1. Registrar la venta
+                const { error: saleErrorET } = await supabase.from(SALES_EL_TRANSITO_TABLE).insert(newSaleET); 
+                if (saleErrorET) throw saleErrorET;
+
+                // 2. Lógica para descontar stock si el estado es 'Pagado'
+                if (newSaleET.status === 'Pagado') {
+                    // Buscar el producto en el inventario El Transito por nombre (búsqueda insensible a mayúsculas/minúsculas)
+                    const { data: productDataET, error: productErrorET } = await supabase
+                        .from(PRODUCTS_EL_TRANSITO_TABLE)
+                        .select("id, quantity")
+                        .ilike("name", newSaleET.product_name_sold)
+                        .limit(1)
+                        .single();
+
+                    if (productErrorET && productErrorET.code !== 'PGRST116') {
+                         console.warn("⚠️ Advertencia: Error al buscar producto para stock (ET), continuando con el registro de venta.", productErrorET.message);
+                    }
+                    
+                    if (productDataET) {
+                        const newQtyET = Math.max(0, (productDataET.quantity || 0) - 1);
+                        // Descontar la cantidad
+                        const { error: updateErrorET } = await supabase
+                            .from(PRODUCTS_EL_TRANSITO_TABLE)
+                            .update({ quantity: newQtyET })
+                            .eq("id", productDataET.id);
+
+                        if (updateErrorET) {
+                            console.error("❌ Error al descontar stock (ET):", updateErrorET.message);
+                        } else {
+                            console.log(`✅ Stock (ET) descontado para: ${newSaleET.product_name_sold}. Nuevo stock: ${newQtyET}`);
+                            fetchProductsET(); // Refrescar inventario El Transito
+                        }
+                    } else {
+                        console.log(`ℹ️ Producto no encontrado en Inventario El Transito: ${newSaleET.product_name_sold}. No se descontó stock.`);
+                    }
+                }
+
+                salesFormET.reset(); 
+                saleDateInET.value = new Date().toISOString().split('T')[0]; 
+                fetchSalesElTransito(); 
+                setStatusMessage(saleStatusET, "Venta (El Transito) registrada con éxito ✅", true); 
+            } catch (err) { 
+                setStatusMessage(saleStatusET, "Error: " + err.message, false); 
+            } finally { 
+                submitBtn.disabled = false; 
+            } 
+        });
+
         missingProductForm.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("missing-product-submit"); submitBtn.disabled = true; try { await supabase.from(MISSING_PRODUCTS_TABLE).insert({ product_name: missingProductNameIn.value, notes: missingProductNotesIn.value || null }); missingProductForm.reset(); fetchMissingProducts(); setStatusMessage(missingProductStatus, "Producto agregado a la lista ✅", true); } catch (err) { setStatusMessage(missingProductStatus, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
         
         toolForm.addEventListener("submit", async (ev) => {
