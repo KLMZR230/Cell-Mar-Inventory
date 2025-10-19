@@ -546,8 +546,41 @@
                 salesListEl.appendChild(table);
             });
         }
+        
+        // MODIFICACIÓN: changeSaleStatus para descontar stock si el nuevo estado es 'Pagado'
+        window.changeSaleStatus = async function(id, newStatus) { 
+            if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) return; 
+            
+            // 1. Obtener el registro de venta actual para saber el producto y el estado anterior
+            const { data: saleData, error: fetchError } = await supabase.from(SALES_TABLE).select("product_name_sold, status").eq("id", id).single();
+            if (fetchError || !saleData) {
+                alert("❌ Error al obtener datos de la venta: " + (fetchError ? fetchError.message : "Venta no encontrada"));
+                return;
+            }
 
-        window.changeSaleStatus = async function(id, newStatus) { if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) return; const { error } = await supabase.from(SALES_TABLE).update({ status: newStatus }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSales(); }
+            const oldStatus = saleData.status;
+            const soldProductWithCategory = saleData.product_name_sold;
+            const soldProductName = getCleanProductName(soldProductWithCategory);
+
+            // 2. Actualizar el estado de la venta
+            const { error: updateError } = await supabase.from(SALES_TABLE).update({ status: newStatus }).eq("id", id); 
+            if (updateError) {
+                alert("❌ Error al actualizar el estado: " + updateError.message); 
+                return;
+            }
+            
+            // 3. Lógica de descuento/reverso de stock
+            if (newStatus === 'Pagado' && oldStatus !== 'Pagado') {
+                // Descontar stock (Venta que pasa a Pagado)
+                await updateProductStock(soldProductName, PRODUCTS_TABLE, allProducts, -1);
+            } else if (oldStatus === 'Pagado' && newStatus !== 'Pagado') {
+                // Revertir stock (Venta que deja de ser Pagada)
+                await updateProductStock(soldProductName, PRODUCTS_TABLE, allProducts, 1);
+            }
+            
+            fetchSales(); // Refrescar la lista de ventas y el inventario (a través de updateProductStock)
+        }
+        
         window.editSalePrice = async function(id, currentPrice) { const newPriceRaw = prompt("Ingrese el nuevo precio (USD):", currentPrice); if (newPriceRaw === null || newPriceRaw.trim() === "") return; const newPrice = parseFloat(newPriceRaw); if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } const { error } = await supabase.from(SALES_TABLE).update({ price: newPrice }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSales(); }
         window.deleteSale = async function(id) { if (!confirm("¿Eliminar este registro de venta?")) return; await supabase.from(SALES_TABLE).delete().eq("id", id); fetchSales(); }
 
@@ -606,8 +639,41 @@
                 salesListElET.appendChild(table);
             });
         }
+        
+        // MODIFICACIÓN: changeSaleStatusET para descontar stock si el nuevo estado es 'Pagado'
+        window.changeSaleStatusET = async function(id, newStatus) { 
+            if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) return; 
+            
+            // 1. Obtener el registro de venta actual para saber el producto y el estado anterior
+            const { data: saleData, error: fetchError } = await supabase.from(SALES_EL_TRANSITO_TABLE).select("product_name_sold, status").eq("id", id).single();
+            if (fetchError || !saleData) {
+                alert("❌ Error al obtener datos de la venta (ET): " + (fetchError ? fetchError.message : "Venta no encontrada"));
+                return;
+            }
 
-        window.changeSaleStatusET = async function(id, newStatus) { if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) return; const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ status: newStatus }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSalesElTransito(); }
+            const oldStatus = saleData.status;
+            const soldProductWithCategory = saleData.product_name_sold;
+            const soldProductName = getCleanProductName(soldProductWithCategory);
+
+            // 2. Actualizar el estado de la venta
+            const { error: updateError } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ status: newStatus }).eq("id", id); 
+            if (updateError) {
+                alert("❌ Error al actualizar el estado (ET): " + updateError.message); 
+                return;
+            }
+            
+            // 3. Lógica de descuento/reverso de stock
+            if (newStatus === 'Pagado' && oldStatus !== 'Pagado') {
+                // Descontar stock (Venta que pasa a Pagado)
+                await updateProductStock(soldProductName, PRODUCTS_EL_TRANSITO_TABLE, allProductsElTransito, -1);
+            } else if (oldStatus === 'Pagado' && newStatus !== 'Pagado') {
+                // Revertir stock (Venta que deja de ser Pagada)
+                await updateProductStock(soldProductName, PRODUCTS_EL_TRANSITO_TABLE, allProductsElTransito, 1);
+            }
+            
+            fetchSalesElTransito(); // Refrescar la lista de ventas y el inventario (a través de updateProductStock)
+        }
+
         window.editSalePriceET = async function(id, currentPrice) { const newPriceRaw = prompt("Ingrese el nuevo precio (USD) (El Transito):", currentPrice); if (newPriceRaw === null || newPriceRaw.trim() === "") return; const newPrice = parseFloat(newPriceRaw); if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ price: newPrice }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSalesElTransito(); }
         window.deleteSaleET = async function(id) { if (!confirm("¿Eliminar este registro de venta?")) return; await supabase.from(SALES_EL_TRANSITO_TABLE).delete().eq("id", id); fetchSalesElTransito(); }
 
@@ -649,11 +715,11 @@
         window.deleteProductET = async function(id) { if (!confirm("¿Eliminar este producto de Inventario El Transito?")) return; await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).delete().eq("id", id); fetchProductsET(); }
 
         // =================================================================================
-        // == Funciones para Autocompletado (MODIFICADA para incluir la categoría)       ==
+        // == Funciones para Autocompletado                                              ==
         // =================================================================================
         function updateAutocompleteList(productsArray, datalistElement) {
             datalistElement.innerHTML = '';
-            // Agrega el nombre del producto y su categoría (si existe)
+            // Agrega el nombre del producto y su categoría
             productsArray.filter(p => p.quantity > 0).forEach(product => {
                 const option = document.createElement('option');
                 option.value = product.name + (product.category ? ` (${product.category})` : '');
@@ -668,6 +734,41 @@
                 return match[1].trim(); // Retorna solo el nombre antes del paréntesis
             }
             return inputName.trim(); // Si no hay categoría, retorna el input tal cual
+        }
+
+        // =================================================================================
+        // == NUEVA FUNCIÓN: Lógica para actualizar stock genérica (reutilizada)          ==
+        // =================================================================================
+        async function updateProductStock(productName, table, localArray, delta) {
+            const productToUpdate = localArray.find(p => p.name.trim() === productName);
+
+            if (productToUpdate) {
+                const currentQty = productToUpdate.quantity || 0;
+                const newQty = Math.max(0, currentQty + delta);
+                
+                // Prevenir descuento si ya está en 0 y el delta es negativo 
+                if (delta < 0 && currentQty <= 0) {
+                     console.warn(`⚠️ Advertencia: Stock de ${productName} ya es 0. No se puede descontar.`);
+                     return;
+                }
+                
+                // Descontar/Revertir la cantidad en la base de datos
+                const { error: updateError } = await supabase
+                    .from(table)
+                    .update({ quantity: newQty })
+                    .eq("id", productToUpdate.id);
+
+                if (updateError) {
+                    console.error("❌ Error al actualizar stock:", updateError.message);
+                } else {
+                    console.log(`✅ Stock actualizado para: ${productName}. Nuevo stock: ${newQty}`);
+                    // Refrescar el inventario correcto (esto es vital para actualizar `allProducts` y `allProductsElTransito`)
+                    if (table === PRODUCTS_TABLE) fetchProducts();
+                    else fetchProductsET();
+                }
+            } else {
+                console.warn(`ℹ️ Producto no encontrado en inventario por nombre exacto: ${productName}. No se modificó stock.`);
+            }
         }
 
 
@@ -875,7 +976,7 @@
             submitBtn.disabled = true; 
             
             const soldProductWithCategory = productNameSoldIn.value.trim();
-            const soldProductName = getCleanProductName(soldProductWithCategory); // Extrae solo el nombre
+            const soldProductName = getCleanProductName(soldProductWithCategory); 
 
             try { 
                 const newSale = {
@@ -892,31 +993,7 @@
 
                 // 2. Lógica para descontar stock si el estado es 'Pagado'
                 if (newSale.status === 'Pagado') {
-                    // Buscar el producto en el array de inventario (coincidencia con el nombre LIMPIO)
-                    const productToUpdate = allProducts.find(p => p.name.trim() === soldProductName);
-
-                    if (productToUpdate) {
-                        if (productToUpdate.quantity <= 0) {
-                            console.warn(`⚠️ Advertencia: El stock de ${soldProductName} es 0. No se puede descontar.`);
-                        } else {
-                            const newQty = Math.max(0, productToUpdate.quantity - 1);
-                            
-                            // Descontar la cantidad en la base de datos
-                            const { error: updateError } = await supabase
-                                .from(PRODUCTS_TABLE)
-                                .update({ quantity: newQty })
-                                .eq("id", productToUpdate.id);
-
-                            if (updateError) {
-                                console.error("❌ Error al descontar stock:", updateError.message);
-                            } else {
-                                console.log(`✅ Stock descontado para: ${soldProductName}. Nuevo stock: ${newQty}`);
-                                fetchProducts(); // Refrescar inventario principal y lista de autocompletado
-                            }
-                        }
-                    } else {
-                        console.warn(`ℹ️ Producto no encontrado en Inventario Principal por nombre exacto: ${soldProductName}. No se descontó stock.`);
-                    }
+                    await updateProductStock(soldProductName, PRODUCTS_TABLE, allProducts, -1);
                 }
 
                 salesForm.reset(); 
@@ -939,7 +1016,7 @@
             submitBtn.disabled = true; 
 
             const soldProductWithCategoryET = productNameSoldInET.value.trim();
-            const soldProductNameET = getCleanProductName(soldProductWithCategoryET); // Extrae solo el nombre
+            const soldProductNameET = getCleanProductName(soldProductWithCategoryET); 
 
             try { 
                 const newSaleET = {
@@ -956,31 +1033,7 @@
 
                 // 2. Lógica para descontar stock si el estado es 'Pagado'
                 if (newSaleET.status === 'Pagado') {
-                    // Buscar el producto en el array de inventario El Transito (coincidencia con el nombre LIMPIO)
-                    const productToUpdateET = allProductsElTransito.find(p => p.name.trim() === soldProductNameET);
-                    
-                    if (productToUpdateET) {
-                        if (productToUpdateET.quantity <= 0) {
-                            console.warn(`⚠️ Advertencia: El stock (ET) de ${soldProductNameET} es 0. No se puede descontar.`);
-                        } else {
-                            const newQtyET = Math.max(0, productToUpdateET.quantity - 1);
-                            
-                            // Descontar la cantidad en la base de datos
-                            const { error: updateErrorET } = await supabase
-                                .from(PRODUCTS_EL_TRANSITO_TABLE)
-                                .update({ quantity: newQtyET })
-                                .eq("id", productToUpdateET.id);
-
-                            if (updateErrorET) {
-                                console.error("❌ Error al descontar stock (ET):", updateErrorET.message);
-                            } else {
-                                console.log(`✅ Stock (ET) descontado para: ${soldProductNameET}. Nuevo stock: ${newQtyET}`);
-                                fetchProductsET(); // Refrescar inventario El Transito y lista de autocompletado
-                            }
-                        }
-                    } else {
-                        console.warn(`ℹ️ Producto no encontrado en Inventario El Transito por nombre exacto: ${soldProductNameET}. No se descontó stock.`);
-                    }
+                    await updateProductStock(soldProductNameET, PRODUCTS_EL_TRANSITO_TABLE, allProductsElTransito, -1);
                 }
 
                 salesFormET.reset(); 
