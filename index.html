@@ -323,7 +323,6 @@
                             <span id="total-paid-amount-et" class="font-bold text-green-500">$0.00</span>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Progreso:</span>
                             <span id="paid-percentage-et" class="font-bold text-indigo-400">0%</span>
                         </div>
                     </div>
@@ -450,7 +449,7 @@
         const currentViewTitle = document.getElementById("current-view-title");
         const formET = document.getElementById("product-form-et"), nameInET = document.getElementById("name-et"), categoryInET = document.getElementById("category-select-et"), priceInET = document.getElementById("price-et"), qtyInET = document.getElementById("quantity-et"), imageInET = document.getElementById("image-et"), statusET = document.getElementById("status-et"), productsElET = document.getElementById("products-et"), totalCountET = document.getElementById("total-count-et"), searchInputET = document.getElementById("search-input-et"), productsLoaderET = document.getElementById("products-loader-et");
         const toolForm = document.getElementById("tool-form"), toolTitleIn = document.getElementById("tool-title"), toolDescriptionIn = document.getElementById("tool-description"), toolImageIn = document.getElementById("tool-image"), toolStatus = document.getElementById("tool-status"), toolsListEl = document.getElementById("tools-list"), totalToolsCount = document.getElementById("total-tools-count"), toolsLoader = document.getElementById("tools-loader");
-        const toolImageEditorInput = document.getElementById('tool-image-editor-input'); // NUEVO: Input para editar imagen
+        const toolImageEditorInput = document.getElementById('tool-image-editor-input'); 
         
         // Elementos Datalist
         const inventorySuggestions = document.getElementById('inventory-suggestions');
@@ -608,7 +607,8 @@
             });
         }
 
-        window.changeSaleStatusET = async function(id, currentPrice) { const newPriceRaw = prompt("Ingrese el nuevo precio (USD) (El Transito):", currentPrice); if (newPriceRaw === null || newPriceRaw.trim() === "") return; const newPrice = parseFloat(newPriceRaw); if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ price: newPrice }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSalesElTransito(); }
+        window.changeSaleStatusET = async function(id, newStatus) { if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) return; const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ status: newStatus }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSalesElTransito(); }
+        window.editSalePriceET = async function(id, currentPrice) { const newPriceRaw = prompt("Ingrese el nuevo precio (USD) (El Transito):", currentPrice); if (newPriceRaw === null || newPriceRaw.trim() === "") return; const newPrice = parseFloat(newPriceRaw); if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ price: newPrice }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSalesElTransito(); }
         window.deleteSaleET = async function(id) { if (!confirm("¿Eliminar este registro de venta?")) return; await supabase.from(SALES_EL_TRANSITO_TABLE).delete().eq("id", id); fetchSalesElTransito(); }
 
         // IV. FUNCIONES DE PRODUCTOS FALTANTES
@@ -649,18 +649,27 @@
         window.deleteProductET = async function(id) { if (!confirm("¿Eliminar este producto de Inventario El Transito?")) return; await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).delete().eq("id", id); fetchProductsET(); }
 
         // =================================================================================
-        // == Funciones para Autocompletado                                              ==
+        // == Funciones para Autocompletado (MODIFICADA para incluir la categoría)       ==
         // =================================================================================
         function updateAutocompleteList(productsArray, datalistElement) {
-            // Limpia la lista actual
             datalistElement.innerHTML = '';
-            // Agrega una opción por cada producto con stock > 0
+            // Agrega el nombre del producto y su categoría (si existe)
             productsArray.filter(p => p.quantity > 0).forEach(product => {
                 const option = document.createElement('option');
-                option.value = product.name;
+                option.value = product.name + (product.category ? ` (${product.category})` : '');
                 datalistElement.appendChild(option);
             });
         }
+        
+        // Función auxiliar para extraer el nombre limpio del producto
+        function getCleanProductName(inputName) {
+            const match = inputName.match(/^(.*?)\s+\((.*?)\)$/);
+            if (match) {
+                return match[1].trim(); // Retorna solo el nombre antes del paréntesis
+            }
+            return inputName.trim(); // Si no hay categoría, retorna el input tal cual
+        }
+
 
         // =================================================================================
         // == Lógica de subida de imágenes a R2 a través de Edge Function                ==
@@ -864,12 +873,14 @@
             ev.preventDefault(); 
             const submitBtn = document.getElementById("sale-submit"); 
             submitBtn.disabled = true; 
-            const soldProductName = productNameSoldIn.value.trim();
             
+            const soldProductWithCategory = productNameSoldIn.value.trim();
+            const soldProductName = getCleanProductName(soldProductWithCategory); // Extrae solo el nombre
+
             try { 
                 const newSale = {
                     recipient_name: recipientNameIn.value,
-                    product_name_sold: soldProductName,
+                    product_name_sold: soldProductWithCategory, // Se guarda el nombre COMPLETO en el registro de venta
                     price: parseFloat(salePriceIn.value),
                     sale_date: saleDateIn.value,
                     status: saleStatusInput.value
@@ -881,7 +892,7 @@
 
                 // 2. Lógica para descontar stock si el estado es 'Pagado'
                 if (newSale.status === 'Pagado') {
-                    // Buscar el producto en el array de inventario (coincidencia exacta)
+                    // Buscar el producto en el array de inventario (coincidencia con el nombre LIMPIO)
                     const productToUpdate = allProducts.find(p => p.name.trim() === soldProductName);
 
                     if (productToUpdate) {
@@ -904,7 +915,7 @@
                             }
                         }
                     } else {
-                        console.warn(`ℹ️ Producto no encontrado en Inventario Principal: ${soldProductName}. No se descontó stock. Asegúrese de seleccionar de la lista de sugerencias.`);
+                        console.warn(`ℹ️ Producto no encontrado en Inventario Principal por nombre exacto: ${soldProductName}. No se descontó stock.`);
                     }
                 }
 
@@ -926,12 +937,14 @@
             ev.preventDefault(); 
             const submitBtn = document.getElementById("sale-submit-et"); 
             submitBtn.disabled = true; 
-            const soldProductNameET = productNameSoldInET.value.trim();
+
+            const soldProductWithCategoryET = productNameSoldInET.value.trim();
+            const soldProductNameET = getCleanProductName(soldProductWithCategoryET); // Extrae solo el nombre
 
             try { 
                 const newSaleET = {
                     recipient_name: recipientNameInET.value,
-                    product_name_sold: soldProductNameET,
+                    product_name_sold: soldProductWithCategoryET, // Se guarda el nombre COMPLETO en el registro de venta
                     price: parseFloat(salePriceInET.value),
                     sale_date: saleDateInET.value,
                     status: saleStatusInputET.value
@@ -943,7 +956,7 @@
 
                 // 2. Lógica para descontar stock si el estado es 'Pagado'
                 if (newSaleET.status === 'Pagado') {
-                    // Buscar el producto en el array de inventario El Transito (coincidencia exacta)
+                    // Buscar el producto en el array de inventario El Transito (coincidencia con el nombre LIMPIO)
                     const productToUpdateET = allProductsElTransito.find(p => p.name.trim() === soldProductNameET);
                     
                     if (productToUpdateET) {
@@ -966,7 +979,7 @@
                             }
                         }
                     } else {
-                        console.warn(`ℹ️ Producto no encontrado en Inventario El Transito: ${soldProductNameET}. No se descontó stock. Asegúrese de seleccionar de la lista de sugerencias.`);
+                        console.warn(`ℹ️ Producto no encontrado en Inventario El Transito por nombre exacto: ${soldProductNameET}. No se descontó stock.`);
                     }
                 }
 
