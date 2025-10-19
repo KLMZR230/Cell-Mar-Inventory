@@ -28,12 +28,7 @@
         .product-card, .tool-card { transition: transform 0.2s, box-shadow 0.3s; }
         .product-card:hover, .tool-card:hover { transform: translateY(-5px); }
         #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
-        
-        /* --- CORRECCIÓN CLAVE --- */
-        /* Esta regla ahora se aplica a CUALQUIER elemento con la clase .hidden */
-        .hidden { 
-            display: none; 
-        }
+        .hidden { display: none; }
         
         .skeleton-card { background-color: transparent; border-radius: 0.5rem; padding: 1rem; display: flex; flex-direction: column; }
         .skeleton-line {
@@ -43,38 +38,6 @@
             animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         @keyframes pulse { 50% { opacity: .4; } }
-
-        /********************************/
-        /* Estilos del Modal (Lightbox) */
-        /********************************/
-        .modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            cursor: pointer;
-        }
-        .modal-content {
-            max-width: 90%;
-            max-height: 90%;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-            border-radius: 0.5rem;
-            overflow: hidden;
-        }
-        .modal-content img {
-            display: block;
-            width: auto;
-            max-height: 90vh; 
-            max-width: 90vw;
-            object-fit: contain;
-        }
-
 
         /********************************/
         /* TEMA 1: Dark (Predeterminado) */
@@ -432,11 +395,6 @@
         <footer class="mt-10 text-center text-gray-400 text-sm">Panel de Inventario — Cell Smart</footer>
     </div>
 
-    <div id="image-modal" class="modal-backdrop hidden" onclick="closeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <img id="modal-image" src="" alt="Imagen ampliada del producto">
-        </div>
-    </div>
     <input type="file" id="tool-image-editor-input" class="hidden" accept="image/*" />
     
     <script type="module">
@@ -496,28 +454,9 @@
         // Elementos Datalist
         const inventorySuggestions = document.getElementById('inventory-suggestions');
         const inventorySuggestionsET = document.getElementById('inventory-suggestions-et');
-        // Elementos del Modal
-        const imageModal = document.getElementById('image-modal');
-        const modalImage = document.getElementById('modal-image');
-
-
+        
         let allProducts = [], allProductsElTransito = [], allSales = [], allSalesElTransito = [], allMissingProducts = [], allTools = [], selectedLogoFile = null;
         let editingToolId = null; 
-
-        // =================================================================================
-        // == Funciones del Modal (Lightbox) - CORREGIDO                                 ==
-        // =================================================================================
-        window.openModal = function(imageUrl) {
-            // Se usa la URL sin el parámetro de tiempo para que la URL sea más limpia en el modal
-            const cleanUrl = imageUrl.split('?')[0]; 
-            modalImage.src = cleanUrl;
-            imageModal.classList.remove('hidden');
-        }
-
-        window.closeModal = function() {
-            imageModal.classList.add('hidden');
-            modalImage.src = '';
-        }
 
         // I. GESTIÓN DE VISTAS Y CARGA
         const views = { 
@@ -607,11 +546,9 @@
             });
         }
         
-        // MODIFICACIÓN: changeSaleStatus para descontar stock si el nuevo estado es 'Pagado'
         window.changeSaleStatus = async function(id, newStatus) { 
             if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) return; 
             
-            // 1. Obtener el registro de venta actual para saber el producto y el estado anterior
             const { data: saleData, error: fetchError } = await supabase.from(SALES_TABLE).select("product_name_sold, status").eq("id", id).single();
             if (fetchError || !saleData) {
                 alert("❌ Error al obtener datos de la venta: " + (fetchError ? fetchError.message : "Venta no encontrada"));
@@ -622,23 +559,19 @@
             const soldProductWithCategory = saleData.product_name_sold;
             const soldProductName = getCleanProductName(soldProductWithCategory);
 
-            // 2. Actualizar el estado de la venta
             const { error: updateError } = await supabase.from(SALES_TABLE).update({ status: newStatus }).eq("id", id); 
             if (updateError) {
                 alert("❌ Error al actualizar el estado: " + updateError.message); 
                 return;
             }
             
-            // 3. Lógica de descuento/reverso de stock
             if (newStatus === 'Pagado' && oldStatus !== 'Pagado') {
-                // Descontar stock (Venta que pasa a Pagado)
                 await updateProductStock(soldProductName, PRODUCTS_TABLE, allProducts, -1);
             } else if (oldStatus === 'Pagado' && newStatus !== 'Pagado') {
-                // Revertir stock (Venta que deja de ser Pagada)
                 await updateProductStock(soldProductName, PRODUCTS_TABLE, allProducts, 1);
             }
             
-            fetchSales(); // Refrescar la lista de ventas y el inventario (a través de updateProductStock)
+            fetchSales();
         }
         
         window.editSalePrice = async function(id, currentPrice) { const newPriceRaw = prompt("Ingrese el nuevo precio (USD):", currentPrice); if (newPriceRaw === null || newPriceRaw.trim() === "") return; const newPrice = parseFloat(newPriceRaw); if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } const { error } = await supabase.from(SALES_TABLE).update({ price: newPrice }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSales(); }
@@ -700,11 +633,9 @@
             });
         }
         
-        // MODIFICACIÓN: changeSaleStatusET para descontar stock si el nuevo estado es 'Pagado'
         window.changeSaleStatusET = async function(id, newStatus) { 
             if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) return; 
             
-            // 1. Obtener el registro de venta actual para saber el producto y el estado anterior
             const { data: saleData, error: fetchError } = await supabase.from(SALES_EL_TRANSITO_TABLE).select("product_name_sold, status").eq("id", id).single();
             if (fetchError || !saleData) {
                 alert("❌ Error al obtener datos de la venta (ET): " + (fetchError ? fetchError.message : "Venta no encontrada"));
@@ -715,23 +646,19 @@
             const soldProductWithCategory = saleData.product_name_sold;
             const soldProductName = getCleanProductName(soldProductWithCategory);
 
-            // 2. Actualizar el estado de la venta
             const { error: updateError } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ status: newStatus }).eq("id", id); 
             if (updateError) {
                 alert("❌ Error al actualizar el estado (ET): " + updateError.message); 
                 return;
             }
             
-            // 3. Lógica de descuento/reverso de stock
             if (newStatus === 'Pagado' && oldStatus !== 'Pagado') {
-                // Descontar stock (Venta que pasa a Pagado)
                 await updateProductStock(soldProductName, PRODUCTS_EL_TRANSITO_TABLE, allProductsElTransito, -1);
             } else if (oldStatus === 'Pagado' && newStatus !== 'Pagado') {
-                // Revertir stock (Venta que deja de ser Pagada)
                 await updateProductStock(soldProductName, PRODUCTS_EL_TRANSITO_TABLE, allProductsElTransito, 1);
             }
             
-            fetchSalesElTransito(); // Refrescar la lista de ventas y el inventario (a través de updateProductStock)
+            fetchSalesElTransito();
         }
 
         window.editSalePriceET = async function(id, currentPrice) { const newPriceRaw = prompt("Ingrese el nuevo precio (USD) (El Transito):", currentPrice); if (newPriceRaw === null || newPriceRaw.trim() === "") return; const newPrice = parseFloat(newPriceRaw); if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ price: newPrice }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSalesElTransito(); }
@@ -752,7 +679,7 @@
             if (error) { console.error("Error cargando productos:", error); totalCount.textContent = "Error al cargar"; productsEl.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
             allProducts = data; 
             filterAndRenderProducts(); 
-            updateAutocompleteList(allProducts, inventorySuggestions); // Actualiza la lista de autocompletado principal
+            updateAutocompleteList(allProducts, inventorySuggestions);
         }
         function filterAndRenderProducts() { const term = (searchInput.value || "").toLowerCase().trim(); const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProducts(filtered); }
         function renderProducts(items) { 
@@ -780,8 +707,7 @@
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
                     
-                    // Modificación: Agregar onclick="openModal(this.src)" a la imagen
-                    card.innerHTML = `<button onclick="handleEditClick('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" class="object-contain h-full w-full cursor-pointer" loading="lazy" alt="${p.name}" onclick="openModal(this.src)"></div><h3 class="font-semibold text-white">${p.name}</h3><p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p><p class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700"><div class="flex gap-2"><button onclick="changeQty('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button><button onclick="changeQty('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button></div><button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button></div>`; 
+                    card.innerHTML = `<button onclick="handleEditClick('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div><h3 class="font-semibold text-white">${p.name}</h3><p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p><p class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700"><div class="flex gap-2"><button onclick="changeQty('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button><button onclick="changeQty('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button></div><button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button></div>`; 
                     grid.appendChild(card); 
                 }); 
                 section.appendChild(grid); 
@@ -798,7 +724,7 @@
             if (error) { console.error("Error cargando productos (El Transito):", error); totalCountET.textContent = "Error al cargar"; productsElET.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
             allProductsElTransito = data; 
             filterAndRenderProductsET(); 
-            updateAutocompleteList(allProductsElTransito, inventorySuggestionsET); // Actualiza la lista de autocompletado El Transito
+            updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
         }
         function filterAndRenderProductsET() { const term = (searchInputET.value || "").toLowerCase().trim(); const filtered = allProductsElTransito.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProductsET(filtered); }
         function renderProductsET(items) { 
@@ -826,8 +752,7 @@
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
                     
-                    // Modificación: Agregar onclick="openModal(this.src)" a la imagen
-                    card.innerHTML = `<button onclick="handleEditClickET('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" class="object-contain h-full w-full cursor-pointer" loading="lazy" alt="${p.name}" onclick="openModal(this.src)"></div><h3 class="font-semibold text-white">${p.name}</h3><p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p><p class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700"><div class="flex gap-2"><button onclick="changeQtyET('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button><button onclick="changeQtyET('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button></div><button onclick="deleteProductET('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button></div>`; 
+                    card.innerHTML = `<button onclick="handleEditClickET('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div><h3 class="font-semibold text-white">${p.name}</h3><p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p><p class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700"><div class="flex gap-2"><button onclick="changeQtyET('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button><button onclick="changeQtyET('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button></div><button onclick="deleteProductET('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button></div>`; 
                     grid.appendChild(card); 
                 }); 
                 section.appendChild(grid); 
@@ -843,7 +768,6 @@
         // =================================================================================
         function updateAutocompleteList(productsArray, datalistElement) {
             datalistElement.innerHTML = '';
-            // Agrega el nombre del producto y su categoría
             productsArray.filter(p => p.quantity > 0).forEach(product => {
                 const option = document.createElement('option');
                 option.value = product.name + (product.category ? ` (${product.category})` : '');
@@ -851,17 +775,16 @@
             });
         }
         
-        // Función auxiliar para extraer el nombre limpio del producto
         function getCleanProductName(inputName) {
             const match = inputName.match(/^(.*?)\s+\((.*?)\)$/);
             if (match) {
-                return match[1].trim(); // Retorna solo el nombre antes del paréntesis
+                return match[1].trim();
             }
-            return inputName.trim(); // Si no hay categoría, retorna el input tal cual
+            return inputName.trim();
         }
 
         // =================================================================================
-        // == NUEVA FUNCIÓN: Lógica para actualizar stock genérica (reutilizada)          ==
+        // == Lógica para actualizar stock genérica (reutilizada)                        ==
         // =================================================================================
         async function updateProductStock(productName, table, localArray, delta) {
             const productToUpdate = localArray.find(p => p.name.trim() === productName);
@@ -870,13 +793,11 @@
                 const currentQty = productToUpdate.quantity || 0;
                 const newQty = Math.max(0, currentQty + delta);
                 
-                // Prevenir descuento si ya está en 0 y el delta es negativo 
                 if (delta < 0 && currentQty <= 0) {
                      console.warn(`⚠️ Advertencia: Stock de ${productName} ya es 0. No se puede descontar.`);
                      return;
                 }
                 
-                // Descontar/Revertir la cantidad en la base de datos
                 const { error: updateError } = await supabase
                     .from(table)
                     .update({ quantity: newQty })
@@ -886,7 +807,6 @@
                     console.error("❌ Error al actualizar stock:", updateError.message);
                 } else {
                     console.log(`✅ Stock actualizado para: ${productName}. Nuevo stock: ${newQty}`);
-                    // Refrescar el inventario correcto (esto es vital para actualizar `allProducts` y `allProductsElTransito`)
                     if (table === PRODUCTS_TABLE) fetchProducts();
                     else fetchProductsET();
                 }
@@ -1035,10 +955,9 @@
             });
         }
         
-        // NUEVO: Función para iniciar la edición de la imagen de una herramienta
         window.editToolImage = function(id) {
-            editingToolId = id; // Guarda el ID de la herramienta que queremos editar
-            toolImageEditorInput.click(); // Dispara el click en el input de archivo oculto
+            editingToolId = id;
+            toolImageEditorInput.click();
         }
 
         window.deleteTool = async function(id) {
@@ -1091,9 +1010,6 @@
             } 
         });
 
-        // =========================================================================
-        // LÓGICA DE VENTA PRINCIPAL (con validación de producto y descuento de stock)
-        // =========================================================================
         salesForm.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("sale-submit"); 
@@ -1105,17 +1021,15 @@
             try { 
                 const newSale = {
                     recipient_name: recipientNameIn.value,
-                    product_name_sold: soldProductWithCategory, // Se guarda el nombre COMPLETO en el registro de venta
+                    product_name_sold: soldProductWithCategory,
                     price: parseFloat(salePriceIn.value),
                     sale_date: saleDateIn.value,
                     status: saleStatusInput.value
                 };
 
-                // 1. Registrar la venta
                 const { error: saleError } = await supabase.from(SALES_TABLE).insert(newSale); 
                 if (saleError) throw saleError;
 
-                // 2. Lógica para descontar stock si el estado es 'Pagado'
                 if (newSale.status === 'Pagado') {
                     await updateProductStock(soldProductName, PRODUCTS_TABLE, allProducts, -1);
                 }
@@ -1131,9 +1045,6 @@
             } 
         });
 
-        // =========================================================================
-        // LÓGICA DE VENTA EL TRANSITO (con validación de producto y descuento de stock)
-        // =========================================================================
         salesFormET.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("sale-submit-et"); 
@@ -1145,17 +1056,15 @@
             try { 
                 const newSaleET = {
                     recipient_name: recipientNameInET.value,
-                    product_name_sold: soldProductWithCategoryET, // Se guarda el nombre COMPLETO en el registro de venta
+                    product_name_sold: soldProductWithCategoryET,
                     price: parseFloat(salePriceInET.value),
                     sale_date: saleDateInET.value,
                     status: saleStatusInputET.value
                 };
 
-                // 1. Registrar la venta
                 const { error: saleErrorET } = await supabase.from(SALES_EL_TRANSITO_TABLE).insert(newSaleET); 
                 if (saleErrorET) throw saleErrorET;
 
-                // 2. Lógica para descontar stock si el estado es 'Pagado'
                 if (newSaleET.status === 'Pagado') {
                     await updateProductStock(soldProductNameET, PRODUCTS_EL_TRANSITO_TABLE, allProductsElTransito, -1);
                 }
@@ -1196,7 +1105,6 @@
             }
         });
         
-        // NUEVO: Event Listener para cuando se selecciona un archivo en el editor de imágenes oculto
         toolImageEditorInput.addEventListener('change', async (event) => {
             if (!editingToolId) return; 
             const file = event.target.files[0];
