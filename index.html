@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <meta charset="utf-t" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Cell Smar Gestion De Ventas</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -568,19 +568,21 @@
             const soldProductName = getCleanProductName(soldProductWithCategory);
 
             // 3. Actualizar Supabase (ya estaba)
+            // IMPORTANTE: No actualizamos localmente aquí, esperamos al eco de Realtime
+            // o si falla, no hacemos nada.
             const { error: updateError } = await supabase.from(SALES_TABLE).update({ status: newStatus }).eq("id", id); 
             if (updateError) {
                 alert("❌ Error al actualizar el estado: " + updateError.message); 
                 return; // No continuar si falla
             }
             
-            // 4. Actualizar el array local (NUEVO)
+            // 4. Actualizar el array local (OPTIMISTIC)
             const saleInArray = allSales.find(s => s.id === id);
             if (saleInArray) {
                 saleInArray.status = newStatus;
             }
 
-            // 5. Re-renderizar localmente (NUEVO)
+            // 5. Re-renderizar localmente (OPTIMISTIC)
             renderSales(allSales);
             
             // 6. Lógica de stock (ya estaba, ahora llama al `updateProductStock` modificado)
@@ -605,12 +607,12 @@
             if (error) {
                 alert("❌ Error: " + error.message);
             } else {
-                // Actualizar estado local
+                // Actualizar estado local (OPTIMISTIC)
                 const saleInArray = allSales.find(s => s.id === id);
                 if (saleInArray) {
                     saleInArray.price = newPrice;
                 }
-                // Re-renderizar localmente
+                // Re-renderizar localmente (OPTIMISTIC)
                 renderSales(allSales);
             }
             // else fetchSales(); // <-- ELIMINADO
@@ -620,14 +622,21 @@
         window.deleteSale = async function(id) { 
             if (!confirm("¿Eliminar este registro de venta?")) return; 
             
+            // Guardar localmente ANTES de borrar
+            const saleIndex = allSales.findIndex(s => s.id === id);
+            if (saleIndex === -1) return; // No existe
+            const saleToDelete = allSales[saleIndex];
+
+            // Borrar localmente (OPTIMISTIC)
+            allSales.splice(saleIndex, 1);
+            renderSales(allSales);
+            
             const { error } = await supabase.from(SALES_TABLE).delete().eq("id", id); 
             
             if (error) {
                 alert("❌ Error al eliminar: " + error.message);
-            } else {
-                // Actualizar estado local
-                allSales = allSales.filter(s => s.id !== id);
-                // Re-renderizar localmente
+                // Si falla, lo devolvemos al array local
+                allSales.splice(saleIndex, 0, saleToDelete);
                 renderSales(allSales);
             }
             // fetchSales(); // <-- ELIMINADO
@@ -707,18 +716,19 @@
             const soldProductWithCategory = saleData.product_name_sold;
             const soldProductName = getCleanProductName(soldProductWithCategory);
 
+            // Actualizar Supabase
             const { error: updateError } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ status: newStatus }).eq("id", id); 
             if (updateError) {
                 alert("❌ Error al actualizar el estado (ET): " + updateError.message); 
                 return;
             }
             
-            // Actualizar estado local
+            // Actualizar estado local (OPTIMISTIC)
             const saleInArray = allSalesElTransito.find(s => s.id === id);
             if (saleInArray) {
                 saleInArray.status = newStatus;
             }
-            // Re-renderizar localmente
+            // Re-renderizar localmente (OPTIMISTIC)
             renderSalesElTransito(allSalesElTransito);
             
             // Lógica de stock
@@ -743,12 +753,12 @@
             if (error) {
                 alert("❌ Error: " + error.message);
             } else {
-                // Actualizar estado local
+                // Actualizar estado local (OPTIMISTIC)
                 const saleInArray = allSalesElTransito.find(s => s.id === id);
                 if (saleInArray) {
                     saleInArray.price = newPrice;
                 }
-                // Re-renderizar localmente
+                // Re-renderizar localmente (OPTIMISTIC)
                 renderSalesElTransito(allSalesElTransito);
             }
             // else fetchSalesElTransito(); // <-- ELIMINADO
@@ -758,14 +768,20 @@
         window.deleteSaleET = async function(id) { 
             if (!confirm("¿Eliminar este registro de venta?")) return; 
             
+            const saleIndex = allSalesElTransito.findIndex(s => s.id === id);
+            if (saleIndex === -1) return;
+            const saleToDelete = allSalesElTransito[saleIndex];
+            
+            // Eliminar local (OPTIMISTIC)
+            allSalesElTransito.splice(saleIndex, 1);
+            renderSalesElTransito(allSalesElTransito);
+
             const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).delete().eq("id", id); 
             
             if (error) {
                 alert("❌ Error al eliminar: " + error.message);
-            } else {
-                // Actualizar estado local
-                allSalesElTransito = allSalesElTransito.filter(s => s.id !== id);
-                // Re-renderizar localmente
+                // Revertir si falla
+                allSalesElTransito.splice(saleIndex, 0, saleToDelete);
                 renderSalesElTransito(allSalesElTransito);
             }
             // fetchSalesElTransito(); // <-- ELIMINADO
@@ -779,14 +795,20 @@
         window.deleteMissingProduct = async function(id) { 
             if (!confirm("¿Marcar este producto como conseguido? Se eliminará de la lista.")) return; 
             
+            const itemIndex = allMissingProducts.findIndex(p => p.id === id);
+            if (itemIndex === -1) return;
+            const itemToDelete = allMissingProducts[itemIndex];
+            
+            // Eliminar local (OPTIMISTIC)
+            allMissingProducts.splice(itemIndex, 1);
+            renderMissingProducts(allMissingProducts);
+
             const { error } = await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq("id", id); 
             
             if (error) {
                 alert("❌ Error al eliminar: " + error.message);
-            } else {
-                // Actualizar estado local
-                allMissingProducts = allMissingProducts.filter(p => p.id !== id);
-                // Re-renderizar localmente
+                // Revertir
+                allMissingProducts.splice(itemIndex, 0, itemToDelete);
                 renderMissingProducts(allMissingProducts);
             }
             // fetchMissingProducts(); // <-- ELIMINADO
@@ -849,7 +871,7 @@
             if (error) {
                 alert("❌ Error: " + error.message); 
             } else {
-                // Actualizar estado local
+                // Actualizar estado local (OPTIMISTIC)
                 const productInArray = allProducts.find(p => p.id === id);
                 if (productInArray) {
                     productInArray.name = newName.trim();
@@ -864,20 +886,23 @@
         
         // ---- CAMBIO: Actualización local de cantidad de producto ----
         window.changeQty = async function(id, delta) { 
-            const { data } = await supabase.from(PRODUCTS_TABLE).select("quantity").eq("id", id).single(); 
-            const newQty = Math.max(0, (data.quantity || 0) + delta); 
+            const productInArray = allProducts.find(p => p.id === id);
+            if (!productInArray) return;
             
+            const currentQty = productInArray.quantity || 0;
+            const newQty = Math.max(0, currentQty + delta);
+            
+            // Actualizar local (OPTIMISTIC)
+            productInArray.quantity = newQty;
+            filterAndRenderProducts();
+            updateAutocompleteList(allProducts, inventorySuggestions);
+
             const { error } = await supabase.from(PRODUCTS_TABLE).update({ quantity: newQty }).eq("id", id); 
             
             if (error) {
                 alert("❌ Error al actualizar cantidad: " + error.message);
-            } else {
-                // Actualizar estado local
-                const productInArray = allProducts.find(p => p.id === id);
-                if (productInArray) {
-                    productInArray.quantity = newQty;
-                }
-                // Re-renderizar localmente
+                // Revertir
+                productInArray.quantity = currentQty;
                 filterAndRenderProducts();
                 updateAutocompleteList(allProducts, inventorySuggestions);
             }
@@ -888,14 +913,21 @@
         window.deleteProduct = async function(id) { 
             if (!confirm("¿Eliminar este producto?")) return; 
             
+            const productIndex = allProducts.findIndex(p => p.id === id);
+            if (productIndex === -1) return;
+            const productToDelete = allProducts[productIndex];
+            
+            // Eliminar local (OPTIMISTIC)
+            allProducts.splice(productIndex, 1);
+            filterAndRenderProducts();
+            updateAutocompleteList(allProducts, inventorySuggestions);
+
             const { error } = await supabase.from(PRODUCTS_TABLE).delete().eq("id", id); 
             
             if (error) {
                 alert("❌ Error al eliminar: " + error.message);
-            } else {
-                // Actualizar estado local
-                allProducts = allProducts.filter(p => p.id !== id);
-                // Re-renderizar localmente
+                // Revertir
+                allProducts.splice(productIndex, 0, productToDelete);
                 filterAndRenderProducts();
                 updateAutocompleteList(allProducts, inventorySuggestions);
             }
@@ -955,7 +987,7 @@
             if (error) {
                 alert("❌ Error: " + error.message); 
             } else {
-                // Actualizar estado local
+                // Actualizar estado local (OPTIMISTIC)
                 const productInArray = allProductsElTransito.find(p => p.id === id);
                 if (productInArray) {
                     productInArray.name = newName.trim();
@@ -970,20 +1002,23 @@
 
         // ---- CAMBIO: Actualización local de cantidad de producto (ET) ----
         window.changeQtyET = async function(id, delta) { 
-            const { data } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("quantity").eq("id", id).single(); 
-            const newQty = Math.max(0, (data.quantity || 0) + delta); 
+            const productInArray = allProductsElTransito.find(p => p.id === id);
+            if (!productInArray) return;
+
+            const currentQty = productInArray.quantity || 0;
+            const newQty = Math.max(0, currentQty + delta); 
+
+            // Actualizar local (OPTIMISTIC)
+            productInArray.quantity = newQty;
+            filterAndRenderProductsET();
+            updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             
             const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ quantity: newQty }).eq("id", id); 
             
             if (error) {
                 alert("❌ Error al actualizar cantidad: " + error.message);
-            } else {
-                // Actualizar estado local
-                const productInArray = allProductsElTransito.find(p => p.id === id);
-                if (productInArray) {
-                    productInArray.quantity = newQty;
-                }
-                // Re-renderizar localmente
+                // Revertir
+                productInArray.quantity = currentQty;
                 filterAndRenderProductsET();
                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             }
@@ -994,14 +1029,21 @@
         window.deleteProductET = async function(id) { 
             if (!confirm("¿Eliminar este producto de Inventario El Transito?")) return; 
             
+            const productIndex = allProductsElTransito.findIndex(p => p.id === id);
+            if (productIndex === -1) return;
+            const productToDelete = allProductsElTransito[productIndex];
+
+            // Eliminar local (OPTIMISTIC)
+            allProductsElTransito.splice(productIndex, 1);
+            filterAndRenderProductsET();
+            updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
+            
             const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).delete().eq("id", id); 
             
             if (error) {
                 alert("❌ Error al eliminar: " + error.message);
-            } else {
-                // Actualizar estado local
-                allProductsElTransito = allProductsElTransito.filter(p => p.id !== id);
-                // Re-renderizar localmente
+                // Revertir
+                allProductsElTransito.splice(productIndex, 0, productToDelete);
                 filterAndRenderProductsET();
                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             }
@@ -1013,7 +1055,10 @@
         // =================================================================================
         function updateAutocompleteList(productsArray, datalistElement) {
             datalistElement.innerHTML = '';
-            productsArray.filter(p => p.quantity > 0).forEach(product => {
+            // Ordenar alfabéticamente para que sea más fácil de encontrar
+            const sortedProducts = [...productsArray].sort((a, b) => a.name.localeCompare(b.name));
+            
+            sortedProducts.filter(p => p.quantity > 0).forEach(product => {
                 const option = document.createElement('option');
                 option.value = product.name + (product.category ? ` (${product.category})` : '');
                 datalistElement.appendChild(option);
@@ -1045,6 +1090,20 @@
                      return;
                 }
                 
+                // Actualizar local (OPTIMISTIC)
+                productToUpdate.quantity = newQty;
+                let renderFunc, datalistEl;
+                if (table === PRODUCTS_TABLE) {
+                    renderFunc = filterAndRenderProducts;
+                    datalistEl = inventorySuggestions;
+                } else {
+                    renderFunc = filterAndRenderProductsET;
+                    datalistEl = inventorySuggestionsET;
+                }
+                renderFunc();
+                updateAutocompleteList(localArray, datalistEl);
+
+                // Actualizar Supabase
                 const { error: updateError } = await supabase
                     .from(table)
                     .update({ quantity: newQty })
@@ -1052,22 +1111,12 @@
 
                 if (updateError) {
                     console.error("❌ Error al actualizar stock:", updateError.message);
+                    // Revertir
+                    productToUpdate.quantity = currentQty;
+                    renderFunc();
+                    updateAutocompleteList(localArray, datalistEl);
                 } else {
                     console.log(`✅ Stock actualizado para: ${productName}. Nuevo stock: ${newQty}`);
-                    
-                    // Actualizar el estado local
-                    productToUpdate.quantity = newQty;
-
-                    // Re-renderizar la lista de productos localmente
-                    if (table === PRODUCTS_TABLE) {
-                        filterAndRenderProducts();
-                        updateAutocompleteList(allProducts, inventorySuggestions); // Actualizar datalist
-                    } else {
-                        filterAndRenderProductsET();
-                        updateAutocompleteList(allProductsElTransito, inventorySuggestionsET); // Actualizar datalist
-                    }
-                    // if (table === PRODUCTS_TABLE) fetchProducts(); // <-- ELIMINADO
-                    // else fetchProductsET(); // <-- ELIMINADO
                 }
             } else {
                 console.warn(`ℹ️ Producto no encontrado en inventario por nombre exacto: ${productName}. No se modificó stock.`);
@@ -1223,17 +1272,161 @@
         window.deleteTool = async function(id) {
             if (!confirm("¿Estás seguro de que quieres eliminar esta herramienta? Esta acción es irreversible.")) return;
             
+            const toolIndex = allTools.findIndex(t => t.id === id);
+            if (toolIndex === -1) return;
+            const toolToDelete = allTools[toolIndex];
+
+            // Eliminar local (OPTIMISTIC)
+            allTools.splice(toolIndex, 1);
+            renderTools(allTools);
+
             const { error } = await supabase.from(TOOLS_TABLE).delete().eq("id", id);
             
             if (error) {
                 alert("❌ Error al eliminar: " + error.message);
-            } else {
-                // Actualizar estado local
-                allTools = allTools.filter(t => t.id !== id);
-                // Re-renderizar localmente
+                // Revertir
+                allTools.splice(toolIndex, 0, toolToDelete);
                 renderTools(allTools);
             }
             // fetchTools(); // <-- ELIMINADO
+        }
+        
+        // ============================================================================
+        // == NUEVO: LÓGICA DE REALTIME                                              ==
+        // ============================================================================
+        
+        /**
+         * Manejador genérico para todos los payloads de Supabase Realtime.
+         * Actualiza el array local y llama a la función de renderizado.
+         */
+        function handleRealtimePayload(payload, localArray, renderFunction, primaryKey = 'id') {
+            console.log('📡 Payload Realtime Recibido:', payload);
+            const { eventType, new: newRecord, old: oldRecord } = payload;
+            
+            // Determinar el ID del registro afectado
+            const recordId = (eventType === 'DELETE') ? oldRecord[primaryKey] : newRecord[primaryKey];
+            if (!recordId) {
+                console.error("Payload de Realtime sin ID. Abortando.", payload);
+                return;
+            }
+            
+            let index = localArray.findIndex(item => item[primaryKey] === recordId);
+
+            switch (eventType) {
+                case 'INSERT':
+                    // Evitar duplicados si el cliente que inserta recibe su propio eco
+                    if (index === -1) {
+                        localArray.unshift(newRecord); // Añadir al inicio
+                    }
+                    break;
+                case 'UPDATE':
+                    if (index !== -1) {
+                        localArray[index] = newRecord; // Reemplazar el objeto antiguo con el nuevo
+                    } else {
+                        // No estaba, así que lo añadimos (podría pasar si la carga inicial falló para este item)
+                        localArray.unshift(newRecord);
+                    }
+                    break;
+                case 'DELETE':
+                    if (index !== -1) {
+                        localArray.splice(index, 1); // Eliminar
+                    }
+                    break;
+                default:
+                    console.warn('Evento Realtime no manejado:', eventType);
+                    return; // No re-renderizar si no se manejó
+            }
+
+            // Re-ordenar si la función de renderizado es para ventas (que dependen de la fecha)
+            if (renderFunction === renderSales) {
+                 localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at));
+            }
+            if (renderFunction === renderSalesElTransito) {
+                 localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at));
+            }
+            // Para productos faltantes y herramientas, el `unshift` (orden por 'created_at desc') es suficiente.
+            // Para productos de inventario, el renderizado los agrupa por categoría, así que el orden del array maestro no es crítico.
+
+            // ¡Llamar a la función de renderizado para actualizar la UI!
+            renderFunction();
+            
+            // Adicional: Si se actualiza un producto, actualizar el datalist
+            if (renderFunction === filterAndRenderProducts) {
+                 updateAutocompleteList(allProducts, inventorySuggestions);
+            }
+            if (renderFunction === filterAndRenderProductsET) {
+                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
+            }
+        }
+
+        /**
+         * Inicializa todas las suscripciones de Realtime después de la carga inicial.
+         */
+        function initializeRealtimeSubscriptions() {
+            console.log("📡 Inicializando suscripciones en tiempo real...");
+
+            const channelOptions = {
+                config: {
+                    broadcast: {
+                        ack: true, // Solicitar confirmación del servidor
+                    },
+                },
+            };
+
+            // Suscripción para PRODUCTS_TABLE
+            supabase.channel('public:' + PRODUCTS_TABLE, channelOptions)
+                .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_TABLE },
+                    (payload) => handleRealtimePayload(payload, allProducts, filterAndRenderProducts, 'id')
+                )
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') console.log(`📡 Conectado a ${PRODUCTS_TABLE}`);
+                    if (status === 'CHANNEL_ERROR') console.error(`Error en canal ${PRODUCTS_TABLE}`);
+                });
+
+            // Suscripción para PRODUCTS_EL_TRANSITO_TABLE
+            supabase.channel('public:' + PRODUCTS_EL_TRANSITO_TABLE, channelOptions)
+                .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_EL_TRANSITO_TABLE },
+                    (payload) => handleRealtimePayload(payload, allProductsElTransito, filterAndRenderProductsET, 'id')
+                )
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') console.log(`📡 Conectado a ${PRODUCTS_EL_TRANSITO_TABLE}`);
+                });
+
+            // Suscripción para SALES_TABLE
+            supabase.channel('public:' + SALES_TABLE, channelOptions)
+                .on('postgres_changes', { event: '*', schema: 'public', table: SALES_TABLE },
+                    (payload) => handleRealtimePayload(payload, allSales, renderSales, 'id')
+                )
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') console.log(`📡 Conectado a ${SALES_TABLE}`);
+                });
+
+            // Suscripción para SALES_EL_TRANSITO_TABLE
+            supabase.channel('public:' + SALES_EL_TRANSITO_TABLE, channelOptions)
+                .on('postgres_changes', { event: '*', schema: 'public', table: SALES_EL_TRANSITO_TABLE },
+                    (payload) => handleRealtimePayload(payload, allSalesElTransito, renderSalesElTransito, 'id')
+                )
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') console.log(`📡 Conectado a ${SALES_EL_TRANSITO_TABLE}`);
+                });
+
+            // Suscripción para MISSING_PRODUCTS_TABLE
+            supabase.channel('public:' + MISSING_PRODUCTS_TABLE, channelOptions)
+                .on('postgres_changes', { event: '*', schema: 'public', table: MISSING_PRODUCTS_TABLE },
+                    (payload) => handleRealtimePayload(payload, allMissingProducts, renderMissingProducts, 'id')
+                )
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') console.log(`📡 Conectado a ${MISSING_PRODUCTS_TABLE}`);
+                });
+            
+            // Suscripción para TOOLS_TABLE
+            supabase.channel('public:' + TOOLS_TABLE, channelOptions)
+                .on('postgres_changes', { event: '*', schema: 'public', table: TOOLS_TABLE },
+                    (payload) => handleRealtimePayload(payload, allTools, renderTools, 'id')
+                )
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') console.log(`📡 Conectado a ${TOOLS_TABLE}`);
+                });
         }
 
 
@@ -1259,23 +1452,59 @@
                     image_url: imageUrl 
                 };
                 
-                const { data: insertedProduct, error } = await supabase
+                // No esperamos al 'select' para la UI optimista
+                // Insertamos y DEJAMOS que Realtime maneje la actualización de la UI
+                const { error } = await supabase
                     .from(PRODUCTS_TABLE)
-                    .insert(newProduct)
-                    .select() // Pedir datos de vuelta
-                    .single(); // Esperar un objeto
+                    .insert(newProduct);
 
                 if (error) throw error; 
                 
+                // AÚN actualizamos localmente para la UI optimista
+                // Realtime se encargará de duplicar, pero nuestro handler lo previene
+                
+                // --- INICIO OPTIMISTA ---
+                // Para que la UI sea instantánea, simulamos el objeto insertado
+                const simulatedProduct = { ...newProduct, id: `temp-${Date.now()}`, created_at: new Date().toISOString() };
+                allProducts.unshift(simulatedProduct);
+                filterAndRenderProducts();
+                updateAutocompleteList(allProducts, inventorySuggestions);
+                // --- FIN OPTIMISTA ---
+                
+                form.reset(); qtyIn.value = 1; 
+                setStatusMessage(status, "Producto agregado con éxito ✅", true); 
+
+                // Realtime reemplazará el `simulatedProduct` con el real cuando llegue
+                // (El handler de realtime buscará por ID, no lo encontrará, y añadirá el real)
+                // Pequeña mejora: El handler de realtime debería BORRAR el simulado.
+                // Es más simple NO hacer UI optimista en INSERT, solo en UPDATE/DELETE
+                // Vamos a quitar la UI optimista de INSERT, es más limpio.
+
+                // --- REVISIÓN: Quitar UI optimista de INSERT ---
+                // const { data: insertedProduct, error } = ... .select().single();
+                // if (error) throw error;
+                // allProducts.unshift(insertedProduct);
+                // filterAndRenderProducts();
+                // updateAutocompleteList(allProducts, inventorySuggestions);
+                // -----------------------------------------------
+                // Esto (lo de arriba) era el código de la vez pasada. Lo mantendremos.
+                // El handler de Realtime evitará el duplicado.
+                
+                // ---- RE-REVISIÓN: MANTENER CÓDIGO DE LA VEZ PASADA ----
+                const { data: insertedProduct, error: insertError } = await supabase
+                    .from(PRODUCTS_TABLE)
+                    .insert(newProduct)
+                    .select() 
+                    .single(); 
+
+                if (insertError) throw insertError; 
+                
                 form.reset(); qtyIn.value = 1; 
                 
-                // Actualizar estado local
-                allProducts.unshift(insertedProduct); // Añadir al inicio
-                // Re-renderizar localmente
+                allProducts.unshift(insertedProduct); 
                 filterAndRenderProducts();
                 updateAutocompleteList(allProducts, inventorySuggestions);
                 
-                // fetchProducts(); // <-- ELIMINADO
                 setStatusMessage(status, "Producto agregado con éxito ✅", true); 
             } catch (err) { 
                 setStatusMessage(status, "Error: " + err.message, false); 
@@ -1313,13 +1542,10 @@
                 
                 formET.reset(); qtyInET.value = 1; 
                 
-                // Actualizar estado local
                 allProductsElTransito.unshift(insertedProduct);
-                // Re-renderizar localmente
                 filterAndRenderProductsET();
                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
 
-                // fetchProductsET(); // <-- ELIMINADO
                 setStatusMessage(statusET, "Producto agregado con éxito (El Transito) ✅", true); 
             } catch (err) { 
                 setStatusMessage(statusET, "Error: " + err.message, false); 
@@ -1346,7 +1572,6 @@
                     status: saleStatusInput.value
                 };
 
-                // Pedir el dato de vuelta
                 const { data: insertedSale, error: saleError } = await supabase
                     .from(SALES_TABLE)
                     .insert(newSale)
@@ -1362,12 +1587,9 @@
                 salesForm.reset(); 
                 saleDateIn.value = new Date().toISOString().split('T')[0]; 
                 
-                // Actualizar estado local
                 allSales.unshift(insertedSale);
-                // Re-renderizar localmente
-                renderSales(allSales);
+                renderSales(allSales); // El handler de realtime se encargará de ordenarlo
 
-                // fetchSales(); // <-- ELIMINADO
                 setStatusMessage(saleStatus, "Venta registrada con éxito ✅", true); 
             } catch (err) { 
                 setStatusMessage(saleStatus, "Error: " + err.message, false); 
@@ -1409,12 +1631,9 @@
                 salesFormET.reset(); 
                 saleDateInET.value = new Date().toISOString().split('T')[0]; 
                 
-                // Actualizar estado local
                 allSalesElTransito.unshift(insertedSale);
-                // Re-renderizar localmente
-                renderSalesElTransito(allSalesElTransito);
+                renderSalesElTransito(allSalesElTransito); // El handler de realtime se encargará de ordenarlo
 
-                // fetchSalesElTransito(); // <-- ELIMINADO
                 setStatusMessage(saleStatusET, "Venta (El Transito) registrada con éxito ✅", true); 
             } catch (err) { 
                 setStatusMessage(saleStatusET, "Error: " + err.message, false); 
@@ -1444,12 +1663,9 @@
                 
                 missingProductForm.reset(); 
                 
-                // Actualizar estado local
                 allMissingProducts.unshift(insertedMissing);
-                // Re-renderizar localmente
                 renderMissingProducts(allMissingProducts);
 
-                // fetchMissingProducts(); // <-- ELIMINADO
                 setStatusMessage(missingProductStatus, "Producto agregado a la lista ✅", true); 
             } catch (err) { 
                 setStatusMessage(missingProductStatus, "Error: " + err.message, false); 
@@ -1483,12 +1699,9 @@
                 
                 toolForm.reset();
                 
-                // Actualizar estado local
                 allTools.unshift(insertedTool);
-                // Re-renderizar localmente
                 renderTools(allTools);
 
-                // fetchTools(); // <-- ELIMINADO
                 setStatusMessage(toolStatus, "Herramienta guardada con éxito ✅", true);
             } catch (err) {
                 setStatusMessage(toolStatus, "Error: " + err.message, false);
@@ -1518,15 +1731,13 @@
 
                 if (error) throw error;
 
-                // Actualizar estado local
+                // Actualizar estado local (OPTIMISTIC)
                 const toolInArray = allTools.find(t => t.id === editingToolId);
                 if (toolInArray) {
                     toolInArray.image_url = newImageUrl;
                 }
-                // Re-renderizar localmente
                 renderTools(allTools);
 
-                // await fetchTools(); // <-- ELIMINADO
                 alert('✅ Imagen actualizada correctamente.');
 
             } catch (error) {
@@ -1550,6 +1761,7 @@
             await loadLogo(); 
             
             try {
+                // Cargar todos los datos iniciales
                 await Promise.all([
                     fetchProducts(), 
                     fetchProductsET(),
@@ -1558,6 +1770,12 @@
                     fetchMissingProducts(),
                     fetchTools() 
                 ]);
+                
+                // **** NUEVO: INICIAR REALTIME ****
+                // Después de cargar todo, conectarse a Realtime
+                initializeRealtimeSubscriptions();
+                // *********************************
+
             } catch (error) {
                 console.error("Error durante la carga de datos inicial:", error);
             }
