@@ -209,6 +209,12 @@
     <div class="container mx-auto px-4 py-6">
         <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario</p>
         
+        <div id="critical-error-container" class="hidden bg-red-800 border border-red-600 text-white p-6 rounded-lg shadow-lg mb-6">
+            <h2 class="text-2xl font-bold mb-3">❌ Error Crítico</h2>
+            <p class="mb-2">La aplicación no pudo cargar los datos iniciales. Por favor, reporta el siguiente error:</p>
+            <pre id="critical-error-message" class="bg-black/50 p-3 rounded text-red-200 whitespace-pre-wrap font-mono"></pre>
+        </div>
+        
         <div id="inventory-view" class="view-section">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
                 <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto</h2>
@@ -567,7 +573,7 @@
             }
             
             // La actualización del stock también activará un evento de realtime, 
-            // así que no necesitamos llamar a fetchSales() o fetchProducts() manualmente.
+            // así que no necesitamos llamar a fetchSales() o fetchProducts() manually.
             if (newStatus === 'Pagado' && oldStatus !== 'Pagado') {
                 await updateProductStock(soldProductName, PRODUCTS_TABLE, allProducts, -1);
             } else if (oldStatus === 'Pagado' && newStatus !== 'Pagado') {
@@ -756,10 +762,9 @@
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
                     
                     // ==========================================================
-                    // == ¡AQUÍ ESTÁ LA LÍNEA CORREGIDA! ==
+                    // == LÍNEA CORREGIDA (de la vez anterior)
                     // ==========================================================
                     card.innerHTML = `<button onclick="handleEditClickET('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div><h3 class="font-semibold text-white">${p.name}</h3><p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p><p class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700"><div class="flex gap-2"><button onclick="changeQtyET('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button><button onclick="changeQtyET('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button></div><button onclick="deleteProductET('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button></div>`; 
-                    // ==========================================================
                     
                     grid.appendChild(card); 
                 }); 
@@ -975,7 +980,7 @@
         }
         
         // ============================================================================
-        // == IX. SUSCRIPCIONES EN TIEMPO REAL (NUEVO)                              ==
+        // == IX. SUSCRIPCIONES EN TIEMPO REAL                                      ==
         // ============================================================================
         function setupRealtimeSubscriptions() {
             console.log("📡 Configurando suscripciones en tiempo real...");
@@ -993,7 +998,7 @@
                 
             // Escuchar cambios en Inventario El Transito
             supabase
-                .channel('public:' + PRODUCTS_EL_TRANSITO_TABLE)
+                .channel('public:'_ + PRODUCTS_EL_TRANSITO_TABLE)
                 .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_EL_TRANSITO_TABLE }, (payload) => {
                     console.log('Cambio detectado en ' + PRODUCTS_EL_TRANSITO_TABLE, payload);
                     fetchProductsET();
@@ -1097,7 +1102,7 @@
             submitBtn.disabled = true; 
             
             const soldProductWithCategory = productNameSoldIn.value.trim();
-            const soldProductName = getCleanProductName(soldProductWithCategory); 
+            const soldProductName = getCleanProductName(soldProductWithCatery); 
 
             try { 
                 const newSale = {
@@ -1246,6 +1251,25 @@
                 
             } catch (error) {
                 console.error("Error durante la carga de datos inicial:", error);
+                
+                // ==========================================================
+                // == ¡NUEVO! MOSTRAR ERROR EN PANTALLA
+                // ==========================================================
+                const errorContainer = document.getElementById('critical-error-container');
+                const errorMessageEl = document.getElementById('critical-error-message');
+                
+                if (errorContainer && errorMessageEl) {
+                    errorMessageEl.textContent = error.message ? error.message : JSON.stringify(error);
+                    errorContainer.classList.remove('hidden');
+                }
+                
+                // Ocultar todos los loaders para que el error sea lo único visible
+                productsLoader.innerHTML = "";
+                productsLoaderET.innerHTML = "";
+                toolsLoader.innerHTML = "";
+                salesListLoader.innerHTML = ""; 
+                salesListLoaderET.innerHTML = "";
+                missingListLoader.innerHTML = ""; 
             }
         });
     </script>
