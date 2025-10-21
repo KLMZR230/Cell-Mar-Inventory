@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-t" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Cell Smar Gestion De Ventas</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -546,9 +546,17 @@
             });
         }
         
+        // ---- CAMBIO: Actualización local de estado de venta ----
         window.changeSaleStatus = async function(id, newStatus) { 
-            if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) return; 
+            // 1. Confirmación (ya estaba)
+            if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) {
+                // Restaurar el select al valor anterior si el usuario cancela
+                const sale = allSales.find(s => s.id === id);
+                if (sale) renderSales(allSales); // Simplemente re-renderiza para resetear el select
+                return; 
+            }
             
+            // 2. Obtener datos antiguos (ya estaba)
             const { data: saleData, error: fetchError } = await supabase.from(SALES_TABLE).select("product_name_sold, status").eq("id", id).single();
             if (fetchError || !saleData) {
                 alert("❌ Error al obtener datos de la venta: " + (fetchError ? fetchError.message : "Venta no encontrada"));
@@ -559,23 +567,71 @@
             const soldProductWithCategory = saleData.product_name_sold;
             const soldProductName = getCleanProductName(soldProductWithCategory);
 
+            // 3. Actualizar Supabase (ya estaba)
             const { error: updateError } = await supabase.from(SALES_TABLE).update({ status: newStatus }).eq("id", id); 
             if (updateError) {
                 alert("❌ Error al actualizar el estado: " + updateError.message); 
-                return;
+                return; // No continuar si falla
             }
             
+            // 4. Actualizar el array local (NUEVO)
+            const saleInArray = allSales.find(s => s.id === id);
+            if (saleInArray) {
+                saleInArray.status = newStatus;
+            }
+
+            // 5. Re-renderizar localmente (NUEVO)
+            renderSales(allSales);
+            
+            // 6. Lógica de stock (ya estaba, ahora llama al `updateProductStock` modificado)
             if (newStatus === 'Pagado' && oldStatus !== 'Pagado') {
                 await updateProductStock(soldProductName, PRODUCTS_TABLE, allProducts, -1);
             } else if (oldStatus === 'Pagado' && newStatus !== 'Pagado') {
                 await updateProductStock(soldProductName, PRODUCTS_TABLE, allProducts, 1);
             }
             
-            fetchSales();
+            // fetchSales(); // <-- ELIMINADO
         }
         
-        window.editSalePrice = async function(id, currentPrice) { const newPriceRaw = prompt("Ingrese el nuevo precio (USD):", currentPrice); if (newPriceRaw === null || newPriceRaw.trim() === "") return; const newPrice = parseFloat(newPriceRaw); if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } const { error } = await supabase.from(SALES_TABLE).update({ price: newPrice }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSales(); }
-        window.deleteSale = async function(id) { if (!confirm("¿Eliminar este registro de venta?")) return; await supabase.from(SALES_TABLE).delete().eq("id", id); fetchSales(); }
+        // ---- CAMBIO: Actualización local de precio de venta ----
+        window.editSalePrice = async function(id, currentPrice) { 
+            const newPriceRaw = prompt("Ingrese el nuevo precio (USD):", currentPrice); 
+            if (newPriceRaw === null || newPriceRaw.trim() === "") return; 
+            const newPrice = parseFloat(newPriceRaw); 
+            if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } 
+            
+            const { error } = await supabase.from(SALES_TABLE).update({ price: newPrice }).eq("id", id); 
+            
+            if (error) {
+                alert("❌ Error: " + error.message);
+            } else {
+                // Actualizar estado local
+                const saleInArray = allSales.find(s => s.id === id);
+                if (saleInArray) {
+                    saleInArray.price = newPrice;
+                }
+                // Re-renderizar localmente
+                renderSales(allSales);
+            }
+            // else fetchSales(); // <-- ELIMINADO
+        }
+
+        // ---- CAMBIO: Eliminación local de venta ----
+        window.deleteSale = async function(id) { 
+            if (!confirm("¿Eliminar este registro de venta?")) return; 
+            
+            const { error } = await supabase.from(SALES_TABLE).delete().eq("id", id); 
+            
+            if (error) {
+                alert("❌ Error al eliminar: " + error.message);
+            } else {
+                // Actualizar estado local
+                allSales = allSales.filter(s => s.id !== id);
+                // Re-renderizar localmente
+                renderSales(allSales);
+            }
+            // fetchSales(); // <-- ELIMINADO
+        }
 
         // III. FUNCIONES DE VENTA (EL TRANSITO)
         async function fetchSalesElTransito() { const { data, error } = await supabase.from(SALES_EL_TRANSITO_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false }); if (error) { console.error("Error cargando ventas (El Transito):", error); totalSalesCountET.textContent = "Error al cargar"; return; } allSalesElTransito = data; renderSalesElTransito(allSalesElTransito); }
@@ -633,8 +689,13 @@
             });
         }
         
+        // ---- CAMBIO: Actualización local de estado de venta (ET) ----
         window.changeSaleStatusET = async function(id, newStatus) { 
-            if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) return; 
+            if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) {
+                const sale = allSalesElTransito.find(s => s.id === id);
+                if (sale) renderSalesElTransito(allSalesElTransito); // Resetear select
+                return; 
+            }
             
             const { data: saleData, error: fetchError } = await supabase.from(SALES_EL_TRANSITO_TABLE).select("product_name_sold, status").eq("id", id).single();
             if (fetchError || !saleData) {
@@ -652,22 +713,84 @@
                 return;
             }
             
+            // Actualizar estado local
+            const saleInArray = allSalesElTransito.find(s => s.id === id);
+            if (saleInArray) {
+                saleInArray.status = newStatus;
+            }
+            // Re-renderizar localmente
+            renderSalesElTransito(allSalesElTransito);
+            
+            // Lógica de stock
             if (newStatus === 'Pagado' && oldStatus !== 'Pagado') {
                 await updateProductStock(soldProductName, PRODUCTS_EL_TRANSITO_TABLE, allProductsElTransito, -1);
             } else if (oldStatus === 'Pagado' && newStatus !== 'Pagado') {
                 await updateProductStock(soldProductName, PRODUCTS_EL_TRANSITO_TABLE, allProductsElTransito, 1);
             }
             
-            fetchSalesElTransito();
+            // fetchSalesElTransito(); // <-- ELIMINADO
         }
 
-        window.editSalePriceET = async function(id, currentPrice) { const newPriceRaw = prompt("Ingrese el nuevo precio (USD) (El Transito):", currentPrice); if (newPriceRaw === null || newPriceRaw.trim() === "") return; const newPrice = parseFloat(newPriceRaw); if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ price: newPrice }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchSalesElTransito(); }
-        window.deleteSaleET = async function(id) { if (!confirm("¿Eliminar este registro de venta?")) return; await supabase.from(SALES_EL_TRANSITO_TABLE).delete().eq("id", id); fetchSalesElTransito(); }
+        // ---- CAMBIO: Actualización local de precio de venta (ET) ----
+        window.editSalePriceET = async function(id, currentPrice) { 
+            const newPriceRaw = prompt("Ingrese el nuevo precio (USD) (El Transito):", currentPrice); 
+            if (newPriceRaw === null || newPriceRaw.trim() === "") return; 
+            const newPrice = parseFloat(newPriceRaw); 
+            if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } 
+            
+            const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ price: newPrice }).eq("id", id); 
+            
+            if (error) {
+                alert("❌ Error: " + error.message);
+            } else {
+                // Actualizar estado local
+                const saleInArray = allSalesElTransito.find(s => s.id === id);
+                if (saleInArray) {
+                    saleInArray.price = newPrice;
+                }
+                // Re-renderizar localmente
+                renderSalesElTransito(allSalesElTransito);
+            }
+            // else fetchSalesElTransito(); // <-- ELIMINADO
+        }
+        
+        // ---- CAMBIO: Eliminación local de venta (ET) ----
+        window.deleteSaleET = async function(id) { 
+            if (!confirm("¿Eliminar este registro de venta?")) return; 
+            
+            const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).delete().eq("id", id); 
+            
+            if (error) {
+                alert("❌ Error al eliminar: " + error.message);
+            } else {
+                // Actualizar estado local
+                allSalesElTransito = allSalesElTransito.filter(s => s.id !== id);
+                // Re-renderizar localmente
+                renderSalesElTransito(allSalesElTransito);
+            }
+            // fetchSalesElTransito(); // <-- ELIMINADO
+        }
 
         // IV. FUNCIONES DE PRODUCTOS FALTANTES
         async function fetchMissingProducts() { const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false }); if (error) { console.error("Error cargando productos faltantes:", error); totalMissingCount.textContent = "Error al cargar"; return; } allMissingProducts = data; renderMissingProducts(allMissingProducts); }
         function renderMissingProducts(items) { missingListLoader.innerHTML = ""; missingListEl.innerHTML = ""; totalMissingCount.textContent = `${items.length} productos`; if (items.length === 0) { missingListEl.innerHTML = `<p class="p-4 text-gray-400">No hay productos faltantes registrados.</p>`; return; } const table = document.createElement('table'); table.className = 'min-w-full divide-y divide-gray-700'; table.innerHTML = `<thead><tr><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto y Notas</th><th class="px-6 py-3 bg-gray-700"></th></tr></thead>`; const tbody = document.createElement('tbody'); tbody.className = 'bg-gray-800 divide-y divide-gray-700'; items.forEach(item => { const row = tbody.insertRow(); const notesHtml = item.notes ? `<p class="text-xs text-gray-400 mt-1">${item.notes}</p>` : ''; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm"><span class="font-medium text-white">${item.product_name}</span>${notesHtml}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteMissingProduct('${item.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded shadow text-xs transition">Conseguido ✔</button></td>`; }); table.appendChild(tbody); missingListEl.appendChild(table); }
-        window.deleteMissingProduct = async function(id) { if (!confirm("¿Marcar este producto como conseguido? Se eliminará de la lista.")) return; await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq("id", id); fetchMissingProducts(); }
+        
+        // ---- CAMBIO: Eliminación local de producto faltante ----
+        window.deleteMissingProduct = async function(id) { 
+            if (!confirm("¿Marcar este producto como conseguido? Se eliminará de la lista.")) return; 
+            
+            const { error } = await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq("id", id); 
+            
+            if (error) {
+                alert("❌ Error al eliminar: " + error.message);
+            } else {
+                // Actualizar estado local
+                allMissingProducts = allMissingProducts.filter(p => p.id !== id);
+                // Re-renderizar localmente
+                renderMissingProducts(allMissingProducts);
+            }
+            // fetchMissingProducts(); // <-- ELIMINADO
+        }
 
         // V. FUNCIONES DE INVENTARIO (PRINCIPAL)
         function escapeJsString(str) {
@@ -714,9 +837,70 @@
                 productsEl.appendChild(section); 
             }); 
         }
-        window.handleEditClick = (id, name, price) => { const newName = prompt("Nuevo nombre:", name); if (newName === null || newName.trim() === "") return; const newPrice = prompt("Nuevo precio (USD):", Number(price).toFixed(2)); if (newPrice === null) return; editProduct(id, newName, newPrice); }; async function editProduct(id, newName, newPrice) { const priceValue = parseFloat(newPrice); if (isNaN(priceValue) || priceValue < 0) { alert("Precio inválido."); return; } const { error } = await supabase.from(PRODUCTS_TABLE).update({ name: newName.trim(), price: priceValue }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchProducts(); }
-        window.changeQty = async function(id, delta) { const { data } = await supabase.from(PRODUCTS_TABLE).select("quantity").eq("id", id).single(); const newQty = Math.max(0, (data.quantity || 0) + delta); await supabase.from(PRODUCTS_TABLE).update({ quantity: newQty }).eq("id", id); fetchProducts(); }
-        window.deleteProduct = async function(id) { if (!confirm("¿Eliminar este producto?")) return; await supabase.from(PRODUCTS_TABLE).delete().eq("id", id); fetchProducts(); }
+
+        // ---- CAMBIO: Actualización local de edición de producto ----
+        window.handleEditClick = (id, name, price) => { const newName = prompt("Nuevo nombre:", name); if (newName === null || newName.trim() === "") return; const newPrice = prompt("Nuevo precio (USD):", Number(price).toFixed(2)); if (newPrice === null) return; editProduct(id, newName, newPrice); }; 
+        async function editProduct(id, newName, newPrice) { 
+            const priceValue = parseFloat(newPrice); 
+            if (isNaN(priceValue) || priceValue < 0) { alert("Precio inválido."); return; } 
+            
+            const { error } = await supabase.from(PRODUCTS_TABLE).update({ name: newName.trim(), price: priceValue }).eq("id", id); 
+            
+            if (error) {
+                alert("❌ Error: " + error.message); 
+            } else {
+                // Actualizar estado local
+                const productInArray = allProducts.find(p => p.id === id);
+                if (productInArray) {
+                    productInArray.name = newName.trim();
+                    productInArray.price = priceValue;
+                }
+                // Re-renderizar localmente
+                filterAndRenderProducts();
+                updateAutocompleteList(allProducts, inventorySuggestions);
+            }
+            // else fetchProducts(); // <-- ELIMINADO
+        }
+        
+        // ---- CAMBIO: Actualización local de cantidad de producto ----
+        window.changeQty = async function(id, delta) { 
+            const { data } = await supabase.from(PRODUCTS_TABLE).select("quantity").eq("id", id).single(); 
+            const newQty = Math.max(0, (data.quantity || 0) + delta); 
+            
+            const { error } = await supabase.from(PRODUCTS_TABLE).update({ quantity: newQty }).eq("id", id); 
+            
+            if (error) {
+                alert("❌ Error al actualizar cantidad: " + error.message);
+            } else {
+                // Actualizar estado local
+                const productInArray = allProducts.find(p => p.id === id);
+                if (productInArray) {
+                    productInArray.quantity = newQty;
+                }
+                // Re-renderizar localmente
+                filterAndRenderProducts();
+                updateAutocompleteList(allProducts, inventorySuggestions);
+            }
+            // fetchProducts(); // <-- ELIMINADO
+        }
+        
+        // ---- CAMBIO: Eliminación local de producto ----
+        window.deleteProduct = async function(id) { 
+            if (!confirm("¿Eliminar este producto?")) return; 
+            
+            const { error } = await supabase.from(PRODUCTS_TABLE).delete().eq("id", id); 
+            
+            if (error) {
+                alert("❌ Error al eliminar: " + error.message);
+            } else {
+                // Actualizar estado local
+                allProducts = allProducts.filter(p => p.id !== id);
+                // Re-renderizar localmente
+                filterAndRenderProducts();
+                updateAutocompleteList(allProducts, inventorySuggestions);
+            }
+            // fetchProducts(); // <-- ELIMINADO
+        }
         
         // VI. FUNCIONES DE INVENTARIO (EL TRANSITO)
         async function fetchProductsET() { 
@@ -759,9 +943,70 @@
                 productsElET.appendChild(section); 
             }); 
         }
-        window.handleEditClickET = (id, name, price) => { const newName = prompt("Nuevo nombre (El Transito):", name); if (newName === null || newName.trim() === "") return; const newPrice = prompt("Nuevo precio (USD) (El Transito):", Number(price).toFixed(2)); if (newPrice === null) return; editProductET(id, newName, newPrice); }; async function editProductET(id, newName, newPrice) { const priceValue = parseFloat(newPrice); if (isNaN(priceValue) || priceValue < 0) { alert("Precio inválido."); return; } const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ name: newName.trim(), price: priceValue }).eq("id", id); if (error) alert("❌ Error: " + error.message); else fetchProductsET(); }
-        window.changeQtyET = async function(id, delta) { const { data } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("quantity").eq("id", id).single(); const newQty = Math.max(0, (data.quantity || 0) + delta); await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ quantity: newQty }).eq("id", id); fetchProductsET(); }
-        window.deleteProductET = async function(id) { if (!confirm("¿Eliminar este producto de Inventario El Transito?")) return; await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).delete().eq("id", id); fetchProductsET(); }
+
+        // ---- CAMBIO: Actualización local de edición de producto (ET) ----
+        window.handleEditClickET = (id, name, price) => { const newName = prompt("Nuevo nombre (El Transito):", name); if (newName === null || newName.trim() === "") return; const newPrice = prompt("Nuevo precio (USD) (El Transito):", Number(price).toFixed(2)); if (newPrice === null) return; editProductET(id, newName, newPrice); }; 
+        async function editProductET(id, newName, newPrice) { 
+            const priceValue = parseFloat(newPrice); 
+            if (isNaN(priceValue) || priceValue < 0) { alert("Precio inválido."); return; } 
+            
+            const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ name: newName.trim(), price: priceValue }).eq("id", id); 
+            
+            if (error) {
+                alert("❌ Error: " + error.message); 
+            } else {
+                // Actualizar estado local
+                const productInArray = allProductsElTransito.find(p => p.id === id);
+                if (productInArray) {
+                    productInArray.name = newName.trim();
+                    productInArray.price = priceValue;
+                }
+                // Re-renderizar localmente
+                filterAndRenderProductsET();
+                updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
+            }
+            // else fetchProductsET(); // <-- ELIMINADO
+        }
+
+        // ---- CAMBIO: Actualización local de cantidad de producto (ET) ----
+        window.changeQtyET = async function(id, delta) { 
+            const { data } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("quantity").eq("id", id).single(); 
+            const newQty = Math.max(0, (data.quantity || 0) + delta); 
+            
+            const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ quantity: newQty }).eq("id", id); 
+            
+            if (error) {
+                alert("❌ Error al actualizar cantidad: " + error.message);
+            } else {
+                // Actualizar estado local
+                const productInArray = allProductsElTransito.find(p => p.id === id);
+                if (productInArray) {
+                    productInArray.quantity = newQty;
+                }
+                // Re-renderizar localmente
+                filterAndRenderProductsET();
+                updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
+            }
+            // fetchProductsET(); // <-- ELIMINADO
+        }
+        
+        // ---- CAMBIO: Eliminación local de producto (ET) ----
+        window.deleteProductET = async function(id) { 
+            if (!confirm("¿Eliminar este producto de Inventario El Transito?")) return; 
+            
+            const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).delete().eq("id", id); 
+            
+            if (error) {
+                alert("❌ Error al eliminar: " + error.message);
+            } else {
+                // Actualizar estado local
+                allProductsElTransito = allProductsElTransito.filter(p => p.id !== id);
+                // Re-renderizar localmente
+                filterAndRenderProductsET();
+                updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
+            }
+            // fetchProductsET(); // <-- ELIMINADO
+        }
 
         // =================================================================================
         // == Funciones para Autocompletado                                              ==
@@ -786,6 +1031,8 @@
         // =================================================================================
         // == Lógica para actualizar stock genérica (reutilizada)                        ==
         // =================================================================================
+        
+        // ---- CAMBIO: `updateProductStock` ahora actualiza localmente ----
         async function updateProductStock(productName, table, localArray, delta) {
             const productToUpdate = localArray.find(p => p.name.trim() === productName);
 
@@ -807,8 +1054,20 @@
                     console.error("❌ Error al actualizar stock:", updateError.message);
                 } else {
                     console.log(`✅ Stock actualizado para: ${productName}. Nuevo stock: ${newQty}`);
-                    if (table === PRODUCTS_TABLE) fetchProducts();
-                    else fetchProductsET();
+                    
+                    // Actualizar el estado local
+                    productToUpdate.quantity = newQty;
+
+                    // Re-renderizar la lista de productos localmente
+                    if (table === PRODUCTS_TABLE) {
+                        filterAndRenderProducts();
+                        updateAutocompleteList(allProducts, inventorySuggestions); // Actualizar datalist
+                    } else {
+                        filterAndRenderProductsET();
+                        updateAutocompleteList(allProductsElTransito, inventorySuggestionsET); // Actualizar datalist
+                    }
+                    // if (table === PRODUCTS_TABLE) fetchProducts(); // <-- ELIMINADO
+                    // else fetchProductsET(); // <-- ELIMINADO
                 }
             } else {
                 console.warn(`ℹ️ Producto no encontrado en inventario por nombre exacto: ${productName}. No se modificó stock.`);
@@ -960,10 +1219,21 @@
             toolImageEditorInput.click();
         }
 
+        // ---- CAMBIO: Eliminación local de herramienta ----
         window.deleteTool = async function(id) {
             if (!confirm("¿Estás seguro de que quieres eliminar esta herramienta? Esta acción es irreversible.")) return;
-            await supabase.from(TOOLS_TABLE).delete().eq("id", id);
-            fetchTools();
+            
+            const { error } = await supabase.from(TOOLS_TABLE).delete().eq("id", id);
+            
+            if (error) {
+                alert("❌ Error al eliminar: " + error.message);
+            } else {
+                // Actualizar estado local
+                allTools = allTools.filter(t => t.id !== id);
+                // Re-renderizar localmente
+                renderTools(allTools);
+            }
+            // fetchTools(); // <-- ELIMINADO
         }
 
 
@@ -971,6 +1241,8 @@
         function setStatusMessage(el, msg, success = true) { el.textContent = msg; el.className = `text-sm mt-3 ${success ? 'text-green-400' : 'text-red-400'}`; setTimeout(() => (el.textContent = ""), 3000); }
         
         searchInput.addEventListener("input", filterAndRenderProducts);
+        
+        // ---- CAMBIO: Submit de producto actualiza localmente ----
         form.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("submit"); 
@@ -978,10 +1250,32 @@
             setStatusMessage(status, "Guardando...", true); 
             try { 
                 const imageUrl = imageIn.files[0] ? await uploadImage(imageIn.files[0]) : null; 
-                const { error } = await supabase.from(PRODUCTS_TABLE).insert({ name: nameIn.value, category: categoryIn.value, price: parseFloat(priceIn.value), quantity: parseInt(qtyIn.value), image_url: imageUrl }); 
+                
+                const newProduct = { 
+                    name: nameIn.value, 
+                    category: categoryIn.value, 
+                    price: parseFloat(priceIn.value), 
+                    quantity: parseInt(qtyIn.value), 
+                    image_url: imageUrl 
+                };
+                
+                const { data: insertedProduct, error } = await supabase
+                    .from(PRODUCTS_TABLE)
+                    .insert(newProduct)
+                    .select() // Pedir datos de vuelta
+                    .single(); // Esperar un objeto
+
                 if (error) throw error; 
+                
                 form.reset(); qtyIn.value = 1; 
-                fetchProducts(); 
+                
+                // Actualizar estado local
+                allProducts.unshift(insertedProduct); // Añadir al inicio
+                // Re-renderizar localmente
+                filterAndRenderProducts();
+                updateAutocompleteList(allProducts, inventorySuggestions);
+                
+                // fetchProducts(); // <-- ELIMINADO
                 setStatusMessage(status, "Producto agregado con éxito ✅", true); 
             } catch (err) { 
                 setStatusMessage(status, "Error: " + err.message, false); 
@@ -991,6 +1285,8 @@
         });
 
         searchInputET.addEventListener("input", filterAndRenderProductsET);
+        
+        // ---- CAMBIO: Submit de producto (ET) actualiza localmente ----
         formET.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("submit-et"); 
@@ -998,10 +1294,32 @@
             setStatusMessage(statusET, "Guardando...", true); 
             try { 
                 const imageUrl = imageInET.files[0] ? await uploadImage(imageInET.files[0]) : null; 
-                const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).insert({ name: nameInET.value, category: categoryInET.value, price: parseFloat(priceInET.value), quantity: parseInt(qtyInET.value), image_url: imageUrl }); 
+                
+                const newProductET = { 
+                    name: nameInET.value, 
+                    category: categoryInET.value, 
+                    price: parseFloat(priceInET.value), 
+                    quantity: parseInt(qtyInET.value), 
+                    image_url: imageUrl 
+                };
+
+                const { data: insertedProduct, error } = await supabase
+                    .from(PRODUCTS_EL_TRANSITO_TABLE)
+                    .insert(newProductET)
+                    .select()
+                    .single();
+                    
                 if (error) throw error; 
+                
                 formET.reset(); qtyInET.value = 1; 
-                fetchProductsET(); 
+                
+                // Actualizar estado local
+                allProductsElTransito.unshift(insertedProduct);
+                // Re-renderizar localmente
+                filterAndRenderProductsET();
+                updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
+
+                // fetchProductsET(); // <-- ELIMINADO
                 setStatusMessage(statusET, "Producto agregado con éxito (El Transito) ✅", true); 
             } catch (err) { 
                 setStatusMessage(statusET, "Error: " + err.message, false); 
@@ -1010,6 +1328,7 @@
             } 
         });
 
+        // ---- CAMBIO: Submit de venta actualiza localmente ----
         salesForm.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("sale-submit"); 
@@ -1027,7 +1346,13 @@
                     status: saleStatusInput.value
                 };
 
-                const { error: saleError } = await supabase.from(SALES_TABLE).insert(newSale); 
+                // Pedir el dato de vuelta
+                const { data: insertedSale, error: saleError } = await supabase
+                    .from(SALES_TABLE)
+                    .insert(newSale)
+                    .select()
+                    .single();
+
                 if (saleError) throw saleError;
 
                 if (newSale.status === 'Pagado') {
@@ -1036,7 +1361,13 @@
 
                 salesForm.reset(); 
                 saleDateIn.value = new Date().toISOString().split('T')[0]; 
-                fetchSales(); 
+                
+                // Actualizar estado local
+                allSales.unshift(insertedSale);
+                // Re-renderizar localmente
+                renderSales(allSales);
+
+                // fetchSales(); // <-- ELIMINADO
                 setStatusMessage(saleStatus, "Venta registrada con éxito ✅", true); 
             } catch (err) { 
                 setStatusMessage(saleStatus, "Error: " + err.message, false); 
@@ -1045,6 +1376,7 @@
             } 
         });
 
+        // ---- CAMBIO: Submit de venta (ET) actualiza localmente ----
         salesFormET.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("sale-submit-et"); 
@@ -1062,7 +1394,12 @@
                     status: saleStatusInputET.value
                 };
 
-                const { error: saleErrorET } = await supabase.from(SALES_EL_TRANSITO_TABLE).insert(newSaleET); 
+                const { data: insertedSale, error: saleErrorET } = await supabase
+                    .from(SALES_EL_TRANSITO_TABLE)
+                    .insert(newSaleET)
+                    .select()
+                    .single();
+                    
                 if (saleErrorET) throw saleErrorET;
 
                 if (newSaleET.status === 'Pagado') {
@@ -1071,7 +1408,13 @@
 
                 salesFormET.reset(); 
                 saleDateInET.value = new Date().toISOString().split('T')[0]; 
-                fetchSalesElTransito(); 
+                
+                // Actualizar estado local
+                allSalesElTransito.unshift(insertedSale);
+                // Re-renderizar localmente
+                renderSalesElTransito(allSalesElTransito);
+
+                // fetchSalesElTransito(); // <-- ELIMINADO
                 setStatusMessage(saleStatusET, "Venta (El Transito) registrada con éxito ✅", true); 
             } catch (err) { 
                 setStatusMessage(saleStatusET, "Error: " + err.message, false); 
@@ -1080,8 +1423,42 @@
             } 
         });
 
-        missingProductForm.addEventListener("submit", async (ev) => { ev.preventDefault(); const submitBtn = document.getElementById("missing-product-submit"); submitBtn.disabled = true; try { await supabase.from(MISSING_PRODUCTS_TABLE).insert({ product_name: missingProductNameIn.value, notes: missingProductNotesIn.value || null }); missingProductForm.reset(); fetchMissingProducts(); setStatusMessage(missingProductStatus, "Producto agregado a la lista ✅", true); } catch (err) { setStatusMessage(missingProductStatus, "Error: " + err.message, false); } finally { submitBtn.disabled = false; } });
+        // ---- CAMBIO: Submit de producto faltante actualiza localmente ----
+        missingProductForm.addEventListener("submit", async (ev) => { 
+            ev.preventDefault(); 
+            const submitBtn = document.getElementById("missing-product-submit"); 
+            submitBtn.disabled = true; 
+            try { 
+                const newMissing = { 
+                    product_name: missingProductNameIn.value, 
+                    notes: missingProductNotesIn.value || null 
+                };
+
+                const { data: insertedMissing, error } = await supabase
+                    .from(MISSING_PRODUCTS_TABLE)
+                    .insert(newMissing)
+                    .select()
+                    .single();
+
+                if (error) throw error;
+                
+                missingProductForm.reset(); 
+                
+                // Actualizar estado local
+                allMissingProducts.unshift(insertedMissing);
+                // Re-renderizar localmente
+                renderMissingProducts(allMissingProducts);
+
+                // fetchMissingProducts(); // <-- ELIMINADO
+                setStatusMessage(missingProductStatus, "Producto agregado a la lista ✅", true); 
+            } catch (err) { 
+                setStatusMessage(missingProductStatus, "Error: " + err.message, false); 
+            } finally { 
+                submitBtn.disabled = false; 
+            } 
+        });
         
+        // ---- CAMBIO: Submit de herramienta actualiza localmente ----
         toolForm.addEventListener("submit", async (ev) => {
             ev.preventDefault();
             const submitBtn = document.getElementById("tool-submit");
@@ -1089,14 +1466,29 @@
             setStatusMessage(toolStatus, "Guardando herramienta...", true);
             try {
                 const imageUrl = toolImageIn.files[0] ? await uploadImage(toolImageIn.files[0]) : null;
-                const { error } = await supabase.from(TOOLS_TABLE).insert({
+                
+                const newTool = {
                     title: toolTitleIn.value,
                     description: toolDescriptionIn.value || null,
                     image_url: imageUrl
-                });
+                };
+
+                const { data: insertedTool, error } = await supabase
+                    .from(TOOLS_TABLE)
+                    .insert(newTool)
+                    .select()
+                    .single();
+
                 if (error) throw error;
+                
                 toolForm.reset();
-                fetchTools();
+                
+                // Actualizar estado local
+                allTools.unshift(insertedTool);
+                // Re-renderizar localmente
+                renderTools(allTools);
+
+                // fetchTools(); // <-- ELIMINADO
                 setStatusMessage(toolStatus, "Herramienta guardada con éxito ✅", true);
             } catch (err) {
                 setStatusMessage(toolStatus, "Error: " + err.message, false);
@@ -1105,12 +1497,13 @@
             }
         });
         
+        // ---- CAMBIO: Edición de imagen de herramienta actualiza localmente ----
         toolImageEditorInput.addEventListener('change', async (event) => {
             if (!editingToolId) return; 
             const file = event.target.files[0];
             if (!file) return; 
 
-            alert('Subiendo nueva imagen... La página se refrescará al terminar.');
+            alert('Subiendo nueva imagen...');
 
             try {
                 const newImageUrl = await uploadImage(file);
@@ -1125,7 +1518,15 @@
 
                 if (error) throw error;
 
-                await fetchTools(); 
+                // Actualizar estado local
+                const toolInArray = allTools.find(t => t.id === editingToolId);
+                if (toolInArray) {
+                    toolInArray.image_url = newImageUrl;
+                }
+                // Re-renderizar localmente
+                renderTools(allTools);
+
+                // await fetchTools(); // <-- ELIMINADO
                 alert('✅ Imagen actualizada correctamente.');
 
             } catch (error) {
