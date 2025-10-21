@@ -404,7 +404,11 @@
     <input type="file" id="tool-image-editor-input" class="hidden" accept="image/*" />
     
     <script type="module">
-        // import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        // // ==========================================================
+        // == ¡AQUÍ ESTÁ LA LÍNEA CORREGIDA!
+        // == Se cambió 'cdn.jsdelivr.net' por 'unpkg.com' para solucionar el error de red.
+        // ==========================================================
+        import { createClient } from 'https://unpkg.com/@supabase/supabase-js/+esm';
 
         // =================================================================================
         // == Configuración de Supabase y Edge Function para R2                          ==
@@ -980,9 +984,6 @@
                 });
                 
             // Escuchar cambios en Inventario El Transito
-            // ==========================================================
-            // == ¡AQUÍ ESTÁ LA LÍNEA CORREGIDA! (Error 1)
-            // ==========================================================
             supabase
                 .channel('public:' + PRODUCTS_EL_TRANSITO_TABLE) 
                 .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_EL_TRANSITO_TABLE }, (payload) => {
@@ -1086,9 +1087,6 @@
             submitBtn.disabled = true; 
             
             const soldProductWithCategory = productNameSoldIn.value.trim();
-            // ==========================================================
-            // == ¡AQUÍ ESTÁ LA LÍNEA CORREGIDA! (Error 2)
-            // ==========================================================
             const soldProductName = getCleanProductName(soldProductWithCategory); 
 
             try { 
@@ -1169,7 +1167,7 @@
                 toolForm.reset();
                 setStatusMessage(toolStatus, "Herramienta guardada con éxito ✅", true);
             } catch (err) {
-                setStatusMessage(toolStatus, "Error: " + err.message, false);
+                setStatusMessage(toolStatus, "Error: "S + err.message, false);
             } finally {
                 submitBtn.disabled = false;
             }
@@ -1219,7 +1217,6 @@
             
             try {
                 // Carga inicial de datos
-                // CAMBIADO: Ya no usamos Promise.all, para poder depurar mejor
                 await fetchProducts();
                 await fetchProductsET();
                 await fetchSales();
