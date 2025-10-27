@@ -672,6 +672,37 @@
         }
 
         /**
+         * Actualiza quirúrgicamente una tarjeta de producto en el DOM.
+         */
+        function updateProductCardInDOM(product, isMainInventory) {
+            const idPrefix = isMainInventory ? '' : '-et-';
+            const stockEl = document.getElementById(`product-stock${idPrefix}${product.id}`);
+            const nameEl = document.getElementById(`product-name${idPrefix}${product.id}`);
+            const priceEl = document.getElementById(`product-price${idPrefix}${product.id}`);
+
+            if (stockEl) {
+                stockEl.textContent = `Stock: ${product.quantity}`;
+            }
+            if (nameEl) {
+                nameEl.textContent = product.name;
+            }
+            if (priceEl) {
+                priceEl.textContent = `$${Number(product.price).toFixed(2)}`;
+            }
+            
+            // MUY IMPORTANTE: Actualizar el 'onclick' del botón de editar
+            // para que el próximo clic use los datos nuevos.
+            const cardEl = document.getElementById(`product-card${idPrefix}${product.id}`);
+            if (cardEl) {
+                const editBtn = cardEl.querySelector('button[onclick*="handleEditClick"]');
+                if (editBtn) {
+                    const editFn = isMainInventory ? 'handleEditClick' : 'handleEditClickET';
+                    editBtn.setAttribute('onclick', `${editFn}('${product.id}', '${escapeJsString(product.name)}', ${product.price})`);
+                }
+            }
+        }
+
+        /**
          * Renderizado INICIAL de la lista de ventas (MONOLÍTICO).
          * Solo se usa en la carga inicial.
          */
@@ -954,8 +985,6 @@
             updateAutocompleteList(allProducts, inventorySuggestions);
         }
         function filterAndRenderProducts() { const term = (searchInput.value || "").toLowerCase().trim(); const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProducts(filtered); }
-        
-        // --- INICIO: FUNCIÓN MODIFICADA ---
         function renderProducts(items) { 
             productsLoader.innerHTML = ""; 
             productsEl.innerHTML = ""; 
@@ -977,42 +1006,69 @@
                 grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
                 
                 grouped[category].forEach(p => { 
-                    const card = document.createElement("div"); 
+                    const card = document.createElement("div");
+                    // --- ID AÑADIDO ---
+                    card.id = `product-card-${p.id}`; 
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
                     
-                    // Se añade id="stock-qty-${p.id}" al <p> del stock
-                    card.innerHTML = `<button onclick="handleEditClick('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div><h3 class="font-semibold text-white">${p.name}</h3><p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p><p class="mt-1 text-sm text-gray-400" id="stock-qty-${p.id}">Stock: ${p.quantity}</p><div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700"><div class="flex gap-2"><button onclick="changeQty('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button><button onclick="changeQty('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button></div><button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button></div>`; 
-                    
+                    // --- IDs AÑADIDOS A ELEMENTOS INTERNOS ---
+                    card.innerHTML = `
+                        <button onclick="handleEditClick('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                        </button>
+                        <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden">
+                            <img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}">
+                        </div>
+                        <h3 id="product-name-${p.id}" class="font-semibold text-white">${p.name}</h3>
+                        <p id="product-price-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
+                        <p id="product-stock-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
+                        <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700">
+                            <div class="flex gap-2">
+                                <button onclick="changeQty('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button>
+                                <button onclick="changeQty('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button>
+                            </div>
+                            <button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
+                        </div>`; 
                     grid.appendChild(card); 
                 }); 
                 section.appendChild(grid); 
                 productsEl.appendChild(section); 
             }); 
         }
-        // --- FIN: FUNCIÓN MODIFICADA ---
 
         window.handleEditClick = (id, name, price) => { const newName = prompt("Nuevo nombre:", name); if (newName === null || newName.trim() === "") return; const newPrice = prompt("Nuevo precio (USD):", Number(price).toFixed(2)); if (newPrice === null) return; editProduct(id, newName, newPrice); }; 
+        
+        // --- FUNCIÓN EDITPRODUCT CORREGIDA ---
         async function editProduct(id, newName, newPrice) { 
             const priceValue = parseFloat(newPrice); 
             if (isNaN(priceValue) || priceValue < 0) { alert("Precio inválido."); return; } 
+            
+            // 1. Actualización optimista de UI
+            const productInArray = allProducts.find(p => p.id === id);
+            if (!productInArray) return;
+
+            const oldName = productInArray.name;
+            const oldPrice = productInArray.price;
+            
+            productInArray.name = newName.trim();
+            productInArray.price = priceValue;
+            updateProductCardInDOM(productInArray, true); // <-- CAMBIO QUIRÚRGICO
+            updateAutocompleteList(allProducts, inventorySuggestions);
             
             const { error } = await supabase.from(PRODUCTS_TABLE).update({ name: newName.trim(), price: priceValue }).eq("id", id); 
             
             if (error) {
                 alert("❌ Error: " + error.message); 
-            } else {
-                const productInArray = allProducts.find(p => p.id === id);
-                if (productInArray) {
-                    productInArray.name = newName.trim();
-                    productInArray.price = priceValue;
-                }
-                filterAndRenderProducts();
+                // 2. Revertir en caso de error
+                productInArray.name = oldName;
+                productInArray.price = oldPrice;
+                updateProductCardInDOM(productInArray, true); // <-- CAMBIO QUIRÚRGICO
                 updateAutocompleteList(allProducts, inventorySuggestions);
             }
         }
         
-        // --- INICIO: FUNCIÓN MODIFICADA ---
+        // --- FUNCIÓN CHANGEQTY CORREGIDA ---
         window.changeQty = async function(id, delta) { 
             const productInArray = allProducts.find(p => p.id === id);
             if (!productInArray) return;
@@ -1020,44 +1076,21 @@
             const currentQty = productInArray.quantity || 0;
             const newQty = Math.max(0, currentQty + delta);
             
-            // 1. Encontrar el elemento del DOM
-            const qtyElement = document.getElementById(`stock-qty-${id}`);
-            
-            // 2. Actualización optimista del DOM
-            if (qtyElement) {
-                qtyElement.textContent = `Stock: ${newQty}`;
-            }
-            
-            // 3. Actualización optimista del array local
+            // 1. Actualización optimista de UI (local)
             productInArray.quantity = newQty;
-            
-            // 4. Eliminar el re-renderizado completo
-            // filterAndRenderProducts(); // <-- ELIMINADO
-            
-            // 5. Actualizar autocompletado (esto es rápido y está bien)
+            updateProductCardInDOM(productInArray, true); // <-- CAMBIO QUIRÚRGICO
             updateAutocompleteList(allProducts, inventorySuggestions);
 
             const { error } = await supabase.from(PRODUCTS_TABLE).update({ quantity: newQty }).eq("id", id); 
             
             if (error) {
                 alert("❌ Error al actualizar cantidad: " + error.message);
-                
-                // 1. Revertir el DOM
-                if (qtyElement) {
-                    qtyElement.textContent = `Stock: ${currentQty}`;
-                }
-                
-                // 2. Revertir el array local
+                // 2. Revertir la UI si hay error
                 productInArray.quantity = currentQty;
-                
-                // 3. Eliminar el re-renderizado completo
-                // filterAndRenderProducts(); // <-- ELIMINADO
-                
-                // 4. Revertir autocompletado
+                updateProductCardInDOM(productInArray, true); // <-- CAMBIO QUIRÚRGICO
                 updateAutocompleteList(allProducts, inventorySuggestions);
             }
         }
-        // --- FIN: FUNCIÓN MODIFICADA ---
         
         window.deleteProduct = async function(id) { 
             if (!confirm("¿Eliminar este producto?")) return; 
@@ -1068,7 +1101,7 @@
                 alert("❌ Error al eliminar: " + error.message);
             } else {
                 allProducts = allProducts.filter(p => p.id !== id);
-                filterAndRenderProducts();
+                filterAndRenderProducts(); // El borrado sí necesita un re-renderizado completo
                 updateAutocompleteList(allProducts, inventorySuggestions);
             }
         }
@@ -1082,8 +1115,6 @@
             updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
         }
         function filterAndRenderProductsET() { const term = (searchInputET.value || "").toLowerCase().trim(); const filtered = allProductsElTransito.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProductsET(filtered); }
-        
-        // --- INICIO: FUNCIÓN MODIFICADA ---
         function renderProductsET(items) { 
             productsLoaderET.innerHTML = ""; 
             productsElET.innerHTML = ""; 
@@ -1106,41 +1137,68 @@
                 
                 grouped[category].forEach(p => { 
                     const card = document.createElement("div"); 
+                    // --- ID AÑADIDO ---
+                    card.id = `product-card-et-${p.id}`;
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
                     
-                    // Se añade id="stock-qty-et-${p.id}" al <p> del stock
-                    card.innerHTML = `<button onclick="handleEditClickET('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div><h3 class="font-semibold text-white">${p.name}</h3><p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p><p class="mt-1 text-sm text-gray-400" id="stock-qty-et-${p.id}">Stock: ${p.quantity}</p><div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700"><div class="flex gap-2"><button onclick="changeQtyET('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button><button onclick="changeQtyET('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button></div><button onclick="deleteProductET('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button></div>`; 
-                    
+                    // --- IDs AÑADIDOS A ELEMENTOS INTERNOS ---
+                    card.innerHTML = `
+                        <button onclick="handleEditClickET('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                        </button>
+                        <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden">
+                            <img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}">
+                        </div>
+                        <h3 id="product-name-et-${p.id}" class="font-semibold text-white">${p.name}</h3>
+                        <p id="product-price-et-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
+                        <p id="product-stock-et-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
+                        <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700">
+                            <div class="flex gap-2">
+                                <button onclick="changeQtyET('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button>
+                                <button onclick="changeQtyET('${p.id}', 1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button>
+                            </div>
+                            <button onclick="deleteProductET('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
+                        </div>`; 
                     grid.appendChild(card); 
                 }); 
                 section.appendChild(grid); 
                 productsElET.appendChild(section); 
             }); 
         }
-        // --- FIN: FUNCIÓN MODIFICADA ---
 
         window.handleEditClickET = (id, name, price) => { const newName = prompt("Nuevo nombre (El Transito):", name); if (newName === null || newName.trim() === "") return; const newPrice = prompt("Nuevo precio (USD) (El Transito):", Number(price).toFixed(2)); if (newPrice === null) return; editProductET(id, newName, newPrice); }; 
+        
+        // --- FUNCIÓN EDITPRODUCTET CORREGIDA ---
         async function editProductET(id, newName, newPrice) { 
             const priceValue = parseFloat(newPrice); 
             if (isNaN(priceValue) || priceValue < 0) { alert("Precio inválido."); return; } 
+            
+            // 1. Actualización optimista de UI
+            const productInArray = allProductsElTransito.find(p => p.id === id);
+            if (!productInArray) return;
+
+            const oldName = productInArray.name;
+            const oldPrice = productInArray.price;
+
+            productInArray.name = newName.trim();
+            productInArray.price = priceValue;
+            updateProductCardInDOM(productInArray, false); // <-- CAMBIO QUIRÚRGICO
+            updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             
             const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ name: newName.trim(), price: priceValue }).eq("id", id); 
             
             if (error) {
                 alert("❌ Error: " + error.message); 
-            } else {
-                const productInArray = allProductsElTransito.find(p => p.id === id);
-                if (productInArray) {
-                    productInArray.name = newName.trim();
-                    productInArray.price = priceValue;
-                }
-                filterAndRenderProductsET();
+                // 2. Revertir en caso de error
+                productInArray.name = oldName;
+                productInArray.price = oldPrice;
+                updateProductCardInDOM(productInArray, false); // <-- CAMBIO QUIRÚRGICO
                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             }
         }
 
-        // --- INICIO: FUNCIÓN MODIFICADA ---
+        // --- FUNCIÓN CHANGEQTYET CORREGIDA ---
         window.changeQtyET = async function(id, delta) { 
             const productInArray = allProductsElTransito.find(p => p.id === id);
             if (!productInArray) return;
@@ -1148,44 +1206,21 @@
             const currentQty = productInArray.quantity || 0;
             const newQty = Math.max(0, currentQty + delta); 
 
-            // 1. Encontrar el elemento del DOM
-            const qtyElement = document.getElementById(`stock-qty-et-${id}`);
-            
-            // 2. Actualización optimista del DOM
-            if (qtyElement) {
-                qtyElement.textContent = `Stock: ${newQty}`;
-            }
-
-            // 3. Actualización optimista del array local
+            // 1. Actualización optimista de UI (local)
             productInArray.quantity = newQty;
-            
-            // 4. Eliminar el re-renderizado completo
-            // filterAndRenderProductsET(); // <-- ELIMINADO
-            
-            // 5. Actualizar autocompletado (esto es rápido y está bien)
+            updateProductCardInDOM(productInArray, false); // <-- CAMBIO QUIRÚRGICO
             updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             
             const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ quantity: newQty }).eq("id", id); 
             
             if (error) {
                 alert("❌ Error al actualizar cantidad: " + error.message);
-
-                // 1. Revertir el DOM
-                if (qtyElement) {
-                    qtyElement.textContent = `Stock: ${currentQty}`;
-                }
-                
-                // 2. Revertir el array local
+                // 2. Revertir la UI si hay error
                 productInArray.quantity = currentQty;
-                
-                // 3. Eliminar el re-renderizado completo
-                // filterAndRenderProductsET(); // <-- ELIMINADO
-                
-                // 4. Revertir autocompletado
+                updateProductCardInDOM(productInArray, false); // <-- CAMBIO QUIRÚRGICO
                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             }
         }
-        // --- FIN: FUNCIÓN MODIFICADA ---
         
         window.deleteProductET = async function(id) { 
             if (!confirm("¿Eliminar este producto de Inventario El Transito?")) return; 
@@ -1196,7 +1231,7 @@
                 alert("❌ Error al eliminar: " + error.message);
             } else {
                 allProductsElTransito = allProductsElTransito.filter(p => p.id !== id);
-                filterAndRenderProductsET();
+                filterAndRenderProductsET(); // El borrado sí necesita un re-renderizado completo
                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             }
         }
@@ -1235,13 +1270,16 @@
                 productToUpdate.quantity = newQty;
                 let renderFunc, datalistEl;
                 if (table === PRODUCTS_TABLE) {
-                    renderFunc = filterAndRenderProducts;
+                    // --- CAMBIO ---
+                    // No llames al renderizado completo, llama a la actualización quirúrgica
+                    updateProductCardInDOM(productToUpdate, true);
                     datalistEl = inventorySuggestions;
                 } else {
-                    renderFunc = filterAndRenderProductsET;
+                    // --- CAMBIO ---
+                    updateProductCardInDOM(productToUpdate, false);
                     datalistEl = inventorySuggestionsET;
                 }
-                renderFunc(); // Esta llamada es necesaria si la actualización viene de una VENTA
+                // renderFunc(); // <-- ELIMINADO
                 updateAutocompleteList(localArray, datalistEl);
 
                 const { error: updateError } = await supabase
@@ -1252,7 +1290,12 @@
                 if (updateError) {
                     console.error("❌ Error al actualizar stock:", updateError.message);
                     productToUpdate.quantity = currentQty;
-                    renderFunc(); // Revertir si falla
+                    // Revertir en el DOM
+                    if (table === PRODUCTS_TABLE) {
+                        updateProductCardInDOM(productToUpdate, true);
+                    } else {
+                        updateProductCardInDOM(productToUpdate, false);
+                    }
                     updateAutocompleteList(localArray, datalistEl);
                 } else {
                     console.log(`✅ Stock actualizado para: ${productName}. Nuevo stock: ${newQty}`);
@@ -1389,6 +1432,7 @@
         // == LÓGICA DE REALTIME (CON ACTUALIZACIÓN QUIRÚRGICA)                    ==
         // ============================================================================
         
+        // --- FUNCIÓN HANDLEREALTIMEPAYLOAD CORREGIDA ---
         function handleRealtimePayload(payload, localArray, renderFunction, idKey = 'id') {
             console.log('📡 Payload Realtime Recibido:', payload);
             const { eventType, new: newRecord, old: oldRecord } = payload;
@@ -1400,37 +1444,85 @@
             const isMainSales = (localArray === allSales);
             const isElTransitoSales = (localArray === allSalesElTransito);
 
-            // --- INICIO DE LÓGICA QUIRÚRGICA PARA VENTAS ---
+            const isMainProducts = (localArray === allProducts);
+            const isElTransitoProducts = (localArray === allProductsElTransito);
+
+            // --- LÓGICA QUIRÚRGICA PARA VENTAS ---
             if (isMainSales || isElTransitoSales) {
                 switch (eventType) {
                     case 'INSERT':
-                        if (index === -1) { // Evitar duplicados
-                            localArray.unshift(newRecord); // Añadir al array local
-                            localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at)); // Re-ordenar
-                            addSaleToDOM(newRecord, localArray, isMainSales); // Añadir al DOM
+                        if (index === -1) { 
+                            localArray.unshift(newRecord); 
+                            localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at)); 
+                            addSaleToDOM(newRecord, localArray, isMainSales); 
                         }
                         break;
                     case 'UPDATE':
                         if (index !== -1) {
-                            localArray[index] = newRecord; // Actualizar array local
-                            updateSaleRowInDOM(newRecord, localArray, isMainSales); // Actualizar fila en DOM
+                            localArray[index] = newRecord; 
+                            updateSaleRowInDOM(newRecord, localArray, isMainSales); 
                         }
                         break;
                     case 'DELETE':
                         if (index !== -1) {
                             const deletedSale = localArray[index];
-                            localArray.splice(index, 1); // Quitar del array local
-                            removeSaleFromDOM(deletedSale, localArray, isMainSales); // Quitar del DOM
+                            localArray.splice(index, 1); 
+                            removeSaleFromDOM(deletedSale, localArray, isMainSales); 
                         }
                         break;
                 }
-                // Actualizar autocompletado si es un producto (aunque esto es para ventas)
-                // No es necesario aquí, ya que los productos tienen su propio handler
-                return; // Salir de la función
+                return; 
             }
             // --- FIN DE LÓGICA QUIRÚRGICA PARA VENTAS ---
 
-            // Lógica normal para el resto (Productos, Faltantes, Herramientas)
+            // --- INICIO DE LÓGICA QUIRÚRGICA PARA PRODUCTOS ---
+            if (isMainProducts || isElTransitoProducts) {
+                let needsFullRender = false;
+                switch (eventType) {
+                    case 'INSERT':
+                        if (index === -1) localArray.unshift(newRecord);
+                        needsFullRender = true; // Necesario para colocar la tarjeta en la categoría correcta
+                        break;
+                    case 'UPDATE':
+                        if (index !== -1) {
+                            // Detectar si la categoría cambió, lo que requiere un re-renderizado
+                            const oldCategory = localArray[index].category;
+                            const newCategory = newRecord.category;
+                            if (oldCategory !== newCategory) {
+                                needsFullRender = true;
+                            }
+                            
+                            localArray[index] = newRecord; // Actualizar array local
+                            if (!needsFullRender) {
+                                updateProductCardInDOM(newRecord, isMainProducts); // <-- CAMBIO QUIRÚRGICO
+                            }
+                        } else {
+                            localArray.unshift(newRecord); 
+                            needsFullRender = true;
+                        }
+                        break;
+                    case 'DELETE':
+                        if (index !== -1) {
+                            localArray.splice(index, 1);
+                            needsFullRender = true; // Necesario para eliminar la tarjeta
+                        }
+                        break;
+                }
+
+                if (needsFullRender) {
+                    renderFunction(); // renderFunction es filterAndRenderProducts / ET
+                }
+
+                // Actualizar autocompletado en todos los casos
+                if (isMainProducts) updateAutocompleteList(allProducts, inventorySuggestions);
+                if (isElTransitoProducts) updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
+                
+                return; // Salir de la función
+            }
+            // --- FIN DE LÓGICA QUIRÚRGICA PARA PRODUCTOS ---
+
+
+            // Lógica normal para el resto (Faltantes, Herramientas)
             switch (eventType) {
                 case 'INSERT':
                     if (index === -1) localArray.unshift(newRecord);
@@ -1447,27 +1539,21 @@
                     return;
             }
 
-            renderFunction(); // Llamar al renderizado completo (filterAndRenderProducts, renderMissingProducts, etc.)
-            
-            if (renderFunction === filterAndRenderProducts) {
-                 updateAutocompleteList(allProducts, inventorySuggestions);
-            }
-            if (renderFunction === filterAndRenderProductsET) {
-                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
-            }
+            renderFunction(); // Llamar al renderizado completo (para MissingProducts, Tools)
         }
+
 
         function initializeRealtimeSubscriptions() {
             console.log("📡 Inicializando suscripciones en tiempo real...");
             const channelOptions = { config: { broadcast: { ack: true } } };
 
-            // Productos
+            // Productos (usa handler quirúrgico)
             supabase.channel('public:' + PRODUCTS_TABLE, channelOptions)
                 .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_TABLE },
                     (payload) => handleRealtimePayload(payload, allProducts, filterAndRenderProducts, 'id')
                 ).subscribe((status) => console.log(`Canal ${PRODUCTS_TABLE}: ${status}`));
 
-            // Productos ET
+            // Productos ET (usa handler quirúrgico)
             supabase.channel('public:' + PRODUCTS_EL_TRANSITO_TABLE, channelOptions)
                 .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_EL_TRANSITO_TABLE },
                     (payload) => handleRealtimePayload(payload, allProductsElTransito, filterAndRenderProductsET, 'id')
@@ -1521,7 +1607,7 @@
                 
                 form.reset(); qtyIn.value = 1; 
                 allProducts.unshift(insertedProduct); 
-                filterAndRenderProducts();
+                filterAndRenderProducts(); // El insert sí necesita un re-renderizado completo
                 updateAutocompleteList(allProducts, inventorySuggestions);
                 setStatusMessage(status, "Producto agregado con éxito ✅", true); 
             } catch (err) { 
@@ -1545,7 +1631,7 @@
                 if (error) throw error; 
                 formET.reset(); qtyInET.value = 1; 
                 allProductsElTransito.unshift(insertedProduct);
-                filterAndRenderProductsET();
+                filterAndRenderProductsET(); // El insert sí necesita un re-renderizado completo
                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
                 setStatusMessage(statusET, "Producto agregado con éxito (El Transito) ✅", true); 
             } catch (err) { 
@@ -1565,7 +1651,7 @@
                 if (error) throw error;
                 missingProductForm.reset(); 
                 allMissingProducts.unshift(insertedMissing);
-                renderMissingProducts(allMissingProducts);
+                renderMissingProducts(allMissingProducts); // Insert necesita re-renderizado simple
                 setStatusMessage(missingProductStatus, "Producto agregado a la lista ✅", true); 
             } catch (err) { 
                 setStatusMessage(missingProductStatus, "Error: " + err.message, false); 
@@ -1586,7 +1672,7 @@
                 if (error) throw error;
                 toolForm.reset();
                 allTools.unshift(insertedTool);
-                renderTools(allTools);
+                renderTools(allTools); // Insert necesita re-renderizado simple
                 setStatusMessage(toolStatus, "Herramienta guardada con éxito ✅", true);
             } catch (err) {
                 setStatusMessage(toolStatus, "Error: " + err.message, false);
