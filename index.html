@@ -675,7 +675,10 @@
          * Actualiza quirúrgicamente una tarjeta de producto en el DOM.
          */
         function updateProductCardInDOM(product, isMainInventory) {
-            const idPrefix = isMainInventory ? '' : '-et-';
+            // ----- ¡¡¡ESTA ES LA LÍNEA CORREGIDA!!! -----
+            const idPrefix = isMainInventory ? '-' : '-et-';
+            // ---------------------------------------------
+
             const stockEl = document.getElementById(`product-stock${idPrefix}${product.id}`);
             const nameEl = document.getElementById(`product-name${idPrefix}${product.id}`);
             const priceEl = document.getElementById(`product-price${idPrefix}${product.id}`);
@@ -955,7 +958,6 @@
         // ============================================================================
         // == EL RESTO DE FUNCIONES (INVENTARIO, FALTANTES, HERRAMIENTAS)            ==
         // ============================================================================
-        // (Estas funciones permanecen igual, ya que sus refrescos no eran el problema principal)
 
         // IV. FUNCIONES DE PRODUCTOS FALTANTES
         async function fetchMissingProducts() { const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false }); if (error) { console.error("Error cargando productos faltantes:", error); totalMissingCount.textContent = "Error al cargar"; return; } allMissingProducts = data; renderMissingProducts(allMissingProducts); }
@@ -1268,7 +1270,7 @@
                 }
                 
                 productToUpdate.quantity = newQty;
-                let renderFunc, datalistEl;
+                let datalistEl;
                 if (table === PRODUCTS_TABLE) {
                     // --- CAMBIO ---
                     // No llames al renderizado completo, llama a la actualización quirúrgica
@@ -1279,7 +1281,6 @@
                     updateProductCardInDOM(productToUpdate, false);
                     datalistEl = inventorySuggestionsET;
                 }
-                // renderFunc(); // <-- ELIMINADO
                 updateAutocompleteList(localArray, datalistEl);
 
                 const { error: updateError } = await supabase
