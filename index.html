@@ -404,7 +404,7 @@
         // == Configuración de Supabase y Edge Function para R2                          ==
         // =================================================================================
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
@@ -560,7 +560,8 @@
          */
         function createDateBlockHTML(sale, date, isMainSales) {
             const idPrefix = isMainSales ? '' : '-et';
-            const displayDate = new Date(date).toLocaleDateString('es-SV', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+            // --- CAMBIO DE FECHA ---
+            const displayDate = new Date(date).toLocaleDateString('es-SV', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
             
             const headerHTML = `
                 <div class="bg-gray-900 p-3 rounded-t-lg mt-6 flex justify-between items-center">
@@ -675,13 +676,12 @@
          * Actualiza quirúrgicamente una tarjeta de producto en el DOM.
          */
         function updateProductCardInDOM(product, isMainInventory) {
-            // ----- ¡¡¡ESTA ES LA LÍNEA CORREGIDA!!! -----
-            const idPrefix = isMainInventory ? '-' : '-et-';
-            // ---------------------------------------------
+            // --- CAMBIO IMPORTANTE: Prefijo explícito ---
+            const idPrefix = isMainInventory ? 'main-' : 'et-';
 
-            const stockEl = document.getElementById(`product-stock${idPrefix}${product.id}`);
-            const nameEl = document.getElementById(`product-name${idPrefix}${product.id}`);
-            const priceEl = document.getElementById(`product-price${idPrefix}${product.id}`);
+            const stockEl = document.getElementById(`product-stock-${idPrefix}${product.id}`);
+            const nameEl = document.getElementById(`product-name-${idPrefix}${product.id}`);
+            const priceEl = document.getElementById(`product-price-${idPrefix}${product.id}`);
 
             if (stockEl) {
                 stockEl.textContent = `Stock: ${product.quantity}`;
@@ -695,7 +695,7 @@
             
             // MUY IMPORTANTE: Actualizar el 'onclick' del botón de editar
             // para que el próximo clic use los datos nuevos.
-            const cardEl = document.getElementById(`product-card${idPrefix}${product.id}`);
+            const cardEl = document.getElementById(`product-card-${idPrefix}${product.id}`);
             if (cardEl) {
                 const editBtn = cardEl.querySelector('button[onclick*="handleEditClick"]');
                 if (editBtn) {
@@ -733,7 +733,8 @@
                 const dailySales = groupedByDate[date];
                 const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
                 const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
-                const displayDate = new Date(date).toLocaleDateString('es-SV', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+                // --- CAMBIO DE FECHA ---
+                const displayDate = new Date(date).toLocaleDateString('es-SV', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
 
                 const headerHTML = `
                     <div class="bg-gray-900 p-3 rounded-t-lg mt-6 flex justify-between items-center">
@@ -859,7 +860,8 @@
                 const dailySales = groupedByDate[date];
                 const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
                 const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
-                const displayDate = new Date(date).toLocaleDateString('es-SV', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+                // --- CAMBIO DE FECHA ---
+                const displayDate = new Date(date).toLocaleDateString('es-SV', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
 
                 const headerHTML = `
                     <div class="bg-gray-900 p-3 rounded-t-lg mt-6 flex justify-between items-center">
@@ -1009,12 +1011,12 @@
                 
                 grouped[category].forEach(p => { 
                     const card = document.createElement("div");
-                    // --- ID AÑADIDO ---
-                    card.id = `product-card-${p.id}`; 
+                    // --- CAMBIO DE ID: 'main-' AÑADIDO ---
+                    card.id = `product-card-main-${p.id}`; 
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
                     
-                    // --- IDs AÑADIDOS A ELEMENTOS INTERNOS ---
+                    // --- CAMBIO DE ID: 'main-' AÑADIDO ---
                     card.innerHTML = `
                         <button onclick="handleEditClick('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
@@ -1022,9 +1024,9 @@
                         <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden">
                             <img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}">
                         </div>
-                        <h3 id="product-name-${p.id}" class="font-semibold text-white">${p.name}</h3>
-                        <p id="product-price-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
-                        <p id="product-stock-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
+                        <h3 id="product-name-main-${p.id}" class="font-semibold text-white">${p.name}</h3>
+                        <p id="product-price-main-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
+                        <p id="product-stock-main-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
                         <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700">
                             <div class="flex gap-2">
                                 <button onclick="changeQty('${p.id}', -1)" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">-</button>
@@ -1139,12 +1141,12 @@
                 
                 grouped[category].forEach(p => { 
                     const card = document.createElement("div"); 
-                    // --- ID AÑADIDO ---
+                    // --- ID 'et-' (sin cambios, ya era correcto) ---
                     card.id = `product-card-et-${p.id}`;
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
                     
-                    // --- IDs AÑADIDOS A ELEMENTOS INTERNOS ---
+                    // --- ID 'et-' (sin cambios, ya era correcto) ---
                     card.innerHTML = `
                         <button onclick="handleEditClickET('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
