@@ -269,6 +269,16 @@
                 <p id="sale-status" class="text-sm text-gray-400 mt-3"></p>
             </section>
             <section>
+                <div class="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex flex-wrap items-center gap-4">
+                    <div class="flex-grow min-w-[250px]">
+                        <label for="search-sales-input" class="block text-sm font-medium text-gray-300 mb-1">🔍 Buscar por Nombre o Producto</label>
+                        <input type="text" id="search-sales-input" placeholder="Ej: Juan Pérez o Pantalla A32..." class="p-2 border rounded-md w-full focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" />
+                    </div>
+                    <div class="flex items-center pt-6">
+                        <input type="checkbox" id="pending-only-checkbox" class="h-4 w-4 text-indigo-600 border-gray-500 rounded bg-gray-600 focus:ring-indigo-500">
+                        <label for="pending-only-checkbox" class="ml-2 block text-sm font-medium text-gray-200">🔔 Mostrar solo pendientes</label>
+                    </div>
+                </div>
                 <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
                     <h2 class="text-xl font-semibold text-indigo-300">📊 Historial de Ventas</h2>
                     <div class="flex items-center space-x-4 text-sm bg-gray-900/50 p-2 rounded-lg">
@@ -310,6 +320,16 @@
                 <p id="sale-status-et" class="text-sm text-gray-400 mt-3"></p>
             </section>
             <section>
+                <div class="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex flex-wrap items-center gap-4">
+                    <div class="flex-grow min-w-[250px]">
+                        <label for="search-sales-input-et" class="block text-sm font-medium text-gray-300 mb-1">🔍 Buscar por Nombre o Producto (El Transito)</label>
+                        <input type="text" id="search-sales-input-et" placeholder="Ej: Ana Gómez o Batería iPhone..." class="p-2 border rounded-md w-full focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" />
+                    </div>
+                    <div class="flex items-center pt-6">
+                        <input type="checkbox" id="pending-only-checkbox-et" class="h-4 w-4 text-indigo-600 border-gray-500 rounded bg-gray-600 focus:ring-indigo-500">
+                        <label for="pending-only-checkbox-et" class="ml-2 block text-sm font-medium text-gray-200">🔔 Mostrar solo pendientes</label>
+                    </div>
+                </div>
                 <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
                     <h2 class="text-xl font-semibold text-indigo-300">📊 Historial de Ventas (El Transito)</h2>
                     <div class="flex items-center space-x-4 text-sm bg-gray-900/50 p-2 rounded-lg">
@@ -443,8 +463,8 @@
 
         // Elementos del DOM
         const form = document.getElementById("product-form"), nameIn = document.getElementById("name"), categoryIn = document.getElementById("category-select"), priceIn = document.getElementById("price"), qtyIn = document.getElementById("quantity"), imageIn = document.getElementById("image"), status = document.getElementById("status"), productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader");
-        const salesForm = document.getElementById("sale-form"), recipientNameIn = document.getElementById("recipient-name"), productNameSoldIn = document.getElementById("product-name-sold"), salePriceIn = document.getElementById("sale-price"), saleDateIn = document.getElementById("sale-date"), saleStatusInput = document.getElementById("sale-status-input"), salesListContainer = document.getElementById("sales-list-container"), saleStatus = document.getElementById("sale-status"), totalSalesCount = document.getElementById("total-sales-count"), salesListLoader = document.getElementById("sales-list-loader");
-        const salesFormET = document.getElementById("sale-el-transito-form"), recipientNameInET = document.getElementById("recipient-name-et"), productNameSoldInET = document.getElementById("product-name-sold-et"), salePriceInET = document.getElementById("sale-price-et"), saleDateInET = document.getElementById("sale-date-et"), saleStatusInputET = document.getElementById("sale-status-input-et"), salesListContainerET = document.getElementById("sales-list-container-et"), saleStatusET = document.getElementById("sale-status-et"), totalSalesCountET = document.getElementById("total-sales-count-et"), salesListLoaderET = document.getElementById("sales-list-loader-et");
+        const salesForm = document.getElementById("sale-form"), recipientNameIn = document.getElementById("recipient-name"), productNameSoldIn = document.getElementById("product-name-sold"), salePriceIn = document.getElementById("sale-price"), saleDateIn = document.getElementById("sale-date"), saleStatusInput = document.getElementById("sale-status-input"), salesListContainer = document.getElementById("sales-list-container"), saleStatus = document.getElementById("sale-status"), totalSalesCount = document.getElementById("total-sales-count"), salesListLoader = document.getElementById("sales-list-loader"), searchSalesInput = document.getElementById("search-sales-input"), pendingOnlyCheckbox = document.getElementById("pending-only-checkbox");
+        const salesFormET = document.getElementById("sale-el-transito-form"), recipientNameInET = document.getElementById("recipient-name-et"), productNameSoldInET = document.getElementById("product-name-sold-et"), salePriceInET = document.getElementById("sale-price-et"), saleDateInET = document.getElementById("sale-date-et"), saleStatusInputET = document.getElementById("sale-status-input-et"), salesListContainerET = document.getElementById("sales-list-container-et"), saleStatusET = document.getElementById("sale-status-et"), totalSalesCountET = document.getElementById("total-sales-count-et"), salesListLoaderET = document.getElementById("sales-list-loader-et"), searchSalesInputET = document.getElementById("search-sales-input-et"), pendingOnlyCheckboxET = document.getElementById("pending-only-checkbox-et");
         const missingProductForm = document.getElementById("missing-product-form"), missingProductNameIn = document.getElementById("missing-product-name"), missingProductNotesIn = document.getElementById("missing-product-notes"), missingProductStatus = document.getElementById("missing-product-status"), missingListEl = document.getElementById("missing-list"), totalMissingCount = document.getElementById("total-missing-count"), missingListLoader = document.getElementById("missing-list-loader");
         const logoUpload = document.getElementById("logo-upload"), businessLogo = document.getElementById("business-logo"), logoSaveButton = document.getElementById("logo-save-button");
         const currentViewTitle = document.getElementById("current-view-title");
@@ -492,39 +512,98 @@
         }
 
         // ============================================================================
-        // == LÓGICA DE RENDERIZADO DE VENTAS (MODIFICADA PARA CIRUGÍA DOM)          ==
+        // == LÓGICA DE RENDERIZADO DE VENTAS (AHORA CON FILTRADO)                   ==
         // ============================================================================
 
         /**
-         * Actualiza los totales GENERALES de una lista de ventas.
+         * Filtra el array de ventas (MAIN) según el input de búsqueda y el checkbox,
+         * y luego llama a renderSales con los resultados.
          */
-        function updateGeneralTotals(localArray, isMainSales) {
+        function filterAndRenderSales() {
+            const term = (searchSalesInput.value || "").toLowerCase().trim();
+            const pendingOnly = pendingOnlyCheckbox.checked;
+
+            let filtered = [...allSales]; // Empezar con una copia completa
+
+            if (term) {
+                filtered = filtered.filter(s => 
+                    (s.recipient_name || '').toLowerCase().includes(term) ||
+                    (s.product_name_sold || '').toLowerCase().includes(term)
+                );
+            }
+
+            if (pendingOnly) {
+                filtered = filtered.filter(s => s.status === 'Pendiente');
+            }
+            
+            // Llamar a la función de renderizado original con la lista filtrada
+            renderSales(filtered);
+        }
+        
+        /**
+         * Filtra el array de ventas (EL TRANSITO) según el input de búsqueda y el checkbox,
+         * y luego llama a renderSalesElTransito con los resultados.
+         */
+        function filterAndRenderSalesET() {
+            const term = (searchSalesInputET.value || "").toLowerCase().trim();
+            const pendingOnly = pendingOnlyCheckboxET.checked;
+
+            let filtered = [...allSalesElTransito]; // Empezar con una copia completa
+
+            if (term) {
+                filtered = filtered.filter(s => 
+                    (s.recipient_name || '').toLowerCase().includes(term) ||
+                    (s.product_name_sold || '').toLowerCase().includes(term)
+                );
+            }
+
+            if (pendingOnly) {
+                filtered = filtered.filter(s => s.status === 'Pendiente');
+            }
+            
+            // Llamar a la función de renderizado original con la lista filtrada
+            renderSalesElTransito(filtered);
+        }
+
+        /**
+         * Actualiza los totales GENERALES de una lista de ventas.
+         * ESTA FUNCIÓN AHORA USA LOS DATOS FILTRADOS.
+         */
+        function updateGeneralTotals(filteredArray, isMainSales) {
             const idSuffix = isMainSales ? '' : '-et'; // Sufijo para IDs
             const totalSoldEl = document.getElementById(`total-sold-amount${idSuffix}`);
             const totalPaidEl = document.getElementById(`total-paid-amount${idSuffix}`);
             const percentageEl = document.getElementById(`paid-percentage${idSuffix}`);
             const countEl = document.getElementById(`total-sales-count${idSuffix}`);
-
-            const totalSold = localArray.reduce((sum, s) => sum + Number(s.price), 0);
-            const totalPaid = localArray.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
+            
+            // Usa el array COMPLETO (allSales) para los totales GENERALES
+            const fullArray = isMainSales ? allSales : allSalesElTransito;
+            
+            const totalSold = fullArray.reduce((sum, s) => sum + Number(s.price), 0);
+            const totalPaid = fullArray.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
             const percentagePaid = totalSold > 0 ? (totalPaid / totalSold) * 100 : 0;
             
             if(totalSoldEl) totalSoldEl.textContent = `$${totalSold.toFixed(2)}`;
             if(totalPaidEl) totalPaidEl.textContent = `$${totalPaid.toFixed(2)}`;
             if(percentageEl) percentageEl.textContent = `${percentagePaid.toFixed(1)}%`;
-            if(countEl) countEl.textContent = `${localArray.length} ventas`;
+            
+            // El contador SÍ debe reflejar el filtro
+            const baseArray = isMainSales ? allSales : allSalesElTransito;
+            if(countEl) countEl.textContent = `${filteredArray.length} de ${baseArray.length} ventas`;
         }
 
         /**
          * Actualiza los totales DIARIOS para una fecha específica.
+         * ESTA FUNCIÓN AHORA USA LOS DATOS FILTRADOS.
          */
-        function updateDailyTotals(date, localArray, isMainSales) {
+        function updateDailyTotals(date, filteredArray, isMainSales) {
             const idSuffix = isMainSales ? '' : '-et'; // Sufijo para IDs
             const dailySoldEl = document.getElementById(`daily-sold${idSuffix}-${date}`);
             const dailyPaidEl = document.getElementById(`daily-paid${idSuffix}-${date}`);
 
             if (dailySoldEl && dailyPaidEl) {
-                const dailySales = localArray.filter(s => new Date(s.sale_date).toISOString().split('T')[0] === date);
+                // Filtra el array ya filtrado por fecha
+                const dailySales = filteredArray.filter(s => new Date(s.sale_date).toISOString().split('T')[0] === date);
                 const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
                 const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
                 
@@ -534,7 +613,7 @@
         }
 
         /**
-         * Crea el HTML para una SOLA fila de venta.
+         * Crea el HTML para una SOLA fila de venta. (Sin cambios)
          */
         function createSaleRowHTML(sale, isMainSales) {
             const idSuffix = isMainSales ? '' : '-et'; // Sufijo para IDs
@@ -557,178 +636,17 @@
         }
         
         /**
-         * Crea el HTML para un NUEVO bloque de fecha (header + table + tbody + 1 fila).
-         */
-        function createDateBlockHTML(sale, date, isMainSales) {
-            const idSuffix = isMainSales ? '' : '-et'; // Sufijo para IDs
-            // --- FORMATO DE FECHA CORREGIDO ---
-            const displayDate = new Date(date + 'T00:00:00Z').toLocaleDateString('es-SV', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
-            
-            const headerHTML = `
-                <div class="bg-gray-900 p-3 rounded-t-lg mt-6 flex justify-between items-center">
-                    <h3 class="font-bold text-lg text-white">${displayDate}</h3>
-                    <div class="text-sm font-semibold">
-                        <span class="mr-4">Vendido (día): <span class="text-green-400" id="daily-sold${idSuffix}-${date}">$${Number(sale.price).toFixed(2)}</span></span>
-                        <span>Pagado (día): <span class="text-green-500" id="daily-paid${idSuffix}-${date}">$${sale.status === 'Pagado' ? Number(sale.price).toFixed(2) : '0.00'}</span></span>
-                    </div>
-                </div>`;
-            
-            const tableStartHTML = `
-                <table class="min-w-full divide-y divide-gray-700 shadow-md">
-                    <thead>
-                        <tr>
-                            <th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6">Destinatario</th>
-                            <th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto Vendido</th>
-                            <th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th>
-                            <th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
-                            <th class="px-6 py-3 bg-gray-700/50"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="sales-tbody${idSuffix}-${date}" class="bg-gray-800 divide-y divide-gray-700">
-                        ${createSaleRowHTML(sale, isMainSales)}
-                    </tbody>
-                </table>`;
-
-            return `<div id="date-block${idSuffix}-${date}">${headerHTML}${tableStartHTML}</div>`;
-        }
-
-        /**
-         * Inserta quirúrgicamente una nueva venta en el DOM.
-         */
-        function addSaleToDOM(sale, localArray, isMainSales) {
-            const idSuffix = isMainSales ? '' : '-et'; // Sufijo para IDs
-            const listContainer = document.getElementById(`sales-list-container${idSuffix}`);
-            const date = new Date(sale.sale_date).toISOString().split('T')[0];
-            
-            const targetTbody = document.getElementById(`sales-tbody${idSuffix}-${date}`);
-            
-            if (targetTbody) {
-                // Caso A: La fecha ya existe. Inserta la fila al inicio del tbody.
-                const newRowHTML = createSaleRowHTML(sale, isMainSales);
-                targetTbody.insertAdjacentHTML('afterbegin', newRowHTML);
-                
-                // Actualiza totales diarios y generales
-                updateDailyTotals(date, localArray, isMainSales);
-                updateGeneralTotals(localArray, isMainSales);
-            } else {
-                // Caso B: Es una nueva fecha. Crea el bloque entero y ponlo al inicio.
-                const newBlockHTML = createDateBlockHTML(sale, date, isMainSales);
-                listContainer.insertAdjacentHTML('afterbegin', newBlockHTML);
-
-                // Actualiza totales generales
-                updateGeneralTotals(localArray, isMainSales);
-            }
-        }
-        
-        /**
-         * Elimina quirúrgicamente una venta del DOM.
-         */
-        function removeSaleFromDOM(sale, localArray, isMainSales) {
-            const idSuffix = isMainSales ? '' : '-et'; // Sufijo para IDs
-            const date = new Date(sale.sale_date).toISOString().split('T')[0];
-            
-            const rowToRemove = document.getElementById(`sale-row${idSuffix}-${sale.id}`);
-            if (rowToRemove) {
-                const tbody = rowToRemove.closest('tbody');
-                rowToRemove.remove();
-
-                // Revisa si el tbody está vacío
-                if (tbody && tbody.children.length === 0) {
-                    const blockToRemove = document.getElementById(`date-block${idSuffix}-${date}`);
-                    if (blockToRemove) {
-                        blockToRemove.remove();
-                    }
-                } else {
-                    // Si no está vacío, solo actualiza totales diarios
-                    updateDailyTotals(date, localArray, isMainSales);
-                }
-            }
-            // Siempre actualiza totales generales
-            updateGeneralTotals(localArray, isMainSales);
-        }
-
-        /**
-         * Actualiza una única fila de venta en el DOM (para cambios de estado/precio).
-         */
-        function updateSaleRowInDOM(sale, localArray, isMainSales) {
-            const idSuffix = isMainSales ? '' : '-et'; // Sufijo para IDs
-            const date = new Date(sale.sale_date).toISOString().split('T')[0];
-            
-            // 1. Actualizar el <select>
-            const selectElement = document.getElementById(`select-status${idSuffix}-${sale.id}`);
-            if (selectElement) {
-                selectElement.className = `p-1 border rounded text-xs font-medium cursor-pointer ${STATUS_COLORS[sale.status] || STATUS_COLORS['Pendiente']}`;
-                selectElement.value = sale.status;
-            }
-
-            // 2. Actualizar la celda del precio
-            const priceCellElement = document.getElementById(`sale-price-cell${idSuffix}-${sale.id}`);
-            if (priceCellElement) {
-                const editFn = isMainSales ? 'editSalePrice' : 'editSalePriceET';
-                priceCellElement.innerHTML = `$${Number(sale.price).toFixed(2)} <button onclick="${editFn}('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button>`;
-            }
-
-            // 3. Actualizar totales DIARIOS y GENERALES
-            updateDailyTotals(date, localArray, isMainSales);
-            updateGeneralTotals(localArray, isMainSales);
-        }
-
-        /**
-         * Actualiza quirúrgicamente una tarjeta de producto en el DOM.
-         */
-        function updateProductCardInDOM(product, isMainInventory) {
-            // --- CORRECCIÓN DEFINITIVA DEL PREFIJO/SUFIJO ---
-            const idSuffix = isMainInventory ? '' : '-et'; // Sufijo para El Transito
-            const elementPrefix = 'product-';          // Prefijo común
-
-            const stockEl = document.getElementById(`${elementPrefix}stock${idSuffix}-${product.id}`);
-            const nameEl = document.getElementById(`${elementPrefix}name${idSuffix}-${product.id}`);
-            const priceEl = document.getElementById(`${elementPrefix}price${idSuffix}-${product.id}`);
-            const cardEl = document.getElementById(`${elementPrefix}card${idSuffix}-${product.id}`);
-            // ------ FIN DE LA CORRECCIÓN ------
-
-            if (stockEl) {
-                stockEl.textContent = `Stock: ${product.quantity}`;
-            } else {
-                 console.error(`Elemento no encontrado: ${elementPrefix}stock${idSuffix}-${product.id}`);
-            }
-            if (nameEl) {
-                nameEl.textContent = product.name;
-            } else {
-                 console.error(`Elemento no encontrado: ${elementPrefix}name${idSuffix}-${product.id}`);
-            }
-            if (priceEl) {
-                priceEl.textContent = `$${Number(product.price).toFixed(2)}`;
-            } else {
-                 console.error(`Elemento no encontrado: ${elementPrefix}price${idSuffix}-${product.id}`);
-            }
-            
-            // MUY IMPORTANTE: Actualizar el 'onclick' del botón de editar
-            // para que el próximo clic use los datos nuevos.
-            if (cardEl) {
-                const editBtn = cardEl.querySelector('button[title="Editar nombre y precio"]'); // Selector más específico
-                if (editBtn) {
-                    const editFn = isMainInventory ? 'handleEditClick' : 'handleEditClickET';
-                    editBtn.setAttribute('onclick', `${editFn}('${product.id}', '${escapeJsString(product.name)}', ${product.price})`);
-                } else {
-                     console.error(`Botón Editar no encontrado en: ${elementPrefix}card${idSuffix}-${product.id}`);
-                }
-            } else {
-                 console.error(`Elemento no encontrado: ${elementPrefix}card${idSuffix}-${product.id}`);
-            }
-        }
-
-        /**
          * Renderizado INICIAL de la lista de ventas (MONOLÍTICO).
-         * Solo se usa en la carga inicial.
+         * AHORA ACEPTA UN ARRAY FILTRADO.
          */
         function renderSales(items) {
             salesListLoader.innerHTML = "";
-            salesListContainer.innerHTML = ""; // Apunta al nuevo contenedor
-            updateGeneralTotals(items, true); // Actualiza totales generales
+            salesListContainer.innerHTML = ""; 
+            updateGeneralTotals(items, true); // Actualiza totales (conoce el array filtrado vs el completo)
 
             if (items.length === 0) {
-                salesListContainer.innerHTML = `<p class="p-4 text-gray-400">No hay ventas registradas.</p>`;
+                const isSearching = searchSalesInput.value || pendingOnlyCheckbox.checked;
+                salesListContainer.innerHTML = `<p class="p-4 text-gray-400">${isSearching ? 'No se encontraron ventas que coincidan con el filtro.' : 'No hay ventas registradas.'}</p>`;
                 return;
             } 
 
@@ -744,9 +662,10 @@
             let fullHTML = '';
             sortedDates.forEach(date => {
                 const dailySales = groupedByDate[date];
+                // Los totales diarios AHORA se basan en los items (filtrados)
                 const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
                 const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
-                // --- FORMATO DE FECHA CORREGIDO ---
+                
                 const displayDate = new Date(date + 'T00:00:00Z').toLocaleDateString('es-SV', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
 
                 const headerHTML = `
@@ -778,7 +697,7 @@
             const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
             if (error) { console.error("Error cargando ventas:", error); totalSalesCount.textContent = "Error al cargar"; return; }
             allSales = data;
-            renderSales(allSales); // Carga inicial
+            filterAndRenderSales(); // Carga inicial con filtro
         }
 
         window.changeSaleStatus = async function(id, newStatus) { 
@@ -799,7 +718,7 @@
             if (updateError) { alert("❌ Error al actualizar: " + updateError.message); return; }
             
             saleInArray.status = newStatus;
-            updateSaleRowInDOM(saleInArray, allSales, true);
+            filterAndRenderSales(); // Re-renderizar para reflejar filtros
             
             if (newStatus === 'Pagado' && oldStatus !== 'Pagado') {
                 await updateProductStock(soldProductName, PRODUCTS_TABLE, allProducts, -1);
@@ -822,7 +741,7 @@
                 const saleInArray = allSales.find(s => s.id === id);
                 if (saleInArray) {
                     saleInArray.price = newPrice;
-                    updateSaleRowInDOM(saleInArray, allSales, true);
+                    filterAndRenderSales(); // Re-renderizar
                 }
             }
         }
@@ -832,7 +751,6 @@
             
             const saleIndex = allSales.findIndex(s => s.id === id);
             if (saleIndex === -1) return;
-            const saleToDelete = allSales[saleIndex];
             
             const { error } = await supabase.from(SALES_TABLE).delete().eq("id", id); 
             
@@ -840,7 +758,7 @@
                 alert("❌ Error al eliminar: " + error.message);
             } else {
                 allSales.splice(saleIndex, 1); // Quitar del array local
-                removeSaleFromDOM(saleToDelete, allSales, true); // Quitar del DOM
+                filterAndRenderSales(); // Re-renderizar la lista filtrada
             }
         }
         
@@ -848,14 +766,16 @@
         
         /**
          * Renderizado INICIAL de la lista de ventas (MONOLÍTICO) - EL TRANSITO.
+         * AHORA ACEPTA UN ARRAY FILTRADO.
          */
         function renderSalesElTransito(items) {
             salesListLoaderET.innerHTML = "";
-            salesListContainerET.innerHTML = ""; // Apunta al nuevo contenedor
-            updateGeneralTotals(items, false); // Actualiza totales generales
+            salesListContainerET.innerHTML = "";
+            updateGeneralTotals(items, false); // Actualiza totales
 
             if (items.length === 0) {
-                salesListContainerET.innerHTML = `<p class="p-4 text-gray-400">No hay ventas registradas en El Transito.</p>`;
+                const isSearching = searchSalesInputET.value || pendingOnlyCheckboxET.checked;
+                salesListContainerET.innerHTML = `<p class="p-4 text-gray-400">${isSearching ? 'No se encontraron ventas que coincidan con el filtro.' : 'No hay ventas registradas en El Transito.'}</p>`;
                 return;
             } 
 
@@ -873,7 +793,6 @@
                 const dailySales = groupedByDate[date];
                 const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
                 const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
-                // --- FORMATO DE FECHA CORREGIDO ---
                 const displayDate = new Date(date + 'T00:00:00Z').toLocaleDateString('es-SV', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
 
                 const headerHTML = `
@@ -904,7 +823,7 @@
             const { data, error } = await supabase.from(SALES_EL_TRANSITO_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
             if (error) { console.error("Error cargando ventas (El Transito):", error); totalSalesCountET.textContent = "Error al cargar"; return; }
             allSalesElTransito = data;
-            renderSalesElTransito(allSalesElTransito); // Carga inicial
+            filterAndRenderSalesET(); // Carga inicial con filtro
         }
         
         window.changeSaleStatusET = async function(id, newStatus) { 
@@ -925,7 +844,7 @@
             if (updateError) { alert("❌ Error al actualizar (ET): " + updateError.message); return; }
             
             saleInArray.status = newStatus;
-            updateSaleRowInDOM(saleInArray, allSalesElTransito, false);
+            filterAndRenderSalesET(); // Re-renderizar
             
             if (newStatus === 'Pagado' && oldStatus !== 'Pagado') {
                 await updateProductStock(soldProductName, PRODUCTS_EL_TRANSITO_TABLE, allProductsElTransito, -1);
@@ -948,7 +867,7 @@
                 const saleInArray = allSalesElTransito.find(s => s.id === id);
                 if (saleInArray) {
                     saleInArray.price = newPrice;
-                    updateSaleRowInDOM(saleInArray, allSalesElTransito, false);
+                    filterAndRenderSalesET(); // Re-renderizar
                 }
             }
         }
@@ -958,7 +877,6 @@
             
             const saleIndex = allSalesElTransito.findIndex(s => s.id === id);
             if (saleIndex === -1) return;
-            const saleToDelete = allSalesElTransito[saleIndex];
             
             const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).delete().eq("id", id); 
             
@@ -966,13 +884,54 @@
                 alert("❌ Error al eliminar: " + error.message);
             } else {
                 allSalesElTransito.splice(saleIndex, 1); // Quitar del array local
-                removeSaleFromDOM(saleToDelete, allSalesElTransito, false); // Quitar del DOM
+                filterAndRenderSalesET(); // Re-renderizar la lista filtrada
             }
         }
 
         // ============================================================================
-        // == EL RESTO DE FUNCIONES (INVENTARIO, FALTANTES, HERRAMIENTAS)            ==
+        // == EL RESTO DE FUNCIONES (PRODUCTOS, FALTANTES, HERRAMIENTAS)             ==
         // ============================================================================
+        
+        /**
+         * Actualiza quirúrgicamente una tarjeta de producto en el DOM. (Sin cambios)
+         */
+        function updateProductCardInDOM(product, isMainInventory) {
+            const idSuffix = isMainInventory ? '' : '-et'; 
+            const elementPrefix = 'product-';
+
+            const stockEl = document.getElementById(`${elementPrefix}stock${idSuffix}-${product.id}`);
+            const nameEl = document.getElementById(`${elementPrefix}name${idSuffix}-${product.id}`);
+            const priceEl = document.getElementById(`${elementPrefix}price${idSuffix}-${product.id}`);
+            const cardEl = document.getElementById(`${elementPrefix}card${idSuffix}-${product.id}`);
+
+            if (stockEl) {
+                stockEl.textContent = `Stock: ${product.quantity}`;
+            } else {
+                 console.error(`Elemento no encontrado: ${elementPrefix}stock${idSuffix}-${product.id}`);
+            }
+            if (nameEl) {
+                nameEl.textContent = product.name;
+            } else {
+                 console.error(`Elemento no encontrado: ${elementPrefix}name${idSuffix}-${product.id}`);
+            }
+            if (priceEl) {
+                priceEl.textContent = `$${Number(product.price).toFixed(2)}`;
+            } else {
+                 console.error(`Elemento no encontrado: ${elementPrefix}price${idSuffix}-${product.id}`);
+            }
+            
+            if (cardEl) {
+                const editBtn = cardEl.querySelector('button[title="Editar nombre y precio"]'); 
+                if (editBtn) {
+                    const editFn = isMainInventory ? 'handleEditClick' : 'handleEditClickET';
+                    editBtn.setAttribute('onclick', `${editFn}('${product.id}', '${escapeJsString(product.name)}', ${product.price})`);
+                } else {
+                     console.error(`Botón Editar no encontrado en: ${elementPrefix}card${idSuffix}-${product.id}`);
+                }
+            } else {
+                 console.error(`Elemento no encontrado: ${elementPrefix}card${idSuffix}-${product.id}`);
+            }
+        }
 
         // IV. FUNCIONES DE PRODUCTOS FALTANTES
         async function fetchMissingProducts() { const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false }); if (error) { console.error("Error cargando productos faltantes:", error); totalMissingCount.textContent = "Error al cargar"; return; } allMissingProducts = data; renderMissingProducts(allMissingProducts); }
@@ -1024,12 +983,10 @@
                 
                 grouped[category].forEach(p => { 
                     const card = document.createElement("div");
-                    // --- ID CORREGIDO ---
                     card.id = `product-card-${p.id}`; 
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
                     
-                    // --- IDs CORREGIDOS ---
                     card.innerHTML = `
                         <button onclick="handleEditClick('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
@@ -1056,12 +1013,10 @@
 
         window.handleEditClick = (id, name, price) => { const newName = prompt("Nuevo nombre:", name); if (newName === null || newName.trim() === "") return; const newPrice = prompt("Nuevo precio (USD):", Number(price).toFixed(2)); if (newPrice === null) return; editProduct(id, newName, newPrice); }; 
         
-        // --- FUNCIÓN EDITPRODUCT CORREGIDA ---
         async function editProduct(id, newName, newPrice) { 
             const priceValue = parseFloat(newPrice); 
             if (isNaN(priceValue) || priceValue < 0) { alert("Precio inválido."); return; } 
             
-            // 1. Actualización optimista de UI
             const productInArray = allProducts.find(p => p.id === id);
             if (!productInArray) return;
 
@@ -1070,22 +1025,20 @@
             
             productInArray.name = newName.trim();
             productInArray.price = priceValue;
-            updateProductCardInDOM(productInArray, true); // <-- Actualiza DOM instantáneamente
+            updateProductCardInDOM(productInArray, true); 
             updateAutocompleteList(allProducts, inventorySuggestions);
             
             const { error } = await supabase.from(PRODUCTS_TABLE).update({ name: newName.trim(), price: priceValue }).eq("id", id); 
             
             if (error) {
                 alert("❌ Error: " + error.message); 
-                // 2. Revertir en caso de error
                 productInArray.name = oldName;
                 productInArray.price = oldPrice;
-                updateProductCardInDOM(productInArray, true); // <-- Revierte en el DOM
+                updateProductCardInDOM(productInArray, true); 
                 updateAutocompleteList(allProducts, inventorySuggestions);
             }
         }
         
-        // --- FUNCIÓN CHANGEQTY CORREGIDA ---
         window.changeQty = async function(id, delta) { 
             const productInArray = allProducts.find(p => p.id === id);
             if (!productInArray) return;
@@ -1093,18 +1046,16 @@
             const currentQty = productInArray.quantity || 0;
             const newQty = Math.max(0, currentQty + delta);
             
-            // 1. Actualización optimista de UI (local)
             productInArray.quantity = newQty;
-            updateProductCardInDOM(productInArray, true); // <-- Actualiza DOM instantáneamente
+            updateProductCardInDOM(productInArray, true); 
             updateAutocompleteList(allProducts, inventorySuggestions);
 
             const { error } = await supabase.from(PRODUCTS_TABLE).update({ quantity: newQty }).eq("id", id); 
             
             if (error) {
                 alert("❌ Error al actualizar cantidad: " + error.message);
-                // 2. Revertir la UI si hay error
                 productInArray.quantity = currentQty;
-                updateProductCardInDOM(productInArray, true); // <-- Revierte en el DOM
+                updateProductCardInDOM(productInArray, true); 
                 updateAutocompleteList(allProducts, inventorySuggestions);
             }
         }
@@ -1118,7 +1069,7 @@
                 alert("❌ Error al eliminar: " + error.message);
             } else {
                 allProducts = allProducts.filter(p => p.id !== id);
-                filterAndRenderProducts(); // El borrado sí necesita un re-renderizado completo
+                filterAndRenderProducts(); 
                 updateAutocompleteList(allProducts, inventorySuggestions);
             }
         }
@@ -1154,12 +1105,10 @@
                 
                 grouped[category].forEach(p => { 
                     const card = document.createElement("div"); 
-                    // --- ID CORREGIDO ---
                     card.id = `product-card-et-${p.id}`;
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
                     
-                    // --- IDs CORREGIDOS ---
                     card.innerHTML = `
                         <button onclick="handleEditClickET('${p.id}', '${escapeJsString(p.name)}', ${p.price})" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
@@ -1186,12 +1135,10 @@
 
         window.handleEditClickET = (id, name, price) => { const newName = prompt("Nuevo nombre (El Transito):", name); if (newName === null || newName.trim() === "") return; const newPrice = prompt("Nuevo precio (USD) (El Transito):", Number(price).toFixed(2)); if (newPrice === null) return; editProductET(id, newName, newPrice); }; 
         
-        // --- FUNCIÓN EDITPRODUCTET CORREGIDA ---
         async function editProductET(id, newName, newPrice) { 
             const priceValue = parseFloat(newPrice); 
             if (isNaN(priceValue) || priceValue < 0) { alert("Precio inválido."); return; } 
             
-            // 1. Actualización optimista de UI
             const productInArray = allProductsElTransito.find(p => p.id === id);
             if (!productInArray) return;
 
@@ -1200,22 +1147,20 @@
 
             productInArray.name = newName.trim();
             productInArray.price = priceValue;
-            updateProductCardInDOM(productInArray, false); // <-- Actualiza DOM instantáneamente
+            updateProductCardInDOM(productInArray, false); 
             updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             
             const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ name: newName.trim(), price: priceValue }).eq("id", id); 
             
             if (error) {
                 alert("❌ Error: " + error.message); 
-                // 2. Revertir en caso de error
                 productInArray.name = oldName;
                 productInArray.price = oldPrice;
-                updateProductCardInDOM(productInArray, false); // <-- Revierte en el DOM
+                updateProductCardInDOM(productInArray, false); 
                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             }
         }
 
-        // --- FUNCIÓN CHANGEQTYET CORREGIDA ---
         window.changeQtyET = async function(id, delta) { 
             const productInArray = allProductsElTransito.find(p => p.id === id);
             if (!productInArray) return;
@@ -1223,18 +1168,16 @@
             const currentQty = productInArray.quantity || 0;
             const newQty = Math.max(0, currentQty + delta); 
 
-            // 1. Actualización optimista de UI (local)
             productInArray.quantity = newQty;
-            updateProductCardInDOM(productInArray, false); // <-- Actualiza DOM instantáneamente
+            updateProductCardInDOM(productInArray, false); 
             updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             
             const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ quantity: newQty }).eq("id", id); 
             
             if (error) {
                 alert("❌ Error al actualizar cantidad: " + error.message);
-                // 2. Revertir la UI si hay error
                 productInArray.quantity = currentQty;
-                updateProductCardInDOM(productInArray, false); // <-- Revierte en el DOM
+                updateProductCardInDOM(productInArray, false); 
                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             }
         }
@@ -1248,7 +1191,7 @@
                 alert("❌ Error al eliminar: " + error.message);
             } else {
                 allProductsElTransito = allProductsElTransito.filter(p => p.id !== id);
-                filterAndRenderProductsET(); // El borrado sí necesita un re-renderizado completo
+                filterAndRenderProductsET(); 
                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             }
         }
@@ -1286,9 +1229,8 @@
                 
                 productToUpdate.quantity = newQty;
                 let datalistEl;
-                let isMain = (table === PRODUCTS_TABLE); // Determinar si es inventario principal
+                let isMain = (table === PRODUCTS_TABLE); 
 
-                // Llamar a la actualización quirúrgica
                 updateProductCardInDOM(productToUpdate, isMain); 
                 datalistEl = isMain ? inventorySuggestions : inventorySuggestionsET;
                 updateAutocompleteList(localArray, datalistEl);
@@ -1301,7 +1243,6 @@
                 if (updateError) {
                     console.error("❌ Error al actualizar stock:", updateError.message);
                     productToUpdate.quantity = currentQty;
-                    // Revertir en el DOM
                     updateProductCardInDOM(productToUpdate, isMain);
                     updateAutocompleteList(localArray, datalistEl);
                 } else {
@@ -1371,7 +1312,6 @@
                 const newLogoUrl = await uploadImage(selectedLogoFile);
                 if (!newLogoUrl) { throw new Error("La función de subida no devolvió una URL."); }
                 
-                // Guardar la URL en la tabla 'config'
                 const { error: updateError } = await supabase
                     .from(CONFIG_TABLE)
                     .upsert({ key: LOGO_CONFIG_KEY, value: newLogoUrl }, { onConflict: 'key' });
@@ -1379,16 +1319,15 @@
                 if (updateError) throw updateError;
                 
                 alert("✅ Logo actualizado correctamente.");
-                await loadLogo(); // Recargar el logo desde la nueva URL
+                await loadLogo(); 
                 selectedLogoFile = null;
-                logoUpload.value = ""; // Limpiar el input file
+                logoUpload.value = ""; 
             } catch (error) {
                 console.error("Error al guardar logo:", error);
                 alert("❌ Fallo al guardar logo: " + error.message);
-                // Opcional: Revertir previsualización si falla la subida
                 await loadLogo(); 
             } finally {
-                logoSaveButton.disabled = true; // Deshabilitar hasta nuevo cambio
+                logoSaveButton.disabled = true; 
                 logoSaveButton.textContent = "Guardar";
             }
         });
@@ -1446,7 +1385,6 @@
         // == LÓGICA DE REALTIME (CON ACTUALIZACIÓN QUIRÚRGICA)                    ==
         // ============================================================================
         
-        // --- FUNCIÓN HANDLEREALTIMEPAYLOAD CORREGIDA ---
         function handleRealtimePayload(payload, localArray, renderFunction, idKey = 'id') {
             console.log('📡 Payload Realtime Recibido:', payload);
             const { eventType, new: newRecord, old: oldRecord } = payload;
@@ -1461,33 +1399,54 @@
             const isMainProducts = (localArray === allProducts);
             const isElTransitoProducts = (localArray === allProductsElTransito);
 
-            // --- LÓGICA QUIRÚRGICA PARA VENTAS ---
+            // --- LÓGICA QUIRÚRGICA PARA VENTAS (MODIFICADA PARA FILTRADO) ---
             if (isMainSales || isElTransitoSales) {
+                let needsFullRender = false; // Flag para disparar re-renderizado
+                
                 switch (eventType) {
                     case 'INSERT':
                         if (index === -1) { 
                             localArray.unshift(newRecord); 
+                            // Re-ordenar el array local
                             localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at)); 
-                            addSaleToDOM(newRecord, localArray, isMainSales); 
+                            needsFullRender = true; 
                         }
                         break;
                     case 'UPDATE':
                         if (index !== -1) {
                             localArray[index] = newRecord; 
-                            updateSaleRowInDOM(newRecord, localArray, isMainSales); 
+                            needsFullRender = true;
+                        } else {
+                            // Evento tardío, tratar como inserción
+                            localArray.unshift(newRecord); 
+                            localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at)); 
+                            needsFullRender = true;
                         }
                         break;
                     case 'DELETE':
                         if (index !== -1) {
-                            const deletedSale = localArray[index];
                             localArray.splice(index, 1); 
-                            removeSaleFromDOM(deletedSale, localArray, isMainSales); 
+                            needsFullRender = true;
                         }
                         break;
+                    default:
+                         console.warn('Evento Realtime no manejado:', eventType, payload);
+                        return;
                 }
-                return; 
+                
+                if (needsFullRender) {
+                    // En lugar de cirugía DOM, llamamos al renderizado completo
+                    // que respeta los filtros actuales.
+                    if (isMainSales) {
+                        filterAndRenderSales();
+                    } else {
+                        filterAndRenderSalesET();
+                    }
+                }
+                return; // Salir de la función
             }
             // --- FIN DE LÓGICA QUIRÚRGICA PARA VENTAS ---
+
 
             // --- INICIO DE LÓGICA QUIRÚRGICA PARA PRODUCTOS ---
             if (isMainProducts || isElTransitoProducts) {
@@ -1496,29 +1455,25 @@
                     case 'INSERT':
                         if (index === -1) {
                              localArray.unshift(newRecord);
-                             // Ordenar después de insertar para mantener consistencia
                              localArray.sort((a, b) => (a.category || '').localeCompare(b.category || '') || new Date(b.created_at) - new Date(a.created_at));
                         }
-                        needsFullRender = true; // Necesario para colocar la tarjeta en la categoría correcta
+                        needsFullRender = true; 
                         break;
                     case 'UPDATE':
                         if (index !== -1) {
-                            // Detectar si la categoría cambió, lo que requiere un re-renderizado
                             const oldCategory = localArray[index].category;
                             const newCategory = newRecord.category;
                             if (oldCategory !== newCategory) {
                                 needsFullRender = true;
                             }
                             
-                            localArray[index] = newRecord; // Actualizar array local
+                            localArray[index] = newRecord; 
                             if (!needsFullRender) {
-                                updateProductCardInDOM(newRecord, isMainProducts); // <-- CAMBIO QUIRÚRGICO
+                                updateProductCardInDOM(newRecord, isMainProducts); 
                             } else {
-                                // Re-ordenar si la categoría cambió antes de redibujar
                                 localArray.sort((a, b) => (a.category || '').localeCompare(b.category || '') || new Date(b.created_at) - new Date(a.created_at));
                             }
                         } else {
-                            // Si no se encuentra, podría ser un evento tardío, tratar como inserción
                             localArray.unshift(newRecord); 
                             localArray.sort((a, b) => (a.category || '').localeCompare(b.category || '') || new Date(b.created_at) - new Date(a.created_at));
                             needsFullRender = true;
@@ -1527,7 +1482,7 @@
                     case 'DELETE':
                         if (index !== -1) {
                             localArray.splice(index, 1);
-                            needsFullRender = true; // Necesario para eliminar la tarjeta
+                            needsFullRender = true; 
                         }
                         break;
                 }
@@ -1536,7 +1491,6 @@
                     renderFunction(); // renderFunction es filterAndRenderProducts / ET
                 }
 
-                // Actualizar autocompletado en todos los casos
                 if (isMainProducts) updateAutocompleteList(allProducts, inventorySuggestions);
                 if (isElTransitoProducts) updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
                 
@@ -1552,7 +1506,7 @@
                     break;
                 case 'UPDATE':
                     if (index !== -1) localArray[index] = newRecord;
-                    else localArray.unshift(newRecord); // Añadir si no se encontró (podría ser evento tardío)
+                    else localArray.unshift(newRecord); 
                     break;
                 case 'DELETE':
                     if (index !== -1) localArray.splice(index, 1);
@@ -1561,7 +1515,6 @@
                     console.warn('Evento Realtime no manejado:', eventType, payload);
                     return;
             }
-            // Reordenar después de cualquier cambio (para Faltantes y Herramientas por fecha)
             if (renderFunction === renderMissingProducts || renderFunction === renderTools) {
                  localArray.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             }
@@ -1586,16 +1539,16 @@
                     (payload) => handleRealtimePayload(payload, allProductsElTransito, filterAndRenderProductsET, 'id')
                 ).subscribe((status, err) => console.log(`Canal ${PRODUCTS_EL_TRANSITO_TABLE}: ${status}`, err || ''));
 
-            // Ventas (usa handler quirúrgico)
+            // Ventas (AHORA usa handler de re-renderizado filtrado)
             supabase.channel('public:' + SALES_TABLE, channelOptions)
                 .on('postgres_changes', { event: '*', schema: 'public', table: SALES_TABLE },
-                    (payload) => handleRealtimePayload(payload, allSales, null, 'id') // Pasamos 'null' como renderFunction
+                    (payload) => handleRealtimePayload(payload, allSales, filterAndRenderSales, 'id') 
                 ).subscribe((status, err) => console.log(`Canal ${SALES_TABLE}: ${status}`, err || ''));
 
-            // Ventas ET (usa handler quirúrgico)
+            // Ventas ET (AHORA usa handler de re-renderizado filtrado)
             supabase.channel('public:' + SALES_EL_TRANSITO_TABLE, channelOptions)
                 .on('postgres_changes', { event: '*', schema: 'public', table: SALES_EL_TRANSITO_TABLE },
-                    (payload) => handleRealtimePayload(payload, allSalesElTransito, null, 'id') // Pasamos 'null' como renderFunction
+                    (payload) => handleRealtimePayload(payload, allSalesElTransito, filterAndRenderSalesET, 'id')
                 ).subscribe((status, err) => console.log(`Canal ${SALES_EL_TRANSITO_TABLE}: ${status}`, err || ''));
 
             // Faltantes
@@ -1617,9 +1570,17 @@
         // ============================================================================
         function setStatusMessage(el, msg, success = true) { el.textContent = msg; el.className = `text-sm mt-3 ${success ? 'text-green-400' : 'text-red-400'}`; setTimeout(() => (el.textContent = ""), 3000); }
         
+        // --- Eventos de Búsqueda de Inventario ---
         searchInput.addEventListener("input", filterAndRenderProducts);
+        searchInputET.addEventListener("input", filterAndRenderProductsET);
         
-        // --- Eventos de Submit de Productos/Herramientas (usan refresco completo al INSERTAR) ---
+        // --- Eventos de Búsqueda de Ventas (NUEVO) ---
+        searchSalesInput.addEventListener("input", filterAndRenderSales);
+        pendingOnlyCheckbox.addEventListener("change", filterAndRenderSales);
+        searchSalesInputET.addEventListener("input", filterAndRenderSalesET);
+        pendingOnlyCheckboxET.addEventListener("change", filterAndRenderSalesET);
+        
+        // --- Eventos de Submit de Productos/Herramientas ---
         form.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("submit"); 
@@ -1633,10 +1594,7 @@
                 if (insertError) throw insertError; 
                 
                 form.reset(); qtyIn.value = 1; 
-                // No es necesario añadirlo manualmente si el realtime funciona bien
-                // allProducts.unshift(insertedProduct); 
-                // filterAndRenderProducts(); // Dejar que el realtime maneje la actualización
-                // updateAutocompleteList(allProducts, inventorySuggestions);
+                // Realtime se encargará de re-renderizar
                 setStatusMessage(status, "Producto agregado con éxito ✅", true); 
             } catch (err) { 
                 console.error("Error al agregar producto:", err);
@@ -1646,8 +1604,6 @@
             } 
         });
 
-        searchInputET.addEventListener("input", filterAndRenderProductsET);
-        
         formET.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("submit-et"); 
@@ -1659,10 +1615,7 @@
                 const { data: insertedProduct, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).insert(newProductET).select().single();
                 if (error) throw error; 
                 formET.reset(); qtyInET.value = 1; 
-                // No es necesario añadirlo manualmente si el realtime funciona bien
-                // allProductsElTransito.unshift(insertedProduct);
-                // filterAndRenderProductsET(); // Dejar que el realtime maneje la actualización
-                // updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
+                // Realtime se encargará de re-renderizar
                 setStatusMessage(statusET, "Producto agregado con éxito (El Transito) ✅", true); 
             } catch (err) { 
                 console.error("Error al agregar producto ET:", err);
@@ -1681,9 +1634,7 @@
                 const { data: insertedMissing, error } = await supabase.from(MISSING_PRODUCTS_TABLE).insert(newMissing).select().single();
                 if (error) throw error;
                 missingProductForm.reset(); 
-                // No es necesario añadirlo manualmente si el realtime funciona bien
-                // allMissingProducts.unshift(insertedMissing);
-                // renderMissingProducts(allMissingProducts); 
+                // Realtime se encargará de re-renderizar
                 setStatusMessage(missingProductStatus, "Producto agregado a la lista ✅", true); 
             } catch (err) { 
                 console.error("Error al agregar producto faltante:", err);
@@ -1704,9 +1655,7 @@
                 const { data: insertedTool, error } = await supabase.from(TOOLS_TABLE).insert(newTool).select().single();
                 if (error) throw error;
                 toolForm.reset();
-                // No es necesario añadirlo manualmente si el realtime funciona bien
-                // allTools.unshift(insertedTool);
-                // renderTools(allTools); 
+                // Realtime se encargará de re-renderizar
                 setStatusMessage(toolStatus, "Herramienta guardada con éxito ✅", true);
             } catch (err) {
                  console.error("Error al guardar herramienta:", err);
@@ -1716,7 +1665,7 @@
             }
         });
 
-        // --- Eventos de Submit de Ventas (USAN LÓGICA QUIRÚRGICA) ---
+        // --- Eventos de Submit de Ventas ---
         salesForm.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("sale-submit"); 
@@ -1742,7 +1691,6 @@
 
                 if (saleError) throw saleError;
 
-                // Actualizar stock DESPUÉS de registrar la venta
                 if (newSale.status === 'Pagado') {
                     await updateProductStock(soldProductName, PRODUCTS_TABLE, allProducts, -1);
                 }
@@ -1750,11 +1698,7 @@
                 salesForm.reset(); 
                 saleDateIn.value = new Date().toISOString().split('T')[0]; 
                 
-                // No es necesario añadirlo/renderizarlo manualmente si el realtime funciona bien
-                // allSales.unshift(insertedSale);
-                // allSales.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at)); 
-                // addSaleToDOM(insertedSale, allSales, true); 
-
+                // Realtime se encargará de re-renderizar
                 setStatusMessage(saleStatus, "Venta registrada con éxito ✅", true); 
             } catch (err) { 
                 console.error("Error al registrar venta:", err);
@@ -1789,7 +1733,6 @@
                     
                 if (saleErrorET) throw saleErrorET;
 
-                 // Actualizar stock DESPUÉS de registrar la venta
                 if (newSaleET.status === 'Pagado') {
                     await updateProductStock(soldProductNameET, PRODUCTS_EL_TRANSITO_TABLE, allProductsElTransito, -1);
                 }
@@ -1797,11 +1740,7 @@
                 salesFormET.reset(); 
                 saleDateInET.value = new Date().toISOString().split('T')[0]; 
                 
-                 // No es necesario añadirlo/renderizarlo manualmente si el realtime funciona bien
-                // allSalesElTransito.unshift(insertedSale);
-                // allSalesElTransito.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at)); 
-                // addSaleToDOM(insertedSale, allSalesElTransito, false);
-
+                // Realtime se encargará de re-renderizar
                 setStatusMessage(saleStatusET, "Venta (El Transito) registrada con éxito ✅", true); 
             } catch (err) { 
                  console.error("Error al registrar venta ET:", err);
@@ -1817,9 +1756,9 @@
             const file = event.target.files[0];
             if (!file) return; 
             
-            const originalButtonText = "Editar Foto"; // Guardar texto original
+            const originalButtonText = "Editar Foto"; 
             const editButton = document.querySelector(`button[onclick="editToolImage('${editingToolId}')"]`);
-            if(editButton) editButton.textContent = "Subiendo..."; // Indicar carga
+            if(editButton) editButton.textContent = "Subiendo..."; 
             
             try {
                 const newImageUrl = await uploadImage(file);
@@ -1828,19 +1767,15 @@
                 const { error } = await supabase.from(TOOLS_TABLE).update({ image_url: newImageUrl }).eq('id', editingToolId);
                 if (error) throw error;
                 
-                // No es necesario actualizar manualmente si el realtime funciona
-                // const toolInArray = allTools.find(t => t.id === editingToolId);
-                // if (toolInArray) toolInArray.image_url = newImageUrl;
-                // renderTools(allTools); 
-                
+                // Realtime se encargará de re-renderizar
                 alert('✅ Imagen actualizada correctamente.');
             } catch (error) {
                 console.error('Error al actualizar la imagen de la herramienta:', error);
                 alert('❌ Error: ' + error.message);
             } finally {
-                editingToolId = null; // Resetear ID
-                toolImageEditorInput.value = ''; // Limpiar input file
-                if(editButton) editButton.textContent = originalButtonText; // Restaurar texto botón
+                editingToolId = null; 
+                toolImageEditorInput.value = ''; 
+                if(editButton) editButton.textContent = originalButtonText; 
             }
         });
 
@@ -1848,34 +1783,28 @@
         
         // --- CARGA INICIAL ---
         window.addEventListener("load", async () => {
-            // Configuración inicial de UI
-            themeSelector.value = root.className || 'theme-dark'; // Asegurar valor inicial
+            themeSelector.value = root.className || 'theme-dark'; 
             saleDateIn.value = new Date().toISOString().split('T')[0];
             saleDateInET.value = new Date().toISOString().split('T')[0];
-            toggleView('inventory'); // Vista por defecto
-            showSkeletonLoaders(); // Mostrar esqueletos mientras carga
+            toggleView('inventory'); 
+            showSkeletonLoaders(); 
             
-            // Cargar logo primero
             await loadLogo(); 
             
-            // Cargar todos los datos iniciales en paralelo
             try {
                 await Promise.all([
                     fetchProducts(), 
                     fetchProductsET(),
-                    fetchSales(), // Llama al renderizado MONOLÍTICO inicial
-                    fetchSalesElTransito(), // Llama al renderizado MONOLÍTICO inicial
+                    fetchSales(), 
+                    fetchSalesElTransito(), 
                     fetchMissingProducts(),
                     fetchTools() 
                 ]);
                 
-                // INICIAR REALTIME DESPUÉS DE LA CARGA INICIAL EXITOSA
                 initializeRealtimeSubscriptions();
 
             } catch (error) {
                 console.error("Error crítico durante la carga de datos inicial:", error);
-                // Opcional: Mostrar un mensaje de error al usuario en la UI
-                // document.body.innerHTML = '<p class="text-red-500 p-4">Error al cargar los datos. Intenta recargar la página.</p>';
             }
         });
     </script>
