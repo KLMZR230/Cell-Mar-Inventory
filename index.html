@@ -1039,13 +1039,21 @@
             }
         }
         
+        // ============================================================================
+        // == ¡¡¡FUNCIÓN CORREGIDA!!! ==
+        // ============================================================================
         window.changeQty = async function(id, delta) { 
             const productInArray = allProducts.find(p => p.id === id);
             if (!productInArray) return;
             
-            const currentQty = productInArray.quantity || 0;
+            // --- LÍNEA CORREGIDA ---
+            // Asegura que la cantidad actual sea un número entero antes de sumar
+            const currentQty = parseInt(productInArray.quantity) || 0;
+            // --- FIN DE LA CORRECCIÓN ---
+            
             const newQty = Math.max(0, currentQty + delta);
             
+            // 1. Actualización optimista de UI (local)
             productInArray.quantity = newQty;
             updateProductCardInDOM(productInArray, true); 
             updateAutocompleteList(allProducts, inventorySuggestions);
@@ -1054,6 +1062,7 @@
             
             if (error) {
                 alert("❌ Error al actualizar cantidad: " + error.message);
+                // 2. Revertir la UI si hay error
                 productInArray.quantity = currentQty;
                 updateProductCardInDOM(productInArray, true); 
                 updateAutocompleteList(allProducts, inventorySuggestions);
@@ -1161,13 +1170,21 @@
             }
         }
 
+        // ============================================================================
+        // == ¡¡¡FUNCIÓN CORREGIDA!!! ==
+        // ============================================================================
         window.changeQtyET = async function(id, delta) { 
             const productInArray = allProductsElTransito.find(p => p.id === id);
             if (!productInArray) return;
 
-            const currentQty = productInArray.quantity || 0;
+            // --- LÍNEA CORREGIDA ---
+            // Asegura que la cantidad actual sea un número entero antes de sumar
+            const currentQty = parseInt(productInArray.quantity) || 0;
+            // --- FIN DE LA CORRECCIÓN ---
+            
             const newQty = Math.max(0, currentQty + delta); 
 
+            // 1. Actualización optimista de UI (local)
             productInArray.quantity = newQty;
             updateProductCardInDOM(productInArray, false); 
             updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
@@ -1176,6 +1193,7 @@
             
             if (error) {
                 alert("❌ Error al actualizar cantidad: " + error.message);
+                // 2. Revertir la UI si hay error
                 productInArray.quantity = currentQty;
                 updateProductCardInDOM(productInArray, false); 
                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
@@ -1219,7 +1237,9 @@
             const productToUpdate = localArray.find(p => p.name.trim() === productName);
 
             if (productToUpdate) {
-                const currentQty = productToUpdate.quantity || 0;
+                // --- POSIBLE LUGAR DE ERROR TAMBIÉN CORREGIDO ---
+                const currentQty = parseInt(productToUpdate.quantity) || 0;
+                // --- FIN DE LA CORRECCIÓN ---
                 const newQty = Math.max(0, currentQty + delta);
                 
                 if (delta < 0 && currentQty <= 0) {
