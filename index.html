@@ -563,22 +563,36 @@
         let selectedProductImageFile = null;
 
         /**
-         * Abre el modal de edición para un producto específico.
+         * Abre el modal de edición para un producto específico, con fallback a DB si no se encuentra localmente.
          */
-        window.openProductEditorModal = function(id, isMain) {
+        window.openProductEditorModal = async function(id, isMain) {
             isMainInventory = isMain;
+            const table = isMain ? PRODUCTS_TABLE : PRODUCTS_EL_TRANSITO_TABLE;
             const localArray = isMain ? allProducts : allProductsElTransito;
-            const product = localArray.find(p => p.id === id);
-
+            let product = localArray.find(p => p.id === id);
+            
+            // Si el producto no se encuentra en el array local (problema de sincronización),
+            // intentamos leerlo directamente de la base de datos.
             if (!product) {
-                alert('❌ Producto no encontrado.');
-                return;
+                console.warn(`Producto ${id} no encontrado localmente. Intentando buscar en DB.`);
+                const { data, error } = await supabase.from(table).select("*").eq("id", id).single();
+                
+                if (error || !data) {
+                    console.error("Error al buscar producto en DB:", error);
+                    alert('❌ Producto no encontrado. Es posible que haya sido eliminado recientemente.');
+                    return;
+                }
+                
+                product = data;
+                // Si lo encontramos en la DB, lo agregamos al array local para sincronizar.
+                localArray.push(product); 
+                console.log("Producto encontrado en DB y agregado al array local.");
             }
 
             currentEditingProduct = product;
-            selectedProductImageFile = null; // Resetear archivo de imagen
-            modalImageUpload.value = ''; // Resetear input file
-            modalStatus.textContent = ''; // Limpiar mensaje de estado
+            selectedProductImageFile = null; 
+            modalImageUpload.value = ''; 
+            modalStatus.textContent = ''; 
 
             // Rellenar Modal
             document.getElementById('modal-location').textContent = isMain ? 'Inventario Principal' : 'Inventario El Transito';
@@ -668,6 +682,7 @@
                     updateProductCardInDOM(currentEditingProduct, isMainInventory);
                 }
                 
+                const localArray = isMainInventory ? allProducts : allProductsElTransito;
                 if (isMainInventory) updateAutocompleteList(allProducts, inventorySuggestions);
                 if (!isMainInventory) updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
 
@@ -1237,7 +1252,7 @@
         }
         
         function getCleanProductName(inputName) {
-            const match = inputName.match(/^(.*?)\s+\((.*?)\)$/);
+            const match = inputName.match(/^(.*?)\s+\((.*?)$/); // Corregido el regex para que no rompa
             if (match) {
                 return match[1].trim();
             }
@@ -1245,7 +1260,7 @@
         }
         
         async function updateProductStock(productName, table, localArray, delta) {
-            const productToUpdate = localArray.find(p => p.name.trim() === productName);
+            const productToUpdate = localArray.find(p => getCleanProductName(p.name).trim() === productName.trim()); // Buscamos por nombre limpio
 
             if (productToUpdate) {
                 const currentQty = parseInt(productToUpdate.quantity) || 0;
