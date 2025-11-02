@@ -925,6 +925,7 @@
                 const editBtn = cardEl.querySelector('button[title="Editar nombre, precio y cantidad"]'); 
                 if (editBtn) {
                     const editFn = isMainInventory ? 'handleEditClick' : 'handleEditClickET';
+                    // La función de manejo de clic debe pasar los 4 valores
                     editBtn.setAttribute('onclick', `${editFn}('${product.id}', '${escapeJsString(product.name)}', ${product.price}, ${product.quantity})`);
                 } else {
                      console.error(`Botón Editar no encontrado en: ${elementPrefix}card${idSuffix}-${product.id}`);
@@ -1012,16 +1013,18 @@
             }); 
         }
 
-        // Función de manejo de clic para edición (MODIFICADA para incluir cantidad)
+        // Función de manejo de clic para edición (MODIFICADA para incluir cantidad y usar prompts secuenciales)
         window.handleEditClick = (id, name, price, quantity) => { 
+            // 1. Editar Nombre
             const newName = prompt("Nuevo nombre:", name); 
             if (newName === null || newName.trim() === "") return; 
             
+            // 2. Editar Precio
             const newPrice = prompt("Nuevo precio (USD):", Number(price).toFixed(2)); 
             if (newPrice === null) return; 
             
-            // NUEVO: Pide la nueva cantidad
-            const newQtyRaw = prompt("Nueva cantidad:", quantity);
+            // 3. Editar Cantidad
+            const newQtyRaw = prompt("Nueva cantidad (debe ser un número entero >= 0):", quantity);
             if (newQtyRaw === null) return;
 
             editProduct(id, newName, newPrice, newQtyRaw); 
@@ -1030,10 +1033,10 @@
         // Función principal de edición (MODIFICADA para incluir cantidad)
         async function editProduct(id, newName, newPrice, newQtyRaw) { 
             const priceValue = parseFloat(newPrice); 
-            if (isNaN(priceValue) || priceValue < 0) { alert("Precio inválido."); return; } 
+            if (isNaN(priceValue) || priceValue < 0) { alert("❌ Error: Precio inválido (debe ser un número >= 0)."); return; } 
             
             const qtyValue = parseInt(newQtyRaw);
-            if (isNaN(qtyValue) || qtyValue < 0) { alert("Cantidad inválida."); return; }
+            if (isNaN(qtyValue) || qtyValue < 0) { alert("❌ Error: Cantidad inválida (debe ser un número entero >= 0)."); return; }
 
             const productInArray = allProducts.find(p => p.id === id);
             if (!productInArray) return;
@@ -1046,22 +1049,23 @@
             productInArray.price = priceValue;
             productInArray.quantity = qtyValue; // Actualizar cantidad localmente
             
-            updateProductCardInDOM(productInArray, true); 
+            updateProductCardInDOM(productInArray, true); // Actualización optimista de UI
             updateAutocompleteList(allProducts, inventorySuggestions);
             
             const { error } = await supabase.from(PRODUCTS_TABLE).update({ name: newName.trim(), price: priceValue, quantity: qtyValue }).eq("id", id); 
             
             if (error) {
-                alert("❌ Error: " + error.message); 
+                alert("❌ Error al guardar: " + error.message); 
+                // Revertir UI si hay error
                 productInArray.name = oldName;
                 productInArray.price = oldPrice;
-                productInArray.quantity = oldQty; // Revertir cantidad
+                productInArray.quantity = oldQty; 
                 updateProductCardInDOM(productInArray, true); 
                 updateAutocompleteList(allProducts, inventorySuggestions);
             }
         }
         
-        // La función changeQty ya no es necesaria, pero se mantiene para no romper la dependencia de sale/saleET, aunque se ha simplificado.
+        // La función changeQty ya no es necesaria para los botones, pero se mantiene para no romper la dependencia de sale/saleET.
         window.changeQty = async function(id, delta) { 
             const productInArray = allProducts.find(p => p.id === id);
             if (!productInArray) return;
@@ -1158,16 +1162,18 @@
             }); 
         }
 
-        // Función de manejo de clic para edición (El Transito) (MODIFICADA para incluir cantidad)
+        // Función de manejo de clic para edición (El Transito) (MODIFICADA para incluir cantidad y usar prompts secuenciales)
         window.handleEditClickET = (id, name, price, quantity) => { 
+            // 1. Editar Nombre (El Transito)
             const newName = prompt("Nuevo nombre (El Transito):", name); 
             if (newName === null || newName.trim() === "") return; 
             
+            // 2. Editar Precio (El Transito)
             const newPrice = prompt("Nuevo precio (USD) (El Transito):", Number(price).toFixed(2)); 
             if (newPrice === null) return; 
             
-            // NUEVO: Pide la nueva cantidad
-            const newQtyRaw = prompt("Nueva cantidad (El Transito):", quantity);
+            // 3. Editar Cantidad (El Transito)
+            const newQtyRaw = prompt("Nueva cantidad (El Transito) (debe ser un número entero >= 0):", quantity);
             if (newQtyRaw === null) return;
 
             editProductET(id, newName, newPrice, newQtyRaw); 
@@ -1176,10 +1182,10 @@
         // Función principal de edición (El Transito) (MODIFICADA para incluir cantidad)
         async function editProductET(id, newName, newPrice, newQtyRaw) { 
             const priceValue = parseFloat(newPrice); 
-            if (isNaN(priceValue) || priceValue < 0) { alert("Precio inválido."); return; } 
+            if (isNaN(priceValue) || priceValue < 0) { alert("❌ Error: Precio inválido (debe ser un número >= 0)."); return; } 
             
             const qtyValue = parseInt(newQtyRaw);
-            if (isNaN(qtyValue) || qtyValue < 0) { alert("Cantidad inválida."); return; }
+            if (isNaN(qtyValue) || qtyValue < 0) { alert("❌ Error: Cantidad inválida (debe ser un número entero >= 0)."); return; }
 
             const productInArray = allProductsElTransito.find(p => p.id === id);
             if (!productInArray) return;
@@ -1192,22 +1198,23 @@
             productInArray.price = priceValue;
             productInArray.quantity = qtyValue; // Actualizar cantidad localmente
             
-            updateProductCardInDOM(productInArray, false); 
+            updateProductCardInDOM(productInArray, false); // Actualización optimista de UI
             updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             
             const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ name: newName.trim(), price: priceValue, quantity: qtyValue }).eq("id", id); 
             
             if (error) {
-                alert("❌ Error: " + error.message); 
+                alert("❌ Error al guardar (El Transito): " + error.message); 
+                // Revertir UI si hay error
                 productInArray.name = oldName;
                 productInArray.price = oldPrice;
-                productInArray.quantity = oldQty; // Revertir cantidad
+                productInArray.quantity = oldQty; 
                 updateProductCardInDOM(productInArray, false); 
                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             }
         }
 
-        // La función changeQtyET ya no es necesaria, pero se ha simplificado.
+        // La función changeQtyET ya no es necesaria para los botones, pero se ha simplificado.
         window.changeQtyET = async function(id, delta) { 
             const productInArray = allProductsElTransito.find(p => p.id === id);
             if (!productInArray) return;
