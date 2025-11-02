@@ -27,6 +27,7 @@
         }
         .product-card, .tool-card { transition: transform 0.2s, box-shadow 0.3s; }
         .product-card:hover, .tool-card:hover { transform: translateY(-5px); }
+        /* El input file del logo debe ser invisible pero accesible */
         #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
         .hidden { display: none; }
         
@@ -166,7 +167,7 @@
         })();
     </script>
     </head>
-<body class=""> 
+<body class="" onclick="closeSettingsDropdown(event)"> 
     <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
         <div class="flex items-center space-x-4">
             <img 
@@ -181,7 +182,7 @@
             </h1>
         </div>
         
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-4 relative">
             <div id="view-buttons" class="flex items-center space-x-2 bg-black/20 p-1 rounded-lg border border-gray-700">
                 <button data-view="inventory" class="view-btn bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg text-sm shadow-md transition duration-300">📦 Inventario</button>
                 <button data-view="inventory_el_transito" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🚚 Inventario El Transito</button>
@@ -190,18 +191,31 @@
                 <button data-view="missing" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🔔 Faltantes</button>
                 <button data-view="tools" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🛠️ Herramientas</button>
             </div>
-            <div class="flex items-center space-x-3">
-                <div class="flex items-center space-x-2">
-                    <label for="theme-selector" class="text-sm text-gray-400">Tema:</label>
-                    <select id="theme-selector" class="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg p-1.5">
-                        <option value="theme-dark">Predeterminado</option>
-                        <option value="theme-infernal">Fuego Infernal</option>
-                        <option value="theme-gold">Luxury Gold</option>
-                    </select>
+            
+            <button id="settings-button" onclick="toggleSettingsDropdown(event)" class="text-gray-300 hover:text-indigo-400 p-2 rounded-full bg-gray-700/50 transition duration-300 shadow-md" title="Configuración">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.313.823 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.823 3.313-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.313-.823-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.823-3.313 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            </button>
+            
+            <div id="settings-dropdown" class="absolute right-0 mt-2 w-72 origin-top-right rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 divide-y divide-gray-700 z-50 hidden">
+                <div class="py-1 px-3 space-y-3">
+                    <div class="flex items-center space-x-2 pt-2">
+                        <label for="theme-selector" class="text-sm text-gray-400">🎨 Tema Visual:</label>
+                        <select id="theme-selector" class="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg p-1.5 flex-grow">
+                            <option value="theme-dark">Predeterminado</option>
+                            <option value="theme-infernal">Fuego Infernal</option>
+                            <option value="theme-gold">Luxury Gold</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2 pt-2">
+                         <label for="logo-upload" class="bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 transition duration-300 cursor-pointer text-sm shadow-sm flex-grow text-center">Subir Nuevo Logo 🖼️</label>
+                        <input type="file" id="logo-upload" title="Sube una nueva imagen para tu logo" accept="image/*" />
+                    </div>
+                    <button id="logo-save-button" class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed text-sm w-full shadow-md" disabled>Guardar Logo</button>
                 </div>
-                <label for="logo-upload" class="bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 transition duration-300 cursor-pointer text-sm shadow-sm">Logo 🖼️</label>
-                <input type="file" id="logo-upload" title="Sube una nueva imagen para tu logo" accept="image/*" />
-                <button id="logo-save-button" class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed text-sm" disabled>Guardar</button>
             </div>
         </div>
     </header>
@@ -488,9 +502,11 @@
         
         const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
 
-        // --- INICIO DE LÓGICA DE TEMAS ---
+        // --- INICIO DE LÓGICA DE TEMAS Y DROPDOWN ---
         const themeSelector = document.getElementById('theme-selector');
         const root = document.documentElement;
+        const settingsDropdown = document.getElementById('settings-dropdown');
+        const settingsButton = document.getElementById('settings-button');
 
         function applyTheme(theme) {
             root.className = theme;
@@ -501,7 +517,30 @@
         themeSelector.addEventListener('change', (e) => {
             applyTheme(e.target.value);
         });
-        // --- FIN DE LÓGICA DE TEMAS ---
+        
+        window.toggleSettingsDropdown = function(event) {
+            // Evita que el clic en el botón se propague y cierre el dropdown inmediatamente
+            event.stopPropagation(); 
+            settingsDropdown.classList.toggle('hidden');
+        };
+
+        window.closeSettingsDropdown = function(event) {
+            // Cierra el dropdown si el clic fue fuera de él o de su botón
+            if (settingsDropdown && !settingsDropdown.classList.contains('hidden')) {
+                 let target = event.target;
+                 // Recorre el árbol DOM hacia arriba para ver si el clic ocurrió dentro del dropdown o su botón
+                 while (target) {
+                     if (target === settingsDropdown || target === settingsButton) {
+                         return; // El clic fue dentro, no hacer nada
+                     }
+                     target = target.parentNode;
+                 }
+                 settingsDropdown.classList.add('hidden');
+            }
+        };
+
+        // El evento listener para cerrar se ha movido al <body> para capturar clics en cualquier parte.
+        // --- FIN DE LÓGICA DE TEMAS Y DROPDOWN ---
 
 
         // Constantes de la Aplicación (Tablas de Supabase)
@@ -585,8 +624,14 @@
                 
                 product = data;
                 // Si lo encontramos en la DB, lo agregamos al array local para sincronizar.
-                localArray.push(product); 
-                console.log("Producto encontrado en DB y agregado al array local.");
+                const localIndex = localArray.findIndex(p => p.id === id);
+                if (localIndex === -1) {
+                     localArray.push(product);
+                } else {
+                     localArray[localIndex] = product; // Actualizar si existía pero no se sincronizó
+                }
+                
+                console.log("Producto encontrado en DB y sincronizado al array local.");
             }
 
             currentEditingProduct = product;
@@ -1062,7 +1107,7 @@
             }
         }
 
-        // V. FUNCIONES DE INVENTARIO (PRINCIPAL) (Corregidas para la tarjeta)
+        // V. FUNCIONES DE INVENTARIO (PRINCIPAL) 
         function escapeJsString(str) {
             if (typeof str !== 'string') return '';
             return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
@@ -1166,7 +1211,7 @@
             }
         }
         
-        // VI. FUNCIONES DE INVENTARIO (EL TRANSITO) (Corregidas para la tarjeta)
+        // VI. FUNCIONES DE INVENTARIO (EL TRANSITO) 
         async function fetchProductsET() { 
             const { data, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
             if (error) { console.error("Error cargando productos (El Transito):", error); totalCountET.textContent = "Error al cargar"; productsElET.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
@@ -1318,7 +1363,7 @@
             return data.url; 
         }
 
-        // VII. LÓGICA DEL LOGO (Sin cambios)
+        // VII. LÓGICA DEL LOGO 
         const LOGO_CONFIG_KEY = "current_logo_url";
         async function loadLogo() {
             try {
@@ -1366,13 +1411,14 @@
                 await loadLogo(); 
                 selectedLogoFile = null;
                 logoUpload.value = ""; 
+                closeSettingsDropdown({ target: settingsButton }); // Cerrar dropdown
             } catch (error) {
                 console.error("Error al guardar logo:", error);
                 alert("❌ Fallo al guardar logo: " + error.message);
                 await loadLogo(); 
             } finally {
                 logoSaveButton.disabled = true; 
-                logoSaveButton.textContent = "Guardar";
+                logoSaveButton.textContent = "Guardar Logo";
             }
         });
 
