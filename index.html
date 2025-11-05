@@ -1031,20 +1031,28 @@
 
                 // Lógica para buscar el producto y rellenar la venta
                 try {
+                    const scannedId = String(decodedText).trim(); // Aseguramos que es una cadena y limpiamos
+                    console.log(`[SCANNER LOG] Código escaneado (ID): ${scannedId}`);
+                    
                     // Buscamos en ambos inventarios (El Transito y Principal)
-                    const product = allProducts.find(p => p.id === decodedText) || allProductsElTransito.find(p => p.id === decodedText);
-
+                    const product = allProducts.find(p => p.id === scannedId) || allProductsElTransito.find(p => p.id === scannedId);
+                    
                     if (!product) {
+                        console.error(`[SCANNER LOG] Producto no encontrado para ID: ${scannedId}`);
                         // Si no encuentra el producto, lanza un error que será capturado abajo
-                        throw new Error(`El producto con ID "${decodedText}" no existe en el inventario. Asegúrate de escanear un QR de producto válido.`);
+                        throw new Error(`El producto con ID "${scannedId}" no existe en el inventario. Asegúrate de escanear un QR de producto válido.`);
                     }
                     
+                    console.log(`[SCANNER LOG] Producto encontrado: ${product.name} (Inventario: ${allProducts.find(p => p.id === scannedId) ? 'Principal' : 'El Transito'})`);
+
+
                     if (parseInt(product.quantity) <= 0) {
-                         alert(`⚠️ ADVERTENCIA: Producto "${product.name}" tiene Stock CERO. Regístralo de todas formas si es necesario.`);
+                         // Usar console.warn en lugar de alert para evitar detener la ejecución
+                         console.warn(`⚠️ ADVERTENCIA: Producto "${product.name}" tiene Stock CERO.`);
                     }
 
                     // Determinar si la venta es en inventario principal o El Transito
-                    const isMainInventory = allProducts.some(p => p.id === decodedText);
+                    const isMainInventory = allProducts.some(p => p.id === scannedId);
                     
                     // --- CORRECCIÓN DE FLUJO DE VENTA ---
                     if (isMainInventory) {
@@ -1110,19 +1118,25 @@
         window.closeScannerModal = function() {
             scannerModal.classList.add('hidden');
             scannerStatusEl.textContent = 'Esperando código QR o de barras...';
-            if (html5QrcodeScanner && isScannerRunning) { // Agregué isScannerRunning aquí para evitar errores si ya fue detenido por éxito
-                html5QrcodeScanner.clear().then(() => {
-                    isScannerRunning = false;
-                }).catch(error => {
-                    // Usamos console.warn ya que html5-qrcode a menudo lanza este error aunque la cámara esté detenida
-                    console.warn("Error al detener el escáner:", error); 
-                    isScannerRunning = false;
-                });
-            } else {
-                isScannerRunning = false;
-            }
-            // CLAVE: Resetear la bandera. Esto corrige el problema de que el escáner no se puede reabrir
-            // si fue cerrado manualmente o si hubo un error de procesamiento.
+            
+            if (html5QrcodeScanner) {
+                 if (isScannerRunning) {
+                     // Intentamos detener el escáner
+                     html5QrcodeScanner.stop().then(() => {
+                         isScannerRunning = false;
+                         console.log("[SCANNER LOG] Escáner detenido exitosamente.");
+                     }).catch(error => {
+                         // Esto a menudo ocurre si se llama a stop() más de una vez. Se ignora.
+                         console.warn("[SCANNER LOG] Error al intentar detener el escáner (puede ser normal):", error); 
+                         isScannerRunning = false;
+                     });
+                 }
+                // Limpiamos la instancia para la próxima apertura
+                html5QrcodeScanner.clear().catch(e => console.warn("[SCANNER LOG] Error al limpiar la instancia del escáner:", e));
+                html5QrcodeScanner = null;
+            } 
+            isScannerRunning = false;
+            // CLAVE: Resetear la bandera para permitir una nueva captura
             scanSuccessHandled = false; 
         };
 
