@@ -185,7 +185,7 @@
         })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode.js@0.0.1/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body class="" onclick="closeSettingsDropdown(event)"> 
@@ -580,10 +580,18 @@
         // == Configuración de Supabase y Edge Function para R2                       ==
         // =================================================================================
         // --- TUS CREDENCIALES ---
+        // Accedemos a la librería globalmente
+        const createClient = window.supabase ? window.supabase.createClient : null;
+        
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
-        // Aseguramos que la función createClient esté disponible globalmente (cargada por el script CDN)
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let supabase = null;
+        if (createClient) {
+            supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } else {
+            console.error("Error Crítico: La librería Supabase no se ha cargado. Verifique la URL del CDN.");
+        }
         
         const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
 
@@ -762,7 +770,7 @@
         modalForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            if (!currentEditingProduct) return;
+            if (!currentEditingProduct || !supabase) return;
 
             modalSaveButton.disabled = true;
             modalSaveButton.textContent = 'Guardando...';
@@ -864,6 +872,7 @@
             qrProductInfo.textContent = `Producto: ${productName} (ID: ${productId})`;
 
             // Generar el código QR
+            // Usamos window.QRCode ya que se cargó globalmente (solución al error)
             if (typeof QRCode !== 'undefined') {
                  new QRCode(qrCodeContainer, {
                     text: productId, // El valor del QR es el ID de Supabase
@@ -874,6 +883,7 @@
                     correctLevel : QRCode.CorrectLevel.H
                 });
             } else {
+                // Esto es un fallback, la corrección debería haber solucionado el ReferenceError
                 qrProductInfo.textContent = "Error: La librería QRCode no se cargó correctamente. (Verifique la URL del CDN)";
             }
 
@@ -898,6 +908,7 @@
 
         window.openScannerModal = async function() {
             if (isScannerRunning) return;
+            // Aseguramos que el objeto Html5QrcodeScanner esté definido globalmente
             if (typeof Html5QrcodeScanner === 'undefined') {
                 alert("Error: La librería de escaneo no se cargó correctamente. Intenta refrescar la página.");
                 return;
@@ -1159,7 +1170,7 @@
         }
         function renderSalesElTransito(items) {
             salesListLoaderET.innerHTML = "";
-            salesListContainerET.innerHTML = "";
+            salesListContainerET.innerHTML = ""; 
             updateGeneralTotals(items, false); 
 
             if (items.length === 0) {
@@ -1209,12 +1220,14 @@
         }
 
         async function fetchSales() {
+            if (!supabase) return;
             const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
             if (error) { console.error("Error cargando ventas:", error); totalSalesCount.textContent = "Error al cargar"; return; }
             allSales = data;
             filterAndRenderSales(); 
         }
         async function fetchSalesElTransito() {
+            if (!supabase) return;
             const { data, error } = await supabase.from(SALES_EL_TRANSITO_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
             if (error) { console.error("Error cargando ventas (El Transito):", error); totalSalesCountET.textContent = "Error al cargar"; return; }
             allSalesElTransito = data;
@@ -1230,7 +1243,7 @@
             }
             
             const saleInArray = allSales.find(s => s.id === id);
-            if (!saleInArray) { alert("❌ Error: Venta no encontrada."); return; }
+            if (!saleInArray || !supabase) { alert("❌ Error: Venta no encontrada o Supabase no cargado."); return; }
             
             const oldStatus = saleInArray.status;
             const soldProductName = getCleanProductName(saleInArray.product_name_sold);
@@ -1254,6 +1267,7 @@
             const newPrice = parseFloat(newPriceRaw); 
             if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } 
             
+            if (!supabase) return alert("❌ Error: Supabase no está cargado."); 
             const { error } = await supabase.from(SALES_TABLE).update({ price: newPrice }).eq("id", id); 
             
             if (error) {
@@ -1271,7 +1285,7 @@
             if (!confirm("¿Eliminar este registro de venta?")) return; 
             
             const saleIndex = allSales.findIndex(s => s.id === id);
-            if (saleIndex === -1) return;
+            if (saleIndex === -1 || !supabase) { alert("❌ Error: Supabase no cargado."); return; }
             
             const { error } = await supabase.from(SALES_TABLE).delete().eq("id", id); 
             
@@ -1292,7 +1306,7 @@
             }
             
             const saleInArray = allSalesElTransito.find(s => s.id === id);
-            if (!saleInArray) { alert("❌ Error: Venta no encontrada (ET)."); return; }
+            if (!saleInArray || !supabase) { alert("❌ Error: Venta no encontrada o Supabase no cargado."); return; }
 
             const oldStatus = saleInArray.status;
             const soldProductName = getCleanProductName(saleInArray.product_name_sold);
@@ -1316,6 +1330,7 @@
             const newPrice = parseFloat(newPriceRaw); 
             if (isNaN(newPrice) || newPrice < 0) { alert("❌ Precio inválido."); return; } 
             
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
             const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ price: newPrice }).eq("id", id); 
             
             if (error) {
@@ -1333,7 +1348,7 @@
             if (!confirm("¿Eliminar este registro de venta?")) return; 
             
             const saleIndex = allSalesElTransito.findIndex(s => s.id === id);
-            if (saleIndex === -1) return;
+            if (saleIndex === -1 || !supabase) { alert("❌ Error: Supabase no cargado."); return; }
             
             const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).delete().eq("id", id); 
             
@@ -1346,11 +1361,38 @@
         }
 
         // IV. FUNCIONES DE PRODUCTOS FALTANTES (Sin cambios)
-        async function fetchMissingProducts() { const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false }); if (error) { console.error("Error cargando productos faltantes:", error); totalMissingCount.textContent = "Error al cargar"; return; } allMissingProducts = data; renderMissingProducts(allMissingProducts); }
-        function renderMissingProducts(items) { missingListLoader.innerHTML = ""; missingListEl.innerHTML = ""; totalMissingCount.textContent = `${items.length} productos`; if (items.length === 0) { missingListEl.innerHTML = `<p class="p-4 text-gray-400">No hay productos faltantes registrados.</p>`; return; } const table = document.createElement('table'); table.className = 'min-w-full divide-y divide-gray-700'; table.innerHTML = `<thead><tr><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto y Notas</th><th class="px-6 py-3 bg-gray-700"></th></tr></thead>`; const tbody = document.createElement('tbody'); tbody.className = 'bg-gray-800 divide-y divide-gray-700'; items.forEach(item => { const row = tbody.insertRow(); const notesHtml = item.notes ? `<p class="text-xs text-gray-400 mt-1">${item.notes}</p>` : ''; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm"><span class="font-medium text-white">${item.product_name}</span>${notesHtml}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteMissingProduct('${item.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded shadow text-xs transition">Conseguido ✔</button></td>`; }); table.appendChild(tbody); missingListEl.appendChild(table); }
+        async function fetchMissingProducts() { 
+            if (!supabase) return;
+            const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false }); 
+            if (error) { console.error("Error cargando productos faltantes:", error); totalMissingCount.textContent = "Error al cargar"; return; } 
+            allMissingProducts = data; 
+            renderMissingProducts(allMissingProducts); 
+        }
+        function renderMissingProducts(items) { 
+            missingListLoader.innerHTML = ""; 
+            missingListEl.innerHTML = ""; 
+            totalMissingCount.textContent = `${items.length} productos`; 
+            if (items.length === 0) { 
+                missingListEl.innerHTML = `<p class="p-4 text-gray-400">No hay productos faltantes registrados.</p>`; 
+                return; 
+            } 
+            const table = document.createElement('table'); 
+            table.className = 'min-w-full divide-y divide-gray-700'; 
+            table.innerHTML = `<thead><tr><th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto y Notas</th><th class="px-6 py-3 bg-gray-700"></th></tr></thead>`; 
+            const tbody = document.createElement('tbody'); 
+            tbody.className = 'bg-gray-800 divide-y divide-gray-700'; 
+            items.forEach(item => { 
+                const row = tbody.insertRow(); 
+                const notesHtml = item.notes ? `<p class="text-xs text-gray-400 mt-1">${item.notes}</p>` : ''; 
+                row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm"><span class="font-medium text-white">${item.product_name}</span>${notesHtml}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteMissingProduct('${item.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded shadow text-xs transition">Conseguido ✔</button></td>`; 
+            }); 
+            table.appendChild(tbody); 
+            missingListEl.appendChild(table); 
+        }
         
         window.deleteMissingProduct = async function(id) { 
             if (!confirm("¿Marcar este producto como conseguido? Se eliminará de la lista.")) return; 
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
             const { error } = await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq("id", id); 
             if (error) {
                 alert("❌ Error al eliminar: " + error.message);
@@ -1366,6 +1408,7 @@
             return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         }
         async function fetchProducts() { 
+            if (!supabase) return;
             const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
             if (error) { console.error("Error cargando productos:", error); totalCount.textContent = "Error al cargar"; productsEl.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
             allProducts = data; 
@@ -1459,6 +1502,7 @@
         
         window.deleteProduct = async function(id) { 
             if (!confirm("¿Eliminar este producto?")) return; 
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
             
             const { error } = await supabase.from(PRODUCTS_TABLE).delete().eq("id", id); 
             
@@ -1473,6 +1517,7 @@
         
         // VI. FUNCIONES DE INVENTARIO (EL TRANSITO) 
         async function fetchProductsET() { 
+            if (!supabase) return;
             const { data, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
             if (error) { console.error("Error cargando productos (El Transito):", error); totalCountET.textContent = "Error al cargar"; productsElET.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
             allProductsElTransito = data; 
@@ -1535,6 +1580,7 @@
         
         window.deleteProductET = async function(id) { 
             if (!confirm("¿Eliminar este producto de Inventario El Transito?")) return; 
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
             
             const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).delete().eq("id", id); 
             
@@ -1586,6 +1632,7 @@
                 datalistEl = isMain ? inventorySuggestions : inventorySuggestionsET;
                 updateAutocompleteList(localArray, datalistEl);
 
+                if (!supabase) return console.error("❌ Error: Supabase no está cargado para actualizar stock.");
                 const { error: updateError } = await supabase
                     .from(table)
                     .update({ quantity: newQty })
@@ -1606,7 +1653,7 @@
 
 
         async function uploadImage(file) {
-            if (!file) return null;
+            if (!file || !supabase) return null;
             
             const formData = new FormData();
             formData.append('file', file);
@@ -1628,8 +1675,13 @@
         // VII. LÓGICA DEL LOGO 
         const LOGO_CONFIG_KEY = "current_logo_url";
         async function loadLogo() {
+            if (!supabase) return;
             try {
-                const { data, error } = await supabase.from(CONFIG_TABLE).select("value").eq("key", LOGO_CONFIG_KEY).single();
+                const { data, error } = await supabase
+                    .from(CONFIG_TABLE)
+                    .select("value")
+                    .eq("key", LOGO_CONFIG_KEY)
+                    .single();
                 if (error || !data || !data.value) {
                     if (error && error.code !== 'PGRST116') { 
                        console.warn("No se encontró URL de logo en config o hubo un error:", error?.message);
@@ -1652,14 +1704,16 @@
             }
         });
         logoSaveButton.addEventListener("click", async () => {
-            if (!selectedLogoFile) return;
+            if (!selectedLogoFile || !supabase) return alert("❌ Error: Supabase no está cargado.");
             logoSaveButton.disabled = true;
             logoSaveButton.textContent = "Subiendo...";
             try {
                 const newLogoUrl = await uploadImage(selectedLogoFile);
                 if (!newLogoUrl) { throw new Error("La función de subida no devolvió una URL."); }
                 
-                const { error: updateError } = await supabase.from(CONFIG_TABLE).upsert({ key: LOGO_CONFIG_KEY, value: newLogoUrl }, { onConflict: 'key' });
+                const { error: updateError } = await supabase
+                    .from(CONFIG_TABLE)
+                    .upsert({ key: LOGO_CONFIG_KEY, value: newLogoUrl }, { onConflict: 'key' });
                     
                 if (updateError) throw updateError;
                 
@@ -1680,6 +1734,7 @@
 
         // VIII. FUNCIONES DE HERRAMIENTAS / TUTORIALES (Sin cambios)
         async function fetchTools() {
+            if (!supabase) return;
             const { data, error } = await supabase.from(TOOLS_TABLE).select("*").order("created_at", { ascending: false });
             if (error) { console.error("Error cargando herramientas:", error); totalToolsCount.textContent = "Error al cargar"; return; }
             allTools = data;
@@ -1712,12 +1767,13 @@
                 toolsListEl.appendChild(card);
             });
         }
-        window.editToolImage = function(id) {
+        window.editToolImage = async function(id) {
             editingToolId = id;
             toolImageEditorInput.click();
         }
         window.deleteTool = async function(id) {
             if (!confirm("¿Estás seguro de que quieres eliminar esta herramienta? Esta acción es irreversible.")) return;
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
             const { error } = await supabase.from(TOOLS_TABLE).delete().eq("id", id);
             if (error) {
                 alert("❌ Error al eliminar: " + error.message);
@@ -1729,6 +1785,8 @@
         
         // IX. LÓGICA DE REALTIME (Sin cambios)
         function handleRealtimePayload(payload, localArray, renderFunction, idKey = 'id') {
+            if (!supabase) return;
+
             console.log('📡 Payload Realtime Recibido:', payload);
             const { eventType, new: newRecord, old: oldRecord } = payload;
             
@@ -1854,6 +1912,7 @@
         }
 
         function initializeRealtimeSubscriptions() {
+            if (!supabase) return;
             console.log("📡 Inicializando suscripciones en tiempo real...");
             const channelOptions = { config: { broadcast: { ack: true } } };
 
@@ -1908,6 +1967,7 @@
             const submitBtn = document.getElementById("submit"); 
             submitBtn.disabled = true; 
             setStatusMessage(status, "Guardando...", true); 
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
             try { 
                 const imageUrl = imageIn.files[0] ? await uploadImage(imageIn.files[0]) : null; 
                 const newProduct = { name: nameIn.value, category: categoryIn.value, price: parseFloat(priceIn.value), quantity: parseInt(qtyIn.value), image_url: imageUrl, box_number: boxNumberIn.value.trim() || null };
@@ -1930,6 +1990,7 @@
             const submitBtn = document.getElementById("submit-et"); 
             submitBtn.disabled = true; 
             setStatusMessage(statusET, "Guardando...", true); 
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
             try { 
                 const imageUrl = imageInET.files[0] ? await uploadImage(imageInET.files[0]) : null; 
                 const newProductET = { name: nameInET.value, category: categoryInET.value, price: parseFloat(priceInET.value), quantity: parseInt(qtyInET.value), image_url: imageUrl, box_number: boxNumberInET.value.trim() || null };
@@ -1949,6 +2010,7 @@
             ev.preventDefault(); 
             const submitBtn = document.getElementById("missing-product-submit"); 
             submitBtn.disabled = true; 
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
             try { 
                 const newMissing = { product_name: missingProductNameIn.value, notes: missingProductNotesIn.value || null };
                 const { data: insertedMissing, error } = await supabase.from(MISSING_PRODUCTS_TABLE).insert(newMissing).select().single();
@@ -1968,6 +2030,7 @@
             const submitBtn = document.getElementById("tool-submit");
             submitBtn.disabled = true;
             setStatusMessage(toolStatus, "Guardando herramienta...", true);
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
             try {
                 const imageUrl = toolImageIn.files[0] ? await uploadImage(toolImageIn.files[0]) : null;
                 const newTool = { title: toolTitleIn.value, description: toolDescriptionIn.value || null, image_url: imageUrl };
@@ -1988,6 +2051,7 @@
             ev.preventDefault(); 
             const submitBtn = document.getElementById("sale-submit"); 
             submitBtn.disabled = true; 
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
             
             const soldProductWithCategory = productNameSoldIn.value.trim();
             const soldProductName = getCleanProductName(soldProductWithCategory); 
@@ -2029,6 +2093,7 @@
             ev.preventDefault(); 
             const submitBtn = document.getElementById("sale-submit-et"); 
             submitBtn.disabled = true; 
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
 
             const soldProductWithCategoryET = productNameSoldInET.value.trim();
             const soldProductNameET = getCleanProductName(soldProductWithCategoryET); 
@@ -2106,20 +2171,24 @@
             
             await loadLogo(); 
             
-            try {
-                await Promise.all([
-                    fetchProducts(), 
-                    fetchProductsET(),
-                    fetchSales(), 
-                    fetchSalesElTransito(), 
-                    fetchMissingProducts(),
-                    fetchTools() 
-                ]);
-                
-                initializeRealtimeSubscriptions();
+            if (supabase) {
+                try {
+                    await Promise.all([
+                        fetchProducts(), 
+                        fetchProductsET(),
+                        fetchSales(), 
+                        fetchSalesElTransito(), 
+                        fetchMissingProducts(),
+                        fetchTools() 
+                    ]);
+                    
+                    initializeRealtimeSubscriptions();
 
-            } catch (error) {
-                console.error("Error crítico durante la carga de datos inicial:", error);
+                } catch (error) {
+                    console.error("Error crítico durante la carga de datos inicial:", error);
+                }
+            } else {
+                 alert("Error Crítico: No se pudo cargar Supabase. Revise la conexión de internet o la URL del CDN en el HTML.");
             }
         });
     </script>
