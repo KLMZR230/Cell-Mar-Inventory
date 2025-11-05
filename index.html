@@ -184,8 +184,8 @@
             }
         })();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode.js/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode.js@0.0.1/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body class="" onclick="closeSettingsDropdown(event)"> 
@@ -575,16 +575,15 @@
     <input type="file" id="tool-image-editor-input" class="hidden" accept="image/*" />
     
     <script>
-        // Importación de Supabase se hace aquí para evitar conflictos de módulos si se usa type="module" en el script principal.
-        const { createClient } = window.supabase; 
-
+        
         // =================================================================================
         // == Configuración de Supabase y Edge Function para R2                       ==
         // =================================================================================
-        // --- TUS CREDENCIALES (NO MODIFICADAS) ---
+        // --- TUS CREDENCIALES ---
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Aseguramos que la función createClient esté disponible globalmente (cargada por el script CDN)
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
 
@@ -865,7 +864,6 @@
             qrProductInfo.textContent = `Producto: ${productName} (ID: ${productId})`;
 
             // Generar el código QR
-            // Usa window.QRCode ya que se cargó globalmente (solución al error)
             if (typeof QRCode !== 'undefined') {
                  new QRCode(qrCodeContainer, {
                     text: productId, // El valor del QR es el ID de Supabase
@@ -876,7 +874,7 @@
                     correctLevel : QRCode.CorrectLevel.H
                 });
             } else {
-                qrProductInfo.textContent = "Error: La librería QRCode no se cargó correctamente.";
+                qrProductInfo.textContent = "Error: La librería QRCode no se cargó correctamente. (Verifique la URL del CDN)";
             }
 
 
