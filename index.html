@@ -990,7 +990,8 @@
                 return;
             }
 
-            toggleView('sales'); // Cambiamos a la vista de ventas
+            // Cambiamos a la vista de ventas *antes* de iniciar el escáner (esto se invierte abajo)
+            // toggleView('sales'); 
             scannerModal.classList.remove('hidden');
             scannerStatusEl.textContent = 'Iniciando cámara...';
             scanSuccessHandled = false;
@@ -1043,27 +1044,33 @@
                     // Determinar si la venta es en inventario principal o El Transito
                     const isMainInventory = allProducts.some(p => p.id === decodedText);
                     
+                    // --- CORRECCIÓN DE FLUJO DE VENTA ---
                     if (isMainInventory) {
                         // Rellenar Formulario Principal
-                        toggleView('sales');
+                        toggleView('sales'); // Cambio de vista
                         recipientNameIn.value = '';
-                        productNameSoldIn.value = product.name;
+                        // Formato de nombre con categoría para autocompletado si es necesario
+                        const productNameWithCategory = product.name + (product.category ? ` (${product.category})` : '');
+                        productNameSoldIn.value = productNameWithCategory;
                         salePriceIn.value = Number(product.price).toFixed(2);
                         saleDateIn.value = new Date().toISOString().split('T')[0];
                         saleStatusInput.value = 'Pagado'; 
-                        recipientNameIn.focus();
-                        alert(`✅ Producto "${product.name}" cargado en el formulario de Venta Principal. Confirma el Destinatario y registra.`);
+                        recipientNameIn.focus(); // Enfocamos el campo de destinatario
+                        alert(`✅ Producto "${product.name}" cargado en el formulario de Venta Principal. Continúa con el Destinatario y registra.`);
                     } else {
                         // Rellenar Formulario El Transito
-                        toggleView('sales_el_transito');
+                        toggleView('sales_el_transito'); // Cambio de vista
                         recipientNameInET.value = '';
-                        productNameSoldInET.value = product.name;
+                         // Formato de nombre con categoría para autocompletado si es necesario
+                        const productNameWithCategoryET = product.name + (product.category ? ` (${product.category})` : '');
+                        productNameSoldInET.value = productNameWithCategoryET;
                         salePriceInET.value = Number(product.price).toFixed(2);
                         saleDateInET.value = new Date().toISOString().split('T')[0];
                         saleStatusInputET.value = 'Pagado'; 
-                        recipientNameInET.focus();
-                        alert(`✅ Producto "${product.name}" cargado en el formulario de Venta El Transito. Confirma el Destinatario y registra.`);
+                        recipientNameInET.focus(); // Enfocamos el campo de destinatario
+                        alert(`✅ Producto "${product.name}" cargado en el formulario de Venta El Transito. Continúa con el Destinatario y registra.`);
                     }
+                    // --- FIN CORRECCIÓN DE FLUJO DE VENTA ---
                     
                 } catch (error) {
                     console.error("Error al procesar escaneo:", error);
