@@ -644,6 +644,7 @@
         
         let supabase = null;
         if (createClient) {
+            // Inicialización de Supabase
             supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } else {
             console.error("Error Crítico: La librería Supabase no se ha cargado. La aplicación no funcionará correctamente.");
@@ -1045,7 +1046,10 @@
             const onScanError = (errorMessage) => {
                  // Solo actualizamos el estado si no hemos manejado ya un éxito.
                  if (!scanSuccessHandled) {
-                    scannerStatusEl.textContent = `Escaneando... (Error: ${errorMessage.slice(0, 30)}...)`;
+                    // Si es un error de cámara, lo ignoramos para que siga intentando.
+                    if (!errorMessage.includes("No camera found")) {
+                        scannerStatusEl.textContent = `Escaneando... (Error: ${errorMessage.slice(0, 30)}...)`;
+                    }
                  }
             };
 
@@ -1087,6 +1091,9 @@
             });
             const sortedCategories = Array.from(categories).sort();
 
+            // Guardar la categoría seleccionada actualmente
+            const currentCategory = labelsCategorySelect.value;
+
             labelsCategorySelect.innerHTML = '<option value="all">Todas las Categorías</option>';
             sortedCategories.forEach(cat => {
                 const option = document.createElement('option');
@@ -1094,6 +1101,9 @@
                 option.textContent = cat;
                 labelsCategorySelect.appendChild(option);
             });
+            
+            // Restaurar o usar la categoría 'all'
+            labelsCategorySelect.value = sortedCategories.includes(currentCategory) ? currentCategory : 'all';
         }
         
         // Listener para actualizar categorías al cambiar de inventario
@@ -1103,16 +1113,24 @@
         function updateLabelView() {
             const location = labelsLocationSelect.value;
             const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
-            populateLabelCategories(selectedProducts);
             
-            // Contar y mostrar
+            // 1. Rellenar las categorías (Crucial para que el filtro funcione)
+            populateLabelCategories(selectedProducts);
+
+            // 2. Aplicar el filtro de categoría (Lee el valor ACTUAL después de la población)
             const categoryFilter = labelsCategorySelect.value;
             const filtered = selectedProducts.filter(p => categoryFilter === 'all' || p.category === categoryFilter);
+            
+            // 3. Actualizar el contador y el mensaje de salida
             labelsCountSpan.textContent = `${filtered.length} Productos seleccionados`;
             labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Presiona "Generar e Imprimir Etiquetas" para crear ${filtered.length} etiquetas.</p>`;
         }
         
         window.generateAndPrintLabels = function() {
+            if (typeof QRCode === 'undefined') {
+                return alert("❌ Error: La librería QRCode no está cargada. Por favor, refresque la página.");
+            }
+            
             const location = labelsLocationSelect.value;
             const categoryFilter = labelsCategorySelect.value;
             const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
@@ -1120,6 +1138,10 @@
             const productsToPrint = selectedProducts.filter(p => 
                 categoryFilter === 'all' || p.category === categoryFilter
             );
+
+            if (productsToPrint.length === 0) {
+                 return alert("No hay productos que coincidan con el filtro seleccionado para imprimir.");
+            }
 
             labelsOutputDiv.innerHTML = '';
             labelsOutputDiv.classList.add('labels-container'); // Aplica estilos de impresión
@@ -1131,7 +1153,7 @@
                 // 1. Contenedor del QR
                 const qrBox = document.createElement('div');
                 qrBox.className = 'qr-box mr-2';
-                qrBox.id = `qr-${product.id}`;
+                qrBox.id = `qr-${product.id}-${index}`; // ID Único
                 qrBox.style.padding = '2px';
                 
                 // 2. Información del producto
@@ -1144,10 +1166,10 @@
                 const productName = product.name.length > 30 ? product.name.substring(0, 27) + '...' : product.name;
 
                 infoBox.innerHTML = `
-                    <p style="font-weight: bold; font-size: 11px;">${productName}</p>
-                    <p style="font-size: 10px;">Cat: ${product.category || 'N/A'}</p>
-                    <p style="font-weight: bold; color: #10b981; font-size: 11px;">$${Number(product.price).toFixed(2)}</p>
-                    <p style="font-size: 9px;">Caja: ${product.box_number || 'N/A'}</p>
+                    <p style="font-weight: bold; font-size: 11px; margin: 0;">${productName}</p>
+                    <p style="font-size: 10px; margin: 0;">Cat: ${product.category || 'N/A'}</p>
+                    <p style="font-weight: bold; color: #10b981; font-size: 11px; margin: 0;">$${Number(product.price).toFixed(2)}</p>
+                    <p style="font-size: 9px; margin: 0;">Caja: ${product.box_number || 'N/A'}</p>
                 `;
 
                 label.appendChild(qrBox);
@@ -1155,7 +1177,6 @@
                 labelsOutputDiv.appendChild(label);
                 
                 // Generar QR en el contenedor recién creado
-                // Nota: Usamos la configuración mínima para que imprima bien
                 new QRCode(qrBox, {
                     text: product.id, 
                     width: 100, // Tamaño en píxeles que se ajustará con CSS de impresión
@@ -1582,7 +1603,6 @@
             allProducts = data; 
             filterAndRenderProducts(); 
             updateAutocompleteList(allProducts, inventorySuggestions);
-            populateLabelCategories(allProducts); // Llenar categorías al cargar productos principales
         }
         function filterAndRenderProducts() { const term = (searchInput.value || "").toLowerCase().trim(); const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProducts(filtered); }
         
@@ -1884,9 +1904,7 @@
                 const newLogoUrl = await uploadImage(selectedLogoFile);
                 if (!newLogoUrl) { throw new Error("La función de subida no devolvió una URL."); }
                 
-                const { error: updateError } = await supabase
-                    .from(CONFIG_TABLE)
-                    .upsert({ key: LOGO_CONFIG_KEY, value: newLogoUrl }, { onConflict: 'key' });
+                const { error: updateError } = await supabase.from(CONFIG_TABLE).upsert({ key: LOGO_CONFIG_KEY, value: newLogoUrl }, { onConflict: 'key' });
                     
                 if (updateError) throw updateError;
                 
@@ -2316,7 +2334,7 @@
             
             try {
                 const newImageUrl = await uploadImage(file);
-                if (!newImageUrl) { throw new Error("La subida de la imagen falló o no devolvió URL."); }
+                if (!newImageUrl) { throw new Error("La función de subida no devolvió una URL."); }
                 
                 const { error } = await supabase.from(TOOLS_TABLE).update({ image_url: newImageUrl }).eq('id', editingToolId);
                 if (error) throw error;
@@ -2346,6 +2364,7 @@
             
             if (supabase) {
                 try {
+                    // Cargar inventarios (CRÍTICO)
                     await Promise.all([
                         fetchProducts(), 
                         fetchProductsET(),
@@ -2354,6 +2373,9 @@
                         fetchMissingProducts(),
                         fetchTools() 
                     ]);
+                    
+                    // Inicializar la vista de etiquetas después de cargar los productos
+                    updateLabelView(); 
                     
                     initializeRealtimeSubscriptions();
 
