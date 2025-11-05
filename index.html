@@ -1146,9 +1146,11 @@
             labelsOutputDiv.innerHTML = '';
             labelsOutputDiv.classList.add('labels-container'); // Aplica estilos de impresión
 
+            const qrPromises = []; // Arreglo para almacenar las promesas de generación de QR
+
             productsToPrint.forEach((product, index) => {
                 const label = document.createElement('div');
-                label.className = 'label-tag border border-gray-400 p-1 flex items-center justify-start'; // Usar clase de impresión
+                label.className = 'label-tag border border-gray-400 p-1 flex items-center justify-start'; 
 
                 // 1. Contenedor del QR
                 const qrBox = document.createElement('div');
@@ -1176,25 +1178,35 @@
                 label.appendChild(infoBox);
                 labelsOutputDiv.appendChild(label);
                 
-                // Generar QR en el contenedor recién creado
-                new QRCode(qrBox, {
-                    text: product.id, 
-                    width: 100, // Tamaño en píxeles que se ajustará con CSS de impresión
-                    height: 100,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.L
+                // Creamos una promesa para esperar que el QR se dibuje
+                const qrPromise = new Promise(resolve => {
+                    // El truco es asegurar que el constructor haya terminado de dibujar
+                    const qr = new QRCode(qrBox, {
+                        text: product.id, 
+                        width: 100, 
+                        height: 100,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.L
+                    });
+                    // Dado que qrcode.js no ofrece un callback directo, usamos un pequeño retraso
+                    // para dar tiempo al renderizado antes de imprimir.
+                    setTimeout(resolve, 50); 
                 });
+                qrPromises.push(qrPromise);
             });
 
-            // Forzar la ventana de impresión
-            setTimeout(() => {
+            // Esperar a que todos los QR se hayan generado antes de imprimir
+            Promise.all(qrPromises).then(() => {
+                console.log("Todos los QR generados. Abriendo diálogo de impresión.");
                 window.print();
-            }, 100); 
-            
-            // Ocultar la salida de etiquetas después de imprimir
-            labelsOutputDiv.classList.remove('labels-container');
-            labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Etiquetas generadas. Puedes imprimir otra vez o cambiar el filtro.</p>`;
+
+                // Limpieza de la vista después de imprimir (el navegador lo hará solo, pero por si acaso)
+                setTimeout(() => {
+                    labelsOutputDiv.classList.remove('labels-container');
+                    labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Etiquetas generadas. Puedes imprimir otra vez o cambiar el filtro.</p>`;
+                }, 500);
+            });
         };
 
         // II. GESTIÓN DE VISTAS Y CARGA 
@@ -2303,7 +2315,7 @@
                     .insert(newSaleET)
                     .select()
                     .single();
-                    
+
                 if (saleErrorET) throw saleErrorET;
 
                 if (newSaleET.status === 'Pagado') {
