@@ -1025,8 +1025,9 @@
                 
                 scannerStatusEl.textContent = `Código detectado: ${decodedText}. Procesando...`;
 
-                // Detenemos el escáner inmediatamente
-                closeScannerModal();
+                // La lógica de CIERRE DE MODAL se mueve al final del bloque 'try' para asegurar que el 
+                // cambio de vista (toggleView) y el rellenado de formulario ocurran ANTES de que la cámara se apague.
+                // Esto da la indicación visual al usuario de que el escaneo fue exitoso.
 
                 // Lógica para buscar el producto y rellenar la venta
                 try {
@@ -1034,7 +1035,8 @@
                     const product = allProducts.find(p => p.id === decodedText) || allProductsElTransito.find(p => p.id === decodedText);
 
                     if (!product) {
-                        throw new Error("Producto no encontrado. Asegúrate de escanear un QR de producto válido.");
+                        // Si no encuentra el producto, lanza un error que será capturado abajo
+                        throw new Error(`El producto con ID "${decodedText}" no existe en el inventario. Asegúrate de escanear un QR de producto válido.`);
                     }
                     
                     if (parseInt(product.quantity) <= 0) {
@@ -1047,7 +1049,7 @@
                     // --- CORRECCIÓN DE FLUJO DE VENTA ---
                     if (isMainInventory) {
                         // Rellenar Formulario Principal
-                        toggleView('sales'); // Cambio de vista
+                        toggleView('sales'); // Cambio de vista a Ventas Principal (CLAVE)
                         recipientNameIn.value = '';
                         // Formato de nombre con categoría para autocompletado si es necesario
                         const productNameWithCategory = product.name + (product.category ? ` (${product.category})` : '');
@@ -1059,7 +1061,7 @@
                         alert(`✅ Producto "${product.name}" cargado en el formulario de Venta Principal. Continúa con el Destinatario y registra.`);
                     } else {
                         // Rellenar Formulario El Transito
-                        toggleView('sales_el_transito'); // Cambio de vista
+                        toggleView('sales_el_transito'); // Cambio de vista a Ventas El Transito (CLAVE)
                         recipientNameInET.value = '';
                          // Formato de nombre con categoría para autocompletado si es necesario
                         const productNameWithCategoryET = product.name + (product.category ? ` (${product.category})` : '');
@@ -1070,12 +1072,18 @@
                         recipientNameInET.focus(); // Enfocamos el campo de destinatario
                         alert(`✅ Producto "${product.name}" cargado en el formulario de Venta El Transito. Continúa con el Destinatario y registra.`);
                     }
+                    // Detenemos el escáner y cerramos la modal SOLO después de cargar la venta
+                    closeScannerModal(); // <-- MOVIMIENTO CLAVE
                     // --- FIN CORRECCIÓN DE FLUJO DE VENTA ---
                     
                 } catch (error) {
+                    // Si hay un error (ej. producto no encontrado), detenemos el escáner y mostramos el error
                     console.error("Error al procesar escaneo:", error);
+                    // Aseguramos el cierre de la modal incluso si falla el procesamiento
+                    closeScannerModal(); 
                     alert(`❌ Error en Escaneo: ${error.message}`);
-                    // NO resetear scanSuccessHandled aquí, se resetea en closeScannerModal.
+                } finally {
+                    // En caso de éxito o fallo, la modal se cierra y closeScannerModal resetea scanSuccessHandled.
                 }
             };
             
@@ -1097,7 +1105,7 @@
         window.closeScannerModal = function() {
             scannerModal.classList.add('hidden');
             scannerStatusEl.textContent = 'Esperando código QR o de barras...';
-            if (html5QrcodeScanner) {
+            if (html5QrcodeScanner && isScannerRunning) { // Agregué isScannerRunning aquí para evitar errores si ya fue detenido por éxito
                 html5QrcodeScanner.clear().then(() => {
                     isScannerRunning = false;
                 }).catch(error => {
