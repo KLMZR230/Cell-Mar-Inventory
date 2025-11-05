@@ -185,7 +185,8 @@
         })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode.js/qrcode.min.js"></script>
-    </head>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
 <body class="" onclick="closeSettingsDropdown(event)"> 
     <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
         <div class="flex items-center space-x-4">
@@ -574,8 +575,7 @@
     
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-        import { Html5QrcodeScanner } from 'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.4/esm/html5-qrcode-scanner.js';
-
+        
         // =================================================================================
         // == Configuración de Supabase y Edge Function para R2                       ==
         // =================================================================================
@@ -888,13 +888,18 @@
         const scannerStatusEl = document.getElementById('scanner-status');
         let html5QrcodeScanner = null;
         let scanSuccessHandled = false;
+        let isScannerRunning = false;
 
         window.openScannerModal = async function() {
+            if (isScannerRunning) return;
+
             toggleView('sales'); // Cambiamos a la vista de ventas
             scannerModal.classList.remove('hidden');
             scannerStatusEl.textContent = 'Iniciando cámara...';
             scanSuccessHandled = false;
+            isScannerRunning = true;
             
+            // Inicialización de Html5QrcodeScanner
             if (!html5QrcodeScanner) {
                  html5QrcodeScanner = new Html5QrcodeScanner(
                     "reader", { 
@@ -906,6 +911,69 @@
                 );
             }
 
+            // Función de éxito (se usa directamente en .render)
+            const onScanSuccess = async (decodedText, decodedResult) => {
+                if (scanSuccessHandled) return;
+                scanSuccessHandled = true; 
+                
+                scannerStatusEl.textContent = `Código detectado: ${decodedText}. Procesando...`;
+
+                // Detenemos el escáner inmediatamente
+                closeScannerModal();
+
+                // Lógica para buscar el producto y rellenar la venta
+                try {
+                    // Buscamos en ambos inventarios (El Transito y Principal)
+                    const product = allProducts.find(p => p.id === decodedText) || allProductsElTransito.find(p => p.id === decodedText);
+
+                    if (!product) {
+                        throw new Error("Producto no encontrado. Asegúrate de escanear un QR de producto válido.");
+                    }
+                    
+                    if (parseInt(product.quantity) <= 0) {
+                         alert(`⚠️ ADVERTENCIA: Producto "${product.name}" tiene Stock CERO. Regístralo de todas formas si es necesario.`);
+                    }
+
+                    // Determinar si la venta es en inventario principal o El Transito
+                    const isMainInventory = allProducts.some(p => p.id === decodedText);
+                    
+                    if (isMainInventory) {
+                        // Rellenar Formulario Principal
+                        toggleView('sales');
+                        recipientNameIn.value = '';
+                        productNameSoldIn.value = product.name;
+                        salePriceIn.value = Number(product.price).toFixed(2);
+                        saleDateIn.value = new Date().toISOString().split('T')[0];
+                        saleStatusInput.value = 'Pagado'; 
+                        recipientNameIn.focus();
+                        alert(`✅ Producto "${product.name}" cargado en el formulario de Venta Principal. Confirma el Destinatario y registra.`);
+                    } else {
+                        // Rellenar Formulario El Transito
+                        toggleView('sales_el_transito');
+                        recipientNameInET.value = '';
+                        productNameSoldInET.value = product.name;
+                        salePriceInET.value = Number(product.price).toFixed(2);
+                        saleDateInET.value = new Date().toISOString().split('T')[0];
+                        saleStatusInputET.value = 'Pagado'; 
+                        recipientNameInET.focus();
+                        alert(`✅ Producto "${product.name}" cargado en el formulario de Venta El Transito. Confirma el Destinatario y registra.`);
+                    }
+                    
+                } catch (error) {
+                    console.error("Error al procesar escaneo:", error);
+                    alert(`❌ Error en Escaneo: ${error.message}`);
+                    scanSuccessHandled = false; // Re-habilitar si el error es de tipo "producto no encontrado"
+                }
+            };
+            
+            const onScanError = (errorMessage) => {
+                 // Solo actualizamos el estado si no hemos manejado ya un éxito.
+                 if (!scanSuccessHandled) {
+                    scannerStatusEl.textContent = `Escaneando... (Error: ${errorMessage.slice(0, 30)}...)`;
+                 }
+            };
+
+
             // Iniciamos el escaneo
             html5QrcodeScanner.render(onScanSuccess, onScanError);
         };
@@ -914,69 +982,16 @@
             scannerModal.classList.add('hidden');
             scannerStatusEl.textContent = 'Esperando código QR o de barras...';
             if (html5QrcodeScanner) {
-                html5QrcodeScanner.clear().catch(error => {
+                html5QrcodeScanner.clear().then(() => {
+                    isScannerRunning = false;
+                }).catch(error => {
                     console.error("Error al detener el escáner:", error);
+                    isScannerRunning = false;
                 });
+            } else {
+                isScannerRunning = false;
             }
         };
-
-        function onScanError(errorMessage) {
-            scannerStatusEl.textContent = 'Escaneando... (Error: ' + errorMessage.slice(0, 30) + '...)';
-        }
-
-        async function onScanSuccess(decodedText, decodedResult) {
-            if (scanSuccessHandled) return;
-            scanSuccessHandled = true; // Previene múltiples ejecuciones
-            
-            scannerStatusEl.textContent = `Código detectado: ${decodedText}. Procesando...`;
-
-            // Detenemos el escáner inmediatamente
-            closeScannerModal();
-
-            // Lógica para buscar el producto y rellenar la venta
-            try {
-                // Buscamos en ambos inventarios (El Transito y Principal)
-                const product = allProducts.find(p => p.id === decodedText) || allProductsElTransito.find(p => p.id === decodedText);
-
-                if (!product) {
-                    throw new Error("Producto no encontrado. Asegúrate de escanear un QR de producto válido.");
-                }
-                
-                if (parseInt(product.quantity) <= 0) {
-                     alert(`⚠️ ADVERTENCIA: Producto "${product.name}" tiene Stock CERO. Regístralo de todas formas si es necesario.`);
-                }
-
-                // Determinar si la venta es en inventario principal o El Transito
-                const isMainInventory = allProducts.some(p => p.id === decodedText);
-                
-                if (isMainInventory) {
-                    // Rellenar Formulario Principal
-                    toggleView('sales');
-                    recipientNameIn.value = '';
-                    productNameSoldIn.value = product.name;
-                    salePriceIn.value = Number(product.price).toFixed(2);
-                    saleDateIn.value = new Date().toISOString().split('T')[0];
-                    saleStatusInput.value = 'Pagado'; 
-                    recipientNameIn.focus();
-                    alert(`✅ Producto "${product.name}" cargado en el formulario de Venta Principal. Confirma el Destinatario y registra.`);
-                } else {
-                    // Rellenar Formulario El Transito
-                    toggleView('sales_el_transito');
-                    recipientNameInET.value = '';
-                    productNameSoldInET.value = product.name;
-                    salePriceInET.value = Number(product.price).toFixed(2);
-                    saleDateInET.value = new Date().toISOString().split('T')[0];
-                    saleStatusInputET.value = 'Pagado'; 
-                    recipientNameInET.focus();
-                    alert(`✅ Producto "${product.name}" cargado en el formulario de Venta El Transito. Confirma el Destinatario y registra.`);
-                }
-                
-            } catch (error) {
-                console.error("Error al procesar escaneo:", error);
-                alert(`❌ Error en Escaneo: ${error.message}`);
-                scanSuccessHandled = false; // Re-habilitar si el error es de tipo "producto no encontrado"
-            }
-        }
 
 
         // II. GESTIÓN DE VISTAS Y CARGA 
