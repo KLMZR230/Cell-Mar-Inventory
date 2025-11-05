@@ -907,7 +907,7 @@
 
 
         // ============================================================================
-        // == II. LÓGICA DE QR GENERATOR (FASE 1)                                   ==
+        // == II. LÓGICA DE QR GENERATOR (Fase 1)                                   ==
         // ============================================================================
 
         const qrModal = document.getElementById('qr-modal');
@@ -931,25 +931,45 @@
 
             // Generar el código QR
             if (typeof QRCode !== 'undefined') {
-                 new QRCode(qrCodeContainer, {
+                 // 1. Crear el QR
+                 const tempDiv = document.createElement('div');
+                 new QRCode(tempDiv, {
                     text: productId, // El valor del QR es el ID de Supabase
                     width: 256,
                     height: 256,
                     colorDark : "#000000",
                     colorLight : "#ffffff",
                     correctLevel : QRCode.CorrectLevel.H
-                });
+                 });
+
+                 // 2. Esperar que se dibuje y convertirlo a imagen PNG para impresión estable
+                 setTimeout(() => {
+                    const canvas = tempDiv.querySelector('canvas');
+                    if (canvas) {
+                        const imgUrl = canvas.toDataURL("image/png");
+                        
+                        // Reemplazar el canvas por una imagen estática para impresión
+                        const img = document.createElement('img');
+                        img.src = imgUrl;
+                        img.style.width = '256px';
+                        img.style.height = '256px';
+                        
+                        qrCodeContainer.innerHTML = '';
+                        qrCodeContainer.appendChild(img);
+                    }
+                 }, 50); // Pequeño delay para asegurar la conversión del canvas
+                
             } else {
                 qrProductInfo.textContent = "Error: La librería QRCode no se cargó correctamente. (Verifique la URL del CDN)";
             }
-
 
             qrModal.classList.remove('hidden');
         };
 
         window.closeQrModal = function() {
+            // Se puede mantener el borrado aquí ya que es solo la previsualización del modal
             qrModal.classList.add('hidden');
-            qrCodeContainer.innerHTML = '';
+            // qrCodeContainer.innerHTML = ''; // Comentado o se deja vacío ya que la impresión lo maneja ahora
         };
 
         // ============================================================================
@@ -1152,11 +1172,8 @@
                 const label = document.createElement('div');
                 label.className = 'label-tag border border-gray-400 p-1 flex items-center justify-start'; 
 
-                // 1. Contenedor del QR
-                const qrBox = document.createElement('div');
-                qrBox.className = 'qr-box mr-2';
-                qrBox.id = `qr-${product.id}-${index}`; // ID Único
-                qrBox.style.padding = '2px';
+                // 1. Contenedor temporal del QR (para generar el canvas)
+                const tempDiv = document.createElement('div');
                 
                 // 2. Información del producto
                 const infoBox = document.createElement('div');
@@ -1164,7 +1181,6 @@
                 infoBox.style.color = '#000'; // Fuerza color negro para impresión
                 infoBox.style.fontFamily = 'sans-serif';
 
-                // Usamos un nombre limpio para la etiqueta
                 const productName = product.name.length > 30 ? product.name.substring(0, 27) + '...' : product.name;
 
                 infoBox.innerHTML = `
@@ -1174,14 +1190,9 @@
                     <p style="font-size: 9px; margin: 0;">Caja: ${product.box_number || 'N/A'}</p>
                 `;
 
-                label.appendChild(qrBox);
-                label.appendChild(infoBox);
-                labelsOutputDiv.appendChild(label);
-                
-                // Creamos una promesa para esperar que el QR se dibuje
+                // Promesa para manejar la asincronía del QR
                 const qrPromise = new Promise(resolve => {
-                    // El truco es asegurar que el constructor haya terminado de dibujar
-                    const qr = new QRCode(qrBox, {
+                    const qr = new QRCode(tempDiv, {
                         text: product.id, 
                         width: 100, 
                         height: 100,
@@ -1189,9 +1200,27 @@
                         colorLight : "#ffffff",
                         correctLevel : QRCode.CorrectLevel.L
                     });
-                    // Dado que qrcode.js no ofrece un callback directo, usamos un pequeño retraso
-                    // para dar tiempo al renderizado antes de imprimir.
-                    setTimeout(resolve, 50); 
+
+                    // Forzar el renderizado y convertir a IMG (más estable para impresión)
+                    setTimeout(() => {
+                        const canvas = tempDiv.querySelector('canvas');
+                        if (canvas) {
+                            const imgUrl = canvas.toDataURL("image/png");
+                            
+                            const imgBox = document.createElement('div');
+                            imgBox.className = 'qr-box mr-2';
+                            const img = document.createElement('img');
+                            img.src = imgUrl;
+                            img.style.width = '30mm';
+                            img.style.height = '30mm';
+                            
+                            imgBox.appendChild(img);
+                            label.appendChild(imgBox);
+                            label.appendChild(infoBox);
+                            labelsOutputDiv.appendChild(label);
+                        }
+                        resolve(); // Resolvemos la promesa después del renderizado (o intento)
+                    }, 100); 
                 });
                 qrPromises.push(qrPromise);
             });
