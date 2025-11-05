@@ -996,17 +996,26 @@
             scanSuccessHandled = false;
             isScannerRunning = true;
             
-            // Inicialización de Html5QrcodeScanner (usando window.Html5QrcodeScanner)
-            if (!html5QrcodeScanner) {
-                 html5QrcodeScanner = new Html5QrcodeScanner(
-                    "reader", { 
-                        fps: 10, 
-                        qrbox: {width: 250, height: 250},
-                        rememberLastUsedCamera: true
-                    },
-                    /* verbose= */ false
-                );
+            // --- INICIO DE CORRECCIÓN PARA EVITAR "QR PARSE ERROR" ---
+            // Si el escáner ya existe, lo detenemos y recreamos para evitar conflictos de estado.
+            if (html5QrcodeScanner) {
+                try {
+                    await html5QrcodeScanner.clear();
+                } catch (e) {
+                    console.warn("Error al intentar limpiar escáner previo, recreando objeto: ", e);
+                }
             }
+            // Inicialización de Html5QrcodeScanner (usando window.Html5QrcodeScanner)
+            html5QrcodeScanner = new Html5QrcodeScanner(
+                "reader", { 
+                    fps: 10, 
+                    qrbox: {width: 250, height: 250},
+                    rememberLastUsedCamera: true
+                },
+                /* verbose= */ false
+            );
+            // --- FIN DE CORRECCIÓN ---
+
 
             // Función de éxito (se usa directamente en .render)
             const onScanSuccess = async (decodedText, decodedResult) => {
