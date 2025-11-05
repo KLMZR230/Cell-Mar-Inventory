@@ -39,6 +39,24 @@
             animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         @keyframes pulse { 50% { opacity: .4; } }
+        
+        /* Estilos para impresión de QR */
+        @media print {
+            body > *:not(#qr-modal) { display: none !important; }
+            #qr-modal {
+                display: flex !important;
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: white;
+                align-items: center;
+                justify-content: center;
+            }
+            #qr-modal .bg-gray-800, #qr-modal .bg-gray-900 { background-color: white !important; }
+            #qr-modal .text-white, #qr-modal .text-gray-300 { color: black !important; }
+            #qr-modal .border-purple-500 { border-color: black !important; }
+            #qr-modal .print\:hidden { display: none !important; }
+        }
+
 
         /********************************/
         /* TEMA 1: Dark (Predeterminado) */
@@ -166,6 +184,7 @@
             }
         })();
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode.js/qrcode.min.js"></script>
     </head>
 <body class="" onclick="closeSettingsDropdown(event)"> 
     <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
@@ -183,6 +202,9 @@
         </div>
         
         <div class="flex items-center space-x-4 relative">
+             <button id="scan-button" onclick="openScannerModal()" class="text-white hover:text-green-400 p-2 rounded-lg bg-green-600 hover:bg-green-700 transition duration-300 shadow-md text-sm font-medium" title="Escanear Producto y Registrar Venta">
+                 📞 Escanear Venta
+            </button>
             <div id="view-buttons" class="flex items-center space-x-2 bg-black/20 p-1 rounded-lg border border-gray-700">
                 <button data-view="inventory" class="view-btn bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg text-sm shadow-md transition duration-300">📦 Inventario</button>
                 <button data-view="inventory_el_transito" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🚚 Inventario El Transito</button>
@@ -490,21 +512,69 @@
               </div>
             </div>
           </div>
-          <div class="bg-gray-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-            <button type="submit" form="modal-product-form" id="modal-save-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-500 text-base font-medium text-white hover:bg-indigo-600 sm:ml-3 sm:w-auto sm:text-sm transition">
-              Guardar Cambios
+          <div class="bg-gray-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse justify-between border-t border-gray-700">
+             <button type="button" onclick="openQrModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 sm:ml-3 sm:w-auto sm:text-sm transition mt-2 sm:mt-0">
+              Generar QR para Imprimir 🖨️
             </button>
-            <button type="button" onclick="closeProductEditorModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-700 text-base font-medium text-gray-200 hover:bg-gray-600 sm:mt-0 sm:w-auto sm:text-sm transition">
-              Cancelar
-            </button>
+            <div class="flex flex-col sm:flex-row-reverse">
+                <button type="submit" form="modal-product-form" id="modal-save-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-500 text-base font-medium text-white hover:bg-indigo-600 sm:ml-3 sm:w-auto sm:text-sm transition">
+                  Guardar Cambios
+                </button>
+                <button type="button" onclick="closeProductEditorModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-700 text-base font-medium text-gray-200 hover:bg-gray-600 sm:mt-0 sm:w-auto sm:text-sm transition">
+                  Cancelar
+                </button>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+    
+    <div id="qr-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="qr-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeQrModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-gray-700">
+                <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-lg leading-6 font-medium text-white mb-4 border-b border-purple-500 pb-2" id="qr-modal-title">Código QR para Impresión</h3>
+                    <div id="qr-code-container" class="flex justify-center p-4 bg-white rounded">
+                        </div>
+                    <p id="qr-product-info" class="text-gray-300 text-center mt-3 text-sm"></p>
+                </div>
+                <div class="bg-gray-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" onclick="window.print()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-500 text-base font-medium text-white hover:bg-indigo-600 sm:ml-3 sm:w-auto sm:text-sm transition print:hidden">
+                        Imprimir Etiqueta
+                    </button>
+                    <button type="button" onclick="closeQrModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-700 text-base font-medium text-gray-200 hover:bg-gray-600 sm:mt-0 sm:w-auto sm:text-sm transition print:hidden">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="scanner-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="scanner-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeScannerModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-700">
+                <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-lg leading-6 font-medium text-white mb-4 border-b border-green-500 pb-2" id="scanner-modal-title">Escanear Producto para Venta</h3>
+                    <div id="reader" style="width: 100%;"></div>
+                    <p id="scanner-status" class="text-sm text-gray-400 mt-3">Esperando código QR o de barras...</p>
+                </div>
+                <div class="bg-gray-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" onclick="closeScannerModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-700 text-base font-medium text-gray-200 hover:bg-gray-600 sm:mt-0 sm:w-auto sm:text-sm transition">
+                        Cancelar Escaneo
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
     <input type="file" id="tool-image-editor-input" class="hidden" accept="image/*" />
     
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        import { Html5QrcodeScanner } from 'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.4/esm/html5-qrcode-scanner.js';
 
         // =================================================================================
         // == Configuración de Supabase y Edge Function para R2                       ==
@@ -552,8 +622,6 @@
                  settingsDropdown.classList.add('hidden');
             }
         };
-
-        // El evento listener para cerrar se ha movido al <body> para capturar clics en cualquier parte.
         // --- FIN DE LÓGICA DE TEMAS Y DROPDOWN ---
 
 
@@ -573,7 +641,6 @@
         };
 
         // Elementos del DOM (Inventario y Formulario de Agregar)
-        // === CONSTANTES MODIFICADAS (form y formET) ===
         const form = document.getElementById("product-form"), nameIn = document.getElementById("name"), categoryIn = document.getElementById("category-select"), priceIn = document.getElementById("price"), qtyIn = document.getElementById("quantity"), imageIn = document.getElementById("image"), status = document.getElementById("status"), productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader"), boxNumberIn = document.getElementById("box-number");
         const formET = document.getElementById("product-form-et"), nameInET = document.getElementById("name-et"), categoryInET = document.getElementById("category-select-et"), priceInET = document.getElementById("price-et"), qtyInET = document.getElementById("quantity-et"), imageInET = document.getElementById("image-et"), statusET = document.getElementById("status-et"), productsElET = document.getElementById("products-et"), totalCountET = document.getElementById("total-count-et"), searchInputET = document.getElementById("search-input-et"), productsLoaderET = document.getElementById("products-loader-et"), boxNumberInET = document.getElementById("box-number-et");
         
@@ -612,7 +679,6 @@
         const modalImageUpload = document.getElementById('modal-image-upload');
         const modalSaveButton = document.getElementById('modal-save-button');
         const modalStatus = document.getElementById('modal-status');
-        // === CONSTANTE AÑADIDA ===
         const modalBoxNumberIn = document.getElementById('modal-box-number');
         
         let currentEditingProduct = null;
@@ -663,8 +729,6 @@
             modalCategoryIn.value = product.category || 'Otros';
             modalPriceIn.value = Number(product.price).toFixed(2);
             modalQuantityIn.value = product.quantity;
-            
-            // === CAMPO AÑADIDO ===
             modalBoxNumberIn.value = product.box_number || '';
             
             const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
@@ -679,8 +743,7 @@
             modalStatus.textContent = '';
             currentEditingProduct = null;
             selectedProductImageFile = null;
-            // === CAMPO AÑADIDO ===
-            modalBoxNumberIn.value = ''; // Limpiar el campo de la caja
+            modalBoxNumberIn.value = '';
         };
 
         // Previsualización de la nueva imagen
@@ -715,20 +778,18 @@
                 const newCategory = modalCategoryIn.value;
                 const newPrice = parseFloat(modalPriceIn.value);
                 const newQuantity = parseInt(modalQuantityIn.value);
-                // === CAMPO AÑADIDO ===
                 const newBoxNumber = modalBoxNumberIn.value.trim();
 
                 if (isNaN(newPrice) || newPrice < 0 || isNaN(newQuantity) || newQuantity < 0 || !Number.isInteger(newQuantity)) {
                     throw new Error("Valores de Precio o Cantidad inválidos.");
                 }
                 
-                // === PAYLOAD MODIFICADO ===
                 const updatePayload = {
                     name: newName,
                     category: newCategory,
                     price: newPrice,
                     quantity: newQuantity,
-                    box_number: newBoxNumber || null // Añadido
+                    box_number: newBoxNumber || null
                 };
 
                 // 2. Subir nueva imagen si existe
@@ -747,7 +808,6 @@
                 Object.assign(currentEditingProduct, updatePayload);
                 
                 // Forzar re-renderizado solo si la categoría o nombre cambiaron, sino actualización quirúrgica
-                // === LÓGICA DE RENDER MODIFICADA ===
                 const needsFullRender = (oldProduct.category !== newCategory) || (oldProduct.name !== newName) || (oldProduct.box_number !== newBoxNumber);
                 if (needsFullRender) {
                     if(isMainInventory) filterAndRenderProducts(); else filterAndRenderProductsET();
@@ -777,6 +837,146 @@
                 modalSaveButton.textContent = 'Guardar Cambios';
             }
         });
+
+
+        // ============================================================================
+        // == II. LÓGICA DE QR GENERATOR (FASE 1)                                   ==
+        // ============================================================================
+
+        const qrModal = document.getElementById('qr-modal');
+        const qrCodeContainer = document.getElementById('qr-code-container');
+        const qrProductInfo = document.getElementById('qr-product-info');
+
+        window.openQrModal = function() {
+            if (!currentEditingProduct || !currentEditingProduct.id) {
+                alert("Error: No hay producto seleccionado para generar el QR.");
+                return;
+            }
+
+            const productId = currentEditingProduct.id;
+            const productName = currentEditingProduct.name;
+            
+            // Limpiar contenedor antes de generar
+            qrCodeContainer.innerHTML = ''; 
+
+            // Rellenar info de producto
+            qrProductInfo.textContent = `Producto: ${productName} (ID: ${productId})`;
+
+            // Generar el código QR
+            new QRCode(qrCodeContainer, {
+                text: productId, // El valor del QR es el ID de Supabase
+                width: 256,
+                height: 256,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            qrModal.classList.remove('hidden');
+        };
+
+        window.closeQrModal = function() {
+            qrModal.classList.add('hidden');
+            qrCodeContainer.innerHTML = '';
+        };
+
+        // ============================================================================
+        // == III. LÓGICA DE ESCÁNER DE CÓDIGO DE BARRAS/QR (FASE 2 & 3)             ==
+        // ============================================================================
+        
+        const scannerModal = document.getElementById('scanner-modal');
+        const scannerStatusEl = document.getElementById('scanner-status');
+        let html5QrcodeScanner = null;
+        let scanSuccessHandled = false;
+
+        window.openScannerModal = async function() {
+            toggleView('sales'); // Cambiamos a la vista de ventas
+            scannerModal.classList.remove('hidden');
+            scannerStatusEl.textContent = 'Iniciando cámara...';
+            scanSuccessHandled = false;
+            
+            if (!html5QrcodeScanner) {
+                 html5QrcodeScanner = new Html5QrcodeScanner(
+                    "reader", { 
+                        fps: 10, 
+                        qrbox: {width: 250, height: 250},
+                        rememberLastUsedCamera: true
+                    },
+                    /* verbose= */ false
+                );
+            }
+
+            // Iniciamos el escaneo
+            html5QrcodeScanner.render(onScanSuccess, onScanError);
+        };
+
+        window.closeScannerModal = function() {
+            scannerModal.classList.add('hidden');
+            scannerStatusEl.textContent = 'Esperando código QR o de barras...';
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.clear().catch(error => {
+                    console.error("Error al detener el escáner:", error);
+                });
+            }
+        };
+
+        function onScanError(errorMessage) {
+            scannerStatusEl.textContent = 'Escaneando... (Error: ' + errorMessage.slice(0, 30) + '...)';
+        }
+
+        async function onScanSuccess(decodedText, decodedResult) {
+            if (scanSuccessHandled) return;
+            scanSuccessHandled = true; // Previene múltiples ejecuciones
+            
+            scannerStatusEl.textContent = `Código detectado: ${decodedText}. Procesando...`;
+
+            // Detenemos el escáner inmediatamente
+            closeScannerModal();
+
+            // Lógica para buscar el producto y rellenar la venta
+            try {
+                // Buscamos en ambos inventarios (El Transito y Principal)
+                const product = allProducts.find(p => p.id === decodedText) || allProductsElTransito.find(p => p.id === decodedText);
+
+                if (!product) {
+                    throw new Error("Producto no encontrado. Asegúrate de escanear un QR de producto válido.");
+                }
+                
+                if (parseInt(product.quantity) <= 0) {
+                     alert(`⚠️ ADVERTENCIA: Producto "${product.name}" tiene Stock CERO. Regístralo de todas formas si es necesario.`);
+                }
+
+                // Determinar si la venta es en inventario principal o El Transito
+                const isMainInventory = allProducts.some(p => p.id === decodedText);
+                
+                if (isMainInventory) {
+                    // Rellenar Formulario Principal
+                    toggleView('sales');
+                    recipientNameIn.value = '';
+                    productNameSoldIn.value = product.name;
+                    salePriceIn.value = Number(product.price).toFixed(2);
+                    saleDateIn.value = new Date().toISOString().split('T')[0];
+                    saleStatusInput.value = 'Pagado'; 
+                    recipientNameIn.focus();
+                    alert(`✅ Producto "${product.name}" cargado en el formulario de Venta Principal. Confirma el Destinatario y registra.`);
+                } else {
+                    // Rellenar Formulario El Transito
+                    toggleView('sales_el_transito');
+                    recipientNameInET.value = '';
+                    productNameSoldInET.value = product.name;
+                    salePriceInET.value = Number(product.price).toFixed(2);
+                    saleDateInET.value = new Date().toISOString().split('T')[0];
+                    saleStatusInputET.value = 'Pagado'; 
+                    recipientNameInET.focus();
+                    alert(`✅ Producto "${product.name}" cargado en el formulario de Venta El Transito. Confirma el Destinatario y registra.`);
+                }
+                
+            } catch (error) {
+                console.error("Error al procesar escaneo:", error);
+                alert(`❌ Error en Escaneo: ${error.message}`);
+                scanSuccessHandled = false; // Re-habilitar si el error es de tipo "producto no encontrado"
+            }
+        }
 
 
         // II. GESTIÓN DE VISTAS Y CARGA 
@@ -1178,7 +1378,6 @@
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
                     
-                    // === CARD.INNERHTML MODIFICADO ===
                     card.innerHTML = `
                         <button onclick="openProductEditorModal('${p.id}', true)" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
@@ -1190,10 +1389,9 @@
                         <p id="product-category-${p.id}" class="text-xs text-gray-400 -mt-1">${p.category || 'Otros'}</p>
                         <p id="product-price-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
                         <p id="product-stock-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
-                        
                         <p id="product-box-number-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
-                        
-                        <div class="flex-grow"></div> <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
+                        <div class="flex-grow"></div>
+                        <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
                             <button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
                         </div>`; 
                     grid.appendChild(card); 
@@ -1215,9 +1413,8 @@
             const priceEl = document.getElementById(`${elementPrefix}price${idSuffix}-${product.id}`);
             const categoryEl = document.getElementById(`${elementPrefix}category${idSuffix}-${product.id}`);
             const imgEl = document.getElementById(`${elementPrefix}img${idSuffix}-${product.id}`);
-            
-            // === CAMPO AÑADIDO ===
             const boxNumberEl = document.getElementById(`${elementPrefix}box-number${idSuffix}-${product.id}`);
+            
             if (boxNumberEl) {
                 boxNumberEl.querySelector('span').textContent = product.box_number || 'N/A';
             }
@@ -1288,7 +1485,6 @@
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
                     
-                    // === CARD.INNERHTML MODIFICADO ===
                     card.innerHTML = `
                         <button onclick="openProductEditorModal('${p.id}', false)" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
@@ -1300,10 +1496,9 @@
                         <p id="product-category-et-${p.id}" class="text-xs text-gray-400 -mt-1">${p.category || 'Otros'}</p>
                         <p id="product-price-et-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
                         <p id="product-stock-et-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
-                        
                         <p id="product-box-number-et-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
-                        
-                        <div class="flex-grow"></div> <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
+                        <div class="flex-grow"></div>
+                        <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
                             <button onclick="deleteProductET('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
                         </div>`; 
                     grid.appendChild(card); 
@@ -1696,7 +1891,6 @@
             setStatusMessage(status, "Guardando...", true); 
             try { 
                 const imageUrl = imageIn.files[0] ? await uploadImage(imageIn.files[0]) : null; 
-                // === NEWPRODUCT MODIFICADO ===
                 const newProduct = { name: nameIn.value, category: categoryIn.value, price: parseFloat(priceIn.value), quantity: parseInt(qtyIn.value), image_url: imageUrl, box_number: boxNumberIn.value.trim() || null };
                 
                 const { data: insertedProduct, error: insertError } = await supabase.from(PRODUCTS_TABLE).insert(newProduct).select().single(); 
@@ -1719,7 +1913,6 @@
             setStatusMessage(statusET, "Guardando...", true); 
             try { 
                 const imageUrl = imageInET.files[0] ? await uploadImage(imageInET.files[0]) : null; 
-                // === NEWPRODUCTET MODIFICADO ===
                 const newProductET = { name: nameInET.value, category: categoryInET.value, price: parseFloat(priceInET.value), quantity: parseInt(qtyInET.value), image_url: imageUrl, box_number: boxNumberInET.value.trim() || null };
                 const { data: insertedProduct, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).insert(newProductET).select().single();
                 if (error) throw error; 
