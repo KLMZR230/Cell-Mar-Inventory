@@ -194,7 +194,7 @@
             
             <button id="settings-button" onclick="toggleSettingsDropdown(event)" class="text-gray-300 hover:text-indigo-400 p-2 rounded-full bg-gray-700/50 transition duration-300 shadow-md" title="Configuración">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.313.823 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.823 3.313-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.313-.823-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.823-3.313 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.313.823 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.823 3.313-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.313-.823-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.823 3.313 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
             </button>
@@ -226,13 +226,17 @@
         <div id="inventory-view" class="view-section">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
                 <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto</h2>
-                <form id="product-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                <form id="product-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                     <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Flex de Botones" /></div>
                     <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="">Seleccionar</option><option value="Pantallas">Pantallas</option><option value="Jacks de Carga">Jacks de Carga</option><option value="Flex Main">Flex Main</option><option value="Placas de Carga">Placas de Carga</option><option value="Botones Fisicos">Botones Fisicos</option><option value="Botones Internos">Botones Internos</option><option value="Accesorios">Accesorios</option><option value="Otros">Otros</option></select></div>
+                    
+                    <div><label class="block text-sm font-medium text-gray-300">Caja N°</label><input id="box-number" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: A-01" /></div>
+                    
                     <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="12.50" /></div>
                     <div><label class="block text-sm font-medium text-gray-300">Cantidad</label><input id="quantity" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
                     <div><label class="block text-sm font-medium text-gray-300">Imagen</label><input id="image" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" /></div>
-                    <div class="md:col-span-5 text-right"><button id="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
+                    
+                    <div class="md:col-span-6 text-right"><button id="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
                 </form>
                 <p id="status" class="text-sm text-gray-400 mt-3"></p>
             </section>
@@ -247,13 +251,17 @@
         <div id="inventory-el-transito-view" class="view-section hidden">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
                 <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (El Transito)</h2>
-                <form id="product-form-et" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                <form id="product-form-et" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                     <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name-et" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Flex de Botones" /></div>
                     <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select-et" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="">Seleccionar</option><option value="Pantallas">Pantallas</option><option value="Jacks de Carga">Jacks de Carga</option><option value="Flex Main">Flex Main</option><option value="Placas de Carga">Placas de Carga</option><option value="Botones Fisicos">Botones Fisicos</option><option value="Botones Internos">Botones Internos</option><option value="Accesorios">Accesorios</option><option value="Otros">Otros</option></select></div>
+                    
+                    <div><label class="block text-sm font-medium text-gray-300">Caja N°</label><input id="box-number-et" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: A-01" /></div>
+                    
                     <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="price-et" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="12.50" /></div>
                     <div><label class="block text-sm font-medium text-gray-300">Cantidad</label><input id="quantity-et" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
                     <div><label class="block text-sm font-medium text-gray-300">Imagen</label><input id="image-et" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" /></div>
-                    <div class="md:col-span-5 text-right"><button id="submit-et" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
+                    
+                    <div class="md:col-span-6 text-right"><button id="submit-et" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
                 </form>
                 <p id="status-et" class="text-sm text-gray-400 mt-3"></p>
             </section>
@@ -470,6 +478,12 @@
                             <label class="block text-sm font-medium text-gray-300">Cantidad Disponible</label>
                             <input id="modal-quantity" type="number" min="0" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
                         </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300">Caja Número</label>
+                            <input id="modal-box-number" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: B-05" />
+                        </div>
+                        
                         <p id="modal-status" class="text-sm text-gray-400 mt-3"></p>
                     </div>
                 </form>
@@ -559,8 +573,9 @@
         };
 
         // Elementos del DOM (Inventario y Formulario de Agregar)
-        const form = document.getElementById("product-form"), nameIn = document.getElementById("name"), categoryIn = document.getElementById("category-select"), priceIn = document.getElementById("price"), qtyIn = document.getElementById("quantity"), imageIn = document.getElementById("image"), status = document.getElementById("status"), productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader");
-        const formET = document.getElementById("product-form-et"), nameInET = document.getElementById("name-et"), categoryInET = document.getElementById("category-select-et"), priceInET = document.getElementById("price-et"), qtyInET = document.getElementById("quantity-et"), imageInET = document.getElementById("image-et"), statusET = document.getElementById("status-et"), productsElET = document.getElementById("products-et"), totalCountET = document.getElementById("total-count-et"), searchInputET = document.getElementById("search-input-et"), productsLoaderET = document.getElementById("products-loader-et");
+        // === CONSTANTES MODIFICADAS (form y formET) ===
+        const form = document.getElementById("product-form"), nameIn = document.getElementById("name"), categoryIn = document.getElementById("category-select"), priceIn = document.getElementById("price"), qtyIn = document.getElementById("quantity"), imageIn = document.getElementById("image"), status = document.getElementById("status"), productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader"), boxNumberIn = document.getElementById("box-number");
+        const formET = document.getElementById("product-form-et"), nameInET = document.getElementById("name-et"), categoryInET = document.getElementById("category-select-et"), priceInET = document.getElementById("price-et"), qtyInET = document.getElementById("quantity-et"), imageInET = document.getElementById("image-et"), statusET = document.getElementById("status-et"), productsElET = document.getElementById("products-et"), totalCountET = document.getElementById("total-count-et"), searchInputET = document.getElementById("search-input-et"), productsLoaderET = document.getElementById("products-loader-et"), boxNumberInET = document.getElementById("box-number-et");
         
         // Elementos del DOM (Ventas)
         const salesForm = document.getElementById("sale-form"), recipientNameIn = document.getElementById("recipient-name"), productNameSoldIn = document.getElementById("product-name-sold"), salePriceIn = document.getElementById("sale-price"), saleDateIn = document.getElementById("sale-date"), saleStatusInput = document.getElementById("sale-status-input"), salesListContainer = document.getElementById("sales-list-container"), saleStatus = document.getElementById("sale-status"), totalSalesCount = document.getElementById("total-sales-count"), salesListLoader = document.getElementById("sales-list-loader"), searchSalesInput = document.getElementById("search-sales-input"), pendingOnlyCheckbox = document.getElementById("pending-only-checkbox");
@@ -597,6 +612,9 @@
         const modalImageUpload = document.getElementById('modal-image-upload');
         const modalSaveButton = document.getElementById('modal-save-button');
         const modalStatus = document.getElementById('modal-status');
+        // === CONSTANTE AÑADIDA ===
+        const modalBoxNumberIn = document.getElementById('modal-box-number');
+        
         let currentEditingProduct = null;
         let isMainInventory = true;
         let selectedProductImageFile = null;
@@ -646,6 +664,9 @@
             modalPriceIn.value = Number(product.price).toFixed(2);
             modalQuantityIn.value = product.quantity;
             
+            // === CAMPO AÑADIDO ===
+            modalBoxNumberIn.value = product.box_number || '';
+            
             const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
             modalImagePreview.src = imageUrl;
 
@@ -658,6 +679,8 @@
             modalStatus.textContent = '';
             currentEditingProduct = null;
             selectedProductImageFile = null;
+            // === CAMPO AÑADIDO ===
+            modalBoxNumberIn.value = ''; // Limpiar el campo de la caja
         };
 
         // Previsualización de la nueva imagen
@@ -692,16 +715,20 @@
                 const newCategory = modalCategoryIn.value;
                 const newPrice = parseFloat(modalPriceIn.value);
                 const newQuantity = parseInt(modalQuantityIn.value);
+                // === CAMPO AÑADIDO ===
+                const newBoxNumber = modalBoxNumberIn.value.trim();
 
                 if (isNaN(newPrice) || newPrice < 0 || isNaN(newQuantity) || newQuantity < 0 || !Number.isInteger(newQuantity)) {
                     throw new Error("Valores de Precio o Cantidad inválidos.");
                 }
                 
+                // === PAYLOAD MODIFICADO ===
                 const updatePayload = {
                     name: newName,
                     category: newCategory,
                     price: newPrice,
-                    quantity: newQuantity
+                    quantity: newQuantity,
+                    box_number: newBoxNumber || null // Añadido
                 };
 
                 // 2. Subir nueva imagen si existe
@@ -720,7 +747,8 @@
                 Object.assign(currentEditingProduct, updatePayload);
                 
                 // Forzar re-renderizado solo si la categoría o nombre cambiaron, sino actualización quirúrgica
-                const needsFullRender = (oldProduct.category !== newCategory) || (oldProduct.name !== newName);
+                // === LÓGICA DE RENDER MODIFICADA ===
+                const needsFullRender = (oldProduct.category !== newCategory) || (oldProduct.name !== newName) || (oldProduct.box_number !== newBoxNumber);
                 if (needsFullRender) {
                     if(isMainInventory) filterAndRenderProducts(); else filterAndRenderProductsET();
                 } else {
@@ -1150,6 +1178,7 @@
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
                     
+                    // === CARD.INNERHTML MODIFICADO ===
                     card.innerHTML = `
                         <button onclick="openProductEditorModal('${p.id}', true)" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
@@ -1161,7 +1190,10 @@
                         <p id="product-category-${p.id}" class="text-xs text-gray-400 -mt-1">${p.category || 'Otros'}</p>
                         <p id="product-price-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
                         <p id="product-stock-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
-                        <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
+                        
+                        <p id="product-box-number-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
+                        
+                        <div class="flex-grow"></div> <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
                             <button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
                         </div>`; 
                     grid.appendChild(card); 
@@ -1183,6 +1215,12 @@
             const priceEl = document.getElementById(`${elementPrefix}price${idSuffix}-${product.id}`);
             const categoryEl = document.getElementById(`${elementPrefix}category${idSuffix}-${product.id}`);
             const imgEl = document.getElementById(`${elementPrefix}img${idSuffix}-${product.id}`);
+            
+            // === CAMPO AÑADIDO ===
+            const boxNumberEl = document.getElementById(`${elementPrefix}box-number${idSuffix}-${product.id}`);
+            if (boxNumberEl) {
+                boxNumberEl.querySelector('span').textContent = product.box_number || 'N/A';
+            }
 
             if (stockEl) stockEl.textContent = `Stock: ${product.quantity}`;
             if (nameEl) nameEl.textContent = product.name;
@@ -1250,6 +1288,7 @@
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
                     
+                    // === CARD.INNERHTML MODIFICADO ===
                     card.innerHTML = `
                         <button onclick="openProductEditorModal('${p.id}', false)" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
@@ -1261,7 +1300,10 @@
                         <p id="product-category-et-${p.id}" class="text-xs text-gray-400 -mt-1">${p.category || 'Otros'}</p>
                         <p id="product-price-et-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
                         <p id="product-stock-et-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
-                        <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
+                        
+                        <p id="product-box-number-et-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
+                        
+                        <div class="flex-grow"></div> <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
                             <button onclick="deleteProductET('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
                         </div>`; 
                     grid.appendChild(card); 
@@ -1654,7 +1696,8 @@
             setStatusMessage(status, "Guardando...", true); 
             try { 
                 const imageUrl = imageIn.files[0] ? await uploadImage(imageIn.files[0]) : null; 
-                const newProduct = { name: nameIn.value, category: categoryIn.value, price: parseFloat(priceIn.value), quantity: parseInt(qtyIn.value), image_url: imageUrl };
+                // === NEWPRODUCT MODIFICADO ===
+                const newProduct = { name: nameIn.value, category: categoryIn.value, price: parseFloat(priceIn.value), quantity: parseInt(qtyIn.value), image_url: imageUrl, box_number: boxNumberIn.value.trim() || null };
                 
                 const { data: insertedProduct, error: insertError } = await supabase.from(PRODUCTS_TABLE).insert(newProduct).select().single(); 
                 if (insertError) throw insertError; 
@@ -1676,7 +1719,8 @@
             setStatusMessage(statusET, "Guardando...", true); 
             try { 
                 const imageUrl = imageInET.files[0] ? await uploadImage(imageInET.files[0]) : null; 
-                const newProductET = { name: nameInET.value, category: categoryInET.value, price: parseFloat(priceInET.value), quantity: parseInt(qtyInET.value), image_url: imageUrl };
+                // === NEWPRODUCTET MODIFICADO ===
+                const newProductET = { name: nameInET.value, category: categoryInET.value, price: parseFloat(priceInET.value), quantity: parseInt(qtyInET.value), image_url: imageUrl, box_number: boxNumberInET.value.trim() || null };
                 const { data: insertedProduct, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).insert(newProductET).select().single();
                 if (error) throw error; 
                 formET.reset(); qtyInET.value = 1; 
