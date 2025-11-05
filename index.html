@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es" class="theme-dark">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -21,7 +21,6 @@
             display: flex;
             flex-direction: column;
             transition: background-color 0.5s ease;
-            font-family: 'Roboto', sans-serif;
         }
         .container.mx-auto {
             flex-grow: 1;
@@ -62,10 +61,6 @@
                 line-height: 1.1;
                 color: #000;
                 background-color: #fff;
-            }
-            .qr-label-card img {
-                max-width: 80%;
-                height: auto;
             }
             .labels-container {
                 display: flex;
@@ -114,7 +109,7 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/dist/html5-qrcode.min.js"></script>
     
 </head>
-<body class="transition-colors duration-500">
+<body class="transition-colors duration-500 theme-dark">
     <div id="scanner-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-75 transition-opacity duration-300">
         <div class="card-bg rounded-lg shadow-xl p-6 w-11/12 max-w-lg">
             <h3 class="text-xl font-bold mb-4">Escanear Código QR</h3>
@@ -669,15 +664,15 @@
                 html5QrCode = new Html5Qrcode("reader");
             }
             
-            // FIX SCANNER ROBUSTEZ: Parada defensiva antes de reiniciar. 
-            // Esto soluciona problemas comunes de reinicio de la cámara.
+            // ** ARREGLO DEL SCANNER **: Parada defensiva antes de reiniciar. 
+            // Esto soluciona el problema de que la cámara no se libera y falla al reabrir.
             try {
                 if (html5QrCode.isScanning) {
                      console.log("Scanner ya estaba corriendo. Deteniendo para reiniciar de forma segura.");
                      await html5QrCode.stop();
                 }
             } catch (e) {
-                // Ignorar el error si falla el stop.
+                // Si falla el stop (ej. no había cámara iniciada), se ignora y se sigue.
                 console.warn("Error preventivo al detener scanner:", e);
             }
             
@@ -1706,14 +1701,17 @@
                 labelCard.style.height = '120px';
                 labelCard.style.fontSize = '8pt';
                 labelCard.style.lineHeight = '1.1';
-                labelCard.style.backgroundColor = '#ffffff'; // **FIX COLOR 2**
-                labelCard.style.color = '#1f2937'; // **FIX COLOR 2**
+                
+                // ** ARREGLO DE COLOR 2 **: Forzar color de fondo y texto para previsualización
+                labelCard.style.backgroundColor = '#ffffff'; 
+                labelCard.style.color = '#1f2937'; 
 
                 // Texto a codificar en el QR: Código|Precio|Modelo
                 const qrData = `${code}|${price}|${model}`;
                 
                 const canvasId = `qr-canvas-${i}`;
                 
+                // Asegurar que el texto dentro del card sea oscuro
                 labelCard.innerHTML = `
                     <p class="font-bold text-gray-900 leading-tight truncate w-full">${model}</p>
                     <canvas id="${canvasId}" class="my-1"></canvas>
@@ -1920,36 +1918,31 @@
         
         // --- CARGA INICIAL ---
         window.addEventListener("load", async () => {
-            // Cargar tema
             const savedTheme = localStorage.getItem('theme') || 'theme-dark';
             root.className = savedTheme;
-            themeSelector.value = savedTheme;
+            themeSelector.value = savedTheme; 
             
-            // Inicializar fechas
             saleDateIn.value = new Date().toISOString().split('T')[0];
             saleDateInET.value = new Date().toISOString().split('T')[0];
+            toggleView('inventory'); 
+            showSkeletonLoaders(); 
             
-            toggleView('inventory'); // Vista por defecto
-            showSkeletonLoaders(); // Mostrar cargador al inicio
-
-            
-            await loadLogo(); // Cargar logo local
+            await loadLogo(); 
             
             if (supabase) {
                 try {
-                    // Cargar datos (CRÍTICO)
+                    // Cargar inventarios (CRÍTICO)
                     await Promise.all([
-                        fetchProducts(), // Carga inventario principal
-                        fetchProductsET(), // Carga inventario El Tránsito
-                        fetchSales(), // Carga ventas principal
-                        fetchSalesElTransito(), // Carga ventas El Tránsito
-                        fetchMissingProducts(), // Carga faltantes
+                        fetchProducts(), 
+                        fetchProductsET(),
+                        fetchSales(), 
+                        fetchSalesElTransito(), 
+                        fetchMissingProducts(),
                     ]);
                     
                     // Inicializar la vista de etiquetas después de cargar los productos
                     updateLabelView(); 
                     
-                    // Iniciar Realtime
                     initializeRealtimeSubscriptions();
 
                 } catch (error) {
