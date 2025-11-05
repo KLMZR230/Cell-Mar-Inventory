@@ -67,6 +67,11 @@
             .labels-container .qr-box { margin-right: 10px; width: 35mm; height: 35mm; display: flex; justify-content: center; align-items: center; }
             .labels-container canvas, .labels-container img { width: 30mm !important; height: 30mm !important; }
             
+            /* FIX: Asegurar que todo el texto dentro de la etiqueta sea NEGRO para impresión */
+            .labels-container p, .labels-container span, .labels-container div {
+                color: black !important;
+            }
+
             #qr-modal {
                 display: flex !important;
                 position: fixed;
@@ -424,8 +429,8 @@
             <section>
                 <div class="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex flex-wrap items-center gap-4">
                     <div class="flex-grow min-w-[250px]">
-                        <label for="search-sales-input-et" class="block text-sm font-medium text-gray-300 mb-1">🔍 Buscar por Nombre o Producto</label>
-                        <input type="text" id="search-sales-input-et" placeholder="Ej: Ana Gómez o Batería iPhone 11..." class="p-2 border rounded-md w-full focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" />
+                        <label for="search-sales-input-et" class="block text-sm font-medium text-gray-300 mb-1">🔍 Buscar por Nombre o Producto (El Transito)</label>
+                        <input type="text" id="search-sales-input-et" placeholder="Ej: Ana Gómez o Batería iPhone..." class="p-2 border rounded-md w-full focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" />
                     </div>
                     <div class="flex items-center pt-6">
                         <input type="checkbox" id="pending-only-checkbox-et" class="h-4 w-4 text-indigo-600 border-gray-500 rounded bg-gray-600 focus:ring-indigo-500">
@@ -445,7 +450,7 @@
                             <span id="total-paid-amount-et" class="font-bold text-green-500">$0.00</span>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Progreso:</span>
+                            <span class="font-medium text-indigo-400">Progreso:</span>
                             <span id="paid-percentage-et" class="font-bold text-indigo-400">0%</span>
                         </div>
                     </div>
@@ -457,28 +462,23 @@
 
         <div id="tools-view" class="view-section hidden">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-indigo-300">🛠️ Agregar Nueva Herramienta / Tutorial</h2>
-                <form id="tool-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300">Título</label>
-                        <input id="tool-title" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Calibración de Pantalla Samsung" />
+                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar Nueva Herramienta / Tutorial</h2>
+                <form id="tool-form" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300">Título</label>
+                            <input id="tool-title" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Test Point iPhone 12" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300">Descripción / Pasos</label>
+                            <textarea id="tool-description" rows="4" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Describe los pasos o información relevante aquí..."></textarea>
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-300">Categoría</label>
-                        <input id="tool-category" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Reparación de Software" />
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-300">URL del Tutorial/Video</label>
-                        <input id="tool-url" type="url" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: https://youtube.com/watch?v=..." />
-                    </div>
-                    <div class="md:col-span-4">
-                        <label class="block text-sm font-medium text-gray-300">Descripción / Notas Rápidas</label>
-                        <textarea id="tool-description" rows="3" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Escribe un resumen de los pasos importantes o notas personales..."></textarea>
-                    </div>
-                    <div class="md:col-span-4">
                         <label class="block text-sm font-medium text-gray-300">Imagen (Tutorial)</label>
                         <input id="tool-image" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" />
                         <p class="text-xs text-gray-400 mt-1">Opcional. Ideal para diagramas o capturas de pantalla.</p>
+                        
                         <div class="mt-6 flex justify-end">
                             <button id="tool-submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Herramienta</button>
                         </div>
@@ -486,6 +486,7 @@
                 </form>
                 <p id="tool-status" class="text-sm text-gray-400 mt-3"></p>
             </section>
+            
             <section>
                 <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">🛠️ Biblioteca de Herramientas y Tutoriales</h2><span id="total-tools-count" class="text-gray-400 text-sm"></span></div>
                 <div class="mb-6 flex items-center space-x-3">
@@ -498,25 +499,29 @@
         </div>
         
     </div>
-
+    
     <div id="edit-product-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-                <form id="product-editor-form">
+            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full">
+                <form id="modal-product-form">
                     <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div class="sm:flex sm:items-start">
                             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                <h3 class="text-xl leading-6 font-medium text-white mb-1" id="modal-title">Editar Producto</h3>
-                                <p id="modal-inventory-location" class="text-sm text-indigo-300 mb-4 font-semibold">Inventario: Principal</p>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div class="md:col-span-1 flex flex-col items-center">
-                                        <img id="modal-image-preview" src="https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen" alt="Vista previa" class="w-full h-auto object-contain rounded-lg border-2 border-gray-700 mb-3" />
-                                        <label class="block text-sm font-medium text-gray-300">Cambiar Imagen</label>
-                                        <input id="modal-image-upload" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white text-sm" />
+                                <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">Editar Producto</h3>
+                                <p id="modal-inventory-location" class="text-sm text-gray-400 mb-4"></p>
+                                <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-4">
+                                        <div class="h-32 flex items-center justify-center border border-gray-600 rounded-md overflow-hidden">
+                                            <img id="modal-image-preview" src="https://via.placeholder.com/150x100/4f46e5/ffffff?text=Cargando..." alt="Previsualización" class="h-full w-full object-contain" />
+                                        </div>
+                                        <div>
+                                            <label for="modal-image-upload" class="block text-sm font-medium text-gray-300">Subir Nueva Imagen</label>
+                                            <input type="file" id="modal-image-upload" accept="image/*" class="mt-1 block w-full p-1.5 border rounded-md bg-gray-600 border-gray-500 text-white text-sm" />
+                                        </div>
                                     </div>
-                                    <div class="md:col-span-2 grid grid-cols-2 gap-4">
+                                    <div class="space-y-4">
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300">Nombre</label>
                                             <input id="modal-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
@@ -524,14 +529,7 @@
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300">Categoría</label>
                                             <select id="modal-category" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
-                                                <option value="Pantallas">Pantallas</option>
-                                                <option value="Jacks de Carga">Jacks de Carga</option>
-                                                <option value="Flex Main">Flex Main</option>
-                                                <option value="Placas de Carga">Placas de Carga</option>
-                                                <option value="Botones Fisicos">Botones Fisicos</option>
-                                                <option value="Botones Internos">Botones Internos</option>
-                                                <option value="Accesorios">Accesorios</option>
-                                                <option value="Otros">Otros</option>
+                                                <option value="Pantallas">Pantallas</option><option value="Jacks de Carga">Jacks de Carga</option><option value="Flex Main">Flex Main</option><option value="Placas de Carga">Placas de Carga</option><option value="Botones Fisicos">Botones Fisicos</option><option value="Botones Internos">Botones Internos</option><option value="Accesorios">Accesorios</option><option value="Otros">Otros</option>
                                             </select>
                                         </div>
                                         <div>
@@ -553,24 +551,44 @@
                         </div>
                     </div>
                     <div class="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button type="submit" id="modal-save-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm transition">
-                            Guardar Cambios
-                        </button>
-                        <button type="button" onclick="window.generateQrCode(currentEditingProduct)" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-yellow-600 text-base font-medium text-white hover:bg-yellow-700 sm:ml-3 sm:w-auto sm:text-sm transition">
-                            🖨️ Generar QR
-                        </button>
-                        <button type="button" onclick="closeProductEditorModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-600 text-base font-medium text-white hover:bg-gray-500 sm:mt-0 sm:w-auto sm:text-sm transition">
-                            Cancelar
-                        </button>
+                        <button type="submit" id="modal-save-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm transition"> Guardar Cambios </button>
+                        <button type="button" onclick="window.generateQrCode(currentEditingProduct)" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-yellow-600 text-base font-medium text-white hover:bg-yellow-700 sm:ml-3 sm:w-auto sm:text-sm transition"> 🖨️ Generar QR </button>
+                        <button type="button" onclick="closeProductEditorModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-600 text-base font-medium text-white hover:bg-gray-500 sm:mt-0 sm:w-auto sm:text-sm transition"> Cancelar </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-
-    <div id="scanner-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="qr-modal-title" role="dialog" aria-modal="true">
+    
+    <div id="qr-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="qr-modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity print:hidden" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen print:hidden" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
+                <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-white print:text-black" id="qr-modal-title">Código QR del Producto</h3>
+                            <p id="qr-product-info" class="text-sm text-gray-400 print:text-gray-700 mb-4"></p>
+                            <div class="mt-2 flex justify-center p-4 border border-indigo-500 rounded-md bg-white">
+                                <div id="qr-code-container">
+                                    </div>
+                            </div>
+                            <p class="text-sm text-gray-400 mt-2 print:hidden">Escanea este código en el botón "Escanear Venta" para registrar una venta rápida.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse print:hidden">
+                    <button type="button" onclick="window.print()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-500 text-base font-medium text-white hover:bg-indigo-600 sm:ml-3 sm:w-auto sm:text-sm transition print:hidden"> Imprimir Etiqueta </button>
+                    <button type="button" onclick="closeQrModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-700 text-base font-medium text-gray-200 hover:bg-gray-600 sm:mt-0 sm:w-auto sm:text-sm transition print:hidden"> Cerrar </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="scanner-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="scanner-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
             <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -578,6 +596,7 @@
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
                             <h3 class="text-lg leading-6 font-medium text-white" id="scanner-modal-title">Escanear Código QR / Código de Barras</h3>
                             <div class="mt-2">
+                                <!-- Contenedor del escáner con ID para html5-qrcode -->
                                 <div id="scanner-container" style="width: 100%; height: 300px; border: 1px solid #4f46e5; border-radius: 8px;"></div>
                                 <p id="scanner-status" class="text-sm text-gray-400 mt-2">Esperando permiso de cámara...</p>
                             </div>
@@ -585,87 +604,65 @@
                     </div>
                 </div>
                 <div class="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" onclick="closeScannerModal()" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-600 text-base font-medium text-white hover:bg-gray-500 sm:ml-3 sm:w-auto sm:text-sm transition">
-                        Cerrar Escáner
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="qr-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="qr-modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity print:hidden" aria-hidden="true"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen print:hidden" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-white print:text-gray-900" id="qr-modal-title">Código QR para Impresión</h3>
-                            <p id="qr-product-info" class="text-sm text-gray-300 mb-4 print:text-gray-700">Producto: N/A (ID: N/A)</p>
-                            <div id="qr-code-container" class="flex justify-center items-center p-4 bg-white rounded-lg shadow-inner w-64 h-64 mx-auto border-4 border-purple-500">
-                                </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse print:hidden">
-                    <button type="button" onclick="window.print()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm transition">
-                        🖨️ Imprimir
-                    </button>
-                    <button type="button" onclick="closeQrModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-600 text-base font-medium text-white hover:bg-gray-500 sm:mt-0 sm:w-auto sm:text-sm transition">
-                        Cerrar
-                    </button>
+                    <button type="button" onclick="closeScannerModal()" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-600 text-base font-medium text-white hover:bg-gray-500 sm:ml-3 sm:w-auto sm:text-sm transition"> Cerrar Escáner </button>
                 </div>
             </div>
         </div>
     </div>
     
+
     <script>
         // ============================================================================
         // == I. INICIALIZACIÓN Y VARIABLES GLOBALES ==================================
         // ============================================================================
+        // NOTA IMPORTANTE: Mantener las variables de Supabase con los valores originales
         const SUPABASE_URL = 'https://ftcjaadsjpnzbckxevxq.supabase.co'; // Reemplazar con tu URL
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M'; // Reemplazar con tu clave ANÓNIMA
-        const supabase = (typeof supabase === 'undefined' || !SUPABASE_URL.includes('http')) ? null : supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // FIX: Mover la inicialización de supabase a una variable 'let' y usar una IIFE para evitar 
+        // el ReferenceError al acceder a 'supabase' antes de su inicialización completa.
+        let supabase = null; 
+        (function() {
+            // Se asegura de que la librería haya cargado (supabase.createClient exista) y la URL sea válida
+            if (typeof window.supabase !== 'undefined' && SUPABASE_URL.includes('http')) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                console.error("Supabase client not loaded or URL invalid.");
+            }
+        })();
+        
         const PRODUCTS_TABLE = 'products';
         const PRODUCTS_EL_TRANSITO_TABLE = 'products_el_transito';
         const SALES_TABLE = 'sales';
         const SALES_EL_TRANSITO_TABLE = 'sales_el_transito';
         const TOOLS_TABLE = 'tools';
-        
-        // Estado Global
+
         let allProducts = [];
         let allProductsElTransito = [];
         let allSales = [];
         let allSalesElTransito = [];
         let allTools = [];
-        let currentView = 'inventory';
-        let html5QrCode = null;
+
         let currentEditingProduct = null;
         let isMainInventory = true;
         let selectedProductImageFile = null;
-        let selectedToolImageFile = null;
         
-        // Elementos de la UI
+        // Elementos del DOM
         const root = document.documentElement;
-        const viewButtons = document.getElementById('view-buttons');
-        const views = {
-            inventory: { element: document.getElementById('inventory-view'), title: 'Vista: Inventario Principal' },
-            inventory_el_transito: { element: document.getElementById('inventory-el-transito-view'), title: 'Vista: Inventario El Transito' },
-            labels: { element: document.getElementById('labels-view'), title: 'Vista: Generador de Etiquetas QR' },
-            sales: { element: document.getElementById('sales-view'), title: 'Vista: Historial de Ventas Principal' },
-            sales_el_transito: { element: document.getElementById('sales-el-transito-view'), title: 'Vista: Historial de Ventas El Transito' },
-            tools: { element: document.getElementById('tools-view'), title: 'Vista: Herramientas y Tutoriales' }
-        };
         const currentViewTitle = document.getElementById('current-view-title');
-        const settingsDropdown = document.getElementById('settings-dropdown');
-        const themeSelector = document.getElementById('theme-selector');
-        const logoUpload = document.getElementById('logo-upload');
-        const logoSaveButton = document.getElementById('logo-save-button');
-        const businessLogo = document.getElementById('business-logo');
-        
-        // Elementos de la vista de Inventario Principal
+        const viewButtons = document.getElementById('view-buttons');
+        const productsEl = document.getElementById('products');
+        const productsElET = document.getElementById('products-et');
+        const totalCount = document.getElementById('total-count');
+        const totalCountET = document.getElementById('total-count-et');
+        const searchInput = document.getElementById('search-input');
+        const searchInputET = document.getElementById('search-input-et');
+        const productsLoader = document.getElementById('products-loader');
+        const productsLoaderET = document.getElementById('products-loader-et');
+        const inventorySuggestions = document.getElementById('inventory-suggestions');
+        const inventorySuggestionsET = document.getElementById('inventory-suggestions-et');
+
+        // Formulario de Productos Principal
         const productForm = document.getElementById('product-form');
         const nameIn = document.getElementById('name');
         const categorySelect = document.getElementById('category-select');
@@ -673,15 +670,9 @@
         const priceIn = document.getElementById('price');
         const quantityIn = document.getElementById('quantity');
         const imageIn = document.getElementById('image');
-        const submitButton = document.getElementById('submit');
         const statusEl = document.getElementById('status');
-        const searchInput = document.getElementById('search-input');
-        const productsEl = document.getElementById('products');
-        const productsLoader = document.getElementById('products-loader');
-        const totalCount = document.getElementById('total-count');
-        const inventorySuggestions = document.getElementById('inventory-suggestions');
         
-        // Elementos de la vista de Inventario El Transito
+        // Formulario de Productos El Transito
         const productFormET = document.getElementById('product-form-et');
         const nameInET = document.getElementById('name-et');
         const categorySelectET = document.getElementById('category-select-et');
@@ -689,15 +680,9 @@
         const priceInET = document.getElementById('price-et');
         const quantityInET = document.getElementById('quantity-et');
         const imageInET = document.getElementById('image-et');
-        const submitButtonET = document.getElementById('submit-et');
         const statusElET = document.getElementById('status-et');
-        const searchInputET = document.getElementById('search-input-et');
-        const productsElET = document.getElementById('products-et');
-        const productsLoaderET = document.getElementById('products-loader-et');
-        const totalCountET = document.getElementById('total-count-et');
-        const inventorySuggestionsET = document.getElementById('inventory-suggestions-et');
-        
-        // Elementos del Modal de Edición
+
+        // Elementos del Modal
         const editProductModal = document.getElementById('edit-product-modal');
         const modalNameIn = document.getElementById('modal-name');
         const modalCategoryIn = document.getElementById('modal-category');
@@ -706,12 +691,10 @@
         const modalQuantityIn = document.getElementById('modal-quantity');
         const modalImageUpload = document.getElementById('modal-image-upload');
         const modalImagePreview = document.getElementById('modal-image-preview');
+        const modalForm = document.getElementById('modal-product-form');
+        const modalSaveButton = document.getElementById('modal-save-button');
         const modalStatus = document.getElementById('modal-status');
-        
-        // Elementos del Modal de Escáner
-        const scannerModal = document.getElementById('scanner-modal');
-        const scannerStatus = document.getElementById('scanner-status');
-        
+
         // Elementos de la vista de Etiquetas
         const labelsLocationSelect = document.getElementById('labels-location');
         const labelsCategorySelect = document.getElementById('labels-category');
@@ -720,7 +703,7 @@
         const qrModal = document.getElementById('qr-modal');
         const qrCodeContainer = document.getElementById('qr-code-container');
         const qrProductInfo = document.getElementById('qr-product-info');
-        
+
         // Elementos de la vista de Ventas Principal
         const recipientNameIn = document.getElementById('recipient-name');
         const productNameSoldIn = document.getElementById('product-name-sold');
@@ -736,7 +719,7 @@
         const totalSoldAmountSpan = document.getElementById('total-sold-amount');
         const totalPaidAmountSpan = document.getElementById('total-paid-amount');
         const paidPercentageSpan = document.getElementById('paid-percentage');
-        
+
         // Elementos de la vista de Ventas El Transito
         const recipientNameInET = document.getElementById('recipient-name-et');
         const productNameSoldInET = document.getElementById('product-name-sold-et');
@@ -753,137 +736,53 @@
         const totalPaidAmountSpanET = document.getElementById('total-paid-amount-et');
         const paidPercentageSpanET = document.getElementById('paid-percentage-et');
         
-        // Elementos de la vista de Herramientas
+        // Elementos de Herramientas
         const toolForm = document.getElementById('tool-form');
         const toolTitleIn = document.getElementById('tool-title');
-        const toolCategoryIn = document.getElementById('tool-category');
-        const toolUrlIn = document.getElementById('tool-url');
         const toolDescriptionIn = document.getElementById('tool-description');
         const toolImageIn = document.getElementById('tool-image');
-        const toolSubmitButton = document.getElementById('tool-submit');
         const toolStatusEl = document.getElementById('tool-status');
-        const searchToolsInput = document.getElementById('search-tools-input');
         const toolsListEl = document.getElementById('tools-list');
-        const toolsLoader = document.getElementById('tools-loader');
-        const totalToolsCount = document.getElementById('total-tools-count');
+        const searchToolsInput = document.getElementById('search-tools-input');
+
+        // Configuración y Logo
+        const settingsDropdown = document.getElementById('settings-dropdown');
+        const themeSelector = document.getElementById('theme-selector');
+        const logoUploadInput = document.getElementById('logo-upload');
+        const logoSaveButton = document.getElementById('logo-save-button');
+        const businessLogoImg = document.getElementById('business-logo');
         
+        // Escáner
+        let html5QrCode = null;
+        const scannerModal = document.getElementById('scanner-modal');
+        const scannerContainer = document.getElementById('scanner-container');
+        const scannerStatus = document.getElementById('scanner-status');
+
         // ============================================================================
-        // == II. FUNCIONES DE UI Y UTILIDADES ========================================
+        // == II. FUNCIONES DE UTILIDAD (SETUP, TEMAS, LOGO, VISTAS) ==================
         // ============================================================================
-        
-        // Manejo de Logo y Tema
-        function toggleSettingsDropdown(event) {
-            event.stopPropagation();
-            settingsDropdown.classList.toggle('hidden');
-        }
-        function closeSettingsDropdown(event) {
-            if (settingsDropdown && !settingsDropdown.contains(event.target) && event.target.id !== 'settings-button') {
-                settingsDropdown.classList.add('hidden');
-            }
-        }
-        themeSelector.addEventListener('change', (e) => {
-            const newTheme = e.target.value;
-            root.className = newTheme;
-            try {
-                localStorage.setItem('selectedTheme', newTheme);
-            } catch (error) {
-                console.error("No se pudo guardar el tema en localStorage:", error);
-            }
-        });
-        
-        logoUpload.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                logoSaveButton.disabled = false;
-            } else {
-                logoSaveButton.disabled = true;
-            }
-        });
-        
-        logoSaveButton.addEventListener('click', async () => {
-            if (!logoUpload.files.length) return;
-            logoSaveButton.disabled = true;
-            logoSaveButton.textContent = 'Subiendo...';
-            try {
-                const file = logoUpload.files[0];
-                const { data, error } = await supabase.storage
-                    .from('assets')
-                    .upload('logo/logo.png', file, {
-                        cacheControl: '3600',
-                        upsert: true,
-                        contentType: file.type
-                    });
 
-                if (error) throw error;
-
-                // Obtener la URL pública y guardarla en localStorage
-                const { data: publicUrlData } = supabase.storage
-                    .from('assets')
-                    .getPublicUrl('logo/logo.png');
-
-                if (publicUrlData.publicUrl) {
-                    localStorage.setItem('businessLogoUrl', publicUrlData.publicUrl);
-                    businessLogo.src = publicUrlData.publicUrl;
-                    alert('✅ Logo actualizado y guardado con éxito.');
-                }
-            } catch (error) {
-                console.error("Error al guardar logo:", error);
-                alert('❌ Error al guardar logo: ' + error.message);
-            } finally {
-                logoSaveButton.disabled = false;
-                logoSaveButton.textContent = 'Guardar Logo';
-                logoUpload.value = null; // Limpiar el input file
-            }
-        });
-
-        function loadLogo() {
-            return new Promise(async (resolve) => {
-                try {
-                    const savedUrl = localStorage.getItem('businessLogoUrl');
-                    if (savedUrl) {
-                        businessLogo.src = savedUrl;
-                        resolve();
-                        return;
-                    }
-
-                    // Intentar cargar la URL pública de Supabase
-                    if (!supabase) { resolve(); return; }
-
-                    const { data: publicUrlData } = supabase.storage
-                        .from('assets')
-                        .getPublicUrl('logo/logo.png');
-
-                    if (publicUrlData.publicUrl) {
-                        localStorage.setItem('businessLogoUrl', publicUrlData.publicUrl);
-                        businessLogo.src = publicUrlData.publicUrl;
-                    }
-                } catch (error) {
-                    console.error("Error al cargar logo desde Supabase:", error);
-                }
-                resolve();
-            });
-        }
-
-        // Utilidad para mensajes de estado
-        function setStatusMessage(el, message, isSuccess = false) {
-            el.textContent = message;
-            el.classList.remove('text-red-500', 'text-green-500', 'text-gray-400');
-            if (isSuccess) {
-                el.classList.add('text-green-500');
-            } else if (message.includes('Error') || message.includes('❌')) {
-                el.classList.add('text-red-500');
-            } else {
-                el.classList.add('text-gray-400');
-            }
+        function setStatusMessage(element, message, isInfo = false) {
+            element.textContent = message;
+            element.className = `text-sm mt-3 ${isInfo ? 'text-blue-400' : 'text-red-500'}`;
         }
         
-        // Manejo de Vistas
+        // Función para cambiar la vista
+        const views = {
+            inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario' },
+            inventory_el_transito: { el: document.getElementById('inventory-el-transito-view'), title: 'Vista: Inventario El Transito' },
+            labels: { el: document.getElementById('labels-view'), title: 'Vista: Etiquetas QR' },
+            sales: { el: document.getElementById('sales-view'), title: 'Vista: Ventas' },
+            sales_el_transito: { el: document.getElementById('sales-el-transito-view'), title: 'Vista: Ventas El Transito' },
+            tools: { el: document.getElementById('tools-view'), title: 'Vista: Herramientas' },
+        };
+        
         function toggleView(targetView) {
-            currentView = targetView;
             Object.keys(views).forEach(view => {
                 const isTarget = view === targetView;
-                views[view].element.classList.toggle('hidden', !isTarget);
-
-                // Manejar estilos de los botones
+                views[view].el.classList.toggle('hidden', !isTarget);
+                
+                // Actualizar estilo del botón
                 const btn = viewButtons.querySelector(`[data-view="${view}"]`);
                 if (btn) {
                     btn.classList.toggle('bg-indigo-500', isTarget);
@@ -902,71 +801,90 @@
         // ============================================================================
         // == III. LÓGICA DE ESCÁNER DE CÓDIGO DE BARRAS/QR (FASE 2) ==================
         // ============================================================================
+        
         window.openScannerModal = async function() {
             scannerModal.classList.remove('hidden');
             setStatusMessage(scannerStatus, 'Esperando permiso de cámara...', true);
+            
+            // Inicializar solo si no está inicializado
             if (!html5QrCode) {
                 html5QrCode = new Html5Qrcode("scanner-container");
             }
+
             // Configuración para preferir la cámara trasera (environment) para QR/Barras
-            const config = { fps: 10, qrbox: {width: 250, height: 250} };
+            const config = {
+                fps: 10,
+                qrbox: {width: 250, height: 250}
+            };
 
             // Intentar iniciar el escaneo usando la cámara trasera (más robusto)
-            html5QrCode.start(
-              { facingMode: "environment" }, // Preferir cámara trasera
-              config,
-              onScanSuccess,
-              (errorMessage) => { 
-                  // No hacer nada en el error de frame para evitar spam 
-              }
-            ).then(() => {
+            try {
+                // Si ya estaba escaneando, detenerlo primero.
+                if (html5QrCode.isScanning) {
+                    await html5QrCode.stop().catch(() => {});
+                }
+                
+                await html5QrCode.start(
+                    { facingMode: "environment" }, // Preferir cámara trasera
+                    config,
+                    onScanSuccess, 
+                    (errorMessage) => { 
+                        // No hacer nada en el error de frame para evitar spam
+                    } 
+                );
                 setStatusMessage(scannerStatus, 'Escaneando... Apunte el código QR/Barras.', true);
-            }).catch(async (err) => {
-                console.warn("Fallo al iniciar con cámara trasera, intentando con cámara frontal (o por defecto):", err);
-                try {
-                     // Intentar con la cámara frontal como fallback
-                    await html5QrCode.start(
-                      { facingMode: "user" }, // Fallback: cámara frontal
-                      config,
-                      onScanSuccess,
-                      (errorMessage) => {}
-                    );
-                    setStatusMessage(scannerStatus, 'Escaneando con cámara frontal... Apunte el código QR/Barras.', true);
-                } catch (fallbackErr) {
-                    console.error("Error al iniciar el escáner con ambos modos:", fallbackErr);
-                    setStatusMessage(scannerStatus, '❌ Error: No se pudo iniciar la cámara. Verifique los permisos del navegador.', false);
-                }
-            });
-        };
 
-        window.closeScannerModal = async function() {
-            scannerModal.classList.add('hidden');
-            if (html5QrCode && html5QrCode.isScanning) {
+            } catch(err) {
+                console.warn("Fallo al iniciar con cámara trasera, intentando con cámara frontal (o por defecto):", err);
+                setStatusMessage(scannerStatus, 'Intentando cámara alternativa...', true);
+                
+                // Fallback: Intentar con el modo de usuario (frontal/por defecto)
                 try {
-                    await html5QrCode.stop();
-                    console.log("Escáner detenido.");
-                } catch (error) {
-                    console.warn("Error al detener el escáner:", error);
+                    await html5QrCode.start(
+                        { facingMode: "user" },
+                        config,
+                        onScanSuccess, 
+                        (errorMessage) => {}
+                    );
+                    setStatusMessage(scannerStatus, 'Escaneando (Cámara Frontal)... Apunte el código QR/Barras.', true);
+                } catch(err2) {
+                    console.error("Error al iniciar el escáner:", err2);
+                    alert("❌ Error Crítico: No se pudo iniciar el escáner. Asegúrate de que tu cámara esté disponible y que la página tenga permisos.");
+                    closeScannerModal();
                 }
+            }
+        }
+
+        window.closeScannerModal = function() {
+            scannerModal.classList.add('hidden');
+            // Detener el escaneo para liberar la cámara
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then((ignore) => {
+                    // Escaneo detenido
+                }).catch((err) => {
+                    console.error("Error al detener el escáner:", err);
+                });
             }
         };
 
-        window.onScanSuccess = async function(decodedText, decodedResult) {
+        const onScanSuccess = (decodedText, decodedResult) => {
+            console.log(`Code matched = ${decodedText}`, decodedResult);
+            // Detener el escáner inmediatamente
+            closeScannerModal();
+            
+            // Lógica para buscar el producto y rellenar la venta
             try {
-                // <<<<< ¡CORRECCIÓN CRÍTICA: DETENER ESCÁNER Y CERRAR MODAL! >>>>>
-                await html5QrCode.stop(); 
-                closeScannerModal();
-                // <<<<< FIN DE CORRECCIÓN >>>>>
-                
-                // Buscar el producto por ID en ambos inventarios
+                // Buscamos en ambos inventarios (El Transito y Principal)
                 const product = allProducts.find(p => p.id === decodedText) || allProductsElTransito.find(p => p.id === decodedText);
 
                 if (!product) {
-                    setStatusMessage(scannerStatus, `❌ Error: Producto con ID ${decodedText} no encontrado.`, false);
-                    alert(`❌ Producto con ID ${decodedText} no encontrado.`);
-                    return;
+                    throw new Error("Producto no encontrado. Asegúrate de escanear un QR de producto válido.");
                 }
-                
+
+                if (parseInt(product.quantity) <= 0) {
+                    alert(`⚠️ ADVERTENCIA: Producto "${product.name}" tiene Stock CERO. Regístralo de todas formas si es necesario.`);
+                }
+
                 // Determinar si la venta es en inventario principal o El Transito
                 const isMainInventory = allProducts.some(p => p.id === decodedText);
 
@@ -997,49 +915,59 @@
                 alert(`❌ Error en Escaneo: ${error.message}`);
             }
         };
-
+        
         const onScanError = (errorMessage) => {
-            // console.warn(`Error de escaneo: ${errorMessage}`); // Manejar errores de lectura de frames aquí (opcional)
+            // console.warn(`Error de escaneo: ${errorMessage}`);
+            // Manejar errores de lectura de frames aquí (opcional)
         };
 
 
         // ============================================================================
         // == IV. GESTIÓN DE ETIQUETAS QR (LABELS) ====================================
         // ============================================================================
+
         function populateLabelCategories(products) {
             const categories = new Set();
-            products.forEach(p => {
-                if (p.category) categories.add(p.category);
-            });
-
-            const targetSelect = labelsLocationSelect.value === 'main' ? labelsCategorySelect : labelsCategorySelect; // Solo hay un select de categoría
+            products.forEach(p => { if (p.category) categories.add(p.category); });
+            const sortedCategories = Array.from(categories).sort();
             
-            targetSelect.innerHTML = '<option value="all">Todas las Categorías</option>';
-            Array.from(categories).sort().forEach(cat => {
+            // Guardar la categoría seleccionada actualmente
+            const currentCategory = labelsCategorySelect.value;
+            labelsCategorySelect.innerHTML = '<option value="all">Todas las Categorías</option>';
+            sortedCategories.forEach(cat => {
                 const option = document.createElement('option');
                 option.value = cat;
                 option.textContent = cat;
-                targetSelect.appendChild(option);
+                labelsCategorySelect.appendChild(option);
             });
-            updateLabelView();
+            // Restaurar o usar la categoría 'all'
+            labelsCategorySelect.value = sortedCategories.includes(currentCategory) ? currentCategory : 'all';
         }
+
+        // Listener para actualizar categorías al cambiar de inventario
+        labelsLocationSelect.addEventListener('change', updateLabelView);
+        labelsCategorySelect.addEventListener('change', updateLabelView);
 
         function updateLabelView() {
             const location = labelsLocationSelect.value;
-            const categoryFilter = labelsCategorySelect.value;
             const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
-            const filteredProducts = selectedProducts.filter(p => categoryFilter === 'all' || p.category === categoryFilter);
-            labelsCountSpan.textContent = `${filteredProducts.length} Productos seleccionados`;
+            
+            // 1. Rellenar las categorías (Crucial para que el filtro funcione)
+            populateLabelCategories(selectedProducts);
+
+            // 2. Aplicar el filtro de categoría (Lee el valor ACTUAL después de la población)
+            const categoryFilter = labelsCategorySelect.value;
+            const filtered = selectedProducts.filter(p => categoryFilter === 'all' || p.category === categoryFilter);
+
+            // 3. Actualizar el contador y el mensaje de salida
+            labelsCountSpan.textContent = `${filtered.length} Productos seleccionados`;
+            // IMPORTANTE: NO TOCAMOS labelsOutputDiv aquí, solo lo hacemos en generateAndPrintLabels
+            if (labelsOutputDiv.children.length === 0 || labelsOutputDiv.children[0].tagName === 'P') {
+                labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Presiona "Generar e Imprimir Etiquetas" para crear ${filtered.length} etiquetas.</p>`;
+            }
         }
 
-        labelsLocationSelect.addEventListener('change', () => {
-            const products = labelsLocationSelect.value === 'main' ? allProducts : allProductsElTransito;
-            populateLabelCategories(products);
-        });
-
-        labelsCategorySelect.addEventListener('change', updateLabelView);
-
-        async function generateAndPrintLabels() {
+        window.generateAndPrintLabels = function() {
             if (typeof QRCode === 'undefined') {
                 return alert("❌ Error: La librería QRCode no está cargada. Por favor, refresque la página.");
             }
@@ -1052,7 +980,7 @@
             if (filteredProducts.length === 0) {
                 return alert("No hay productos para generar etiquetas con los filtros seleccionados.");
             }
-
+            
             labelsOutputDiv.innerHTML = "";
             labelsOutputDiv.classList.add('labels-container'); // Activar estilos de impresión
 
@@ -1062,78 +990,76 @@
                 const label = document.createElement('div');
                 label.className = 'label-box'; // Clase para el contenedor de la etiqueta
                 
-                const qrBox = document.createElement('div');
-                qrBox.className = 'qr-box';
-                const tempDiv = document.createElement('div');
-                qrBox.appendChild(tempDiv);
-                
                 const infoBox = document.createElement('div');
                 infoBox.className = 'info-box';
                 infoBox.style.cssText = 'flex-grow: 1; margin-left: 5px; max-width: 60mm;';
+                
+                // CORRECCIÓN: Forzar el color del texto a negro para impresión
+                // Añado inline styles más fuertes que el CSS global para asegurar el negro.
                 infoBox.innerHTML = `
-                    <p style="font-weight: bold; font-size: 10px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${product.name}</p>
-                    <p style="font-size: 9px; margin: 0; color: #6b7280;">Cat: ${product.category || 'N/A'}</p>
-                    <p style="font-weight: bold; color: #10b981; font-size: 11px; margin: 0;">$${Number(product.price).toFixed(2)}</p>
-                    <p style="font-size: 9px; margin: 0; color: #9ca3af;">Caja: ${product.box_number || 'N/A'}</p>
+                    <p style="font-weight: bold; font-size: 10px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: black !important;">${product.name}</p>
+                    <p style="font-size: 9px; margin: 0; color: black !important;">Cat: ${product.category || 'N/A'}</p>
+                    <p style="font-weight: bold; color: #10b981 !important; font-size: 11px; margin: 0;">$${Number(product.price).toFixed(2)}</p>
+                    <p style="font-size: 9px; margin: 0; color: black !important;">Caja: ${product.box_number || 'N/A'}</p>
                 `;
 
-                label.appendChild(qrBox);
-                label.appendChild(infoBox);
-                labelsOutputDiv.appendChild(label);
+                // Crear un div temporal para generar el QR
+                const tempDiv = document.createElement('div');
                 
-                // Generar el código QR
-                qrPromises.push(new Promise(resolve => {
-                    new QRCode(tempDiv, {
+                // Promesa para manejar la asincronía del QR
+                const qrPromise = new Promise(resolve => {
+                    const qr = new QRCode(tempDiv, {
                         text: product.id,
-                        width: 128,
-                        height: 128,
+                        width: 100,
+                        height: 100,
                         colorDark : "#000000",
                         colorLight : "#ffffff",
-                        correctLevel : QRCode.CorrectLevel.H
+                        correctLevel : QRCode.CorrectLevel.H // Nivel de corrección a H para más estabilidad
                     });
 
-                    // Esperar un momento para que el canvas se dibuje y convertirlo a imagen
+                    // Forzar el renderizado y convertir a IMG (más estable para impresión)
                     setTimeout(() => {
                         const canvas = tempDiv.querySelector('canvas');
                         if (canvas) {
                             const imgUrl = canvas.toDataURL("image/png");
+                            const imgBox = document.createElement('div');
+                            imgBox.className = 'qr-box mr-2';
                             const img = document.createElement('img');
                             img.src = imgUrl;
-                            img.alt = `QR Code for ${product.name}`;
                             img.style.width = '30mm';
                             img.style.height = '30mm';
-                            qrBox.innerHTML = ''; // Limpiar el canvas
-                            qrBox.appendChild(img);
+                            imgBox.appendChild(img);
+                            label.appendChild(imgBox);
+                            label.appendChild(infoBox);
+                            labelsOutputDiv.appendChild(label);
                         }
-                        resolve();
-                    }, 50); // Pequeño delay
-                }));
+                        resolve(); // Resolvemos la promesa después del renderizado (o intento)
+                    }, 100);
+                });
+                qrPromises.push(qrPromise);
             });
 
-            // Esperar a que todos los QRs se conviertan a imágenes antes de imprimir
-            await Promise.all(qrPromises);
-            
-            // Abrir la ventana de impresión
-            window.print();
-            
-            // Limpiar la vista de etiquetas después de un breve momento
-            setTimeout(() => {
-                labelsOutputDiv.innerHTML = '<p class="p-4 text-gray-400">Selecciona el inventario y presiona "Generar e Imprimir Etiquetas".</p>';
+            // Esperar a que todos los QR se hayan generado antes de imprimir
+            Promise.all(qrPromises).then(() => {
+                console.log("Todos los QR generados. Abriendo diálogo de impresión.");
+                window.print();
+                // Mantenemos los elementos generados en el DOM para que sean visibles después de cerrar la impresión.
                 labelsOutputDiv.classList.remove('labels-container');
-            }, 500);
-        }
+            });
+        };
 
         window.generateQrCode = function(product) {
-            const productId = product.id;
-            const productName = product.name;
-            
-            if (typeof QRCode === 'undefined') {
-                 return alert("❌ Error: La librería QRCode no está cargada. Por favor, refresque la página.");
+            currentEditingProduct = product; // Asegurar que currentEditingProduct esté listo
+            if (!currentEditingProduct || !currentEditingProduct.id) {
+                alert("Error: No hay producto seleccionado para generar el QR.");
+                return;
             }
-            
+            const productId = currentEditingProduct.id;
+            const productName = currentEditingProduct.name;
+
             // Limpiar contenedor antes de generar
             qrCodeContainer.innerHTML = '';
-            
+
             // Rellenar info de producto
             qrProductInfo.textContent = `Producto: ${productName} (ID: ${productId})`;
 
@@ -1149,7 +1075,7 @@
                     colorLight : "#ffffff",
                     correctLevel : QRCode.CorrectLevel.H
                 });
-
+                
                 // 2. Esperar que se dibuje y convertirlo a imagen PNG para impresión estable
                 setTimeout(() => {
                     const canvas = tempDiv.querySelector('canvas');
@@ -1164,6 +1090,7 @@
                         qrCodeContainer.appendChild(img);
                     }
                 }, 50); // Pequeño delay para asegurar la conversión del canvas
+                
             } else {
                 qrProductInfo.textContent = "Error: La librería QRCode no se cargó correctamente. (Verifique la URL del CDN)";
             }
@@ -1179,45 +1106,52 @@
         // ============================================================================
         // == V. FUNCIONES DEL INVENTARIO PRINCIPAL ====================================
         // ============================================================================
+        
         async function uploadImage(file) {
             if (!supabase) return;
             const fileName = `${Date.now()}-${file.name.replace(/\s/g, '_')}`;
             const { data, error } = await supabase.storage
-                .from('product_images')
+                .from('product_images') // Asegúrate de que este bucket exista en Supabase
                 .upload(fileName, file, {
                     cacheControl: '3600',
-                    upsert: false,
-                    contentType: file.type
+                    upsert: false
                 });
 
-            if (error) throw error;
+            if (error) {
+                console.error("Error al subir imagen:", error);
+                return null;
+            }
             
+            // Retornar la URL pública para la base de datos
             const { data: publicUrlData } = supabase.storage
                 .from('product_images')
-                .getPublicUrl(fileName);
+                .getPublicUrl(data.path);
 
             return publicUrlData.publicUrl;
         }
 
         productForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!supabase) { setStatusMessage(statusEl, "❌ Error: Supabase no cargado."); return; }
+            if (!supabase) return setStatusMessage(statusEl, "Error: Supabase no está cargado.");
             
+            const submitButton = document.getElementById('submit');
             submitButton.disabled = true;
             submitButton.textContent = 'Agregando...';
-            setStatusMessage(statusEl, 'Cargando imagen y agregando producto...', true);
+            setStatusMessage(statusEl, 'Subiendo producto...', true);
 
-            const name = nameIn.value.trim();
-            const category = categorySelect.value;
-            const boxNumber = boxNumberIn.value.trim();
-            const price = parseFloat(priceIn.value);
-            const quantity = parseInt(quantityIn.value);
-            const imageFile = imageIn.files[0];
-            
             try {
+                const name = nameIn.value.trim();
+                const category = categorySelect.value;
+                const boxNumber = boxNumberIn.value.trim() || null;
+                const price = parseFloat(priceIn.value);
+                const quantity = parseInt(quantityIn.value);
+                const imageFile = imageIn.files[0];
                 let imageUrl = null;
+
                 if (imageFile) {
                     imageUrl = await uploadImage(imageFile);
+                    if (!imageUrl) throw new Error("La subida de la imagen falló.");
+                    setStatusMessage(statusEl, 'Imagen subida. Guardando en BD...', true);
                 }
 
                 const { data, error } = await supabase
@@ -1225,18 +1159,19 @@
                     .insert([{ name, category, box_number: boxNumber, price, quantity, image_url: imageUrl }])
                     .select()
                     .single();
-                    
+
                 if (error) throw error;
-                
+
                 // Agregar el nuevo producto a la lista local
                 allProducts.unshift(data);
                 filterAndRenderProducts();
                 updateAutocompleteList(allProducts, inventorySuggestions);
-
+                
                 // Limpiar el formulario
                 productForm.reset();
                 quantityIn.value = 1;
                 setStatusMessage(statusEl, `✅ Producto "${name}" agregado con éxito.`, true);
+
             } catch (error) {
                 console.error("Error al agregar producto:", error);
                 setStatusMessage(statusEl, `❌ Error al agregar producto: ${error.message}`);
@@ -1248,13 +1183,7 @@
 
         async function fetchProducts() {
             if (!supabase) return;
-            showProductSkeletonLoaders(productsLoader);
-            
-            const { data, error } = await supabase
-                .from(PRODUCTS_TABLE)
-                .select("*")
-                .order("category", { ascending: true })
-                .order("created_at", { ascending: false });
+            const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false });
 
             if (error) {
                 console.error("Error cargando productos:", error);
@@ -1300,28 +1229,34 @@
                 const section = document.createElement("div");
                 section.className = "mb-10";
                 section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`;
-                
+
                 const grid = document.createElement("div");
                 grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6";
-
+                
                 grouped[category].forEach(p => {
-                    const imageUrl = p.image_url || `https://via.placeholder.com/200x150/4f46e5/ffffff?text=${encodeURIComponent(p.name)}`;
                     const card = document.createElement("div");
-                    card.className = "product-card bg-gray-600 rounded-lg shadow-xl p-4 flex flex-col border-t-4 border-indigo-500 cursor-pointer";
-                    card.setAttribute('data-id', p.id);
-                    card.setAttribute('data-price', p.price);
+                    card.id = `product-card-${p.id}`;
+                    card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative";
                     
+                    const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
+
                     card.innerHTML = `
-                        <div class="h-32 w-full overflow-hidden rounded-md bg-gray-700 mb-3 relative">
-                            <img id="product-image-${p.id}" src="${imageUrl}" alt="${p.name}" class="h-full w-full object-cover transition duration-300 hover:scale-[1.05]" />
-                            <div class="absolute top-0 left-0 bg-black/50 text-white text-xs px-2 py-1 rounded-br-lg">Stock: ${p.quantity}</div>
+                        <button onclick="openProductEditorModal('${p.id}', true)" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                        </button>
+                        
+                        <div class="mb-4 **h-32** overflow-hidden rounded-md bg-gray-700/50 flex items-center justify-center border border-gray-600">
+                            <img id="product-image-${p.id}" src="${imageUrl}" alt="${p.name}" class="h-full w-full **object-contain** transition duration-300 hover:scale-[1.05]" />
                         </div>
+                        
                         <h3 id="product-name-${p.id}" class="text-lg font-bold text-white mb-1 whitespace-nowrap overflow-hidden text-ellipsis" title="${p.name}">${p.name}</h3>
                         <p id="product-price-${p.id}" class="text-xl font-extrabold text-green-400">$${Number(p.price).toFixed(2)}</p>
+                        <p id="product-stock-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
                         <p id="product-box-number-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
+
                         <div class="flex-grow"></div>
-                        <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700">
-                            <button onclick="window.openProductEditorModal('${p.id}', true)" class="px-3 py-1 rounded bg-indigo-600 hover:bg-indigo-700 text-white shadow-md text-sm transition">Editar</button>
+
+                        <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
                             <button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
                         </div>
                     `;
@@ -1330,9 +1265,6 @@
                 section.appendChild(grid);
                 productsEl.appendChild(section);
             });
-            
-            // Añadir event listeners para edición rápida de precio (solo al renderizar)
-            addQuickEditListeners(productsEl, updateProductPrice);
         }
 
         searchInput.addEventListener('input', filterAndRenderProducts);
@@ -1341,10 +1273,7 @@
             if (!confirm("¿Estás seguro de que quieres eliminar este producto del inventario principal?")) return;
             if (!supabase) { alert("❌ Error: Supabase no cargado."); return; }
 
-            const { error } = await supabase
-                .from(PRODUCTS_TABLE)
-                .delete()
-                .eq("id", id);
+            const { error } = await supabase.from(PRODUCTS_TABLE).delete().eq("id", id);
 
             if (error) {
                 alert("❌ Error al eliminar: " + error.message);
@@ -1355,29 +1284,33 @@
                 updateLabelView(); // Actualizar vista de etiquetas
             }
         }
-        
+
         // ============================================================================
-        // == VI. FUNCIONES DEL INVENTARIO EL TRANSITO ==================================
+        // == VI. FUNCIONES DE INVENTARIO (EL TRANSITO) =================================
         // ============================================================================
+
         productFormET.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!supabase) { setStatusMessage(statusElET, "❌ Error: Supabase no cargado."); return; }
+            if (!supabase) return setStatusMessage(statusElET, "Error: Supabase no está cargado.");
             
-            submitButtonET.disabled = true;
-            submitButtonET.textContent = 'Agregando...';
-            setStatusMessage(statusElET, 'Cargando imagen y agregando producto...', true);
+            const submitButton = document.getElementById('submit-et');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Agregando...';
+            setStatusMessage(statusElET, 'Subiendo producto...', true);
 
-            const name = nameInET.value.trim();
-            const category = categorySelectET.value;
-            const boxNumber = boxNumberInET.value.trim();
-            const price = parseFloat(priceInET.value);
-            const quantity = parseInt(quantityInET.value);
-            const imageFile = imageInET.files[0];
-            
             try {
+                const name = nameInET.value.trim();
+                const category = categorySelectET.value;
+                const boxNumber = boxNumberInET.value.trim() || null;
+                const price = parseFloat(priceInET.value);
+                const quantity = parseInt(quantityInET.value);
+                const imageFile = imageInET.files[0];
                 let imageUrl = null;
+
                 if (imageFile) {
                     imageUrl = await uploadImage(imageFile);
+                    if (!imageUrl) throw new Error("La subida de la imagen falló.");
+                    setStatusMessage(statusElET, 'Imagen subida. Guardando en BD...', true);
                 }
 
                 const { data, error } = await supabase
@@ -1385,39 +1318,34 @@
                     .insert([{ name, category, box_number: boxNumber, price, quantity, image_url: imageUrl }])
                     .select()
                     .single();
-                    
+
                 if (error) throw error;
-                
+
                 // Agregar el nuevo producto a la lista local
                 allProductsElTransito.unshift(data);
                 filterAndRenderProductsET();
                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
-
+                
                 // Limpiar el formulario
                 productFormET.reset();
                 quantityInET.value = 1;
                 setStatusMessage(statusElET, `✅ Producto "${name}" agregado con éxito.`, true);
+
             } catch (error) {
                 console.error("Error al agregar producto (ET):", error);
                 setStatusMessage(statusElET, `❌ Error al agregar producto (ET): ${error.message}`);
             } finally {
-                submitButtonET.disabled = false;
-                submitButtonET.textContent = 'Agregar Producto';
+                submitButton.disabled = false;
+                submitButton.textContent = 'Agregar Producto';
             }
         });
 
         async function fetchProductsET() {
             if (!supabase) return;
-            showProductSkeletonLoaders(productsLoaderET);
-            
-            const { data, error } = await supabase
-                .from(PRODUCTS_EL_TRANSITO_TABLE)
-                .select("*")
-                .order("category", { ascending: true })
-                .order("created_at", { ascending: false });
+            const { data, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false });
 
             if (error) {
-                console.error("Error cargando productos (ET):", error);
+                console.error("Error cargando productos (El Transito):", error);
                 totalCountET.textContent = "Error al cargar";
                 productsElET.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
                 return;
@@ -1460,28 +1388,34 @@
                 const section = document.createElement("div");
                 section.className = "mb-10";
                 section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`;
-                
+
                 const grid = document.createElement("div");
                 grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6";
-
+                
                 grouped[category].forEach(p => {
-                    const imageUrl = p.image_url || `https://via.placeholder.com/200x150/4f46e5/ffffff?text=${encodeURIComponent(p.name)}`;
                     const card = document.createElement("div");
-                    card.className = "product-card bg-gray-600 rounded-lg shadow-xl p-4 flex flex-col border-t-4 border-indigo-500 cursor-pointer";
-                    card.setAttribute('data-id', p.id);
-                    card.setAttribute('data-price', p.price);
+                    card.id = `product-card-et-${p.id}`;
+                    card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative";
                     
+                    const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
+
                     card.innerHTML = `
-                        <div class="h-32 w-full overflow-hidden rounded-md bg-gray-700 mb-3 relative">
-                            <img id="product-image-${p.id}" src="${imageUrl}" alt="${p.name}" class="h-full w-full object-cover transition duration-300 hover:scale-[1.05]" />
-                            <div class="absolute top-0 left-0 bg-black/50 text-white text-xs px-2 py-1 rounded-br-lg">Stock: ${p.quantity}</div>
+                        <button onclick="openProductEditorModal('${p.id}', false)" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                        </button>
+                        
+                        <div class="mb-4 **h-32** overflow-hidden rounded-md bg-gray-700/50 flex items-center justify-center border border-gray-600">
+                            <img id="product-image-et-${p.id}" src="${imageUrl}" alt="${p.name}" class="h-full w-full **object-contain** transition duration-300 hover:scale-[1.05]" />
                         </div>
-                        <h3 id="product-name-${p.id}" class="text-lg font-bold text-white mb-1 whitespace-nowrap overflow-hidden text-ellipsis" title="${p.name}">${p.name}</h3>
-                        <p id="product-price-${p.id}" class="text-xl font-extrabold text-green-400">$${Number(p.price).toFixed(2)}</p>
-                        <p id="product-box-number-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
+                        
+                        <h3 id="product-name-et-${p.id}" class="text-lg font-bold text-white mb-1 whitespace-nowrap overflow-hidden text-ellipsis" title="${p.name}">${p.name}</h3>
+                        <p id="product-price-et-${p.id}" class="text-xl font-extrabold text-green-400">$${Number(p.price).toFixed(2)}</p>
+                        <p id="product-stock-et-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
+                        <p id="product-box-number-et-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
+
                         <div class="flex-grow"></div>
-                        <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700">
-                            <button onclick="window.openProductEditorModal('${p.id}', false)" class="px-3 py-1 rounded bg-indigo-600 hover:bg-indigo-700 text-white shadow-md text-sm transition">Editar</button>
+
+                        <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
                             <button onclick="deleteProductET('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
                         </div>
                     `;
@@ -1490,21 +1424,15 @@
                 section.appendChild(grid);
                 productsElET.appendChild(section);
             });
-            
-            // Añadir event listeners para edición rápida de precio (solo al renderizar)
-            addQuickEditListeners(productsElET, updateProductPriceET);
         }
 
         searchInputET.addEventListener('input', filterAndRenderProductsET);
 
         window.deleteProductET = async function(id) {
-            if (!confirm("¿Estás seguro de que quieres eliminar este producto del inventario de El Transito?")) return;
+            if (!confirm("¿Estás seguro de que quieres eliminar este producto del inventario de El Tránsito?")) return;
             if (!supabase) { alert("❌ Error: Supabase no cargado."); return; }
 
-            const { error } = await supabase
-                .from(PRODUCTS_EL_TRANSITO_TABLE)
-                .delete()
-                .eq("id", id);
+            const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).delete().eq("id", id);
 
             if (error) {
                 alert("❌ Error al eliminar: " + error.message);
@@ -1515,19 +1443,22 @@
                 updateLabelView(); // Actualizar vista de etiquetas
             }
         }
-
+        
         // ============================================================================
         // == VII. FUNCIONES MODAL DE EDICIÓN =========================================
         // ============================================================================
+
         window.openProductEditorModal = function(id, isMain) {
             isMainInventory = isMain;
             const product = isMain ? allProducts.find(p => p.id === id) : allProductsElTransito.find(p => p.id === id);
             
-            if (!product) { alert("Producto no encontrado."); return; }
-            
+            if (!product) {
+                alert("Producto no encontrado.");
+                return;
+            }
+
             currentEditingProduct = product;
-            selectedProductImageFile = null; // Resetear archivo
-            
+            selectedProductImageFile = null;
             modalNameIn.value = product.name;
             modalCategoryIn.value = product.category || 'Otros';
             modalBoxNumberIn.value = product.box_number || '';
@@ -1538,8 +1469,9 @@
 
             const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
             modalImagePreview.src = imageUrl;
-            
+
             document.getElementById('modal-inventory-location').textContent = isMain ? 'Inventario: Principal' : 'Inventario: El Transito';
+
             editProductModal.classList.remove('hidden');
         };
 
@@ -1549,59 +1481,63 @@
             selectedProductImageFile = null;
         };
 
+        // Previsualización de la nueva imagen
         modalImageUpload.addEventListener('change', (e) => {
-            selectedProductImageFile = e.target.files[0] || null;
-            if (selectedProductImageFile) {
-                // Previsualizar la imagen temporalmente
+            const file = e.target.files[0];
+            if (file) {
+                selectedProductImageFile = file;
                 const reader = new FileReader();
-                reader.onload = (event) => {
-                    modalImagePreview.src = event.target.result;
+                reader.onload = (ev) => {
+                    modalImagePreview.src = ev.target.result;
                 };
-                reader.readAsDataURL(selectedProductImageFile);
-            } else {
-                // Restaurar imagen original (o placeholder)
-                const product = currentEditingProduct;
-                const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
-                modalImagePreview.src = imageUrl;
+                reader.readAsDataURL(file);
             }
         });
 
-        document.getElementById('product-editor-form').addEventListener('submit', async (e) => {
+        // Manejo del guardado del modal
+        modalForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!supabase || !currentEditingProduct) return;
-            
-            const id = currentEditingProduct.id;
-            const table = isMainInventory ? PRODUCTS_TABLE : PRODUCTS_EL_TRANSITO_TABLE;
-
-            const newName = modalNameIn.value.trim();
-            const newCategory = modalCategoryIn.value;
-            const newBoxNumber = modalBoxNumberIn.value.trim();
-            const newPrice = parseFloat(modalPriceIn.value);
-            const newQuantity = parseInt(modalQuantityIn.value);
+            if (!currentEditingProduct || !supabase) return;
 
             modalSaveButton.disabled = true;
             modalSaveButton.textContent = 'Guardando...';
             setStatusMessage(modalStatus, 'Guardando cambios...', true);
 
-            try {
-                let newImageUrl = currentEditingProduct.image_url;
+            const table = isMainInventory ? PRODUCTS_TABLE : PRODUCTS_EL_TRANSITO_TABLE;
+            const id = currentEditingProduct.id;
+            const oldProduct = {...currentEditingProduct}; // Copia de seguridad
 
-                // 1. Manejar subida de nueva imagen si se seleccionó una
-                if (selectedProductImageFile) {
-                    newImageUrl = await uploadImage(selectedProductImageFile);
+            try {
+                // 1. Validar y construir payload de datos (sin imagen)
+                const newName = modalNameIn.value.trim();
+                const newCategory = modalCategoryIn.value;
+                const newPrice = parseFloat(modalPriceIn.value);
+                const newQuantity = parseInt(modalQuantityIn.value);
+                const newBoxNumber = modalBoxNumberIn.value.trim();
+
+                if (isNaN(newPrice) || newPrice < 0 || isNaN(newQuantity) || newQuantity < 0 || !Number.isInteger(newQuantity)) {
+                    throw new Error("Valores de Precio o Cantidad inválidos.");
                 }
 
-                // 2. Preparar el payload de actualización
                 const updatePayload = {
                     name: newName,
                     category: newCategory,
-                    box_number: newBoxNumber,
                     price: newPrice,
                     quantity: newQuantity,
-                    image_url: newImageUrl
+                    box_number: newBoxNumber || null
                 };
 
-                // 3. Ejecutar la actualización en Supabase
+                // 2. Subir nueva imagen si existe
+                if (selectedProductImageFile) {
+                    setStatusMessage(modalStatus, 'Subiendo imagen...', true);
+                    const newImageUrl = await uploadImage(selectedProductImageFile);
+                    if (!newImageUrl) {
+                        throw new Error("La subida de la imagen falló.");
+                    }
+                    updatePayload.image_url = newImageUrl;
+                }
+
+                // 3. Actualizar Supabase
                 const { data: updatedProductArray, error } = await supabase
                     .from(table)
                     .update(updatePayload)
@@ -1614,10 +1550,9 @@
                 // 4. Actualizar lista local y renderizar
                 const targetArray = isMainInventory ? allProducts : allProductsElTransito;
                 const index = targetArray.findIndex(p => p.id === id);
-
                 if (index !== -1) {
                     targetArray[index] = updatedProductArray; // Reemplazar con datos actualizados
-                    
+
                     // Forzar re-renderizado solo de las vistas afectadas
                     isMainInventory ? filterAndRenderProducts() : filterAndRenderProductsET();
                     updateAutocompleteList(allProducts, inventorySuggestions);
@@ -1630,77 +1565,611 @@
 
             } catch (error) {
                 console.error("Error al guardar cambios:", error);
-                setStatusMessage(modalStatus, `❌ Error al guardar cambios: ${error.message}`);
+                setStatusMessage(modalStatus, `❌ Error al guardar: ${error.message}`);
+                // Si la actualización falla, recargar los datos viejos
+                const targetArray = isMainInventory ? allProducts : allProductsElTransito;
+                const index = targetArray.findIndex(p => p.id === id);
+                if (index !== -1) targetArray[index] = oldProduct;
             } finally {
                 modalSaveButton.disabled = false;
                 modalSaveButton.textContent = 'Guardar Cambios';
             }
         });
+
+        // ============================================================================
+        // == VIII. FUNCIONES DE VENTAS Y REPORTES ====================================
+        // ============================================================================
         
-        // Función general para actualizar precio (usada por la edición rápida)
-        async function updateProductPrice(id, newPrice) {
-            return updateProductField(id, newPrice, 'price', PRODUCTS_TABLE, allProducts, filterAndRenderProducts, inventorySuggestions);
-        }
-        async function updateProductPriceET(id, newPrice) {
-            return updateProductField(id, newPrice, 'price', PRODUCTS_EL_TRANSITO_TABLE, allProductsElTransito, filterAndRenderProductsET, inventorySuggestionsET);
+        // Función auxiliar para obtener el nombre "limpio" del producto para buscar stock
+        function getCleanProductName(productName) {
+            if (!productName) return null;
+            // Eliminar información extra (ej. '(Devuelto)' o '(Sin Stock)')
+            return productName.replace(/\s*\(.*\)\s*$/, '').trim();
         }
 
-        async function updateProductField(id, newValue, fieldName, tableName, array, renderFunction, autocompleteList) {
-            if (!supabase) { alert("❌ Error: Supabase no cargado."); return; }
+        // --------------------------------------------------
+        // Sales (Principal)
+        // --------------------------------------------------
+        saleForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!supabase) return setStatusMessage(saleStatusEl, "Error: Supabase no está cargado.");
             
+            const submitButton = document.getElementById('sale-submit');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Registrando...';
+            setStatusMessage(saleStatusEl, 'Registrando venta...', true);
+
             try {
-                const updatePayload = { [fieldName]: newValue };
-                
-                const { data: updatedProductArray, error } = await supabase
-                    .from(tableName)
-                    .update(updatePayload)
-                    .eq('id', id)
+                const recipientName = recipientNameIn.value.trim();
+                const productName = productNameSoldIn.value.trim();
+                const salePrice = parseFloat(salePriceIn.value);
+                const saleDate = saleDateIn.value;
+                const saleStatus = saleStatusInput.value;
+
+                // 1. Registrar la Venta
+                const { data: newSaleArray, error: saleError } = await supabase
+                    .from(SALES_TABLE)
+                    .insert([{ 
+                        recipient_name: recipientName, 
+                        product_name_sold: productName, 
+                        price: salePrice, 
+                        sale_date: saleDate, 
+                        status: saleStatus
+                    }])
                     .select()
                     .single();
-                    
-                if (error) throw error;
+
+                if (saleError) throw saleError;
                 
-                // Actualizar lista local y re-renderizar
-                const index = array.findIndex(p => p.id === id);
-                if (index !== -1) {
-                    array[index] = updatedProductArray;
-                    renderFunction();
-                    updateAutocompleteList(array, autocompleteList);
-                    updateLabelView();
+                // 2. Actualizar stock (solo si el estado no es Devuelto)
+                if (saleStatus !== 'Devuelto') {
+                    // Buscar el producto en el inventario principal
+                    const cleanProductName = getCleanProductName(productName);
+                    const productToUpdate = allProducts.find(p => p.name.toLowerCase() === cleanProductName.toLowerCase());
+
+                    if (productToUpdate && productToUpdate.quantity > 0) {
+                        const newQuantity = productToUpdate.quantity - 1;
+                        setStatusMessage(saleStatusEl, `Venta registrada. Actualizando stock de ${productToUpdate.name}...`, true);
+                        
+                        const { error: updateError } = await supabase
+                            .from(PRODUCTS_TABLE)
+                            .update({ quantity: newQuantity })
+                            .eq('id', productToUpdate.id);
+                        
+                        if (updateError) {
+                            console.error("Error al actualizar stock:", updateError);
+                            alert(`⚠️ ADVERTENCIA: Venta registrada, pero falló la actualización de stock de ${productToUpdate.name}. (Error: ${updateError.message})`);
+                        } else {
+                            // Actualizar la lista local de productos
+                            productToUpdate.quantity = newQuantity;
+                            filterAndRenderProducts(); // Re-renderizar inventario
+                        }
+                    } else if (productToUpdate) {
+                        alert(`⚠️ ADVERTENCIA: Producto "${productToUpdate.name}" sin stock, pero la venta se ha registrado.`);
+                    } else {
+                        alert(`⚠️ ADVERTENCIA: Venta registrada, pero el producto "${productName}" no se encontró en el inventario principal para actualizar el stock.`);
+                    }
                 }
                 
+                // 3. Actualizar lista de ventas local
+                allSales.unshift(newSaleArray);
+                filterAndRenderSales();
+
+                // Limpiar el formulario
+                saleForm.reset();
+                saleDateIn.value = new Date().toISOString().split('T')[0];
+                setStatusMessage(saleStatusEl, `✅ Venta a ${recipientName} registrada con éxito.`, true);
+
             } catch (error) {
-                console.error(`Error al actualizar ${fieldName}:`, error);
-                alert(`❌ Error al actualizar ${fieldName}: ${error.message}`);
+                console.error("Error al registrar venta:", error);
+                setStatusMessage(saleStatusEl, `❌ Error al registrar venta: ${error.message}`);
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Registrar Venta';
+            }
+        });
+
+        async function fetchSales() {
+            if (!supabase) return;
+            salesListLoader.innerHTML = showTableSkeleton(5);
+            const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
+            salesListLoader.innerHTML = ""; // Quitar el loader
+
+            if (error) {
+                console.error("Error cargando ventas:", error);
+                salesListContainer.innerHTML = `<p class="text-red-500 p-4">Error: ${error.message}</p>`;
+                return;
+            }
+            allSales = data;
+            filterAndRenderSales();
+        }
+
+        function filterAndRenderSales() {
+            const term = (searchSalesInput.value || "").toLowerCase().trim();
+            const pendingOnly = pendingOnlyCheckbox.checked;
+            
+            let filtered = [...allSales];
+
+            if (term) {
+                filtered = filtered.filter(s => 
+                    (s.recipient_name || '').toLowerCase().includes(term) || 
+                    (s.product_name_sold || '').toLowerCase().includes(term)
+                );
+            }
+
+            if (pendingOnly) {
+                filtered = filtered.filter(s => s.status === 'Pendiente');
+            }
+            
+            renderSales(filtered);
+        }
+
+        function renderSales(items) {
+            salesListContainer.innerHTML = "";
+            updateGeneralTotals(items, true);
+
+            if (items.length === 0) {
+                salesListContainer.innerHTML = `<p class="text-gray-400 p-4">No se encontraron registros de ventas.</p>`;
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.className = 'min-w-full divide-y divide-gray-700';
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha y Destinatario</th>
+                        <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto Vendido</th>
+                        <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio (USD)</th>
+                        <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
+                        <th class="px-6 py-3 bg-gray-700"></th>
+                    </tr>
+                </thead>
+            `;
+            const tbody = document.createElement('tbody');
+            tbody.className = 'bg-gray-800 divide-y divide-gray-700';
+
+            items.forEach(sale => {
+                const row = tbody.insertRow();
+                const statusClass = sale.status === 'Pagado' ? 'status-paid' : sale.status === 'Pendiente' ? 'status-pending' : 'status-returned';
+                const formattedDate = new Date(sale.sale_date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' });
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <span class="font-medium text-white">${sale.recipient_name}</span>
+                        <p class="text-xs text-gray-400 mt-1">${formattedDate}</p>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.product_name_sold}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-green-400 font-medium editable-price" data-id="${sale.id}">$${Number(sale.price).toFixed(2)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <select id="select-status-${sale.id}" onchange="changeSaleStatus('${sale.id}', this.value)" class="p-1 rounded text-xs border border-gray-600 ${statusClass}">
+                            <option value="Pendiente" ${sale.status === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                            <option value="Pagado" ${sale.status === 'Pagado' ? 'selected' : ''}>Pagado</option>
+                            <option value="Devuelto" ${sale.status === 'Devuelto' ? 'selected' : ''}>Devuelto</option>
+                        </select>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="deleteSale('${sale.id}')" class="text-red-400 hover:text-red-600 transition">Eliminar</button>
+                    </td>
+                `;
+            });
+
+            table.appendChild(tbody);
+            salesListContainer.appendChild(table);
+            addEditablePriceListeners(salesListContainer, changeSalePrice);
+        }
+
+        // Listener para buscar y filtrar
+        searchSalesInput.addEventListener('input', filterAndRenderSales);
+        pendingOnlyCheckbox.addEventListener('change', filterAndRenderSales);
+
+        window.changeSaleStatus = async function(id, newStatus) {
+            if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) {
+                const selectElement = document.getElementById(`select-status-${id}`);
+                const sale = allSales.find(s => s.id === id);
+                if (selectElement && sale) selectElement.value = sale.status;
+                return;
+            }
+
+            const saleInArray = allSales.find(s => s.id === id);
+            if (!saleInArray || !supabase) { alert("❌ Error: Venta no encontrada o Supabase no cargado."); return; }
+
+            const oldStatus = saleInArray.status;
+            const soldProductName = getCleanProductName(saleInArray.product_name_sold);
+
+            // Iniciar la transacción de la DB
+            const { error: updateError } = await supabase.from(SALES_TABLE).update({ status: newStatus }).eq("id", id);
+            
+            if (updateError) {
+                alert("❌ Error al actualizar: " + updateError.message);
+                // Si falla, revertir el select
+                const selectElement = document.getElementById(`select-status-${id}`);
+                if (selectElement) selectElement.value = oldStatus;
+                return;
+            }
+
+            // Actualizar el estado localmente
+            saleInArray.status = newStatus;
+
+            // ----------------------------------------------------
+            // Lógica de Re-stock (COMPLEJA: Pagado/Pendiente -> Devuelto y viceversa)
+            // ----------------------------------------------------
+            if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') {
+                // Revertir una devolución: Descontar stock (asumimos que la unidad se vende de nuevo)
+                const productToUpdate = allProducts.find(p => p.name.toLowerCase() === soldProductName.toLowerCase());
+                if (productToUpdate) {
+                    const newQuantity = productToUpdate.quantity - 1;
+                    const { error: stockError } = await supabase.from(PRODUCTS_TABLE).update({ quantity: newQuantity }).eq('id', productToUpdate.id);
+                    if (!stockError) productToUpdate.quantity = newQuantity;
+                    else console.error("Error de re-stock (de Devuelto a Pagado/Pendiente):", stockError.message);
+                }
+            } else if (oldStatus !== 'Devuelto' && newStatus === 'Devuelto') {
+                // Registrar una devolución: Aumentar stock
+                const productToUpdate = allProducts.find(p => p.name.toLowerCase() === soldProductName.toLowerCase());
+                if (productToUpdate) {
+                    const newQuantity = productToUpdate.quantity + 1;
+                    const { error: stockError } = await supabase.from(PRODUCTS_TABLE).update({ quantity: newQuantity }).eq('id', productToUpdate.id);
+                    if (!stockError) productToUpdate.quantity = newQuantity;
+                    else console.error("Error de re-stock (a Devuelto):", stockError.message);
+                }
+            }
+            
+            // Re-renderizar ambas vistas (Ventas e Inventario)
+            filterAndRenderSales();
+            filterAndRenderProducts();
+        }
+
+        window.deleteSale = async function(id) {
+            if (!confirm("¿Eliminar este registro de venta?")) return;
+            const saleIndex = allSales.findIndex(s => s.id === id);
+            if (saleIndex === -1 || !supabase) { alert("❌ Error: Supabase no cargado."); return; }
+            
+            const sale = allSales[saleIndex];
+            const soldProductName = getCleanProductName(sale.product_name_sold);
+
+            const { error } = await supabase.from(SALES_TABLE).delete().eq("id", id);
+            
+            if (error) {
+                alert("❌ Error al eliminar: " + error.message);
+            } else {
+                // 1. Revertir stock si la venta NO era Devuelta
+                if (sale.status !== 'Devuelto') {
+                    const productToUpdate = allProducts.find(p => p.name.toLowerCase() === soldProductName.toLowerCase());
+                    if (productToUpdate) {
+                        const newQuantity = productToUpdate.quantity + 1;
+                        const { error: stockError } = await supabase.from(PRODUCTS_TABLE).update({ quantity: newQuantity }).eq('id', productToUpdate.id);
+                        if (!stockError) productToUpdate.quantity = newQuantity;
+                        else console.error("Error de re-stock al eliminar:", stockError.message);
+                        filterAndRenderProducts(); // Re-renderizar inventario
+                    }
+                }
+                
+                // 2. Eliminar de la lista local y re-renderizar ventas
+                allSales.splice(saleIndex, 1);
+                filterAndRenderSales();
             }
         }
 
-        // Añade listeners para la edición rápida de precio con doble clic
-        function addQuickEditListeners(container, updateFunction) {
-            const priceElements = container.querySelectorAll('[id^="product-price-"]');
-            priceElements.forEach(el => {
-                el.addEventListener('dblclick', () => {
+        window.changeSalePrice = async function(id, newPrice) {
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
+            const { error } = await supabase.from(SALES_TABLE).update({ price: newPrice }).eq("id", id);
+
+            if (error) {
+                alert("❌ Error: " + error.message);
+            } else {
+                const saleInArray = allSales.find(s => s.id === id);
+                if (saleInArray) {
+                    saleInArray.price = newPrice;
+                    filterAndRenderSales();
+                }
+            }
+        }
+        
+        // --------------------------------------------------
+        // Sales (El Transito)
+        // --------------------------------------------------
+        saleFormET.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!supabase) return setStatusMessage(saleStatusElET, "Error: Supabase no está cargado.");
+            
+            const submitButton = document.getElementById('sale-submit-et');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Registrando...';
+            setStatusMessage(saleStatusElET, 'Registrando venta...', true);
+
+            try {
+                const recipientName = recipientNameInET.value.trim();
+                const productName = productNameSoldInET.value.trim();
+                const salePrice = parseFloat(salePriceInET.value);
+                const saleDate = saleDateInET.value;
+                const saleStatus = saleStatusInputET.value;
+
+                // 1. Registrar la Venta
+                const { data: newSaleArray, error: saleError } = await supabase
+                    .from(SALES_EL_TRANSITO_TABLE)
+                    .insert([{ 
+                        recipient_name: recipientName, 
+                        product_name_sold: productName, 
+                        price: salePrice, 
+                        sale_date: saleDate, 
+                        status: saleStatus
+                    }])
+                    .select()
+                    .single();
+
+                if (saleError) throw saleError;
+                
+                // 2. Actualizar stock (solo si el estado no es Devuelto)
+                if (saleStatus !== 'Devuelto') {
+                    // Buscar el producto en el inventario de El Transito
+                    const cleanProductName = getCleanProductName(productName);
+                    const productToUpdate = allProductsElTransito.find(p => p.name.toLowerCase() === cleanProductName.toLowerCase());
+
+                    if (productToUpdate && productToUpdate.quantity > 0) {
+                        const newQuantity = productToUpdate.quantity - 1;
+                        setStatusMessage(saleStatusElET, `Venta registrada. Actualizando stock de ${productToUpdate.name}...`, true);
+                        
+                        const { error: updateError } = await supabase
+                            .from(PRODUCTS_EL_TRANSITO_TABLE)
+                            .update({ quantity: newQuantity })
+                            .eq('id', productToUpdate.id);
+                        
+                        if (updateError) {
+                            console.error("Error al actualizar stock (ET):", updateError);
+                            alert(`⚠️ ADVERTENCIA: Venta registrada, pero falló la actualización de stock (ET) de ${productToUpdate.name}. (Error: ${updateError.message})`);
+                        } else {
+                            // Actualizar la lista local de productos
+                            productToUpdate.quantity = newQuantity;
+                            filterAndRenderProductsET(); // Re-renderizar inventario
+                        }
+                    } else if (productToUpdate) {
+                        alert(`⚠️ ADVERTENCIA: Producto "${productToUpdate.name}" sin stock, pero la venta se ha registrado.`);
+                    } else {
+                        alert(`⚠️ ADVERTENCIA: Venta registrada, pero el producto "${productName}" no se encontró en el inventario de El Transito para actualizar el stock.`);
+                    }
+                }
+                
+                // 3. Actualizar lista de ventas local
+                allSalesElTransito.unshift(newSaleArray);
+                filterAndRenderSalesET();
+
+                // Limpiar el formulario
+                saleFormET.reset();
+                saleDateInET.value = new Date().toISOString().split('T')[0];
+                setStatusMessage(saleStatusElET, `✅ Venta a ${recipientName} (ET) registrada con éxito.`, true);
+
+            } catch (error) {
+                console.error("Error al registrar venta (ET):", error);
+                setStatusMessage(saleStatusElET, `❌ Error al registrar venta (ET): ${error.message}`);
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Registrar Venta';
+            }
+        });
+
+        async function fetchSalesElTransito() {
+            if (!supabase) return;
+            salesListLoaderET.innerHTML = showTableSkeleton(5);
+            const { data, error } = await supabase.from(SALES_EL_TRANSITO_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
+            salesListLoaderET.innerHTML = ""; // Quitar el loader
+
+            if (error) {
+                console.error("Error cargando ventas (ET):", error);
+                salesListContainerET.innerHTML = `<p class="text-red-500 p-4">Error: ${error.message}</p>`;
+                return;
+            }
+            allSalesElTransito = data;
+            filterAndRenderSalesET();
+        }
+
+        function filterAndRenderSalesET() {
+            const term = (searchSalesInputET.value || "").toLowerCase().trim();
+            const pendingOnly = pendingOnlyCheckboxET.checked;
+            
+            let filtered = [...allSalesElTransito];
+
+            if (term) {
+                filtered = filtered.filter(s => 
+                    (s.recipient_name || '').toLowerCase().includes(term) || 
+                    (s.product_name_sold || '').toLowerCase().includes(term)
+                );
+            }
+
+            if (pendingOnly) {
+                filtered = filtered.filter(s => s.status === 'Pendiente');
+            }
+            
+            renderSalesElTransito(filtered);
+        }
+
+        function renderSalesElTransito(items) {
+            salesListContainerET.innerHTML = "";
+            updateGeneralTotals(items, false);
+
+            if (items.length === 0) {
+                salesListContainerET.innerHTML = `<p class="text-gray-400 p-4">No se encontraron registros de ventas (El Tránsito).</p>`;
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.className = 'min-w-full divide-y divide-gray-700';
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha y Destinatario</th>
+                        <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto Vendido</th>
+                        <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio (USD)</th>
+                        <th class="px-6 py-3 bg-gray-700 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
+                        <th class="px-6 py-3 bg-gray-700"></th>
+                    </tr>
+                </thead>
+            `;
+            const tbody = document.createElement('tbody');
+            tbody.className = 'bg-gray-800 divide-y divide-gray-700';
+
+            items.forEach(sale => {
+                const row = tbody.insertRow();
+                const statusClass = sale.status === 'Pagado' ? 'status-paid' : sale.status === 'Pendiente' ? 'status-pending' : 'status-returned';
+                const formattedDate = new Date(sale.sale_date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' });
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <span class="font-medium text-white">${sale.recipient_name}</span>
+                        <p class="text-xs text-gray-400 mt-1">${formattedDate}</p>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.product_name_sold}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-green-400 font-medium editable-price-et" data-id="${sale.id}">$${Number(sale.price).toFixed(2)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <select id="select-status-et-${sale.id}" onchange="changeSaleStatusET('${sale.id}', this.value)" class="p-1 rounded text-xs border border-gray-600 ${statusClass}">
+                            <option value="Pendiente" ${sale.status === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                            <option value="Pagado" ${sale.status === 'Pagado' ? 'selected' : ''}>Pagado</option>
+                            <option value="Devuelto" ${sale.status === 'Devuelto' ? 'selected' : ''}>Devuelto</option>
+                        </select>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="deleteSaleET('${sale.id}')" class="text-red-400 hover:text-red-600 transition">Eliminar</button>
+                    </td>
+                `;
+            });
+
+            table.appendChild(tbody);
+            salesListContainerET.appendChild(table);
+            addEditablePriceListeners(salesListContainerET, changeSalePriceET);
+        }
+
+        // Listener para buscar y filtrar (ET)
+        searchSalesInputET.addEventListener('input', filterAndRenderSalesET);
+        pendingOnlyCheckboxET.addEventListener('change', filterAndRenderSalesET);
+
+        window.changeSaleStatusET = async function(id, newStatus) {
+            if (!confirm(`¿Cambiar el estado a "${newStatus}"?`)) {
+                const selectElement = document.getElementById(`select-status-et-${id}`);
+                const sale = allSalesElTransito.find(s => s.id === id);
+                if (selectElement && sale) selectElement.value = sale.status;
+                return;
+            }
+
+            const saleInArray = allSalesElTransito.find(s => s.id === id);
+            if (!saleInArray || !supabase) { alert("❌ Error: Venta no encontrada o Supabase no cargado."); return; }
+
+            const oldStatus = saleInArray.status;
+            const soldProductName = getCleanProductName(saleInArray.product_name_sold);
+
+            // Iniciar la transacción de la DB
+            const { error: updateError } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ status: newStatus }).eq("id", id);
+            
+            if (updateError) {
+                alert("❌ Error al actualizar (ET): " + updateError.message);
+                // Si falla, revertir el select
+                const selectElement = document.getElementById(`select-status-et-${id}`);
+                if (selectElement) selectElement.value = oldStatus;
+                return;
+            }
+
+            // Actualizar el estado localmente
+            saleInArray.status = newStatus;
+
+            // ----------------------------------------------------
+            // Lógica de Re-stock (COMPLEJA: Pagado/Pendiente -> Devuelto y viceversa)
+            // ----------------------------------------------------
+            if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') {
+                // Revertir una devolución: Descontar stock (asumimos que la unidad se vende de nuevo)
+                const productToUpdate = allProductsElTransito.find(p => p.name.toLowerCase() === soldProductName.toLowerCase());
+                if (productToUpdate) {
+                    const newQuantity = productToUpdate.quantity - 1;
+                    const { error: stockError } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ quantity: newQuantity }).eq('id', productToUpdate.id);
+                    if (!stockError) productToUpdate.quantity = newQuantity;
+                    else console.error("Error de re-stock (ET) (de Devuelto a Pagado/Pendiente):", stockError.message);
+                }
+            } else if (oldStatus !== 'Devuelto' && newStatus === 'Devuelto') {
+                // Registrar una devolución: Aumentar stock
+                const productToUpdate = allProductsElTransito.find(p => p.name.toLowerCase() === soldProductName.toLowerCase());
+                if (productToUpdate) {
+                    const newQuantity = productToUpdate.quantity + 1;
+                    const { error: stockError } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ quantity: newQuantity }).eq('id', productToUpdate.id);
+                    if (!stockError) productToUpdate.quantity = newQuantity;
+                    else console.error("Error de re-stock (ET) (a Devuelto):", stockError.message);
+                }
+            }
+            
+            // Re-renderizar ambas vistas (Ventas e Inventario)
+            filterAndRenderSalesET();
+            filterAndRenderProductsET();
+        }
+
+        window.deleteSaleET = async function(id) {
+            if (!confirm("¿Eliminar este registro de venta de El Tránsito?")) return;
+            const saleIndex = allSalesElTransito.findIndex(s => s.id === id);
+            if (saleIndex === -1 || !supabase) { alert("❌ Error: Supabase no cargado."); return; }
+            
+            const sale = allSalesElTransito[saleIndex];
+            const soldProductName = getCleanProductName(sale.product_name_sold);
+
+            const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).delete().eq("id", id);
+            
+            if (error) {
+                alert("❌ Error al eliminar: " + error.message);
+            } else {
+                // 1. Revertir stock si la venta NO era Devuelta
+                if (sale.status !== 'Devuelto') {
+                    const productToUpdate = allProductsElTransito.find(p => p.name.toLowerCase() === soldProductName.toLowerCase());
+                    if (productToUpdate) {
+                        const newQuantity = productToUpdate.quantity + 1;
+                        const { error: stockError } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ quantity: newQuantity }).eq('id', productToUpdate.id);
+                        if (!stockError) productToUpdate.quantity = newQuantity;
+                        else console.error("Error de re-stock al eliminar (ET):", stockError.message);
+                        filterAndRenderProductsET(); // Re-renderizar inventario
+                    }
+                }
+                
+                // 2. Eliminar de la lista local y re-renderizar ventas
+                allSalesElTransito.splice(saleIndex, 1);
+                filterAndRenderSalesET();
+            }
+        }
+
+        window.changeSalePriceET = async function(id, newPrice) {
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
+            const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ price: newPrice }).eq("id", id);
+
+            if (error) {
+                alert("❌ Error: " + error.message);
+            } else {
+                const saleInArray = allSalesElTransito.find(s => s.id === id);
+                if (saleInArray) {
+                    saleInArray.price = newPrice;
+                    filterAndRenderSalesET();
+                }
+            }
+        }
+
+        // --------------------------------------------------
+        // Funciones de Total y Edición
+        // --------------------------------------------------
+
+        function updateGeneralTotals(filteredArray, isMainSales) {
+            const idSuffix = isMainSales ? '' : '-et';
+            const totalSold = filteredArray.reduce((sum, s) => sum + (s.price || 0), 0);
+            const totalPaid = filteredArray.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + (s.price || 0), 0);
+            const paidPercentage = totalSold > 0 ? ((totalPaid / totalSold) * 100).toFixed(1) : 0;
+
+            document.getElementById(`total-sales-count${idSuffix}`).textContent = `${filteredArray.length} Registros`;
+            document.getElementById(`total-sold-amount${idSuffix}`).textContent = `$${totalSold.toFixed(2)}`;
+            document.getElementById(`total-paid-amount${idSuffix}`).textContent = `$${totalPaid.toFixed(2)}`;
+            document.getElementById(`paid-percentage${idSuffix}`).textContent = `${paidPercentage}%`;
+        }
+        
+        function addEditablePriceListeners(container, updateFunction) {
+            container.querySelectorAll('.editable-price, .editable-price-et').forEach(el => {
+                el.addEventListener('click', () => {
                     const currentPrice = el.textContent.replace('$', '').trim();
                     const newPrice = prompt("Editar precio (USD):", currentPrice);
                     if (newPrice !== null && !isNaN(parseFloat(newPrice))) {
                         const parsedPrice = parseFloat(newPrice).toFixed(2);
                         if (parsedPrice !== currentPrice) {
-                            updateFunction(el.parentElement.dataset.id, parseFloat(parsedPrice));
+                            updateFunction(el.dataset.id, parseFloat(parsedPrice));
                         }
                     }
-                });
-            });
-            
-            // Evento para abrir modal al hacer click en la tarjeta (excepto en el doble clic y botones)
-            const productCards = container.querySelectorAll('.product-card');
-            productCards.forEach(card => {
-                card.addEventListener('click', (e) => {
-                    // Evitar que el evento se dispare si el clic fue en un botón o en el precio para la edición rápida
-                    if (e.target.closest('button') || e.target.id.startsWith('product-price-')) {
-                        return;
-                    }
-                    const isMain = container === productsEl;
-                    window.openProductEditorModal(card.dataset.id, isMain);
                 });
             });
         }
@@ -1716,139 +2185,297 @@
         }
 
         // Función para mostrar el skeleton loader de productos
-        function showProductSkeletonLoaders(loaderEl) {
-            const skeletonCard = `<div class="skeleton-card">
-                <div class="skeleton-line h-32 w-full mb-4"></div>
-                <div class="skeleton-line h-6 w-3/4 mb-2"></div>
-                <div class="skeleton-line h-4 w-1/2 mb-4"></div>
-                <div class="skeleton-line h-4 w-1/4"></div>
-                <div class="mt-4 flex justify-end">
-                    <div class="skeleton-line h-8 w-1/3"></div>
+        function showProductSkeletonLoaders() {
+            const skeletonCard = `<div class="skeleton-card"><div class="skeleton-line h-32 w-full mb-4"></div><div class="skeleton-line h-6 w-3/4 mb-2"></div><div class="skeleton-line h-4 w-1/2 mb-4"></div><div class="skeleton-line h-4 w-1/3"></div><div class="skeleton-line h-4 w-1/3 mt-1"></div></div>`;
+            const skeletonGrid = Array(4).fill(skeletonCard).join('');
+            productsLoader.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">${skeletonGrid}</div>`;
+            productsLoaderET.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">${skeletonGrid}</div>`;
+        }
+
+        // Función para mostrar el skeleton loader de ventas
+        function showTableSkeleton(rows) {
+            const rowHtml = `
+                <div class="flex space-x-4 p-4 border border-gray-700 rounded-lg bg-gray-800">
+                    <div class="flex-grow space-y-2">
+                        <div class="skeleton-line h-4 w-1/3"></div>
+                        <div class="skeleton-line h-4 w-1/2"></div>
+                    </div>
+                    <div class="skeleton-line h-6 w-1/6"></div>
+                    <div class="skeleton-line h-6 w-1/6"></div>
                 </div>
-            </div>`;
-            loaderEl.innerHTML = Array(4).fill(skeletonCard).join('');
+            `;
+            return Array(rows).fill(rowHtml).join('');
         }
         
         // ============================================================================
-        // == VIII. FUNCIONES DE VENTAS PRINCIPAL =====================================
+        // == IX. FUNCIONES DE HERRAMIENTAS / TUTORIALES ==============================
         // ============================================================================
-        saleForm.addEventListener('submit', async (e) => {
+
+        toolForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!supabase) { setStatusMessage(saleStatusEl, "❌ Error: Supabase no cargado."); return; }
-
-            const recipientName = recipientNameIn.value.trim();
-            const productNameSold = productNameSoldIn.value.trim();
-            const salePrice = parseFloat(salePriceIn.value);
-            const saleDate = saleDateIn.value;
-            const status = saleStatusInput.value;
-
-            // Encontrar el producto original en el inventario para obtener su ID y restarle stock
-            const product = allProducts.find(p => p.name === productNameSold);
-            const inventory_id = product ? product.id : null;
-            const originalPrice = product ? product.price : salePrice;
-
-            if (product && product.quantity < 1) {
-                return setStatusMessage(saleStatusEl, `❌ Error: No hay stock disponible para "${productNameSold}".`, false);
-            }
-
-            setStatusMessage(saleStatusEl, 'Registrando venta...', true);
+            if (!supabase) return setStatusMessage(toolStatusEl, "Error: Supabase no está cargado.");
             
+            const submitButton = document.getElementById('tool-submit');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Agregando...';
+            setStatusMessage(toolStatusEl, 'Subiendo herramienta...', true);
+
             try {
-                // 1. Registrar la venta
-                const { data: saleData, error: saleError } = await supabase
-                    .from(SALES_TABLE)
-                    .insert([{ recipient_name: recipientName, product_name: productNameSold, price: salePrice, sale_date: saleDate, status, inventory_id, original_price: originalPrice }])
-                    .select()
-                    .single();
-                    
-                if (saleError) throw saleError;
-                
-                // 2. Actualizar el inventario si la venta es de un producto rastreado
-                if (product) {
-                    await updateProductField(
-                        inventory_id,
-                        product.quantity - 1, 
-                        'quantity', 
-                        PRODUCTS_TABLE, 
-                        allProducts, 
-                        filterAndRenderProducts, 
-                        inventorySuggestions
-                    );
+                const title = toolTitleIn.value.trim();
+                const description = toolDescriptionIn.value.trim();
+                const imageFile = toolImageIn.files[0];
+                let imageUrl = null;
+
+                if (imageFile) {
+                    imageUrl = await uploadImage(imageFile); // Reutilizar la función de subida
+                    if (!imageUrl) throw new Error("La subida de la imagen falló.");
+                    setStatusMessage(toolStatusEl, 'Imagen subida. Guardando en BD...', true);
                 }
 
-                allSales.unshift(saleData);
-                filterAndRenderSales();
+                const { data, error } = await supabase
+                    .from(TOOLS_TABLE)
+                    .insert([{ title, description, image_url: imageUrl }])
+                    .select()
+                    .single();
 
-                saleForm.reset();
-                saleDateIn.value = new Date().toISOString().split('T')[0];
-                saleStatusInput.value = 'Pagado';
-                setStatusMessage(saleStatusEl, `✅ Venta a "${recipientName}" de ${productNameSold} registrada con éxito.`, true);
+                if (error) throw error;
+
+                // Agregar la nueva herramienta a la lista local
+                allTools.unshift(data);
+                filterAndRenderTools();
+                
+                // Limpiar el formulario
+                toolForm.reset();
+                setStatusMessage(toolStatusEl, `✅ Herramienta "${title}" agregada con éxito.`, true);
+
             } catch (error) {
-                console.error("Error al registrar venta:", error);
-                setStatusMessage(saleStatusEl, `❌ Error al registrar venta: ${error.message}`);
+                console.error("Error al agregar herramienta:", error);
+                setStatusMessage(toolStatusEl, `❌ Error al agregar herramienta: ${error.message}`);
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Agregar Herramienta';
             }
         });
 
-        async function fetchSales() {
+        async function fetchTools() {
             if (!supabase) return;
-            showSalesSkeletonLoaders(salesListLoader);
+            const loader = document.getElementById('tools-loader');
+            loader.innerHTML = showToolSkeletonLoaders(2);
             
-            const { data, error } = await supabase
-                .from(SALES_TABLE)
-                .select("*")
-                .order("sale_date", { ascending: false });
+            const { data, error } = await supabase.from(TOOLS_TABLE).select("*").order("created_at", { ascending: false });
+            loader.innerHTML = "";
 
             if (error) {
-                console.error("Error cargando ventas:", error);
-                salesListContainer.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+                console.error("Error cargando herramientas:", error);
+                document.getElementById('total-tools-count').textContent = "Error al cargar";
+                toolsListEl.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
                 return;
             }
 
-            allSales = data;
-            filterAndRenderSales();
+            allTools = data;
+            filterAndRenderTools();
+        }
+        
+        function filterAndRenderTools() {
+            const term = (searchToolsInput.value || "").toLowerCase().trim();
+            const filtered = allTools.filter(t => t.title.toLowerCase().includes(term) || (t.description && t.description.toLowerCase().includes(term)));
+            renderTools(filtered);
         }
 
-        function filterAndRenderSales() {
-            const searchTerm = (searchSalesInput.value || "").toLowerCase().trim();
-            const pendingOnly = pendingOnlyCheckbox.checked;
+        function renderTools(items) {
+            toolsListEl.innerHTML = "";
+            document.getElementById('total-tools-count').textContent = `${items.length} elementos`;
 
-            const filtered = allSales.filter(sale => {
-                const matchesSearch = sale.recipient_name.toLowerCase().includes(searchTerm) || sale.product_name.toLowerCase().includes(searchTerm);
-                const matchesPending = !pendingOnly || sale.status === 'Pendiente';
-                return matchesSearch && matchesPending;
+            if (items.length === 0) {
+                toolsListEl.innerHTML = `<p class="p-4 text-gray-400">No se encontraron herramientas o tutoriales.</p>`;
+                return;
+            }
+
+            const grid = document.createElement("div");
+            grid.className = "grid grid-cols-1 md:grid-cols-2 gap-6";
+
+            items.forEach(tool => {
+                const card = document.createElement("div");
+                card.id = `tool-card-${tool.id}`;
+                card.className = "bg-gray-800 rounded-lg shadow-xl p-6 flex flex-col tool-card border border-gray-700";
+                
+                const imageUrl = tool.image_url ? `${tool.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/300x150/4f46e5/ffffff?text=Tutorial`;
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-indigo-300">${tool.title}</h3>
+                        <button onclick="deleteTool('${tool.id}')" class="text-red-400 hover:text-red-600 transition p-1 rounded-full" title="Eliminar herramienta">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="mb-4 h-40 overflow-hidden rounded-md bg-gray-700/50 flex items-center justify-center border border-gray-600">
+                        <img src="${imageUrl}" alt="${tool.title}" class="h-full w-full object-contain transition duration-300" />
+                    </div>
+                    
+                    <p class="text-gray-300 whitespace-pre-wrap">${tool.description || 'Sin descripción.'}</p>
+                `;
+                grid.appendChild(card);
             });
 
-            renderSales(filtered, salesListContainer, totalSoldAmountSpan, totalPaidAmountSpan, paidPercentageSpan);
+            toolsListEl.appendChild(grid);
         }
 
-        function renderSales(items, container, soldSpan, paidSpan, progressSpan) {
-            salesListLoader.innerHTML = '';
-            container.innerHTML = '';
+        searchToolsInput.addEventListener('input', filterAndRenderTools);
 
-            let totalSold = 0;
-            let totalPaid = 0;
-            
-            if (items.length === 0) {
-                container.innerHTML = '<p class="text-gray-400">No se encontraron ventas con los filtros aplicados.</p>';
-                soldSpan.textContent = '$0.00';
-                paidSpan.textContent = '$0.00';
-                progressSpan.textContent = '0%';
-                return;
+        window.deleteTool = async function(id) {
+            if (!confirm("¿Eliminar esta herramienta/tutorial?")) return;
+            if (!supabase) { alert("❌ Error: Supabase no cargado."); return; }
+
+            const { error } = await supabase.from(TOOLS_TABLE).delete().eq("id", id);
+
+            if (error) {
+                alert("❌ Error al eliminar: " + error.message);
+            } else {
+                allTools = allTools.filter(t => t.id !== id);
+                filterAndRenderTools();
             }
+        }
 
-            items.forEach(sale => {
-                const price = Number(sale.price);
-                totalSold += price;
+        function showToolSkeletonLoaders(count) {
+            const skeletonCard = `<div class="skeleton-card p-6 space-y-3"><div class="skeleton-line h-6 w-3/4 mb-4"></div><div class="skeleton-line h-40 w-full"></div><div class="skeleton-line h-4 w-11/12"></div><div class="skeleton-line h-4 w-10/12"></div></div>`;
+            const skeletonGrid = Array(count).fill(skeletonCard).join('');
+            return `<div class="grid grid-cols-1 md:grid-cols-2 gap-6">${skeletonGrid}</div>`;
+        }
+
+        // ============================================================================
+        // == X. REALTIME y MISCELÁNEOS ===============================================
+        // ============================================================================
+
+        function initializeRealtimeSubscriptions() {
+            if (!supabase) return;
+
+            // Se recomienda usar el canal por defecto o crear uno específico si es necesario
+            // Supabase Realtime no es estrictamente necesario para esta app simple
+            // pero si la DB es compartida, puede ser útil.
+            console.log("Realtime subscriptions are disabled for simplicity/performance.");
+        }
+        
+        // --------------------------------------------------
+        // Configuración de Tema y Logo
+        // --------------------------------------------------
+
+        function toggleSettingsDropdown(event) {
+            event.stopPropagation(); // Evita que el body click handler lo cierre inmediatamente
+            settingsDropdown.classList.toggle('hidden');
+        }
+
+        function closeSettingsDropdown(event) {
+            // Cierra el dropdown si el clic no fue dentro del botón ni del dropdown
+            const isInsideButton = document.getElementById('settings-button').contains(event.target);
+            const isInsideDropdown = settingsDropdown.contains(event.target);
+            if (!isInsideButton && !isInsideDropdown) {
+                settingsDropdown.classList.add('hidden');
+            }
+        }
+
+        themeSelector.addEventListener('change', (e) => {
+            const newTheme = e.target.value;
+            root.className = newTheme;
+            try {
+                localStorage.setItem('selectedTheme', newTheme);
+            } catch(e) {
+                console.error("No se pudo guardar el tema en localStorage.");
+            }
+        });
+
+        // Lógica para el logo (Guardar en localStorage o subir a Supabase)
+        logoUploadInput.addEventListener('change', () => {
+            if (logoUploadInput.files.length > 0) {
+                logoSaveButton.disabled = false;
+            } else {
+                logoSaveButton.disabled = true;
+            }
+        });
+        
+        logoSaveButton.addEventListener('click', async () => {
+            const file = logoUploadInput.files[0];
+            if (!file) return;
+
+            logoSaveButton.disabled = true;
+            logoSaveButton.textContent = 'Subiendo...';
+
+            try {
+                // Sube la imagen y obtén la URL
+                const imageUrl = await uploadImage(file); // Reutilizar la función de subida
+                if (!imageUrl) throw new Error("La subida de la imagen falló.");
+
+                // Guarda la URL en localStorage
+                localStorage.setItem('businessLogoUrl', imageUrl);
                 
-                let statusClass = 'bg-gray-500';
-                if (sale.status === 'Pagado') {
-                    statusClass = 'status-paid';
-                    totalPaid += price;
-                } else if (sale.status === 'Pendiente') {
-                    statusClass = 'status-pending';
-                } else if (sale.status === 'Devuelto') {
-                    statusClass = 'status-returned';
+                // Actualiza la imagen visible
+                businessLogoImg.src = imageUrl;
+
+                alert('✅ Logo actualizado con éxito.');
+
+            } catch (error) {
+                console.error("Error al guardar logo:", error);
+                alert(`❌ Error al guardar logo: ${error.message}`);
+            } finally {
+                logoSaveButton.disabled = false;
+                logoSaveButton.textContent = 'Guardar Logo';
+                logoUploadInput.value = null;
+                logoSaveButton.disabled = true;
+            }
+        });
+
+        async function loadLogo() {
+            try {
+                const savedLogoUrl = localStorage.getItem('businessLogoUrl');
+                if (savedLogoUrl) {
+                    businessLogoImg.src = savedLogoUrl;
                 }
-                
-                const card = document.createElement('div');
-                card.className = `bg-gray-800 rounded-lg shadow-lg p-4 border-l-4 border-indigo-500 flex flex-wrap items-center justify-between transition duration-300 hover:shadow-2xl mb
+            } catch (e) {
+                console.error("Error al cargar logo desde localStorage.");
+            }
+        }
+
+        // ============================================================================
+        // == XI. INICIALIZACIÓN DE LA APLICACIÓN =====================================
+        // ============================================================================
+
+        // Asignar listeners a los botones de vista
+        document.querySelectorAll('.view-btn').forEach(btn => 
+            btn.addEventListener('click', () => toggleView(btn.dataset.view)));
+        
+        // --- CARGA INICIAL --
+        window.addEventListener("load", async () => {
+            themeSelector.value = root.className || 'theme-dark'; 
+            saleDateIn.value = new Date().toISOString().split('T')[0];
+            saleDateInET.value = new Date().toISOString().split('T')[0];
+            toggleView('inventory'); 
+            showProductSkeletonLoaders(); 
+            
+            await loadLogo(); 
+            
+            if (supabase) {
+                try {
+                    // Cargar inventarios (CRÍTICO)
+                    await Promise.all([
+                        fetchProducts(), 
+                        fetchProductsET(),
+                        fetchSales(), 
+                        fetchSalesElTransito(), 
+                        fetchTools() 
+                    ]);
+                    
+                    // Inicializar la vista de etiquetas después de cargar los productos
+                    updateLabelView(); 
+                    
+                    initializeRealtimeSubscriptions();
+
+                } catch (error) {
+                    console.error("Error crítico durante la carga de datos inicial:", error);
+                }
+            } else {
+                 alert("Error Crítico: No se pudo cargar Supabase. Revise la conexión de internet o la URL del CDN en el HTML.");
+            }
+        });
+    </script>
+</body>
+</html>
