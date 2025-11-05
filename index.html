@@ -1090,9 +1090,14 @@
             const onScanError = (errorMessage) => {
                  // Solo actualizamos el estado si no hemos manejado ya un éxito.
                  if (!scanSuccessHandled) {
+                    // Modificación CLAVE: Ignorar mensajes de "parse error"
+                    if (errorMessage.includes("QR code parse error") || errorMessage.includes("-D")) {
+                         scannerStatusEl.textContent = 'Escaneando... Apunta el código QR al centro.';
+                    }
                     // Si es un error de cámara, lo ignoramos para que siga intentando.
-                    if (!errorMessage.includes("No camera found")) {
-                        scannerStatusEl.textContent = `Escaneando... (Error: ${errorMessage.slice(0, 30)}...)`;
+                    else if (!errorMessage.includes("No camera found")) {
+                        // Mostramos otros errores más relevantes
+                        scannerStatusEl.textContent = `Escaneando... (Error de cámara/permiso: ${errorMessage.slice(0, 30)}...)`;
                     }
                  }
             };
