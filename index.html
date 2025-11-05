@@ -184,6 +184,7 @@
             }
         })();
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode.js/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
@@ -573,9 +574,10 @@
     </div>
     <input type="file" id="tool-image-editor-input" class="hidden" accept="image/*" />
     
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-        
+    <script>
+        // Importación de Supabase se hace aquí para evitar conflictos de módulos si se usa type="module" en el script principal.
+        const { createClient } = window.supabase; 
+
         // =================================================================================
         // == Configuración de Supabase y Edge Function para R2                       ==
         // =================================================================================
@@ -863,14 +865,20 @@
             qrProductInfo.textContent = `Producto: ${productName} (ID: ${productId})`;
 
             // Generar el código QR
-            new QRCode(qrCodeContainer, {
-                text: productId, // El valor del QR es el ID de Supabase
-                width: 256,
-                height: 256,
-                colorDark : "#000000",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
-            });
+            // Usa window.QRCode ya que se cargó globalmente (solución al error)
+            if (typeof QRCode !== 'undefined') {
+                 new QRCode(qrCodeContainer, {
+                    text: productId, // El valor del QR es el ID de Supabase
+                    width: 256,
+                    height: 256,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            } else {
+                qrProductInfo.textContent = "Error: La librería QRCode no se cargó correctamente.";
+            }
+
 
             qrModal.classList.remove('hidden');
         };
@@ -892,6 +900,10 @@
 
         window.openScannerModal = async function() {
             if (isScannerRunning) return;
+            if (typeof Html5QrcodeScanner === 'undefined') {
+                alert("Error: La librería de escaneo no se cargó correctamente. Intenta refrescar la página.");
+                return;
+            }
 
             toggleView('sales'); // Cambiamos a la vista de ventas
             scannerModal.classList.remove('hidden');
@@ -899,7 +911,7 @@
             scanSuccessHandled = false;
             isScannerRunning = true;
             
-            // Inicialización de Html5QrcodeScanner
+            // Inicialización de Html5QrcodeScanner (usando window.Html5QrcodeScanner)
             if (!html5QrcodeScanner) {
                  html5QrcodeScanner = new Html5QrcodeScanner(
                     "reader", { 
@@ -1619,11 +1631,7 @@
         const LOGO_CONFIG_KEY = "current_logo_url";
         async function loadLogo() {
             try {
-                const { data, error } = await supabase
-                    .from(CONFIG_TABLE)
-                    .select("value")
-                    .eq("key", LOGO_CONFIG_KEY)
-                    .single();
+                const { data, error } = await supabase.from(CONFIG_TABLE).select("value").eq("key", LOGO_CONFIG_KEY).single();
                 if (error || !data || !data.value) {
                     if (error && error.code !== 'PGRST116') { 
                        console.warn("No se encontró URL de logo en config o hubo un error:", error?.message);
@@ -1653,9 +1661,7 @@
                 const newLogoUrl = await uploadImage(selectedLogoFile);
                 if (!newLogoUrl) { throw new Error("La función de subida no devolvió una URL."); }
                 
-                const { error: updateError } = await supabase
-                    .from(CONFIG_TABLE)
-                    .upsert({ key: LOGO_CONFIG_KEY, value: newLogoUrl }, { onConflict: 'key' });
+                const { error: updateError } = await supabase.from(CONFIG_TABLE).upsert({ key: LOGO_CONFIG_KEY, value: newLogoUrl }, { onConflict: 'key' });
                     
                 if (updateError) throw updateError;
                 
