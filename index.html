@@ -42,7 +42,31 @@
         
         /* Estilos para impresión de QR */
         @media print {
-            body > *:not(#qr-modal) { display: none !important; }
+            body > *:not(.labels-container):not(#qr-modal) { display: none !important; }
+            .labels-container { 
+                display: flex !important;
+                flex-wrap: wrap;
+                width: 100%;
+                min-height: 100vh;
+                margin: 0;
+                padding: 0;
+            }
+            .labels-container > div {
+                width: 100mm; /* Ancho deseado de la etiqueta */
+                height: 35mm; /* Alto deseado de la etiqueta */
+                box-sizing: border-box;
+                border: 1px solid #ccc;
+                margin: 2mm;
+                padding: 5px;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+                page-break-after: avoid;
+            }
+            .labels-container .qr-box { margin-right: 10px; width: 35mm; height: 35mm; display: flex; justify-content: center; align-items: center; }
+            .labels-container canvas { width: 30mm !important; height: 30mm !important; }
+            
             #qr-modal {
                 display: flex !important;
                 position: fixed;
@@ -210,6 +234,7 @@
             <div id="view-buttons" class="flex items-center space-x-2 bg-black/20 p-1 rounded-lg border border-gray-700">
                 <button data-view="inventory" class="view-btn bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg text-sm shadow-md transition duration-300">📦 Inventario</button>
                 <button data-view="inventory_el_transito" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🚚 Inventario El Transito</button>
+                <button data-view="labels" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🖨️ Etiquetas QR</button>
                 <button data-view="sales" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">💰 Ventas</button>
                 <button data-view="sales_el_transito" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🚚 Ventas El Transito</button>
                 <button data-view="missing" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🔔 Faltantes</button>
@@ -247,7 +272,39 @@
     <div class="container mx-auto px-4 py-6">
         <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario</p>
         
-        <div id="inventory-view" class="view-section">
+        <div id="labels-view" class="view-section hidden">
+            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-indigo-300">🖨️ Generar e Imprimir Etiquetas QR Masivas</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="labels-location" class="block text-sm font-medium text-gray-300">Seleccionar Inventario</label>
+                        <select id="labels-location" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
+                            <option value="main">Inventario Principal</option>
+                            <option value="et">Inventario El Transito</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="labels-category" class="block text-sm font-medium text-gray-300">Filtrar por Categoría (Opcional)</label>
+                        <select id="labels-category" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
+                            <option value="all">Todas las Categorías</option>
+                            </select>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-between items-center">
+                    <span id="labels-count" class="text-sm text-gray-400">0 Productos seleccionados</span>
+                    <button onclick="generateAndPrintLabels()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 rounded shadow-lg disabled:bg-gray-500">
+                        Generar e Imprimir Etiquetas
+                    </button>
+                </div>
+                <p class="text-sm text-gray-400 mt-3">Recuerda: Cada etiqueta QR representa **un tipo de producto** (una ficha) y debe colocarse en la caja de ese artículo, no en cada unidad.</p>
+            </section>
+            
+            <div id="labels-output" class="labels-container flex flex-wrap gap-4 mt-8">
+                <p class="p-4 text-gray-400">Selecciona el inventario y presiona "Generar e Imprimir Etiquetas".</p>
+            </div>
+        </div>
+
+        <div id="inventory-view" class="view-section hidden">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
                 <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto</h2>
                 <form id="product-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
@@ -579,8 +636,7 @@
         // =================================================================================
         // == Configuración de Supabase y Edge Function para R2                       ==
         // =================================================================================
-        // --- TUS CREDENCIALES ---
-        // Accedemos a la librería globalmente
+        // Accedemos a la librería globalmente y manejamos si aún no está lista
         const createClient = window.supabase ? window.supabase.createClient : null;
         
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
@@ -590,7 +646,7 @@
         if (createClient) {
             supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } else {
-            console.error("Error Crítico: La librería Supabase no se ha cargado. Verifique la URL del CDN.");
+            console.error("Error Crítico: La librería Supabase no se ha cargado. La aplicación no funcionará correctamente.");
         }
         
         const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
@@ -707,6 +763,7 @@
             // intentamos leerlo directamente de la base de datos.
             if (!product) {
                 console.warn(`Producto ${id} no encontrado localmente. Intentando buscar en DB.`);
+                if (!supabase) { alert('❌ Supabase no cargado.'); return; }
                 const { data, error } = await supabase.from(table).select("*").eq("id", id).single();
                 
                 if (error || !data) {
@@ -872,7 +929,6 @@
             qrProductInfo.textContent = `Producto: ${productName} (ID: ${productId})`;
 
             // Generar el código QR
-            // Usamos window.QRCode ya que se cargó globalmente (solución al error)
             if (typeof QRCode !== 'undefined') {
                  new QRCode(qrCodeContainer, {
                     text: productId, // El valor del QR es el ID de Supabase
@@ -883,7 +939,6 @@
                     correctLevel : QRCode.CorrectLevel.H
                 });
             } else {
-                // Esto es un fallback, la corrección debería haber solucionado el ReferenceError
                 qrProductInfo.textContent = "Error: La librería QRCode no se cargó correctamente. (Verifique la URL del CDN)";
             }
 
@@ -1015,10 +1070,117 @@
         };
 
 
+        // ============================================================================
+        // == IV. LÓGICA DE GENERACIÓN DE ETIQUETAS MASIVAS (NUEVA VISTA)            ==
+        // ============================================================================
+
+        const labelsLocationSelect = document.getElementById('labels-location');
+        const labelsCategorySelect = document.getElementById('labels-category');
+        const labelsOutputDiv = document.getElementById('labels-output');
+        const labelsCountSpan = document.getElementById('labels-count');
+
+        // Función para poblar las categorías en el selector de etiquetas
+        function populateLabelCategories(products) {
+            const categories = new Set();
+            products.forEach(p => {
+                if (p.category) categories.add(p.category);
+            });
+            const sortedCategories = Array.from(categories).sort();
+
+            labelsCategorySelect.innerHTML = '<option value="all">Todas las Categorías</option>';
+            sortedCategories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                labelsCategorySelect.appendChild(option);
+            });
+        }
+        
+        // Listener para actualizar categorías al cambiar de inventario
+        labelsLocationSelect.addEventListener('change', updateLabelView);
+        labelsCategorySelect.addEventListener('change', updateLabelView);
+
+        function updateLabelView() {
+            const location = labelsLocationSelect.value;
+            const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
+            populateLabelCategories(selectedProducts);
+            
+            // Contar y mostrar
+            const categoryFilter = labelsCategorySelect.value;
+            const filtered = selectedProducts.filter(p => categoryFilter === 'all' || p.category === categoryFilter);
+            labelsCountSpan.textContent = `${filtered.length} Productos seleccionados`;
+            labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Presiona "Generar e Imprimir Etiquetas" para crear ${filtered.length} etiquetas.</p>`;
+        }
+        
+        window.generateAndPrintLabels = function() {
+            const location = labelsLocationSelect.value;
+            const categoryFilter = labelsCategorySelect.value;
+            const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
+
+            const productsToPrint = selectedProducts.filter(p => 
+                categoryFilter === 'all' || p.category === categoryFilter
+            );
+
+            labelsOutputDiv.innerHTML = '';
+            labelsOutputDiv.classList.add('labels-container'); // Aplica estilos de impresión
+
+            productsToPrint.forEach((product, index) => {
+                const label = document.createElement('div');
+                label.className = 'label-tag border border-gray-400 p-1 flex items-center justify-start'; // Usar clase de impresión
+
+                // 1. Contenedor del QR
+                const qrBox = document.createElement('div');
+                qrBox.className = 'qr-box mr-2';
+                qrBox.id = `qr-${product.id}`;
+                qrBox.style.padding = '2px';
+                
+                // 2. Información del producto
+                const infoBox = document.createElement('div');
+                infoBox.className = 'flex-grow text-xs text-black'; 
+                infoBox.style.color = '#000'; // Fuerza color negro para impresión
+                infoBox.style.fontFamily = 'sans-serif';
+
+                // Usamos un nombre limpio para la etiqueta
+                const productName = product.name.length > 30 ? product.name.substring(0, 27) + '...' : product.name;
+
+                infoBox.innerHTML = `
+                    <p style="font-weight: bold; font-size: 11px;">${productName}</p>
+                    <p style="font-size: 10px;">Cat: ${product.category || 'N/A'}</p>
+                    <p style="font-weight: bold; color: #10b981; font-size: 11px;">$${Number(product.price).toFixed(2)}</p>
+                    <p style="font-size: 9px;">Caja: ${product.box_number || 'N/A'}</p>
+                `;
+
+                label.appendChild(qrBox);
+                label.appendChild(infoBox);
+                labelsOutputDiv.appendChild(label);
+                
+                // Generar QR en el contenedor recién creado
+                // Nota: Usamos la configuración mínima para que imprima bien
+                new QRCode(qrBox, {
+                    text: product.id, 
+                    width: 100, // Tamaño en píxeles que se ajustará con CSS de impresión
+                    height: 100,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.L
+                });
+            });
+
+            // Forzar la ventana de impresión
+            setTimeout(() => {
+                window.print();
+            }, 100); 
+            
+            // Ocultar la salida de etiquetas después de imprimir
+            labelsOutputDiv.classList.remove('labels-container');
+            labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Etiquetas generadas. Puedes imprimir otra vez o cambiar el filtro.</p>`;
+        };
+
         // II. GESTIÓN DE VISTAS Y CARGA 
         const views = { 
             inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario' }, 
             inventory_el_transito: { el: document.getElementById('inventory-el-transito-view'), title: 'Vista: Inventario El Transito' },
+            labels: { el: document.getElementById('labels-view'), title: 'Vista: Generación de Etiquetas QR' }, // Añadida
             sales: { el: document.getElementById('sales-view'), title: 'Vista: Ventas Registradas' },
             sales_el_transito: { el: document.getElementById('sales-el-transito-view'), title: 'Vista: Ventas El Transito' },
             missing: { el: document.getElementById('missing-view'), title: 'Vista: Productos Faltantes' },
@@ -1029,12 +1191,17 @@
                 const isCurrent = key === viewName; 
                 views[key].el.classList.toggle('hidden', !isCurrent); 
                 const btn = document.querySelector(`.view-btn[data-view="${key}"]`); 
-                btn.classList.toggle('bg-indigo-500', isCurrent); 
-                btn.classList.toggle('text-white', isCurrent); 
-                btn.classList.toggle('bg-transparent', !isCurrent); 
-                btn.classList.toggle('text-gray-300', !isCurrent); 
+                if (btn) { // Aseguramos que el botón exista (para el nuevo botón de etiquetas)
+                    btn.classList.toggle('bg-indigo-500', isCurrent); 
+                    btn.classList.toggle('text-white', isCurrent); 
+                    btn.classList.toggle('bg-transparent', !isCurrent); 
+                    btn.classList.toggle('text-gray-300', !isCurrent); 
+                }
             }); 
             currentViewTitle.textContent = views[viewName].title; 
+            if (viewName === 'labels') {
+                updateLabelView(); // Actualiza la vista de etiquetas al entrar
+            }
         }
         function showSkeletonLoaders() { 
             const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div><div class="h-4 w-1/2 skeleton-line"></div><div class="h-8 w-1/4 skeleton-line"></div></div>`).join('');
@@ -1047,7 +1214,8 @@
             missingListLoader.innerHTML = tableSkeleton; 
         }
 
-        // III. LÓGICA DE VENTAS (Sin cambios importantes)
+        // III. LÓGICA DE VENTAS (Misma que antes)
+
         function filterAndRenderSales() {
             const term = (searchSalesInput.value || "").toLowerCase().trim();
             const pendingOnly = pendingOnlyCheckbox.checked;
@@ -1414,6 +1582,7 @@
             allProducts = data; 
             filterAndRenderProducts(); 
             updateAutocompleteList(allProducts, inventorySuggestions);
+            populateLabelCategories(allProducts); // Llenar categorías al cargar productos principales
         }
         function filterAndRenderProducts() { const term = (searchInput.value || "").toLowerCase().trim(); const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProducts(filtered); }
         
@@ -1512,6 +1681,7 @@
                 allProducts = allProducts.filter(p => p.id !== id);
                 filterAndRenderProducts(); 
                 updateAutocompleteList(allProducts, inventorySuggestions);
+                updateLabelView(); // Actualizar vista de etiquetas
             }
         }
         
@@ -1523,6 +1693,8 @@
             allProductsElTransito = data; 
             filterAndRenderProductsET(); 
             updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
+            // Llenar categorías para la vista de etiquetas si ET está seleccionado inicialmente
+            if (labelsLocationSelect.value === 'et') populateLabelCategories(allProductsElTransito);
         }
         function filterAndRenderProductsET() { const term = (searchInputET.value || "").toLowerCase().trim(); const filtered = allProductsElTransito.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProductsET(filtered); }
         
@@ -1590,6 +1762,7 @@
                 allProductsElTransito = allProductsElTransito.filter(p => p.id !== id);
                 filterAndRenderProductsET(); 
                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
+                updateLabelView(); // Actualizar vista de etiquetas
             }
         }
 
