@@ -194,7 +194,7 @@
         }
     </style>
 
-    <script>
+<script>
         (function() {
             try {
                 const theme = localStorage.getItem('selectedTheme');
@@ -213,399 +213,1514 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body class="" onclick="closeSettingsDropdown(event)"> 
-    <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
-        <div class="flex items-center space-x-4">
-            <img 
-                id="business-logo" 
-                src="https://via.placeholder.com/60/4f46e5/ffffff?text=CS" 
-                alt="Logo negocio" 
-                class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105"
-                onerror="this.onerror=null; this.src='https://via.placeholder.com/60/4f46e5/ffffff?text=CS';"
-            />
-            <h1 class="text-3xl font-extrabold tracking-tight">
-                📱 <span class="text-indigo-400">Cell Smar</span> Gestion De Ventas
-            </h1>
+<div id="scanner-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="scanner-modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button type="button" onclick="closeScannerModal()" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-600 text-base font-medium text-white hover:bg-gray-500 sm:ml-3 sm:w-auto sm:text-sm transition"> Cerrar Escáner </button>
         </div>
-        
-        <div class="flex items-center space-x-4 relative">
-             <button id="scan-button" onclick="openScannerModal()" class="text-white hover:text-green-400 p-2 rounded-lg bg-green-600 hover:bg-green-700 transition duration-300 shadow-md text-sm font-medium" title="Escanear Producto y Registrar Venta">
-                 📞 Escanear Venta
-            </button>
-            <div id="view-buttons" class="flex items-center space-x-2 bg-black/20 p-1 rounded-lg border border-gray-700">
-                <button data-view="inventory" class="view-btn bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg text-sm shadow-md transition duration-300">📦 Inventario</button>
-                <button data-view="inventory_el_transito" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🚚 Inventario El Transito</button>
-                <button data-view="labels" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🖨️ Etiquetas QR</button>
-                <button data-view="sales" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">💰 Ventas</button>
-                <button data-view="sales_el_transito" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🚚 Ventas El Transito</button>
-                <button data-view="tools" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🛠️ Herramientas</button>
-            </div>
-            
-            <button id="settings-button" onclick="toggleSettingsDropdown(event)" class="text-gray-300 hover:text-indigo-400 p-2 rounded-full bg-gray-700/50 transition duration-300 shadow-md" title="Configuración">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.313.823 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.823 3.313-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.313-.823-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.823 3.313 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-            </button>
-            
-            <div id="settings-dropdown" class="absolute right-0 mt-2 w-72 origin-top-right rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 divide-y divide-gray-700 z-50 hidden">
-                <div class="py-1 px-3 space-y-3">
-                    <div class="flex items-center space-x-2 pt-2">
-                        <label for="theme-selector" class="text-sm text-gray-400">🎨 Tema Visual:</label>
-                        <select id="theme-selector" class="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg p-1.5 flex-grow">
-                            <option value="theme-dark">Predeterminado</option>
-                            <option value="theme-infernal">Fuego Infernal</option>
-                            <option value="theme-gold">Luxury Gold</option>
-                        </select>
-                    </div>
-                    
-                    <div class="flex items-center space-x-2 pt-2">
-                         <label for="logo-upload" class="bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 transition duration-300 cursor-pointer text-sm shadow-sm flex-grow text-center">Subir Nuevo Logo 🖼️</label>
-                        <input type="file" id="logo-upload" title="Sube una nueva imagen para tu logo" accept="image/*" />
-                    </div>
-                    <button id="logo-save-button" class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed text-sm w-full shadow-md" disabled>Guardar Logo</button>
-                </div>
-            </div>
-        </div>
-    </header>
+    </div>
+</div>
+<script>
+    // ============================================================================
+    // == I. INICIALIZACIÓN Y VARIABLES GLOBALES ==================================
+    // ============================================================================
+    const SUPABASE_URL = 'https://ftcjaadsjpnzbckxevxq.supabase.co'; // Reemplazar con tu URL
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M'; // Reemplazar con tu clave ANÓNIMA
+
+    // CORRECCIÓN 1: Inicialización del cliente Supabase para asegurar la carga de productos
+    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
     
-    <div class="container mx-auto px-4 py-6">
-        <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario</p>
+    const PRODUCTS_TABLE = 'products';
+    const PRODUCTS_EL_TRANSITO_TABLE = 'products_el_transito';
+    const SALES_TABLE = 'sales';
+    const SALES_EL_TRANSITO_TABLE = 'sales_el_transito';
+    const TOOLS_TABLE = 'tools';
+
+    let allProducts = [];
+    let allProductsElTransito = [];
+    let allSales = [];
+    let allSalesElTransito = [];
+    let allTools = [];
+    let currentView = 'inventory';
+    let currentEditingProduct = null;
+    let selectedProductImageFile = null;
+    let html5QrCode = null; // Variable global para la instancia del escáner
+    let isMainInventory = true; // Para saber qué inventario editar
+
+    // ============================================================================
+    // == II. UTILIDADES Y GESTIÓN DE VISTAS ======================================
+    // ============================================================================
+    const root = document.documentElement;
+    
+    // Selectores DOM generales
+    const viewSections = document.querySelectorAll('.view-section');
+    const viewButtons = document.getElementById('view-buttons');
+    const currentViewTitle = document.getElementById('current-view-title');
+    const settingsDropdown = document.getElementById('settings-dropdown');
+    const themeSelector = document.getElementById('theme-selector');
+    const logoUploadInput = document.getElementById('logo-upload');
+    const logoSaveButton = document.getElementById('logo-save-button');
+    const businessLogoImg = document.getElementById('business-logo');
+
+    // Selectores DOM Inventario Principal
+    const productForm = document.getElementById('product-form');
+    const nameIn = document.getElementById('name');
+    const categorySelect = document.getElementById('category-select');
+    const boxNumberIn = document.getElementById('box-number');
+    const priceIn = document.getElementById('price');
+    const quantityIn = document.getElementById('quantity');
+    const imageIn = document.getElementById('image');
+    const submitButton = document.getElementById('submit');
+    const statusEl = document.getElementById('status');
+    const productsEl = document.getElementById('products');
+    const productsLoader = document.getElementById('products-loader');
+    const totalCount = document.getElementById('total-count');
+    const searchInput = document.getElementById('search-input');
+    const inventorySuggestions = document.getElementById('inventory-suggestions');
+
+    // Selectores DOM Inventario El Transito
+    const productFormET = document.getElementById('product-form-et');
+    const nameInET = document.getElementById('name-et');
+    const categorySelectET = document.getElementById('category-select-et');
+    const boxNumberInET = document.getElementById('box-number-et');
+    const priceInET = document.getElementById('price-et');
+    const quantityInET = document.getElementById('quantity-et');
+    const imageInET = document.getElementById('image-et');
+    const submitButtonET = document.getElementById('submit-et');
+    const statusElET = document.getElementById('status-et');
+    const productsElET = document.getElementById('products-et');
+    const productsLoaderET = document.getElementById('products-loader-et');
+    const totalCountET = document.getElementById('total-count-et');
+    const searchInputET = document.getElementById('search-input-et');
+    const inventorySuggestionsET = document.getElementById('inventory-suggestions-et');
+
+    // Selectores DOM Modal Edición
+    const editProductModal = document.getElementById('edit-product-modal');
+    const modalNameIn = document.getElementById('modal-name');
+    const modalCategoryIn = document.getElementById('modal-category');
+    const modalBoxNumberIn = document.getElementById('modal-box-number');
+    const modalPriceIn = document.getElementById('modal-price');
+    const modalQuantityIn = document.getElementById('modal-quantity');
+    const modalImageUpload = document.getElementById('modal-image-upload');
+    const modalImagePreview = document.getElementById('modal-image-preview');
+    const modalSaveButton = document.getElementById('modal-save-button');
+    const modalStatus = document.getElementById('modal-status');
+
+    // Selectores DOM Escáner
+    const scannerModal = document.getElementById('scanner-modal');
+    const scannerStatus = document.getElementById('scanner-status');
+
+    // Elementos de la vista de Etiquetas
+    const labelsLocationSelect = document.getElementById('labels-location');
+    const labelsCategorySelect = document.getElementById('labels-category');
+    const labelsCountSpan = document.getElementById('labels-count');
+    const labelsOutputDiv = document.getElementById('labels-output');
+    const qrModal = document.getElementById('qr-modal');
+    const qrCodeContainer = document.getElementById('qr-code-container');
+    const qrProductInfo = document.getElementById('qr-product-info');
+
+    // Elementos de la vista de Ventas Principal
+    const recipientNameIn = document.getElementById('recipient-name');
+    const productNameSoldIn = document.getElementById('product-name-sold');
+    const salePriceIn = document.getElementById('sale-price');
+    const saleDateIn = document.getElementById('sale-date');
+    const saleStatusInput = document.getElementById('sale-status-input');
+    const saleForm = document.getElementById('sale-form');
+    const saleStatusEl = document.getElementById('sale-status');
+    const salesListContainer = document.getElementById('sales-list-container');
+    const salesListLoader = document.getElementById('sales-list-loader');
+    const searchSalesInput = document.getElementById('search-sales-input');
+    const pendingOnlyCheckbox = document.getElementById('pending-only-checkbox');
+    const totalSoldAmountSpan = document.getElementById('total-sold-amount');
+    const totalPaidAmountSpan = document.getElementById('total-paid-amount');
+    const paidPercentageSpan = document.getElementById('paid-percentage');
+    const totalSalesCountSpan = document.getElementById('total-sales-count');
+
+    // Elementos de la vista de Ventas El Transito
+    const recipientNameInET = document.getElementById('recipient-name-et');
+    const productNameSoldInET = document.getElementById('product-name-sold-et');
+    const salePriceInET = document.getElementById('sale-price-et');
+    const saleDateInET = document.getElementById('sale-date-et');
+    const saleStatusInputET = document.getElementById('sale-status-input-et');
+    const saleFormET = document.getElementById('sale-el-transito-form');
+    const saleStatusElET = document.getElementById('sale-status-et');
+    const salesListContainerET = document.getElementById('sales-list-container-et');
+    const salesListLoaderET = document.getElementById('sales-list-loader-et');
+    const searchSalesInputET = document.getElementById('search-sales-input-et');
+    const pendingOnlyCheckboxET = document.getElementById('pending-only-checkbox-et');
+    const totalSoldAmountSpanET = document.getElementById('total-sold-amount-et');
+    const totalPaidAmountSpanET = document.getElementById('total-paid-amount-et');
+    const paidPercentageSpanET = document.getElementById('paid-percentage-et');
+    const totalSalesCountSpanET = document.getElementById('total-sales-count-et');
+
+    // Mapeo de vistas para cambiar el título
+    const views = {
+        inventory: { id: 'inventory-view', title: 'Vista: Inventario' },
+        inventory_el_transito: { id: 'inventory-el-transito-view', title: 'Vista: Inventario El Transito' },
+        labels: { id: 'labels-view', title: 'Vista: Generación de Etiquetas QR' },
+        sales: { id: 'sales-view', title: 'Vista: Historial y Registro de Ventas' },
+        sales_el_transito: { id: 'sales-el-transito-view', title: 'Vista: Historial y Registro de Ventas El Transito' },
+        tools: { id: 'tools-view', title: 'Vista: Herramientas' },
+    };
+
+    function setStatusMessage(el, message, isSuccess) {
+        el.textContent = message;
+        el.classList.remove('text-green-500', 'text-red-500', 'text-gray-400');
+        el.classList.add(isSuccess ? 'text-green-500' : (isSuccess === false ? 'text-red-500' : 'text-gray-400'));
+    }
+
+    function getStatusClass(status) {
+        switch (status) {
+            case 'Pagado':
+                return 'status-paid';
+            case 'Devuelto':
+                return 'status-returned';
+            case 'Pendiente':
+            default:
+                return 'status-pending';
+        }
+    }
+
+    function toggleSettingsDropdown(event) {
+        event.stopPropagation();
+        settingsDropdown.classList.toggle('hidden');
+    }
+
+    function closeSettingsDropdown(event) {
+        if (!settingsDropdown.contains(event.target) && !document.getElementById('settings-button').contains(event.target)) {
+            settingsDropdown.classList.add('hidden');
+        }
+    }
+
+    function toggleView(targetView) {
+        currentView = targetView;
+        viewSections.forEach(section => {
+            section.classList.add('hidden');
+        });
+        document.getElementById(views[targetView].id).classList.remove('hidden');
+
+        // Actualizar el estilo de los botones de vista
+        const allViewBtns = viewButtons.querySelectorAll('.view-btn');
+        allViewBtns.forEach(btn => {
+            const isTarget = btn.dataset.view === targetView;
+            if (btn) {
+                btn.classList.toggle('bg-indigo-500', isTarget);
+                btn.classList.toggle('text-white', isTarget);
+                btn.classList.toggle('bg-transparent', !isTarget);
+                btn.classList.toggle('text-gray-300', !isTarget);
+                btn.classList.toggle('hover:bg-indigo-600', !isTarget);
+                btn.classList.toggle('hover:text-white', !isTarget);
+            }
+        });
+
+        currentViewTitle.textContent = views[targetView].title;
+
+        // Ocultar dropdown de settings al cambiar de vista
+        settingsDropdown.classList.add('hidden');
+    }
+
+
+    // ============================================================================
+    // == III. LÓGICA DE ESCÁNER DE CÓDIGO DE BARRAS/QR (FASE 2) ==================
+    // ============================================================================
+    window.openScannerModal = async function() {
+        scannerModal.classList.remove('hidden');
+        setStatusMessage(scannerStatus, 'Esperando permiso de cámara...', true);
         
-        <div id="labels-view" class="view-section hidden">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-indigo-300">🖨️ Generar e Imprimir Etiquetas QR Masivas</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="labels-location" class="block text-sm font-medium text-gray-300">Seleccionar Inventario</label>
-                        <select id="labels-location" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
-                            <option value="main">Inventario Principal</option>
-                            <option value="et">Inventario El Transito</option>
-                        </select>
+        if (!html5QrCode) {
+            html5QrCode = new Html5Qrcode("scanner-container");
+        }
+
+        // Configuración para preferir la cámara trasera (environment) para QR/Barras
+        const config = { fps: 10, qrbox: {width: 250, height: 250} };
+
+        // Intentar iniciar el escaneo usando la cámara trasera (más robusto)
+        html5QrCode.start(
+            { facingMode: "environment" }, // Preferir cámara trasera
+            config,
+            onScanSuccess,
+            (errorMessage) => { 
+                // No hacer nada en el error de frame para evitar spam de consola,
+                // ya que se maneja a través del onScanError general si la librería lo expone.
+            }
+        ).then(() => {
+            setStatusMessage(scannerStatus, 'Escaneando... Apunte el código QR/Barras.', true);
+        }).catch(async (err) => {
+            console.warn("Fallo al iniciar con cámara trasera, intentando con cámara frontal (o por defecto):", err);
+            setStatusMessage(scannerStatus, 'Intentando cámara alternativa...', true);
+            // Fallback: Intentar con el identificador de cámara por defecto, o cámara frontal
+            html5QrCode.start(
+                'user', // Usar la cámara frontal (o por defecto)
+                config,
+                onScanSuccess,
+                onScanError
+            ).then(() => {
+                setStatusMessage(scannerStatus, 'Escaneando con cámara alternativa... Apunte el código QR/Barras.', true);
+            }).catch((err2) => {
+                console.error("Fallo definitivo al iniciar el escáner:", err2);
+                setStatusMessage(scannerStatus, `❌ Error crítico al iniciar escáner: ${err2.message || err2}. Verifique permisos de cámara.`, false);
+            });
+        });
+    };
+
+    // CORRECCIÓN 2: Lógica de parada del escáner para liberar la cámara
+    window.closeScannerModal = function() {
+        scannerModal.classList.add('hidden');
+        if (html5QrCode) {
+            html5QrCode.stop().then(() => {
+                 setStatusMessage(scannerStatus, 'Escáner cerrado.', true);
+            }).catch(err => {
+                 // Esto es normal si el escáner falló al iniciar o ya estaba detenido.
+                 console.warn("Advertencia al detener el escáner:", err);
+                 setStatusMessage(scannerStatus, 'Escáner cerrado.', true);
+            });
+        }
+    };
+
+    const onScanSuccess = async (decodedText, decodedResult) => {
+        console.log(`Código escaneado: ${decodedText}`);
+        
+        // 1. Detener el escáner inmediatamente para no seguir escaneando
+        if (html5QrCode) {
+            await html5QrCode.stop().catch(err => console.warn("Error al detener escáner después de éxito:", err));
+        }
+        scannerModal.classList.add('hidden');
+        
+        // 2. Buscar el producto por el ID escaneado (debe ser el ID de Supabase)
+        try {
+            const product = [...allProducts, ...allProductsElTransito].find(p => p.id === decodedText);
+            
+            if (!product) {
+                alert(`❌ Producto con ID ${decodedText} no encontrado en el inventario.`);
+                return;
+            }
+            
+            // 3. Rellenar formulario de venta
+            alert(`✅ Producto encontrado: ${product.name}. Cargando en formulario de Venta...`);
+
+            // Determinar si la venta es en inventario principal o El Transito
+            const isMainInventory = allProducts.some(p => p.id === decodedText);
+
+            if (isMainInventory) {
+                // Rellenar Formulario Principal
+                toggleView('sales');
+                recipientNameIn.value = ''; // Limpiar el nombre del destinatario
+                productNameSoldIn.value = product.name;
+                salePriceIn.value = Number(product.price).toFixed(2);
+                saleDateIn.value = new Date().toISOString().split('T')[0];
+                saleStatusInput.value = 'Pagado';
+                recipientNameIn.focus();
+                alert(`✅ Producto "${product.name}" cargado en el formulario de Venta Principal. Confirma el Destinatario y registra.`);
+            } else {
+                // Rellenar Formulario El Transito
+                toggleView('sales_el_transito');
+                recipientNameInET.value = ''; // Limpiar el nombre del destinatario
+                productNameSoldInET.value = product.name;
+                salePriceInET.value = Number(product.price).toFixed(2);
+                saleDateInET.value = new Date().toISOString().split('T')[0];
+                saleStatusInputET.value = 'Pagado';
+                recipientNameInET.focus();
+                alert(`✅ Producto "${product.name}" cargado en el formulario de Venta El Transito. Confirma el Destinatario y registra.`);
+            }
+
+        } catch (error) {
+            console.error("Error al procesar escaneo:", error);
+            alert(`❌ Error en Escaneo: ${error.message}`);
+        }
+    };
+
+    const onScanError = (errorMessage) => {
+        // console.warn(`Error de escaneo: ${errorMessage}`); // Manejar errores de lectura de frames aquí (opcional)
+    };
+
+    // ============================================================================
+    // == IV. GESTIÓN DE ETIQUETAS QR (LABELS) ====================================
+    // ============================================================================
+    function populateLabelCategories(products) {
+        const categories = new Set();
+        products.forEach(p => { if (p.category) categories.add(p.category); });
+        const sortedCategories = Array.from(categories).sort();
+        
+        // Limpiar y rellenar
+        labelsCategorySelect.innerHTML = '<option value="all">Todas las Categorías</option>';
+        sortedCategories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat;
+            option.textContent = cat;
+            labelsCategorySelect.appendChild(option);
+        });
+        updateLabelCount();
+    }
+
+    function updateLabelCount() {
+        const location = labelsLocationSelect.value;
+        const categoryFilter = labelsCategorySelect.value;
+        const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
+        const filteredProducts = selectedProducts.filter(p => categoryFilter === 'all' || p.category === categoryFilter);
+        labelsCountSpan.textContent = `${filteredProducts.length} Productos seleccionados`;
+    }
+
+    function updateLabelView() {
+        if (currentView === 'labels') {
+            const products = (labelsLocationSelect.value === 'main') ? allProducts : allProductsElTransito;
+            populateLabelCategories(products);
+        }
+    }
+
+    labelsLocationSelect.addEventListener('change', updateLabelView);
+    labelsCategorySelect.addEventListener('change', updateLabelCount);
+
+    window.generateAndPrintLabels = function() {
+        if (typeof QRCode === 'undefined') {
+            return alert("❌ Error: La librería QRCode no está cargada. Por favor, refresque la página.");
+        }
+        
+        const location = labelsLocationSelect.value;
+        const categoryFilter = labelsCategorySelect.value;
+        const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
+        const filteredProducts = selectedProducts.filter(p => categoryFilter === 'all' || p.category === categoryFilter);
+
+        if (filteredProducts.length === 0) {
+            return alert("No hay productos para generar etiquetas con los filtros seleccionados.");
+        }
+
+        labelsOutputDiv.innerHTML = "";
+        labelsOutputDiv.classList.add('labels-container'); // Activar estilos de impresión
+
+        const qrPromises = [];
+        filteredProducts.forEach(product => {
+            const label = document.createElement('div');
+            label.className = 'label-box'; // Clase para el contenedor de la etiqueta
+            
+            const infoBox = document.createElement('div');
+            infoBox.className = 'info-box';
+            infoBox.style.cssText = 'flex-grow: 1; margin-left: 5px; max-width: 60mm;';
+            infoBox.innerHTML = `
+                <p style="font-weight: bold; font-size: 10px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${product.name}</p>
+                <p style="font-size: 9px; margin: 0; color: #6b7280;">Cat: ${product.category || 'N/A'}</p>
+                <p style="font-weight: bold; color: #10b981; font-size: 11px; margin: 0;">$${Number(product.price).toFixed(2)}</p>
+                <p style="font-size: 9px; margin: 0;">Caja: ${product.box_number || 'N/A'}</p>
+            `;
+
+            const qrBox = document.createElement('div');
+            qrBox.className = 'qr-box';
+
+            // CORRECCIÓN 3: Forzar color blanco y negro para la impresión del QR
+            const qrCode = new QRCode(qrBox, {
+                text: product.id,
+                width: 256,
+                height: 256,
+                colorDark : "#000000",
+                colorLight : "#ffffff" 
+            });
+
+            label.appendChild(qrBox);
+            label.appendChild(infoBox);
+            labelsOutputDiv.appendChild(label);
+        });
+
+        // Dar un pequeño tiempo para que se dibuje el canvas antes de imprimir
+        setTimeout(() => {
+             window.print();
+        }, 300);
+    }
+
+    // Generar QR para un producto específico (desde el modal de edición)
+    window.generateQrCode = function(product) {
+        if (!product || typeof product.id === 'undefined') {
+            return alert("Error: No se ha seleccionado un producto válido.");
+        }
+        const productId = product.id;
+        const productName = product.name;
+
+        qrCodeContainer.innerHTML = '';
+        qrProductInfo.textContent = `Producto: ${productName} (ID: ${productId})`;
+
+        if (typeof QRCode !== 'undefined') {
+            const tempDiv = document.createElement('div');
+            new QRCode(tempDiv, {
+                text: productId,
+                width: 256,
+                height: 256,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            setTimeout(() => {
+                const canvas = tempDiv.querySelector('canvas');
+                if (canvas) {
+                    const imgUrl = canvas.toDataURL("image/png");
+                    const img = document.createElement('img');
+                    img.src = imgUrl;
+                    img.style.width = '256px';
+                    img.style.height = '256px';
+                    qrCodeContainer.innerHTML = '';
+                    qrCodeContainer.appendChild(img);
+                }
+            }, 50);
+        } else {
+            qrProductInfo.textContent = "Error: La librería QRCode no se cargó correctamente. (Verifique la URL del CDN)";
+        }
+
+        qrModal.classList.remove('hidden');
+    };
+
+    window.closeQrModal = function() {
+        qrModal.classList.add('hidden');
+    };
+
+
+    // ============================================================================
+    // == V. FUNCIONES DEL INVENTARIO PRINCIPAL ====================================
+    // ============================================================================
+    async function uploadImage(file) {
+        if (!supabase) return;
+        const fileName = `${Date.now()}-${file.name.replace(/\s/g, '_')}`;
+        const { data, error } = await supabase.storage
+            .from('product_images') // Asegúrate de que este bucket exista en Supabase
+            .upload(fileName, file);
+
+        if (error) throw error;
+
+        // La URL pública de Supabase debe ser accesible
+        const { data: publicUrlData } = supabase.storage
+            .from('product_images')
+            .getPublicUrl(fileName);
+
+        return publicUrlData.publicUrl;
+    }
+
+    productForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!supabase) return setStatusMessage(statusEl, '❌ Error: Supabase no cargado.', false);
+
+        submitButton.disabled = true;
+        submitButton.textContent = 'Agregando...';
+        setStatusMessage(statusEl, 'Subiendo imagen...', true);
+
+        const name = nameIn.value;
+        const category = categorySelect.value;
+        const boxNumber = boxNumberIn.value.trim();
+        const price = parseFloat(priceIn.value);
+        const quantity = parseInt(quantityIn.value);
+        const imageFile = imageIn.files[0];
+        let imageUrl = null;
+
+        try {
+            if (imageFile) {
+                imageUrl = await uploadImage(imageFile);
+            }
+
+            setStatusMessage(statusEl, 'Guardando producto en base de datos...', true);
+            
+            const { data, error } = await supabase
+                .from(PRODUCTS_TABLE)
+                .insert([{ name, category, box_number: boxNumber, price, quantity, image_url: imageUrl }])
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            // Agregar el nuevo producto a la lista local
+            allProducts.unshift(data);
+            filterAndRenderProducts();
+            updateAutocompleteList(allProducts, inventorySuggestions);
+
+            // Limpiar el formulario
+            productForm.reset();
+            quantityIn.value = 1;
+
+            setStatusMessage(statusEl, `✅ Producto "${name}" agregado con éxito.`, true);
+
+        } catch (error) {
+            console.error("Error al agregar producto:", error);
+            setStatusMessage(statusEl, `❌ Error al agregar producto: ${error.message}`);
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Agregar Producto';
+        }
+    });
+
+    async function fetchProducts() {
+        if (!supabase) return;
+
+        const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false });
+
+        if (error) {
+            console.error("Error cargando productos:", error);
+            totalCount.textContent = "Error al cargar";
+            productsEl.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+            return;
+        }
+
+        allProducts = data;
+        filterAndRenderProducts();
+        updateAutocompleteList(allProducts, inventorySuggestions);
+
+        // Llenar categorías para la vista de etiquetas si Main está seleccionado inicialmente
+        if (labelsLocationSelect.value === 'main') populateLabelCategories(allProducts);
+    }
+
+    function filterAndRenderProducts() {
+        const term = (searchInput.value || "").toLowerCase().trim();
+        const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term)));
+        renderProducts(filtered);
+    }
+
+    /**
+     * Renderiza la lista de productos (Principal) (Corregida).
+     */
+    function renderProducts(items) {
+        productsLoader.innerHTML = "";
+        productsEl.innerHTML = "";
+        totalCount.textContent = `${items.length} productos`;
+
+        if (items.length === 0) {
+            productsEl.innerHTML = `<p class="text-gray-400">No se encontraron productos${searchInput.value ? ' para "' + searchInput.value + '"' : ''}.</p>`;
+            return;
+        }
+
+        const grouped = items.reduce((acc, p) => {
+            const cat = p.category || 'Sin Categoría';
+            if (!acc[cat]) acc[cat] = [];
+            acc[cat].push(p);
+            return acc;
+        }, {});
+
+        Object.keys(grouped).sort().forEach(category => {
+            const section = document.createElement("div");
+            section.className = "mb-10";
+            section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`;
+
+            const grid = document.createElement("div");
+            grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6";
+
+            grouped[category].forEach(p => {
+                const imageUrl = p.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
+
+                const card = document.createElement("div");
+                card.id = `product-card-${p.id}`;
+                card.className = "bg-gray-700 product-card p-4 rounded-xl shadow-lg flex flex-col h-full border border-gray-700";
+                
+                card.innerHTML = `
+                    <button onclick="openProductEditorModal('${p.id}', true)" class="absolute top-2 right-2 text-indigo-300 hover:text-white transition" title="Editar Producto">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zm-5.63 5.63l2.83 2.828L5.636 17.75H3v-2.636l7.85-7.85z"/></svg>
+                    </button>
+                    <div class="h-48 mb-3 rounded-lg overflow-hidden border border-gray-700 bg-white/5 flex items-center justify-center p-2">
+                        <img id="product-image-${p.id}" src="${imageUrl}" alt="${p.name}" class="h-full w-full object-contain transition duration-300 hover:scale-[1.05]" />
                     </div>
-                    <div>
-                        <label for="labels-category" class="block text-sm font-medium text-gray-300">Filtrar por Categoría (Opcional)</label>
-                        <select id="labels-category" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
-                            <option value="all">Todas las Categorías</option>
-                            </select>
+                    <h3 id="product-name-${p.id}" class="text-lg font-bold text-white mb-1 whitespace-nowrap overflow-hidden text-ellipsis" title="${p.name}">${p.name}</h3>
+                    <p id="product-price-${p.id}" class="text-xl font-extrabold text-green-400">$${Number(p.price).toFixed(2)}</p>
+                    <p id="product-stock-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
+                    <p id="product-box-number-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
+                    <div class="flex-grow"></div>
+                    <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
+                        <button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
                     </div>
+                `;
+
+                grid.appendChild(card);
+            });
+            section.appendChild(grid);
+            productsEl.appendChild(section);
+        });
+    }
+
+    searchInput.addEventListener('input', filterAndRenderProducts);
+
+    window.deleteProduct = async function(id) {
+        if (!confirm("¿Estás seguro de que quieres eliminar este producto del inventario principal?")) return;
+        if (!supabase) { alert("❌ Error: Supabase no cargado."); return; }
+
+        const { error } = await supabase.from(PRODUCTS_TABLE).delete().eq("id", id);
+        
+        if (error) {
+            alert("❌ Error al eliminar: " + error.message);
+        } else {
+            allProducts = allProducts.filter(p => p.id !== id);
+            filterAndRenderProducts();
+            updateAutocompleteList(allProducts, inventorySuggestions);
+            updateLabelView(); // Actualizar vista de etiquetas
+        }
+    }
+
+    // ============================================================================
+    // == VI. FUNCIONES DEL INVENTARIO EL TRANSITO ================================
+    // ============================================================================
+
+    productFormET.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!supabase) return setStatusMessage(statusElET, '❌ Error: Supabase no cargado.', false);
+
+        submitButtonET.disabled = true;
+        submitButtonET.textContent = 'Agregando...';
+        setStatusMessage(statusElET, 'Subiendo imagen...', true);
+
+        const name = nameInET.value;
+        const category = categorySelectET.value;
+        const boxNumber = boxNumberInET.value.trim();
+        const price = parseFloat(priceInET.value);
+        const quantity = parseInt(quantityInET.value);
+        const imageFile = imageInET.files[0];
+        let imageUrl = null;
+
+        try {
+            if (imageFile) {
+                imageUrl = await uploadImage(imageFile); // Reutiliza la función de carga de imágenes
+            }
+
+            setStatusMessage(statusElET, 'Guardando producto en base de datos...', true);
+            
+            const { data, error } = await supabase
+                .from(PRODUCTS_EL_TRANSITO_TABLE)
+                .insert([{ name, category, box_number: boxNumber, price, quantity, image_url: imageUrl }])
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            // Agregar el nuevo producto a la lista local
+            allProductsElTransito.unshift(data);
+            filterAndRenderProductsET();
+            updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
+
+            // Limpiar el formulario
+            productFormET.reset();
+            quantityInET.value = 1;
+
+            setStatusMessage(statusElET, `✅ Producto "${name}" agregado con éxito.`, true);
+
+        } catch (error) {
+            console.error("Error al agregar producto (ET):", error);
+            setStatusMessage(statusElET, `❌ Error al agregar producto (ET): ${error.message}`);
+        } finally {
+            submitButtonET.disabled = false;
+            submitButtonET.textContent = 'Agregar Producto';
+        }
+    });
+
+    async function fetchProductsET() {
+        if (!supabase) return;
+
+        const { data, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false });
+
+        if (error) {
+            console.error("Error cargando productos (ET):", error);
+            totalCountET.textContent = "Error al cargar";
+            productsElET.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+            return;
+        }
+
+        allProductsElTransito = data;
+        filterAndRenderProductsET();
+        updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
+
+        // Llenar categorías para la vista de etiquetas si ET está seleccionado inicialmente
+        if (labelsLocationSelect.value === 'et') populateLabelCategories(allProductsElTransito);
+    }
+
+    function filterAndRenderProductsET() {
+        const term = (searchInputET.value || "").toLowerCase().trim();
+        const filtered = allProductsElTransito.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term)));
+        renderProductsET(filtered);
+    }
+
+    /**
+     * Renderiza la lista de productos (El Transito) (Corregida).
+     */
+    function renderProductsET(items) {
+        productsLoaderET.innerHTML = "";
+        productsElET.innerHTML = "";
+        totalCountET.textContent = `${items.length} productos`;
+
+        if (items.length === 0) {
+            productsElET.innerHTML = `<p class="text-gray-400">No se encontraron productos${searchInputET.value ? ' para "' + searchInputET.value + '"' : ''}.</p>`;
+            return;
+        }
+
+        const grouped = items.reduce((acc, p) => {
+            const cat = p.category || 'Sin Categoría';
+            if (!acc[cat]) acc[cat] = [];
+            acc[cat].push(p);
+            return acc;
+        }, {});
+
+        Object.keys(grouped).sort().forEach(category => {
+            const section = document.createElement("div");
+            section.className = "mb-10";
+            section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`;
+
+            const grid = document.createElement("div");
+            grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6";
+
+            grouped[category].forEach(p => {
+                const imageUrl = p.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
+
+                const card = document.createElement("div");
+                card.id = `product-card-et-${p.id}`;
+                card.className = "bg-gray-700 product-card p-4 rounded-xl shadow-lg flex flex-col h-full border border-gray-700";
+                
+                card.innerHTML = `
+                    <button onclick="openProductEditorModal('${p.id}', false)" class="absolute top-2 right-2 text-indigo-300 hover:text-white transition" title="Editar Producto">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zm-5.63 5.63l2.83 2.828L5.636 17.75H3v-2.636l7.85-7.85z"/></svg>
+                    </button>
+                    <div class="h-48 mb-3 rounded-lg overflow-hidden border border-gray-700 bg-white/5 flex items-center justify-center p-2">
+                        <img id="product-image-et-${p.id}" src="${imageUrl}" alt="${p.name}" class="h-full w-full object-contain transition duration-300 hover:scale-[1.05]" />
+                    </div>
+                    <h3 id="product-name-et-${p.id}" class="text-lg font-bold text-white mb-1 whitespace-nowrap overflow-hidden text-ellipsis" title="${p.name}">${p.name}</h3>
+                    <p id="product-price-et-${p.id}" class="text-xl font-extrabold text-green-400">$${Number(p.price).toFixed(2)}</p>
+                    <p id="product-stock-et-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
+                    <p id="product-box-number-et-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
+                    <div class="flex-grow"></div>
+                    <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
+                        <button onclick="deleteProductET('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+            section.appendChild(grid);
+            productsElET.appendChild(section);
+        });
+    }
+
+    searchInputET.addEventListener('input', filterAndRenderProductsET);
+
+    window.deleteProductET = async function(id) {
+        if (!confirm("¿Estás seguro de que quieres eliminar este producto del inventario El Tránsito?")) return;
+        if (!supabase) { alert("❌ Error: Supabase no cargado."); return; }
+
+        const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).delete().eq("id", id);
+        
+        if (error) {
+            alert("❌ Error al eliminar: " + error.message);
+        } else {
+            allProductsElTransito = allProductsElTransito.filter(p => p.id !== id);
+            filterAndRenderProductsET();
+            updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
+            updateLabelView(); // Actualizar vista de etiquetas
+        }
+    }
+
+    // ============================================================================
+    // == VII. FUNCIONES MODAL DE EDICIÓN =========================================
+    // ============================================================================
+    window.openProductEditorModal = function(id, isMain) {
+        isMainInventory = isMain;
+        const product = isMain ? allProducts.find(p => p.id === id) : allProductsElTransito.find(p => p.id === id);
+        
+        if (!product) {
+            alert("Producto no encontrado.");
+            return;
+        }
+
+        currentEditingProduct = product;
+        selectedProductImageFile = null;
+
+        modalNameIn.value = product.name;
+        modalCategoryIn.value = product.category || 'Otros';
+        modalBoxNumberIn.value = product.box_number || '';
+        modalPriceIn.value = Number(product.price).toFixed(2);
+        modalQuantityIn.value = product.quantity;
+        modalStatus.textContent = ''; // Limpiar mensaje de estado
+        modalImageUpload.value = null; // Limpiar el input file
+
+        const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
+        modalImagePreview.src = imageUrl;
+
+        document.getElementById('modal-inventory-location').textContent = isMain ? 'Inventario: Principal' : 'Inventario: El Transito';
+        editProductModal.classList.remove('hidden');
+    };
+
+    window.closeProductEditorModal = function() {
+        editProductModal.classList.add('hidden');
+        currentEditingProduct = null;
+        selectedProductImageFile = null;
+    };
+
+    // Previsualización de la nueva imagen
+    modalImageUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            selectedProductImageFile = file;
+            modalImagePreview.src = URL.createObjectURL(file);
+        } else {
+            selectedProductImageFile = null;
+            modalImagePreview.src = currentEditingProduct.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
+        }
+    });
+
+    // Guardar los cambios del producto
+    document.getElementById('edit-product-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!currentEditingProduct || !supabase) return setStatusMessage(modalStatus, '❌ Error: Producto o Supabase no disponible.', false);
+        
+        modalSaveButton.disabled = true;
+        modalSaveButton.textContent = 'Guardando...';
+        setStatusMessage(modalStatus, 'Procesando...', true);
+
+        const id = currentEditingProduct.id;
+        const table = isMainInventory ? PRODUCTS_TABLE : PRODUCTS_EL_TRANSITO_TABLE;
+        const oldProduct = { ...currentEditingProduct }; // Clonar para posible reversión
+
+        const newName = modalNameIn.value;
+        const newCategory = modalCategoryIn.value;
+        const newBoxNumber = modalBoxNumberIn.value.trim();
+        const newPrice = parseFloat(modalPriceIn.value);
+        const newQuantity = parseInt(modalQuantityIn.value);
+        let newImageUrl = currentEditingProduct.image_url;
+
+        try {
+            // 1. Subir nueva imagen si existe
+            if (selectedProductImageFile) {
+                setStatusMessage(modalStatus, 'Subiendo nueva imagen...', true);
+                newImageUrl = await uploadImage(selectedProductImageFile);
+            }
+
+            // 2. Preparar payload de actualización
+            const updatePayload = {
+                name: newName,
+                category: newCategory,
+                box_number: newBoxNumber,
+                price: newPrice,
+                quantity: newQuantity,
+                image_url: newImageUrl,
+                updated_at: new Date().toISOString(), // Opcional: actualizar timestamp
+            };
+
+            // 3. Actualizar en Supabase
+            setStatusMessage(modalStatus, 'Actualizando en base de datos...', true);
+            const { data: updatedProductArray, error } = await supabase
+                .from(table)
+                .update(updatePayload)
+                .eq('id', id)
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            // 4. Actualizar lista local y renderizar
+            const targetArray = isMainInventory ? allProducts : allProductsElTransito;
+            const index = targetArray.findIndex(p => p.id === id);
+            
+            if (index !== -1) {
+                targetArray[index] = updatedProductArray; // Reemplazar con datos actualizados
+
+                // Forzar re-renderizado solo de las vistas afectadas
+                isMainInventory ? filterAndRenderProducts() : filterAndRenderProductsET();
+                updateAutocompleteList(allProducts, inventorySuggestions);
+                updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
+                updateLabelView(); // Actualizar vista de etiquetas
+            }
+
+            setStatusMessage(modalStatus, `✅ Producto "${newName}" actualizado con éxito.`, true);
+            setTimeout(closeProductEditorModal, 1500); // Cerrar después de éxito
+
+        } catch (error) {
+            console.error("Error al guardar cambios:", error);
+            setStatusMessage(modalStatus, `❌ Error al guardar: ${error.message}`);
+            // Si la actualización falla, recargar los datos viejos
+            const targetArray = isMainInventory ? allProducts : allProductsElTransito;
+            const index = targetArray.findIndex(p => p.id === id);
+            if (index !== -1) targetArray[index] = oldProduct;
+
+        } finally {
+            modalSaveButton.disabled = false;
+            modalSaveButton.textContent = 'Guardar Cambios';
+        }
+    });
+
+    // ============================================================================
+    // == VIII. FUNCIONES DE VENTAS Y REPORTES ====================================
+    // ============================================================================
+
+    // Función auxiliar para obtener el nombre "limpio" del producto para buscar stock
+    function getCleanProductName(productName) {
+        if (!productName) return null;
+        // Eliminar información extra (ej. '(Devuelto)' o '(Sin Stock)')
+        return productName.replace(/\s*\(.*\)\s*$/, '').trim();
+    }
+
+    // --------------------------------------------------
+    // Sales (Principal)
+    // --------------------------------------------------
+    saleForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!supabase) return setStatusMessage(saleStatusEl, '❌ Error: Supabase no cargado.', false);
+        
+        document.getElementById('sale-submit').disabled = true;
+        setStatusMessage(saleStatusEl, 'Registrando venta...', true);
+
+        const recipientName = recipientNameIn.value.trim();
+        const productName = productNameSoldIn.value.trim();
+        const salePrice = parseFloat(salePriceIn.value);
+        const saleDate = saleDateIn.value;
+        const status = saleStatusInput.value;
+
+        // Limpiar el nombre del producto para buscarlo en el inventario
+        const cleanProductName = getCleanProductName(productName);
+        const productToUpdate = allProducts.find(p => p.name.toLowerCase() === cleanProductName.toLowerCase());
+        const isSale = status !== 'Devuelto'; // La devolución no afecta el stock (ya se aumentó antes en el cambio de estado)
+
+        try {
+            // 1. Registrar la venta
+            const { data: newSaleArray, error: saleError } = await supabase
+                .from(SALES_TABLE)
+                .insert([{ recipient_name: recipientName, product_name_sold: productName, sale_price: salePrice, sale_date: saleDate, status }])
+                .select()
+                .single();
+
+            if (saleError) throw saleError;
+
+            // 2. Actualizar stock (solo si no es devolución, la devolución se maneja al cambiar el estado de una venta existente)
+            if (isSale && productToUpdate) {
+                const newQuantity = productToUpdate.quantity - 1;
+                
+                if (newQuantity < 0) {
+                     alert(`⚠️ ADVERTENCIA: Stock insuficiente para "${productToUpdate.name}". Venta registrada, pero stock permanece en ${productToUpdate.quantity}.`);
+                }
+
+                const { error: updateError } = await supabase
+                    .from(PRODUCTS_TABLE)
+                    .update({ quantity: Math.max(0, newQuantity) })
+                    .eq('id', productToUpdate.id);
+
+                if (updateError) {
+                    console.error("Error al actualizar stock:", updateError);
+                    alert(`⚠️ ADVERTENCIA: Venta registrada, pero falló la actualización de stock de ${productToUpdate.name}. (Error: ${updateError.message})`);
+                } else {
+                    // Actualizar la lista local de productos
+                    productToUpdate.quantity = Math.max(0, newQuantity);
+                    filterAndRenderProducts(); // Re-renderizar inventario
+                }
+            } else if (isSale && productToUpdate) {
+                alert(`⚠️ ADVERTENCIA: Producto "${productToUpdate.name}" sin stock, pero la venta se ha registrado.`);
+            } else if (isSale) {
+                alert(`⚠️ ADVERTENCIA: Venta registrada, pero el producto "${productName}" no se encontró en el inventario principal para actualizar el stock.`);
+            }
+
+            // 3. Actualizar lista de ventas local
+            allSales.unshift(newSaleArray);
+            filterAndRenderSales();
+
+            // Limpiar el formulario
+            saleForm.reset();
+            saleDateIn.value = new Date().toISOString().split('T')[0];
+
+            setStatusMessage(saleStatusEl, `✅ Venta a ${recipientName} registrada con éxito.`, true);
+
+        } catch (error) {
+            console.error("Error al registrar venta:", error);
+            setStatusMessage(saleStatusEl, `❌ Error al registrar venta: ${error.message}`);
+        } finally {
+            document.getElementById('sale-submit').disabled = false;
+        }
+    });
+
+    searchSalesInput.addEventListener('input', filterAndRenderSales);
+    pendingOnlyCheckbox.addEventListener('change', filterAndRenderSales);
+
+    async function fetchSales() {
+        if (!supabase) return;
+
+        const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
+
+        if (error) {
+            console.error("Error cargando ventas:", error);
+            salesListContainer.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+            return;
+        }
+
+        allSales = data;
+        filterAndRenderSales();
+    }
+
+    function filterAndRenderSales() {
+        const term = (searchSalesInput.value || "").toLowerCase().trim();
+        const pendingOnly = pendingOnlyCheckbox.checked;
+
+        let filtered = allSales.filter(s => 
+            (s.recipient_name.toLowerCase().includes(term) || s.product_name_sold.toLowerCase().includes(term))
+            && (!pendingOnly || s.status === 'Pendiente')
+        );
+
+        calculateSalesSummary(filtered, totalSoldAmountSpan, totalPaidAmountSpan, paidPercentageSpan, totalSalesCountSpan);
+        renderSalesList(filtered, salesListContainer, 'main');
+    }
+
+    function calculateSalesSummary(sales, totalSoldSpan, totalPaidSpan, paidPercentageSpan, totalCountSpan) {
+        let totalSold = 0;
+        let totalPaid = 0;
+        
+        sales.forEach(s => {
+            const price = Number(s.sale_price) || 0;
+            totalSold += price;
+            if (s.status === 'Pagado') {
+                totalPaid += price;
+            } 
+        });
+
+        const paidPercentage = totalSold > 0 ? ((totalPaid / totalSold) * 100).toFixed(1) : 0;
+        const totalMissing = totalSold - totalPaid;
+        const totalMissingElement = document.getElementById('total-missing-amount');
+        if (totalMissingElement) totalMissingElement.textContent = `$${totalMissing.toFixed(2)}`; // Mantenerlo oculto pero actualizado
+
+        totalSoldSpan.textContent = `$${totalSold.toFixed(2)}`;
+        totalPaidSpan.textContent = `$${totalPaid.toFixed(2)}`;
+        paidPercentageSpan.textContent = `${paidPercentage}%`;
+        totalCountSpan.textContent = `${sales.length} registros`;
+    }
+
+    /**
+     * Renderiza la lista de ventas (principal y ET)
+     */
+    function renderSalesList(items, container, location) {
+        const isMain = location === 'main';
+        const deleteFn = isMain ? 'deleteSale' : 'deleteSaleET';
+        const updateFn = isMain ? 'updateSaleStatus' : 'updateSaleStatusET';
+
+        container.innerHTML = "";
+        if (items.length === 0) {
+            container.innerHTML = `<p class="text-gray-400 p-4">No se encontraron registros de ventas.</p>`;
+            return;
+        }
+
+        items.forEach(s => {
+            const statusClass = getStatusClass(s.status);
+            const saleDate = new Date(s.sale_date).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' });
+            
+            // CORRECCIÓN 5: Se elimina la lógica de "Faltante" en la vista.
+            const missingAmount = ''; // Se elimina por petición del usuario
+
+            const saleCard = document.createElement("div");
+            saleCard.id = `sale-card-${s.id}`;
+            saleCard.className = "bg-gray-700 p-4 rounded-lg shadow-md mb-3 flex justify-between items-center border border-gray-600";
+            
+            saleCard.innerHTML = `
+                <div class="flex-grow">
+                    <p class="text-xs font-medium text-gray-400 mb-1">${saleDate}</p>
+                    <p class="text-sm text-gray-400 mt-1">
+                        <span class="font-medium text-white">${s.recipient_name}</span> - 
+                        ${s.product_name_sold} 
+                        <span class="text-lg font-extrabold text-green-400 ml-2">$${Number(s.sale_price).toFixed(2)}</span>
+                    </p>
                 </div>
-                <div class="mt-6 flex justify-between items-center">
-                    <span id="labels-count" class="text-sm text-gray-400">0 Productos seleccionados</span>
-                    <button onclick="generateAndPrintLabels()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 rounded shadow-lg disabled:bg-gray-500">
-                        Generar e Imprimir Etiquetas
+                <div class="flex items-center space-x-3 ml-4">
+                    <select onchange="${updateFn}('${s.id}', this.value)" class="text-sm font-medium py-1 px-2 rounded border border-gray-500 bg-gray-600 ${statusClass}">
+                        <option value="Pendiente" ${s.status === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                        <option value="Pagado" ${s.status === 'Pagado' ? 'selected' : ''}>Pagado</option>
+                        <option value="Devuelto" ${s.status === 'Devuelto' ? 'selected' : ''}>Devuelto</option>
+                    </select>
+                    <button onclick="${deleteFn}('${s.id}')" class="text-red-500 hover:text-red-400 transition" title="Eliminar Venta">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                     </button>
                 </div>
-                <p class="text-sm text-gray-400 mt-3">Recuerda: Cada etiqueta QR representa **un tipo de producto** (una ficha) y debe colocarse en la caja de ese artículo, no en cada unidad.</p>
-            </section>
-            
-            <div id="labels-output" class="labels-container flex flex-wrap gap-4 mt-8">
-                <p class="p-4 text-gray-400">Selecciona el inventario y presiona "Generar e Imprimir Etiquetas".</p>
-            </div>
-        </div>
+            `;
+            container.appendChild(saleCard);
+        });
+    }
 
-        <div id="inventory-view" class="view-section hidden">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto</h2>
-                <form id="product-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-                    <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Flex de Botones" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="">Seleccionar</option><option value="Pantallas">Pantallas</option><option value="Jacks de Carga">Jacks de Carga</option><option value="Flex Main">Flex Main</option><option value="Placas de Carga">Placas de Carga</option><option value="Botones Fisicos">Botones Fisicos</option><option value="Botones Internos">Botones Internos</option><option value="Accesorios">Accesorios</option><option value="Otros">Otros</option></select></div>
-                    
-                    <div><label class="block text-sm font-medium text-gray-300">Caja N°</label><input id="box-number" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: A-01" /></div>
-                    
-                    <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="12.50" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Cantidad</label><input id="quantity" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Imagen</label><input id="image" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" /></div>
-                    
-                    <div class="md:col-span-6 text-right"><button id="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
-                </form>
-                <p id="status" class="text-sm text-gray-400 mt-3"></p>
-            </section>
-            <section>
-                <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">📦 Inventario por Categoría</h2><span id="total-count" class="text-gray-400 text-sm"></span></div>
-                <div class="mb-6 flex items-center space-x-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" id="search-input" placeholder="Buscar por nombre o categoría..." class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" /></div>
-                <div id="products-loader" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
-                <div id="products"></div>
-            </section>
-        </div>
+    window.updateSaleStatus = async function(id, newStatus) {
+        if (!supabase) return alert("❌ Error: Supabase no cargado.");
 
-        <div id="inventory-el-transito-view" class="view-section hidden">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (El Transito)</h2>
-                <form id="product-form-et" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-                    <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name-et" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Flex de Botones" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select-et" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="">Seleccionar</option><option value="Pantallas">Pantallas</option><option value="Jacks de Carga">Jacks de Carga</option><option value="Flex Main">Flex Main</option><option value="Placas de Carga">Placas de Carga</option><option value="Botones Fisicos">Botones Fisicos</option><option value="Botones Internos">Botones Internos</option><option value="Accesorios">Accesorios</option><option value="Otros">Otros</option></select></div>
-                    
-                    <div><label class="block text-sm font-medium text-gray-300">Caja N°</label><input id="box-number-et" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: A-01" /></div>
-                    
-                    <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="price-et" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="12.50" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Cantidad</label><input id="quantity-et" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Imagen</label><input id="image-et" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" /></div>
-                    
-                    <div class="md:col-span-6 text-right"><button id="submit-et" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
-                </form>
-                <p id="status-et" class="text-sm text-gray-400 mt-3"></p>
-            </section>
-            <section>
-                <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">🚚 Inventario por Categoría (El Transito)</h2><span id="total-count-et" class="text-gray-400 text-sm"></span></div>
-                <div class="mb-6 flex items-center space-x-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" id="search-input-et" placeholder="Buscar por nombre o categoría..." class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" /></div>
-                <div id="products-loader-et" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
-                <div id="products-et"></div>
-            </section>
-        </div>
+        const saleIndex = allSales.findIndex(s => s.id === id);
+        if (saleIndex === -1) return alert("Venta no encontrada.");
+
+        const oldStatus = allSales[saleIndex].status;
+        const soldProductName = getCleanProductName(allSales[saleIndex].product_name_sold);
         
-        <div id="sales-view" class="view-section hidden">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-indigo-300">✍️ Registrar Nueva Venta</h2>
-                <form id="sale-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-                    <div><label class="block text-sm font-medium text-gray-300">Nombre de Destinatario</label><input id="recipient-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Juan Pérez" /></div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300">Producto Vendido</label>
-                        <input id="product-name-sold" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Pantalla Samsung A32" list="inventory-suggestions" />
-                        <datalist id="inventory-suggestions"></datalist>
-                    </div>
-                    <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="sale-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="25.99" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Fecha de Venta</label><input id="sale-date" type="date" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Estado</label><select id="sale-status-input" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="Pendiente">Pendiente</option><option value="Pagado">Pagado</option><option value="Devuelto">Devuelto</option></select></div>
-                    <div class="text-right"><button id="sale-submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow w-full">Registrar Venta</button></div>
-                </form>
-                <p id="sale-status" class="text-sm text-gray-400 mt-3"></p>
-            </section>
-            <section>
-                <div class="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex flex-wrap items-center gap-4">
-                    <div class="flex-grow min-w-[250px]">
-                        <label for="search-sales-input" class="block text-sm font-medium text-gray-300 mb-1">🔍 Buscar por Nombre o Producto</label>
-                        <input type="text" id="search-sales-input" placeholder="Ej: Juan Pérez o Pantalla A32..." class="p-2 border rounded-md w-full focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" />
-                    </div>
-                    <div class="flex items-center pt-6">
-                        <input type="checkbox" id="pending-only-checkbox" class="h-4 w-4 text-indigo-600 border-gray-500 rounded bg-gray-600 focus:ring-indigo-500">
-                        <label for="pending-only-checkbox" class="ml-2 block text-sm font-medium text-gray-200">🔔 Mostrar solo pendientes</label>
-                    </div>
-                </div>
-                <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
-                    <h2 class="text-xl font-semibold text-indigo-300">📊 Historial de Ventas</h2>
-                    <div class="flex items-center space-x-4 text-sm bg-gray-900/50 p-2 rounded-lg">
-                        <span id="total-sales-count" class="text-gray-400 pr-2 border-r border-gray-600"></span>
-                        <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Total General Vendido:</span>
-                            <span id="total-sold-amount" class="font-bold text-green-400">$0.00</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Total General Pagado:</span>
-                            <span id="total-paid-amount" class="font-bold text-green-500">$0.00</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Progreso:</span>
-                            <span id="paid-percentage" class="font-bold text-indigo-400">0%</span>
-                        </div>
-                    </div>
-                </div>
-                <div id="sales-list-loader" class="space-y-2"></div>
-                <div id="sales-list-container"></div>
-            </section>
-        </div>
-
-        <div id="sales-el-transito-view" class="view-section hidden">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-indigo-300">✍️ Registrar Nueva Venta (El Transito)</h2>
-                <form id="sale-el-transito-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-                    <div><label class="block text-sm font-medium text-gray-300">Nombre de Destinatario</label><input id="recipient-name-et" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Ana Gómez" /></div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300">Producto Vendido</label>
-                        <input id="product-name-sold-et" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Batería iPhone 11" list="inventory-suggestions-et" />
-                        <datalist id="inventory-suggestions-et"></datalist>
-                    </div>
-                    <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="sale-price-et" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="35.00" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Fecha de Venta</label><input id="sale-date-et" type="date" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Estado</label><select id="sale-status-input-et" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="Pendiente">Pendiente</option><option value="Pagado">Pagado</option><option value="Devuelto">Devuelto</option></select></div>
-                    <div class="text-right"><button id="sale-submit-et" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow w-full">Registrar Venta</button></div>
-                </form>
-                <p id="sale-status-et" class="text-sm text-gray-400 mt-3"></p>
-            </section>
-            <section>
-                <div class="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex flex-wrap items-center gap-4">
-                    <div class="flex-grow min-w-[250px]">
-                        <label for="search-sales-input-et" class="block text-sm font-medium text-gray-300 mb-1">🔍 Buscar por Nombre o Producto (El Transito)</label>
-                        <input type="text" id="search-sales-input-et" placeholder="Ej: Ana Gómez o Batería iPhone..." class="p-2 border rounded-md w-full focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" />
-                    </div>
-                    <div class="flex items-center pt-6">
-                        <input type="checkbox" id="pending-only-checkbox-et" class="h-4 w-4 text-indigo-600 border-gray-500 rounded bg-gray-600 focus:ring-indigo-500">
-                        <label for="pending-only-checkbox-et" class="ml-2 block text-sm font-medium text-gray-200">🔔 Mostrar solo pendientes</label>
-                    </div>
-                </div>
-                <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
-                    <h2 class="text-xl font-semibold text-indigo-300">📊 Historial de Ventas (El Transito)</h2>
-                    <div class="flex items-center space-x-4 text-sm bg-gray-900/50 p-2 rounded-lg">
-                        <span id="total-sales-count-et" class="text-gray-400 pr-2 border-r border-gray-600"></span>
-                        <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Total General Vendido:</span>
-                            <span id="total-sold-amount-et" class="font-bold text-green-400">$0.00</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Total General Pagado:</span>
-                            <span id="total-paid-amount-et" class="font-bold text-green-500">$0.00</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Progreso:</span>
-                            <span id="paid-percentage-et" class="font-bold text-indigo-400">0%</span>
-                        </div>
-                    </div>
-                </div>
-                <div id="sales-list-loader-et" class="space-y-2"></div>
-                <div id="sales-list-container-et"></div>
-            </section>
-        </div>
-
-        <div id="tools-view" class="view-section hidden">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar Nueva Herramienta / Tutorial</h2>
-                <form id="tool-form" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Título</label>
-                            <input id="tool-title" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Test Point iPhone 12" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Descripción / Pasos</label>
-                            <textarea id="tool-description" rows="4" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Describe los pasos o información relevante aquí..."></textarea>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300">Imagen (Tutorial)</label>
-                        <input id="tool-image" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" />
-                        <p class="text-xs text-gray-400 mt-1">Opcional. Ideal para diagramas o capturas de pantalla.</p>
-                        
-                        <div class="mt-6 flex justify-end">
-                            <button id="tool-submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Herramienta</button>
-                        </div>
-                    </div>
-                </form>
-                <p id="tool-status" class="text-sm text-gray-400 mt-3"></p>
-            </section>
+        try {
+            const { data, error } = await supabase.from(SALES_TABLE).update({ status: newStatus }).eq('id', id).select().single();
+            if (error) throw error;
             
-            <section>
-                <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">🛠️ Biblioteca de Herramientas y Tutoriales</h2><span id="total-tools-count" class="text-gray-400 text-sm"></span></div>
-                <div class="mb-6 flex items-center space-x-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                    <input type="text" id="search-tools-input" placeholder="Buscar por título o descripción..." class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" />
-                </div>
-                <div id="tools-loader" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-                <div id="tools-list"></div>
-            </section>
-        </div>
-        
-    </div>
-    
-    <div id="edit-product-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full">
-                <form id="modal-product-form">
-                    <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div class="sm:flex sm:items-start">
-                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">Editar Producto</h3>
-                                <p id="modal-inventory-location" class="text-sm text-gray-400 mb-4"></p>
-                                <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="space-y-4">
-                                        <div class="h-32 flex items-center justify-center border border-gray-600 rounded-md overflow-hidden">
-                                            <img id="modal-image-preview" src="https://via.placeholder.com/150x100/4f46e5/ffffff?text=Cargando..." alt="Previsualización" class="h-full w-full object-contain" />
-                                        </div>
-                                        <div>
-                                            <label for="modal-image-upload" class="block text-sm font-medium text-gray-300">Subir Nueva Imagen</label>
-                                            <input type="file" id="modal-image-upload" accept="image/*" class="mt-1 block w-full p-1.5 border rounded-md bg-gray-600 border-gray-500 text-white text-sm" />
-                                        </div>
-                                    </div>
-                                    <div class="space-y-4">
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-300">Nombre</label>
-                                            <input id="modal-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-300">Categoría</label>
-                                            <select id="modal-category" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
-                                                <option value="Pantallas">Pantallas</option><option value="Jacks de Carga">Jacks de Carga</option><option value="Flex Main">Flex Main</option><option value="Placas de Carga">Placas de Carga</option><option value="Botones Fisicos">Botones Fisicos</option><option value="Botones Internos">Botones Internos</option><option value="Accesorios">Accesorios</option><option value="Otros">Otros</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-300">Caja N°</label>
-                                            <input id="modal-box-number" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-300">Precio (USD)</label>
-                                            <input id="modal-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-300">Cantidad Disponible</label>
-                                            <input id="modal-quantity" type="number" min="0" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <p id="modal-status" class="text-sm text-gray-400 mt-4"></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button type="submit" id="modal-save-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm transition"> Guardar Cambios </button>
-                        <button type="button" onclick="window.generateQrCode(currentEditingProduct)" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-yellow-600 text-base font-medium text-white hover:bg-yellow-700 sm:ml-3 sm:w-auto sm:text-sm transition"> 🖨️ Generar QR </button>
-                        <button type="button" onclick="closeProductEditorModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-600 text-base font-medium text-white hover:bg-gray-500 sm:mt-0 sm:w-auto sm:text-sm transition"> Cancelar </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    
-    <div id="qr-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="qr-modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity print:hidden" aria-hidden="true"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen print:hidden" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
-                <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-white print:text-black" id="qr-modal-title">Código QR del Producto</h3>
-                            <p id="qr-product-info" class="text-sm text-gray-400 print:text-gray-700 mb-4"></p>
-                            <div class="mt-2 flex justify-center p-4 border border-indigo-500 rounded-md bg-white">
-                                <div id="qr-code-container">
-                                    </div>
-                            </div>
-                            <p class="text-sm text-gray-400 mt-2 print:hidden">Escanea este código en el botón "Escanear Venta" para registrar una venta rápida.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse print:hidden">
-                    <button type="button" onclick="window.print()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-500 text-base font-medium text-white hover:bg-indigo-600 sm:ml-3 sm:w-auto sm:text-sm transition print:hidden"> Imprimir Etiqueta </button>
-                    <button type="button" onclick="closeQrModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-700 text-base font-medium text-gray-200 hover:bg-gray-600 sm:mt-0 sm:w-auto sm:text-sm transition print:hidden"> Cerrar </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="scanner-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="scanner-modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-white" id="scanner-modal-title">Escanear Código QR / Código de Barras</h3>
-                            <div class="mt-2">
-                                <div id="scanner-container" style="width: 100%; height: 300px; border: 1px solid #4f46e5; border-radius: 8px;"></div>
-                                <p id="scanner-status" class="text-sm text-gray-400 mt-2">Esperando permiso de cámara...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" onclick="closeScannerModal()" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-600 text-base font-medium text-white hover:bg-gray-500 sm:ml-3 sm:w-auto sm:text-sm transition"> Cerrar Escáner </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
+            // Actualizar la lista local
+            allSales[saleIndex] = data;
 
-    <script>
+            // Lógica de Stock
+            const productToUpdate = allProducts.find(p => p.name.toLowerCase() === soldProductName.toLowerCase());
+            
+            if (productToUpdate) {
+                if (oldStatus !== 'Pagado' && newStatus === 'Pagado') {
+                    // Marcar como pagado: Disminuir stock (si no se hizo al registrar la venta)
+                    // Nota: Asumimos que el stock se disminuye al registrar la venta.
+                    // Si el stock ya se disminuyó al registrar, no hacemos nada aquí.
+                } else if (oldStatus !== 'Devuelto' && newStatus === 'Devuelto') {
+                    // Registrar una devolución: Aumentar stock
+                    const newQuantity = productToUpdate.quantity + 1;
+                    const { error: stockError } = await supabase.from(PRODUCTS_TABLE).update({ quantity: newQuantity }).eq('id', productToUpdate.id);
+                    if (!stockError) productToUpdate.quantity = newQuantity;
+                    else console.error("Error de re-stock (a Devuelto):", stockError.message);
+                } else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') {
+                    // Revertir devolución (ej. a Pendiente o Pagado): Disminuir stock
+                    const newQuantity = Math.max(0, productToUpdate.quantity - 1);
+                    const { error: stockError } = await supabase.from(PRODUCTS_TABLE).update({ quantity: newQuantity }).eq('id', productToUpdate.id);
+                    if (!stockError) productToUpdate.quantity = newQuantity;
+                    else console.error("Error de re-stock (de Devuelto):", stockError.message);
+                }
+            }
+            
+            // Re-renderizar ambas vistas (Ventas e Inventario)
+            filterAndRenderSales();
+            filterAndRenderProducts();
+
+        } catch (error) {
+            console.error("Error al actualizar estado:", error);
+            alert(`❌ Error al actualizar estado: ${error.message}`);
+        }
+    }
+
+    window.deleteSale = async function(id) {
+        if (!confirm("¿Eliminar este registro de venta? Esto NO revertirá el stock de forma automática.")) return;
+        
+        const saleIndex = allSales.findIndex(s => s.id === id);
+        if (saleIndex === -1 || !supabase) { alert("❌ Error: Supabase no cargado."); return; }
+        
+        const sale = allSales[saleIndex];
+        const { error } = await supabase.from(SALES_TABLE).delete().eq("id", id);
+        
+        if (error) {
+            alert("❌ Error al eliminar: " + error.message);
+        } else {
+            // Eliminar de la lista local
+            allSales = allSales.filter(p => p.id !== id);
+            filterAndRenderSales();
+            alert(`✅ Venta eliminada. Recuerde ajustar el stock manualmente si es necesario.`);
+        }
+    }
+
+
+    // --------------------------------------------------
+    // Sales (El Transito)
+    // --------------------------------------------------
+    saleFormET.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!supabase) return setStatusMessage(saleStatusElET, '❌ Error: Supabase no cargado.', false);
+        
+        document.getElementById('sale-submit-et').disabled = true;
+        setStatusMessage(saleStatusElET, 'Registrando venta (ET)...', true);
+
+        const recipientName = recipientNameInET.value.trim();
+        const productName = productNameSoldInET.value.trim();
+        const salePrice = parseFloat(salePriceInET.value);
+        const saleDate = saleDateInET.value;
+        const status = saleStatusInputET.value;
+
+        // Limpiar el nombre del producto para buscarlo en el inventario
+        const cleanProductName = getCleanProductName(productName);
+        const productToUpdate = allProductsElTransito.find(p => p.name.toLowerCase() === cleanProductName.toLowerCase());
+        const isSale = status !== 'Devuelto';
+
+        try {
+            // 1. Registrar la venta
+            const { data: newSaleArray, error: saleError } = await supabase
+                .from(SALES_EL_TRANSITO_TABLE)
+                .insert([{ recipient_name: recipientName, product_name_sold: productName, sale_price: salePrice, sale_date: saleDate, status }])
+                .select()
+                .single();
+
+            if (saleError) throw saleError;
+
+            // 2. Actualizar stock
+            if (isSale && productToUpdate) {
+                const newQuantity = productToUpdate.quantity - 1;
+                
+                 if (newQuantity < 0) {
+                     alert(`⚠️ ADVERTENCIA: Stock insuficiente para "${productToUpdate.name}" (ET). Venta registrada, pero stock permanece en ${productToUpdate.quantity}.`);
+                }
+
+                const { error: updateError } = await supabase
+                    .from(PRODUCTS_EL_TRANSITO_TABLE)
+                    .update({ quantity: Math.max(0, newQuantity) })
+                    .eq('id', productToUpdate.id);
+
+                if (updateError) {
+                    console.error("Error al actualizar stock (ET):", updateError);
+                    alert(`⚠️ ADVERTENCIA: Venta registrada, pero falló la actualización de stock de ${productToUpdate.name} (ET). (Error: ${updateError.message})`);
+                } else {
+                    productToUpdate.quantity = Math.max(0, newQuantity);
+                    filterAndRenderProductsET();
+                }
+            } else if (isSale && productToUpdate) {
+                alert(`⚠️ ADVERTENCIA: Producto "${productToUpdate.name}" sin stock (ET), pero la venta se ha registrado.`);
+            } else if (isSale) {
+                alert(`⚠️ ADVERTENCIA: Venta registrada, pero el producto "${productName}" no se encontró en el inventario El Transito para actualizar el stock.`);
+            }
+
+            // 3. Actualizar lista de ventas local
+            allSalesElTransito.unshift(newSaleArray);
+            filterAndRenderSalesET();
+
+            // Limpiar el formulario
+            saleFormET.reset();
+            saleDateInET.value = new Date().toISOString().split('T')[0];
+
+            setStatusMessage(saleStatusElET, `✅ Venta a ${recipientName} (ET) registrada con éxito.`, true);
+
+        } catch (error) {
+            console.error("Error al registrar venta (ET):", error);
+            setStatusMessage(saleStatusElET, `❌ Error al registrar venta (ET): ${error.message}`);
+        } finally {
+            document.getElementById('sale-submit-et').disabled = false;
+        }
+    });
+
+    searchSalesInputET.addEventListener('input', filterAndRenderSalesET);
+    pendingOnlyCheckboxET.addEventListener('change', filterAndRenderSalesET);
+
+    async function fetchSalesElTransito() {
+        if (!supabase) return;
+
+        const { data, error } = await supabase.from(SALES_EL_TRANSITO_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
+
+        if (error) {
+            console.error("Error cargando ventas (ET):", error);
+            salesListContainerET.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+            return;
+        }
+
+        allSalesElTransito = data;
+        filterAndRenderSalesET();
+    }
+
+    function filterAndRenderSalesET() {
+        const term = (searchSalesInputET.value || "").toLowerCase().trim();
+        const pendingOnly = pendingOnlyCheckboxET.checked;
+
+        let filtered = allSalesElTransito.filter(s => 
+            (s.recipient_name.toLowerCase().includes(term) || s.product_name_sold.toLowerCase().includes(term))
+            && (!pendingOnly || s.status === 'Pendiente')
+        );
+
+        calculateSalesSummary(filtered, totalSoldAmountSpanET, totalPaidAmountSpanET, paidPercentageSpanET, totalSalesCountSpanET);
+        renderSalesList(filtered, salesListContainerET, 'et');
+    }
+
+    window.updateSaleStatusET = async function(id, newStatus) {
+        if (!supabase) return alert("❌ Error: Supabase no cargado.");
+
+        const saleIndex = allSalesElTransito.findIndex(s => s.id === id);
+        if (saleIndex === -1) return alert("Venta (ET) no encontrada.");
+
+        const oldStatus = allSalesElTransito[saleIndex].status;
+        const soldProductName = getCleanProductName(allSalesElTransito[saleIndex].product_name_sold);
+        
+        try {
+            const { data, error } = await supabase.from(SALES_EL_TRANSITO_TABLE).update({ status: newStatus }).eq('id', id).select().single();
+            if (error) throw error;
+            
+            allSalesElTransito[saleIndex] = data;
+
+            const productToUpdate = allProductsElTransito.find(p => p.name.toLowerCase() === soldProductName.toLowerCase());
+            
+            if (productToUpdate) {
+                if (oldStatus !== 'Devuelto' && newStatus === 'Devuelto') {
+                    // Registrar una devolución: Aumentar stock
+                    const newQuantity = productToUpdate.quantity + 1;
+                    const { error: stockError } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ quantity: newQuantity }).eq('id', productToUpdate.id);
+                    if (!stockError) productToUpdate.quantity = newQuantity;
+                    else console.error("Error de re-stock (ET) (a Devuelto):", stockError.message);
+                } else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') {
+                    // Revertir devolución (ej. a Pendiente o Pagado): Disminuir stock
+                    const newQuantity = Math.max(0, productToUpdate.quantity - 1);
+                    const { error: stockError } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).update({ quantity: newQuantity }).eq('id', productToUpdate.id);
+                    if (!stockError) productToUpdate.quantity = newQuantity;
+                    else console.error("Error de re-stock (ET) (de Devuelto):", stockError.message);
+                }
+            }
+            
+            // Re-renderizar ambas vistas (Ventas e Inventario)
+            filterAndRenderSalesET();
+            filterAndRenderProductsET();
+
+        } catch (error) {
+            console.error("Error al actualizar estado (ET):", error);
+            alert(`❌ Error al actualizar estado (ET): ${error.message}`);
+        }
+    }
+
+    window.deleteSaleET = async function(id) {
+        if (!confirm("¿Eliminar este registro de venta de El Tránsito? Esto NO revertirá el stock de forma automática.")) return;
+        
+        const saleIndex = allSalesElTransito.findIndex(s => s.id === id);
+        if (saleIndex === -1 || !supabase) { alert("❌ Error: Supabase no cargado."); return; }
+        
+        const sale = allSalesElTransito[saleIndex];
+        const { error } = await supabase.from(SALES_EL_TRANSITO_TABLE).delete().eq("id", id);
+        
+        if (error) {
+            alert("❌ Error al eliminar: " + error.message);
+        } else {
+            allSalesElTransito = allSalesElTransito.filter(p => p.id !== id);
+            filterAndRenderSalesET();
+             alert(`✅ Venta eliminada (ET). Recuerde ajustar el stock manualmente si es necesario.`);
+        }
+    }
+
+
+    // ============================================================================
+    // == IX. GESTIÓN DE LOGO Y TEMAS =============================================
+    // ============================================================================
+    async function loadLogo() {
+        const logoUrl = localStorage.getItem('businessLogoUrl');
+        if (logoUrl) {
+            businessLogoImg.src = logoUrl;
+        }
+    }
+
+    logoUploadInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            logoSaveButton.disabled = false;
+        } else {
+            logoSaveButton.disabled = true;
+        }
+    });
+
+    logoSaveButton.addEventListener('click', async () => {
+        if (!supabase) return alert('Error: Supabase no cargado.');
+        const file = logoUploadInput.files[0];
+        if (!file) return;
+
+        logoSaveButton.disabled = true;
+        logoSaveButton.textContent = 'Subiendo...';
+
+        try {
+            const fileName = `logo-${Date.now()}-${file.name.replace(/\s/g, '_')}`;
+            const { data, error } = await supabase.storage
+                .from('logos') // Usa un bucket diferente para logos
+                .upload(fileName, file);
+
+            if (error) throw error;
+
+            const { data: publicUrlData } = supabase.storage
+                .from('logos')
+                .getPublicUrl(fileName);
+
+            const newLogoUrl = publicUrlData.publicUrl;
+            localStorage.setItem('businessLogoUrl', newLogoUrl);
+            businessLogoImg.src = newLogoUrl;
+            alert('✅ Logo actualizado con éxito. Podría tomar unos minutos en refrescarse en el servidor.');
+            closeSettingsDropdown({ target: logoSaveButton });
+        } catch (error) {
+            console.error("Error al subir logo:", error);
+            alert(`❌ Error al subir logo: ${error.message}`);
+        } finally {
+            logoSaveButton.disabled = false;
+            logoSaveButton.textContent = 'Guardar Logo';
+            logoUploadInput.value = null; // Limpiar el input
+        }
+    });
+
+    themeSelector.addEventListener('change', (e) => {
+        const selectedTheme = e.target.value;
+        root.className = selectedTheme;
+        localStorage.setItem('selectedTheme', selectedTheme);
+    });
+
+    // ============================================================================
+    // == X. OTRAS UTILIDADES =====================================================
+    // ============================================================================
+
+    function showProductSkeletonLoaders() {
+        const skeletonCard = `
+            <div class="skeleton-card bg-gray-700 p-4 rounded-xl shadow-lg flex flex-col h-full border border-gray-700">
+                <div class="h-40 mb-3 rounded-lg overflow-hidden border border-gray-700 skeleton-line"></div>
+                <div class="skeleton-line h-5 w-3/4 mb-2"></div>
+                <div class="skeleton-line h-6 w-1/2 mb-1"></div>
+                <div class="skeleton-line h-4 w-1/3"></div>
+                <div class="flex-grow"></div>
+                <div class="skeleton-line h-8 w-1/4 mt-4 self-end"></div>
+            </div>`;
+        
+        productsLoader.innerHTML = skeletonCard.repeat(4);
+        productsLoaderET.innerHTML = skeletonCard.repeat(4);
+    }
+    
+    function updateAutocompleteList(products, datalist) {
+        datalist.innerHTML = products.map(p => `<option value="${p.name}">`).join('');
+    }
+
+    // Función para manejar las suscripciones de Realtime
+    function initializeRealtimeSubscriptions() {
+        if (!supabase) return;
+
+        // Suscripción al Inventario Principal
+        supabase.channel('products_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_TABLE }, (payload) => {
+                // Una forma simple es recargar los datos
+                console.log('Cambio en Inventario Principal (Realtime):', payload);
+                fetchProducts(); 
+            })
+            .subscribe();
+
+        // Suscripción al Inventario El Transito
+        supabase.channel('products_et_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_EL_TRANSITO_TABLE }, (payload) => {
+                console.log('Cambio en Inventario El Transito (Realtime):', payload);
+                fetchProductsET(); 
+            })
+            .subscribe();
+            
+        // Suscripción a Ventas Principal
+        supabase.channel('sales_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: SALES_TABLE }, (payload) => {
+                console.log('Cambio en Ventas Principal (Realtime):', payload);
+                fetchSales(); 
+            })
+            .subscribe();
+            
+        // Suscripción a Ventas El Transito
+        supabase.channel('sales_et_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: SALES_EL_TRANSITO_TABLE }, (payload) => {
+                console.log('Cambio en Ventas El Transito (Realtime):', payload);
+                fetchSalesElTransito(); 
+            })
+            .subscribe();
+    }
+
+
+    // ============================================================================
+    // == XI. INICIALIZACIÓN DE EVENTOS ===========================================
+    // ============================================================================
+    
+    // Asignar evento de cambio de vista
+    viewButtons.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', () => toggleView(btn.dataset.view)));
+    
+    // --- CARGA INICIAL --
+    window.addEventListener("load", async () => {
+        themeSelector.value = root.className || 'theme-dark'; 
+        saleDateIn.value = new Date().toISOString().split('T')[0];
+        saleDateInET.value = new Date().toISOString().split('T')[0];
+        toggleView('inventory'); 
+        showProductSkeletonLoaders(); 
+        
+        await loadLogo(); 
+        
+        if (supabase) {
+            try {
+                // Cargar inventarios (CRÍTICO)
+                await Promise.all([
+                    fetchProducts(), 
+                    fetchProductsET(),
+                    fetchSales(), 
+                    fetchSalesElTransito(), 
+                    // fetchTools() // Las herramientas ya no son necesarias en la carga inicial
+                ]);
+                
+                // Inicializar la vista de etiquetas después de cargar los productos
+                updateLabelView(); 
+                
+                initializeRealtimeSubscriptions();
+
+            } catch (error) {
+                console.error("Error crítico durante la carga de datos inicial:", error);
+                 alert(`Error Crítico: No se pudo cargar los datos iniciales. Revise la consola. (Error: ${error.message})`);
+            }
+        } else {
+             alert("Error Crítico: No se pudo cargar Supabase. Revise la conexión de internet o la URL del CDN en el HTML.");
+        }
+    });
+</script>
         // ============================================================================
         // == I. INICIALIZACIÓN Y VARIABLES GLOBALES ==================================
         // ============================================================================
