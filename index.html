@@ -588,7 +588,7 @@
     </div>
     <div id="scanner-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="scanner-modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeScannerModal()"></div>
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeScannerModal(true)"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
             <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-700 modal-content">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -597,7 +597,7 @@
                     <p id="scanner-status" class="text-black text-sm mt-3">Esperando código QR o de barras...</p>
                 </div>
                 <div class="bg-gray-100 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" onclick="closeScannerModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-700 text-base font-medium text-gray-200 hover:bg-gray-600 sm:mt-0 sm:w-auto sm:text-sm transition">
+                    <button type="button" onclick="closeScannerModal(true)" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-700 text-base font-medium text-gray-200 hover:bg-gray-600 sm:mt-0 sm:w-auto sm:text-sm transition">
                         Cancelar Escaneo
                     </button>
                 </div>
@@ -875,30 +875,38 @@
             }
         };
         // ============================================================================
-        // == III. LÓGICA DE ESCÁNER DE CÓDIGO DE BARRAS/QR (CORREGIDO PARCIALMENTE) ==
+        // == III. LÓGICA DE ESCÁNER DE CÓDIGO DE BARRAS/QR (CORREGIDA)              ==
         // ============================================================================
         const scannerModal = document.getElementById('scanner-modal');
         const scannerStatusEl = document.getElementById('scanner-status');
         let html5QrcodeScanner = null;
         let scanSuccessHandled = false;
         let isScannerRunning = false;
+
         window.openScannerModal = async function() {
             if (isScannerRunning) return;
             if (typeof Html5QrcodeScanner === 'undefined') {
                 alert("Error: La librería de escaneo no se cargó correctamente.");
                 return;
             }
+
+            // 1. Mostrar Modal y Estado
             scannerModal.classList.remove('hidden');
             scannerStatusEl.textContent = 'Iniciando cámara...';
             scanSuccessHandled = false;
             isScannerRunning = true;
+
+            // 2. Limpiar instancia previa si existe (seguridad)
             if (html5QrcodeScanner) {
                 try {
                     await html5QrcodeScanner.clear();
                 } catch (e) {
                     console.warn("Error al intentar limpiar escáner previo:", e);
                 }
+                html5QrcodeScanner = null;
             }
+
+            // 3. Crear NUEVA instancia
             html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader", { 
                     fps: 10, 
@@ -907,22 +915,32 @@
                 },
                 false
             );
+
+            // 4. Definir y Renderizar
             const onScanSuccess = async (decodedText, decodedResult) => {
                 if (scanSuccessHandled) return;
                 scanSuccessHandled = true; 
                 scannerStatusEl.textContent = `Código detectado: ${decodedText}. Procesando...`;
+                
+                // Detener el escáner inmediatamente después de un éxito para liberar la cámara
+                await closeScannerModal(false); 
+
                 try {
                     const scannedId = String(decodedText).trim();
                     console.log(`[SCANNER LOG] Código escaneado (ID): ${scannedId}`);
+                    
+                    // Buscar producto en ambos inventarios
                     const product = allProducts.find(p => p.id === scannedId) || allProductsElTransito.find(p => p.id === scannedId);
+                    
                     if (!product) {
                         throw new Error(`El producto con ID "${scannedId}" no existe en el inventario.`);
                     }
+                    
                     console.log(`[SCANNER LOG] Producto encontrado: ${product.name} (Inventario: ${allProducts.find(p => p.id === scannedId) ? 'Principal' : 'El Transito'})`);
-                    if (parseInt(product.quantity) <= 0) {
-                        console.warn(`⚠️ ADVERTENCIA: Producto "${product.name}" tiene Stock CERO.`);
-                    }
+                    
                     const isMainInventory = allProducts.some(p => p.id === scannedId);
+                    
+                    // Llenar formulario de venta
                     if (isMainInventory) {
                         toggleView('sales');
                         recipientNameIn.value = '';
@@ -944,146 +962,63 @@
                         alert(`✅ Producto "${product.name}" cargado en Venta El Transito.`);
                         recipientNameInET.focus();
                     }
-                    closeScannerModal();
                 } catch (error) {
                     console.error("Error al procesar escaneo:", error);
-                    closeScannerModal();
                     alert(`❌ Error en Escaneo: ${error.message}`);
                 }
             };
+
             const onScanError = (errorMessage) => {
                 if (!scanSuccessHandled) {
+                     // Silenciar errores comunes de parseo mientras escanea
                     if (errorMessage.includes("QR code parse error") || errorMessage.includes("-D")) {
                         scannerStatusEl.textContent = 'Escaneando... Apunta el código QR al centro.';
                     }
-                    else if (!errorMessage.includes("No camera found")) {
+                    else if (errorMessage.includes("No camera found")) {
+                        scannerStatusEl.textContent = 'Error: No se detectó ninguna cámara. Asegúrate de dar permiso.';
+                    }
+                    else if (!errorMessage.includes("code parse error")) {
+                         // Mostrar un mensaje de error genérico si no es un error de parseo constante
                         scannerStatusEl.textContent = `Escaneando... (Error: ${errorMessage.slice(0, 30)}...)`;
                     }
                 }
             };
+            
+            // Iniciar el renderizado
             html5QrcodeScanner.render(onScanSuccess, onScanError);
         };
-        window.closeScannerModal = function() {
-            scannerModal.classList.add('hidden');
+
+        window.closeScannerModal = async function(hideModal = true) {
+            if (hideModal) {
+                scannerModal.classList.add('hidden');
+            }
             scannerStatusEl.textContent = 'Esperando código QR o de barras...';
+            
             if (html5QrcodeScanner) {
                 if (isScannerRunning) {
-                    html5QrcodeScanner.stop().then(() => {
-                        isScannerRunning = false;
+                    try {
+                        // Parar la cámara antes de limpiar la instancia
+                        await html5QrcodeScanner.stop();
                         console.log("[SCANNER LOG] Escáner detenido exitosamente.");
-                    }).catch(error => {
-                        console.warn("[SCANNER LOG] Error al detener el escáner:", error); 
-                        isScannerRunning = false;
-                    });
+                    } catch (error) {
+                        console.warn("[SCANNER LOG] Error al detener el escáner (puede que ya estuviera detenido):", error); 
+                    }
                 }
-                html5QrcodeScanner.clear().catch(e => console.warn("[SCANNER LOG] Error al limpiar la instancia:", e));
+                
+                try {
+                    // Limpiar el contenido del div "reader"
+                    await html5QrcodeScanner.clear();
+                } catch (e) {
+                    console.warn("[SCANNER LOG] Error al limpiar la instancia:", e);
+                }
+                
                 html5QrcodeScanner = null;
             } 
+            
             isScannerRunning = false;
             scanSuccessHandled = false; 
         };
-        // ============================================================================
-        // == IV. LÓGICA DE GENERACIÓN DE ETIQUETAS MASIVAS                          ==
-        // ============================================================================
-        const labelsLocationSelect = document.getElementById('labels-location');
-        const labelsCategorySelect = document.getElementById('labels-category');
-        const labelsOutputDiv = document.getElementById('labels-output');
-        const labelsCountSpan = document.getElementById('labels-count');
-        function populateLabelCategories(products) {
-            const categories = new Set();
-            products.forEach(p => {
-                if (p.category) categories.add(p.category);
-            });
-            const sortedCategories = Array.from(categories).sort();
-            const currentCategory = labelsCategorySelect.value;
-            labelsCategorySelect.innerHTML = '<option value="all">Todas las Categorías</option>';
-            sortedCategories.forEach(cat => {
-                const option = document.createElement('option');
-                option.value = cat;
-                option.textContent = cat;
-                labelsCategorySelect.appendChild(option);
-            });
-            labelsCategorySelect.value = sortedCategories.includes(currentCategory) ? currentCategory : 'all';
-        }
-        labelsLocationSelect.addEventListener('change', updateLabelView);
-        labelsCategorySelect.addEventListener('change', updateLabelView);
-        function updateLabelView() {
-            const location = labelsLocationSelect.value;
-            const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
-            populateLabelCategories(selectedProducts);
-            const categoryFilter = labelsCategorySelect.value;
-            const filtered = selectedProducts.filter(p => categoryFilter === 'all' || p.category === categoryFilter);
-            labelsCountSpan.textContent = `${filtered.length} Productos seleccionados`;
-            if (labelsOutputDiv.children.length === 0 || labelsOutputDiv.children[0].tagName === 'P') {
-                labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Presiona "Generar e Imprimir Etiquetas" para crear ${filtered.length} etiquetas.</p>`;
-            }
-        }
-        window.generateAndPrintLabels = function() {
-            if (typeof QRCode === 'undefined') {
-                return alert("❌ Error: La librería QRCode no está cargada.");
-            }
-            const location = labelsLocationSelect.value;
-            const categoryFilter = labelsCategorySelect.value;
-            const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
-            const productsToPrint = selectedProducts.filter(p => 
-                categoryFilter === 'all' || p.category === categoryFilter
-            );
-            if (productsToPrint.length === 0) {
-                return alert("No hay productos que coincidan con el filtro seleccionado.");
-            }
-            labelsOutputDiv.innerHTML = '';
-            labelsOutputDiv.classList.add('labels-container');
-            const qrPromises = [];
-            productsToPrint.forEach((product, index) => {
-                const label = document.createElement('div');
-                label.className = 'label-tag border border-gray-400 p-1 flex items-center justify-start';
-                const tempDiv = document.createElement('div');
-                const infoBox = document.createElement('div');
-                infoBox.className = 'flex-grow text-xs text-black';
-                infoBox.style.color = '#000';
-                infoBox.style.fontFamily = 'sans-serif';
-                const productName = product.name.length > 30 ? product.name.substring(0, 27) + '...' : product.name;
-                infoBox.innerHTML = `
-                    <p style="font-weight: bold; font-size: 11px; margin: 0;">${productName}</p>
-                    <p style="font-size: 10px; margin: 0;">Cat: ${product.category || 'N/A'}</p>
-                    <p style="font-weight: bold; color: #10b981; font-size: 11px; margin: 0;">$${Number(product.price).toFixed(2)}</p>
-                    <p style="font-size: 9px; margin: 0;">Caja: ${product.box_number || 'N/A'}</p>
-                `;
-                const qrPromise = new Promise(resolve => {
-                    const qr = new QRCode(tempDiv, {
-                        text: product.id, 
-                        width: 100, 
-                        height: 100,
-                        colorDark : "#000000",
-                        colorLight : "#ffffff",
-                        correctLevel : QRCode.CorrectLevel.L
-                    });
-                    setTimeout(() => {
-                        const canvas = tempDiv.querySelector('canvas');
-                        if (canvas) {
-                            const imgUrl = canvas.toDataURL("image/png");
-                            const imgBox = document.createElement('div');
-                            imgBox.className = 'qr-box mr-2';
-                            const img = document.createElement('img');
-                            img.src = imgUrl;
-                            img.style.width = '30mm';
-                            img.style.height = '30mm';
-                            imgBox.appendChild(img);
-                            label.appendChild(imgBox);
-                            label.appendChild(infoBox);
-                            labelsOutputDiv.appendChild(label);
-                        }
-                        resolve();
-                    }, 100); 
-                });
-                qrPromises.push(qrPromise);
-            });
-            Promise.all(qrPromises).then(() => {
-                console.log("Todos los QR generados. Abriendo diálogo de impresión.");
-                window.print();
-                labelsOutputDiv.classList.remove('labels-container'); 
-            });
-        };
+
         // ============================================================================
         // == V. LÓGICA DE VISTAS                                                    ==
         // ============================================================================
