@@ -1115,8 +1115,10 @@
                         salePriceIn.value = Number(product.price).toFixed(2);
                         saleDateIn.value = new Date().toISOString().split('T')[0];
                         saleStatusInput.value = 'Pagado'; 
-                        recipientNameIn.focus(); // Enfocamos el campo de destinatario
+                        
                         alert(`✅ Producto "${product.name}" cargado en el formulario de Venta Principal. Continúa con el Destinatario y registra.`);
+                        recipientNameIn.focus(); // <-- Aseguramos el foco después de la alerta.
+
                     } else {
                         // Rellenar Formulario El Transito
                         toggleView('sales_el_transito'); // Cambio de vista a Ventas El Transito (CLAVE)
@@ -1127,9 +1129,11 @@
                         salePriceInET.value = Number(product.price).toFixed(2);
                         saleDateInET.value = new Date().toISOString().split('T')[0];
                         saleStatusInputET.value = 'Pagado'; 
-                        recipientNameInET.focus(); // Enfocamos el campo de destinatario
+                        
                         alert(`✅ Producto "${product.name}" cargado en el formulario de Venta El Transito. Continúa con el Destinatario y registra.`);
+                        recipientNameInET.focus(); // <-- Aseguramos el foco después de la alerta.
                     }
+                    
                     // Detenemos el escáner y cerramos la modal SOLO después de cargar la venta
                     closeScannerModal(); // <-- MOVIMIENTO CLAVE
                     // --- FIN CORRECCIÓN DE FLUJO DE VENTA ---
