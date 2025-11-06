@@ -49,8 +49,8 @@
                 padding: 0;
             }
             .labels-container > div {
-                width: 100mm;
-                height: 35mm;
+                width: 100mm; /* Ancho deseado de la etiqueta */
+                height: 35mm; /* Alto deseado de la etiqueta */
                 box-sizing: border-box;
                 border: 1px solid #ccc;
                 margin: 2mm;
@@ -64,6 +64,7 @@
             .labels-container .qr-box { margin-right: 10px; width: 35mm; height: 35mm; display: flex; justify-content: center; align-items: center; }
             .labels-container canvas, .labels-container img { width: 30mm !important; height: 30mm !important; }
             #qr-modal {
+                /* Forzamos fondo blanco para impresión de QR */
                 display: flex !important;
                 position: fixed;
                 top: 0; left: 0; right: 0; bottom: 0;
@@ -175,17 +176,17 @@
         /* ESTILOS FIJOS PARA ESTADOS DE VENTA */
         /********************************/
         .status-paid {
-            background-color: #16a34a !important;
+            background-color: #16a34a !important; /* Verde */
             color: #ffffff !important;
             border-color: #15803d !important;
         }
         .status-pending {
-            background-color: #f59e0b !important;
+            background-color: #f59e0b !important; /* Naranja/Amarillo */
             color: #1f2937 !important;
             border-color: #d97706 !important;
         }
         .status-returned {
-            background-color: #dc2626 !important;
+            background-color: #dc2626 !important; /* Rojo */
             color: #ffffff !important;
             border-color: #b91c1c !important;
         }
@@ -208,7 +209,7 @@
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
-<body class="" onclick="closeSettingsDropdown(event)">
+<body class="" onclick="closeSettingsDropdown(event)"> 
     <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
         <div class="flex items-center space-x-4">
             <img 
@@ -618,7 +619,6 @@
             console.error("Error Crítico: La librería Supabase no se ha cargado.");
         }
         const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
-
         // --- INICIO DE LÓGICA DE TEMAS Y DROPDOWN ---
         const themeSelector = document.getElementById('theme-selector');
         const root = document.documentElement;
@@ -649,7 +649,6 @@
             }
         };
         // --- FIN DE LÓGICA DE TEMAS Y DROPDOWN ---
-
         const PRODUCTS_TABLE = "products";
         const PRODUCTS_EL_TRANSITO_TABLE = "products_el_transito";
         const SALES_TABLE = "sales";
@@ -662,7 +661,6 @@
             'Pendiente': 'status-pending', 
             'Devuelto': 'status-returned' 
         };
-
         // Elementos del DOM (Inventario y Formulario de Agregar)
         const form = document.getElementById("product-form"), nameIn = document.getElementById("name"), categoryIn = document.getElementById("category-select"), priceIn = document.getElementById("price"), qtyIn = document.getElementById("quantity"), imageIn = document.getElementById("image"), status = document.getElementById("status"), productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader"), boxNumberIn = document.getElementById("box-number");
         const formET = document.getElementById("product-form-et"), nameInET = document.getElementById("name-et"), categoryInET = document.getElementById("category-select-et"), priceInET = document.getElementById("price-et"), qtyInET = document.getElementById("quantity-et"), imageInET = document.getElementById("image-et"), statusET = document.getElementById("status-et"), productsElET = document.getElementById("products-et"), totalCountET = document.getElementById("total-count-et"), searchInputET = document.getElementById("search-input-et"), productsLoaderET = document.getElementById("products-loader-et"), boxNumberInET = document.getElementById("box-number-et");
@@ -682,7 +680,6 @@
         // Datos Locales
         let allProducts = [], allProductsElTransito = [], allSales = [], allSalesElTransito = [], allMissingProducts = [], allTools = [], selectedLogoFile = null;
         let editingToolId = null; 
-
         // ============================================================================
         // == I. LÓGICA DE EDICIÓN DE PRODUCTO (MODAL)                              ==
         // ============================================================================
@@ -700,7 +697,6 @@
         let currentEditingProduct = null;
         let isMainInventory = true;
         let selectedProductImageFile = null;
-
         window.openProductEditorModal = async function(id, isMain) {
             isMainInventory = isMain;
             const table = isMain ? PRODUCTS_TABLE : PRODUCTS_EL_TRANSITO_TABLE;
@@ -738,7 +734,6 @@
             modalImagePreview.src = imageUrl;
             modal.classList.remove('hidden');
         };
-
         window.closeProductEditorModal = function() {
             modal.classList.add('hidden');
             modalStatus.textContent = '';
@@ -746,7 +741,6 @@
             selectedProductImageFile = null;
             modalBoxNumberIn.value = '';
         };
-
         modalImageUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -756,7 +750,6 @@
                 reader.readAsDataURL(file);
             }
         });
-
         modalForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentEditingProduct || !supabase) return;
@@ -790,7 +783,6 @@
                 }
                 const { error: updateError } = await supabase.from(table).update(updatePayload).eq("id", id);
                 if (updateError) throw updateError;
-
                 Object.assign(currentEditingProduct, updatePayload);
                 const needsFullRender = (oldProduct.category !== newCategory) || (oldProduct.name !== newName) || (oldProduct.box_number !== newBoxNumber);
                 if (needsFullRender) {
@@ -815,7 +807,6 @@
                 modalSaveButton.textContent = 'Guardar Cambios';
             }
         });
-
         // ============================================================================
         // == II. LÓGICA DE QR GENERATOR (Fase 1)                                   ==
         // ============================================================================
@@ -823,7 +814,6 @@
         const qrCodeContainer = document.getElementById('qr-code-container');
         const qrProductInfo = document.getElementById('qr-product-info');
         let currentQrCanvas = null;
-
         window.openQrModal = function() {
             if (!currentEditingProduct || !currentEditingProduct.id) {
                 alert("Error: No hay producto seleccionado para generar el QR.");
@@ -862,11 +852,9 @@
             }
             qrModal.classList.remove('hidden');
         };
-
         window.closeQrModal = function() {
             qrModal.classList.add('hidden');
         };
-
         window.downloadQrCode = function() {
             if (!currentQrCanvas || !currentEditingProduct) {
                 alert("Error: No se ha generado el QR para descargar.");
@@ -886,16 +874,14 @@
                 alert("❌ Error al descargar el QR.");
             }
         };
-
         // ============================================================================
-        // == III. LÓGICA DE ESCÁNER DE CÓDIGO DE BARRAS/QR (CORREGIDO)             ==
+        // == III. LÓGICA DE ESCÁNER DE CÓDIGO DE BARRAS/QR (CORREGIDO PARCIALMENTE) ==
         // ============================================================================
         const scannerModal = document.getElementById('scanner-modal');
         const scannerStatusEl = document.getElementById('scanner-status');
         let html5QrcodeScanner = null;
         let scanSuccessHandled = false;
         let isScannerRunning = false;
-
         window.openScannerModal = async function() {
             if (isScannerRunning) return;
             if (typeof Html5QrcodeScanner === 'undefined') {
@@ -921,15 +907,10 @@
                 },
                 false
             );
-
             const onScanSuccess = async (decodedText, decodedResult) => {
                 if (scanSuccessHandled) return;
                 scanSuccessHandled = true; 
                 scannerStatusEl.textContent = `Código detectado: ${decodedText}. Procesando...`;
-
-                // ✅ CERRAR MODAL ANTES DE CUALQUIER OTRA ACCIÓN
-                closeScannerModal();
-
                 try {
                     const scannedId = String(decodedText).trim();
                     console.log(`[SCANNER LOG] Código escaneado (ID): ${scannedId}`);
@@ -950,8 +931,8 @@
                         salePriceIn.value = Number(product.price).toFixed(2);
                         saleDateIn.value = new Date().toISOString().split('T')[0];
                         saleStatusInput.value = 'Pagado';
-                        console.log(`✅ Producto "${product.name}" cargado en Venta Principal.`);
-                        setTimeout(() => recipientNameIn.focus(), 100);
+                        alert(`✅ Producto "${product.name}" cargado en Venta Principal.`);
+                        recipientNameIn.focus();
                     } else {
                         toggleView('sales_el_transito');
                         recipientNameInET.value = '';
@@ -960,15 +941,16 @@
                         salePriceInET.value = Number(product.price).toFixed(2);
                         saleDateInET.value = new Date().toISOString().split('T')[0];
                         saleStatusInputET.value = 'Pagado';
-                        console.log(`✅ Producto "${product.name}" cargado en Venta El Transito.`);
-                        setTimeout(() => recipientNameInET.focus(), 100);
+                        alert(`✅ Producto "${product.name}" cargado en Venta El Transito.`);
+                        recipientNameInET.focus();
                     }
+                    closeScannerModal();
                 } catch (error) {
                     console.error("Error al procesar escaneo:", error);
+                    closeScannerModal();
                     alert(`❌ Error en Escaneo: ${error.message}`);
                 }
             };
-
             const onScanError = (errorMessage) => {
                  if (!scanSuccessHandled) {
                     if (errorMessage.includes("QR code parse error") || errorMessage.includes("-D")) {
@@ -979,10 +961,8 @@
                     }
                  }
             };
-
             html5QrcodeScanner.render(onScanSuccess, onScanError);
         };
-
         window.closeScannerModal = function() {
             scannerModal.classList.add('hidden');
             scannerStatusEl.textContent = 'Esperando código QR o de barras...';
@@ -1002,7 +982,6 @@
             isScannerRunning = false;
             scanSuccessHandled = false; 
         };
-
         // ============================================================================
         // == IV. LÓGICA DE GENERACIÓN DE ETIQUETAS MASIVAS                         ==
         // ============================================================================
@@ -1010,7 +989,6 @@
         const labelsCategorySelect = document.getElementById('labels-category');
         const labelsOutputDiv = document.getElementById('labels-output');
         const labelsCountSpan = document.getElementById('labels-count');
-
         function populateLabelCategories(products) {
             const categories = new Set();
             products.forEach(p => {
@@ -1027,10 +1005,8 @@
             });
             labelsCategorySelect.value = sortedCategories.includes(currentCategory) ? currentCategory : 'all';
         }
-
         labelsLocationSelect.addEventListener('change', updateLabelView);
         labelsCategorySelect.addEventListener('change', updateLabelView);
-
         function updateLabelView() {
             const location = labelsLocationSelect.value;
             const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
@@ -1042,7 +1018,6 @@
                  labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Presiona "Generar e Imprimir Etiquetas" para crear ${filtered.length} etiquetas.</p>`;
             }
         }
-
         window.generateAndPrintLabels = function() {
             if (typeof QRCode === 'undefined') {
                 return alert("❌ Error: La librería QRCode no está cargada.");
@@ -1109,7 +1084,6 @@
                 labelsOutputDiv.classList.remove('labels-container'); 
             });
         };
-
         // ============================================================================
         // == V. LÓGICA DE VISTAS                                                  ==
         // ============================================================================
@@ -1122,7 +1096,6 @@
             missing: { el: document.getElementById('missing-view'), title: 'Vista: Productos Faltantes' },
             tools: { el: document.getElementById('tools-view'), title: 'Vista: Herramientas y Tutoriales' } 
         };
-
         function toggleView(viewName) { 
             Object.keys(views).forEach(key => { 
                 const isCurrent = key === viewName; 
@@ -1140,7 +1113,6 @@
                 updateLabelView();
             }
         }
-
         function showSkeletonLoaders() { 
             const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div><div class="h-4 w-1/2 skeleton-line"></div><div class="h-8 w-1/4 skeleton-line"></div></div>`).join('');
             productsLoader.innerHTML = cardSkeleton;
@@ -1151,7 +1123,6 @@
             salesListLoaderET.innerHTML = tableSkeleton;
             missingListLoader.innerHTML = tableSkeleton; 
         }
-
         // VENTAS
         function filterAndRenderSales() {
             const term = (searchSalesInput.value || "").toLowerCase().trim();
@@ -1168,7 +1139,6 @@
             }
             renderSales(filtered);
         }
-
         function filterAndRenderSalesET() {
             const term = (searchSalesInputET.value || "").toLowerCase().trim();
             const pendingOnly = pendingOnlyCheckboxET.checked;
@@ -1184,7 +1154,6 @@
             }
             renderSalesElTransito(filtered);
         }
-
         function updateGeneralTotals(filteredArray, isMainSales) {
             const idSuffix = isMainSales ? '' : '-et'; 
             const totalSoldEl = document.getElementById(`total-sold-amount${idSuffix}`);
@@ -1201,7 +1170,6 @@
             const baseArray = isMainSales ? allSales : allSalesElTransito;
             if(countEl) countEl.textContent = `${filteredArray.length} de ${baseArray.length} ventas`;
         }
-
         function createSaleRowHTML(sale, isMainSales) {
             const idSuffix = isMainSales ? '' : '-et'; 
             const currentStatus = sale.status || 'Pendiente';
@@ -1219,7 +1187,6 @@
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="${deleteFn}('${sale.id}')" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td>
                 </tr>`;
         }
-
         function renderSales(items) {
             salesListLoader.innerHTML = "";
             salesListContainer.innerHTML = ""; 
@@ -1262,7 +1229,6 @@
             });
             salesListContainer.innerHTML = fullHTML;
         }
-
         function renderSalesElTransito(items) {
             salesListLoaderET.innerHTML = "";
             salesListContainerET.innerHTML = ""; 
@@ -1305,7 +1271,6 @@
             });
             salesListContainerET.innerHTML = fullHTML;
         }
-
         // PRODUCTOS
         async function fetchProducts() { 
             if (!supabase) return;
@@ -1315,9 +1280,7 @@
             filterAndRenderProducts(); 
             updateAutocompleteList(allProducts, inventorySuggestions);
         }
-
         function filterAndRenderProducts() { const term = (searchInput.value || "").toLowerCase().trim(); const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProducts(filtered); }
-
         function renderProducts(items) { 
             productsLoader.innerHTML = ""; 
             productsEl.innerHTML = ""; 
@@ -1362,7 +1325,6 @@
                 productsEl.appendChild(section); 
             }); 
         }
-
         function updateProductCardInDOM(product, isMainInventory) {
             const idSuffix = isMainInventory ? '' : '-et'; 
             const elementPrefix = 'product-';
@@ -1385,7 +1347,6 @@
                 imgEl.alt = product.name; 
             }
         }
-
         window.deleteProduct = async function(id) { 
             if (!confirm("¿Eliminar este producto?")) return; 
             if (!supabase) return alert("❌ Error: Supabase no está cargado.");
@@ -1399,7 +1360,6 @@
                 updateLabelView();
             }
         }
-
         async function fetchProductsET() { 
             if (!supabase) return;
             const { data, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
@@ -1409,9 +1369,7 @@
             updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             if (labelsLocationSelect.value === 'et') populateLabelCategories(allProductsElTransito);
         }
-
         function filterAndRenderProductsET() { const term = (searchInputET.value || "").toLowerCase().trim(); const filtered = allProductsElTransito.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProductsET(filtered); }
-
         function renderProductsET(items) { 
             productsLoaderET.innerHTML = ""; 
             productsElET.innerHTML = ""; 
@@ -1456,7 +1414,6 @@
                 productsElET.appendChild(section); 
             }); 
         }
-
         window.deleteProductET = async function(id) { 
             if (!confirm("¿Eliminar este producto de Inventario El Transito?")) return; 
             if (!supabase) return alert("❌ Error: Supabase no está cargado.");
@@ -1470,7 +1427,6 @@
                 updateLabelView();
             }
         }
-
         function updateAutocompleteList(productsArray, datalistElement) {
             datalistElement.innerHTML = '';
             const sortedProducts = [...productsArray].sort((a, b) => a.name.localeCompare(b.name));
@@ -1480,7 +1436,6 @@
                 datalistElement.appendChild(option);
             });
         }
-
         function getCleanProductName(inputName) {
             const match = inputName.match(/^(.*?)\s+\((.*?)$/);
             if (match) {
@@ -1488,7 +1443,6 @@
             }
             return inputName.trim();
         }
-
         async function updateProductStock(productName, table, localArray, delta) {
             const productToUpdate = localArray.find(p => getCleanProductName(p.name).trim() === productName.trim());
             if (productToUpdate) {
@@ -1521,7 +1475,6 @@
                 console.warn(`ℹ️ Producto no encontrado en inventario por nombre exacto: ${productName}. No se modificó stock.`);
             }
         }
-
         async function uploadImage(file) {
             if (!file || !supabase) return null;
             const formData = new FormData();
@@ -1536,7 +1489,6 @@
             }
             return data.url; 
         }
-
         // LOGO
         const LOGO_CONFIG_KEY = "current_logo_url";
         async function loadLogo() {
@@ -1558,7 +1510,6 @@
                 console.error("Error en loadLogo:", err);
             }
         }
-
         logoUpload.addEventListener("change", (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -1569,7 +1520,6 @@
                 logoSaveButton.disabled = false;
             }
         });
-
         logoSaveButton.addEventListener("click", async () => {
             if (!selectedLogoFile || !supabase) return alert("❌ Error: Supabase no está cargado.");
             logoSaveButton.disabled = true;
@@ -1593,7 +1543,6 @@
                 logoSaveButton.textContent = "Guardar Logo";
             }
         });
-
         // HERRAMIENTAS
         async function fetchTools() {
             if (!supabase) return;
@@ -1602,7 +1551,6 @@
             allTools = data;
             renderTools(allTools);
         }
-
         function renderTools(items) {
             toolsLoader.innerHTML = "";
             toolsListEl.innerHTML = "";
@@ -1615,8 +1563,8 @@
                 const card = document.createElement("div");
                 card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col tool-card border border-gray-700 relative";
                 const imageUrl = tool.image_url ? `${tool.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/6366f1/ffffff?text=Tutorial`;
-                const descriptionHtml = tool.description ? `<p class="text-gray-400 text-sm mt-2 flex-grow">${tool.description.replace(/
-/g, '<br>')}</p>` : '<div class="flex-grow"></div>';
+                // ✅ CORRECCIÓN AQUÍ: se usa /\n/g en lugar de una expresión rota
+                const descriptionHtml = tool.description ? `<p class="text-gray-400 text-sm mt-2 flex-grow">${tool.description.replace(/\n/g, '<br>')}</p>` : '<div class="flex-grow"></div>';
                 card.innerHTML = `
                     <div class="h-48 bg-gray-700 rounded flex items-center justify-center mb-3 overflow-hidden">
                         <img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${tool.title}">
@@ -1630,12 +1578,10 @@
                 toolsListEl.appendChild(card);
             });
         }
-
         window.editToolImage = async function(id) {
             editingToolId = id;
             toolImageEditorInput.click();
         }
-
         window.deleteTool = async function(id) {
             if (!confirm("¿Estás seguro de que quieres eliminar esta herramienta?")) return;
             if (!supabase) return alert("❌ Error: Supabase no está cargado.");
@@ -1647,7 +1593,6 @@
                 renderTools(allTools);
             }
         }
-
         // REALTIME
         function handleRealtimePayload(payload, localArray, renderFunction, idKey = 'id') {
             if (!supabase) return;
@@ -1759,7 +1704,6 @@
             }
             renderFunction(localArray); 
         }
-
         function initializeRealtimeSubscriptions() {
             if (!supabase) return;
             console.log("📡 Inicializando suscripciones en tiempo real...");
@@ -1789,9 +1733,7 @@
                     (payload) => handleRealtimePayload(payload, allTools, renderTools, 'id')
                 ).subscribe((status, err) => console.log(`Canal ${TOOLS_TABLE}: ${status}`, err || ''));
         }
-
         function setStatusMessage(el, msg, success = true) { el.textContent = msg; el.className = `text-sm mt-3 ${success ? 'text-green-400' : 'text-red-400'}`; setTimeout(() => (el.textContent = ""), 3000); }
-
         // EVENTOS
         searchInput.addEventListener("input", filterAndRenderProducts);
         searchInputET.addEventListener("input", filterAndRenderProductsET);
@@ -1799,7 +1741,6 @@
         pendingOnlyCheckbox.addEventListener("change", filterAndRenderSales);
         searchSalesInputET.addEventListener("input", filterAndRenderSalesET);
         pendingOnlyCheckboxET.addEventListener("change", filterAndRenderSalesET);
-
         form.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("submit"); 
@@ -1820,7 +1761,6 @@
                 submitBtn.disabled = false; 
             } 
         });
-
         formET.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("submit-et"); 
@@ -1841,7 +1781,6 @@
                 submitBtn.disabled = false; 
             } 
         });
-
         missingProductForm.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("missing-product-submit"); 
@@ -1860,7 +1799,6 @@
                 submitBtn.disabled = false; 
             } 
         });
-
         toolForm.addEventListener("submit", async (ev) => {
             ev.preventDefault();
             const submitBtn = document.getElementById("tool-submit");
@@ -1881,7 +1819,6 @@
                 submitBtn.disabled = false;
             }
         });
-
         salesForm.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("sale-submit"); 
@@ -1897,11 +1834,7 @@
                     sale_date: saleDateIn.value,
                     status: saleStatusInput.value
                 };
-                const { data: insertedSale, error: saleError } = await supabase
-                    .from(SALES_TABLE)
-                    .insert(newSale)
-                    .select()
-                    .single();
+                const { data: insertedSale, error: saleError } = await supabase.from(SALES_TABLE).insert(newSale).select().single();
                 if (saleError) throw saleError;
                 if (newSale.status === 'Pagado') {
                     await updateProductStock(soldProductName, PRODUCTS_TABLE, allProducts, -1);
@@ -1916,7 +1849,6 @@
                 submitBtn.disabled = false; 
             } 
         });
-
         salesFormET.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("sale-submit-et"); 
@@ -1932,11 +1864,7 @@
                     sale_date: saleDateInET.value,
                     status: saleStatusInputET.value
                 };
-                const { data: insertedSale, error: saleErrorET } = await supabase
-                    .from(SALES_EL_TRANSITO_TABLE)
-                    .insert(newSaleET)
-                    .select()
-                    .single();
+                const { data: insertedSale, error: saleErrorET } = await supabase.from(SALES_EL_TRANSITO_TABLE).insert(newSaleET).select().single();
                 if (saleErrorET) throw saleErrorET;
                 if (newSaleET.status === 'Pagado') {
                     await updateProductStock(soldProductNameET, PRODUCTS_EL_TRANSITO_TABLE, allProductsElTransito, -1);
@@ -1951,7 +1879,6 @@
                 submitBtn.disabled = false; 
             } 
         });
-
         toolImageEditorInput.addEventListener('change', async (event) => {
             if (!editingToolId) return; 
             const file = event.target.files[0];
@@ -1974,9 +1901,7 @@
                 if(editButton) editButton.textContent = originalButtonText; 
             }
         });
-
         document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', () => toggleView(btn.dataset.view)));
-
         // --- CARGA INICIAL ---
         window.addEventListener("load", async () => {
             themeSelector.value = root.className || 'theme-dark'; 
