@@ -1577,18 +1577,19 @@
             selectedProductImageFile = null;
             modalStatus.textContent = '';
             
+            // 1. Determinar el array de productos y buscar el producto por ID
             const productArray = isMain ? allProducts : allProductsElTransito;
             const product = productArray.find(p => p.id === productId);
 
             if (!product) {
-                alert("Error: Producto no encontrado.");
+                alert("Error: Producto no encontrado en el inventario local. Intente recargar la página.");
                 return;
             }
 
             currentEditingProduct = product;
             isMainInventory = isMain;
 
-            // 1. Llenar campos del modal
+            // 2. Llenar campos del modal
             modalName.value = product.name;
             modalCategory.value = product.category || 'Otros';
             modalPrice.value = Number(product.price).toFixed(2);
@@ -1596,14 +1597,13 @@
             modalBoxNumber.value = product.box_number || '';
             modalLocation.textContent = isMain ? 'Inventario Principal' : 'Inventario El Transito';
 
-            // 2. Cargar imagen de previsualización
+            // 3. Cargar imagen de previsualización
+            // Añadimos un timestamp para forzar la recarga de la imagen si se ha actualizado
             const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
             modalImagePreview.src = imageUrl;
             
-            // 3. Limpiar el input file por si acaso
+            // 4. Limpiar el input file y mostrar modal
             modalImageUpload.value = '';
-
-            // 4. Mostrar modal
             modal.classList.remove('hidden');
         }
 
