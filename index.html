@@ -644,7 +644,7 @@
         let editingToolId = null; 
         let currentEditingProduct = null;
         let isMainInventory = true;
-        let selectedProductImageFile = null;
+        let selectedProductImageFile = null; // Variable para almacenar el archivo de imagen a subir en el modal de edición
 
         // --- Elementos de Configuración General ---
         const themeSelector = document.getElementById('theme-selector');
@@ -692,6 +692,18 @@
         let html5QrcodeScanner = null;
         let scanSuccessHandled = false;
         let isScannerRunning = false;
+        
+        // --- Elementos del Modal de Edición de Producto ---
+        const modalProductForm = document.getElementById('modal-product-form');
+        const modalName = document.getElementById('modal-name');
+        const modalCategory = document.getElementById('modal-category');
+        const modalPrice = document.getElementById('modal-price');
+        const modalQuantity = document.getElementById('modal-quantity');
+        const modalBoxNumber = document.getElementById('modal-box-number');
+        const modalLocation = document.getElementById('modal-location');
+        const modalImagePreview = document.getElementById('modal-image-preview');
+        const modalImageUpload = document.getElementById('modal-image-upload');
+        const modalStatus = document.getElementById('modal-status');
 
 
         // ============================================================================
@@ -1555,8 +1567,122 @@
         }
 
         // ============================================================================
-        // == VI. LÓGICA DE MODALES (QR y Scanner)                                   ==
+        // == VI. LÓGICA DE MODALES (QR, Scanner y EDITOR)                             ==
         // ============================================================================
+
+        // --- Lógica del Editor de Producto (Modal) ---
+        
+        window.openProductEditorModal = function(productId, isMain) {
+            currentEditingProduct = null;
+            selectedProductImageFile = null;
+            modalStatus.textContent = '';
+            
+            const productArray = isMain ? allProducts : allProductsElTransito;
+            const product = productArray.find(p => p.id === productId);
+
+            if (!product) {
+                alert("Error: Producto no encontrado.");
+                return;
+            }
+
+            currentEditingProduct = product;
+            isMainInventory = isMain;
+
+            // 1. Llenar campos del modal
+            modalName.value = product.name;
+            modalCategory.value = product.category || 'Otros';
+            modalPrice.value = Number(product.price).toFixed(2);
+            modalQuantity.value = product.quantity;
+            modalBoxNumber.value = product.box_number || '';
+            modalLocation.textContent = isMain ? 'Inventario Principal' : 'Inventario El Transito';
+
+            // 2. Cargar imagen de previsualización
+            const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
+            modalImagePreview.src = imageUrl;
+            
+            // 3. Limpiar el input file por si acaso
+            modalImageUpload.value = '';
+
+            // 4. Mostrar modal
+            modal.classList.remove('hidden');
+        }
+
+        window.closeProductEditorModal = function() {
+            modal.classList.add('hidden');
+            modalProductForm.reset();
+            selectedProductImageFile = null;
+        }
+
+        modalImageUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                selectedProductImageFile = file;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    modalImagePreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        modalProductForm.addEventListener('submit', async (ev) => {
+            ev.preventDefault();
+            const saveButton = document.getElementById('modal-save-button');
+            saveButton.disabled = true;
+            modalStatus.textContent = 'Guardando cambios...';
+
+            if (!supabase || !currentEditingProduct) {
+                modalStatus.textContent = 'Error: Supabase o producto no cargado.';
+                saveButton.disabled = false;
+                return;
+            }
+
+            const table = isMainInventory ? PRODUCTS_TABLE : PRODUCTS_EL_TRANSITO_TABLE;
+            let newImageUrl = currentEditingProduct.image_url;
+            let updatePayload = {};
+
+            try {
+                // 1. Subir nueva imagen si se seleccionó un archivo
+                if (selectedProductImageFile) {
+                    modalStatus.textContent = 'Subiendo nueva imagen...';
+                    newImageUrl = await uploadImage(selectedProductImageFile);
+                }
+
+                // 2. Preparar payload de actualización
+                updatePayload = {
+                    name: modalName.value,
+                    category: modalCategory.value,
+                    price: parseFloat(modalPrice.value),
+                    quantity: parseInt(modalQuantity.value),
+                    box_number: modalBoxNumber.value.trim() || null,
+                    image_url: newImageUrl
+                };
+
+                // 3. Actualizar en Supabase
+                modalStatus.textContent = 'Actualizando registro en la base de datos...';
+                const { error } = await supabase
+                    .from(table)
+                    .update(updatePayload)
+                    .eq('id', currentEditingProduct.id);
+                
+                if (error) throw error;
+
+                // 4. Actualizar localmente y en el DOM (Realtime debería hacer esto, pero por robustez)
+                Object.assign(currentEditingProduct, updatePayload);
+                updateProductCardInDOM(currentEditingProduct, isMainInventory);
+                
+                modalStatus.textContent = 'Producto actualizado con éxito. ✅';
+                setTimeout(closeProductEditorModal, 1000);
+
+            } catch (err) {
+                console.error("Error al guardar cambios del producto:", err);
+                modalStatus.textContent = 'Error al actualizar: ' + err.message;
+            } finally {
+                saveButton.disabled = false;
+            }
+        });
+
+        // --- Lógica del QR Modal ---
 
         window.openQrModal = function() {
             if (!currentEditingProduct || !currentEditingProduct.id) {
@@ -1621,8 +1747,9 @@
 
 
         // ============================================================================
-        // == VIII. NUEVA FUNCIÓN: Registro de Venta Escaneada (CRÍTICA PARA ARREGLO) ==
+        // == VIII. LÓGICA DEL ESCÁNER Y REGISTRO DE VENTA AUTOMÁTICA                 ==
         // ============================================================================
+        
         async function registerScannedSale(product, isMainInventory) {
             if (!supabase) return alert("❌ Error: Supabase no está cargado.");
             const salesTable = isMainInventory ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
@@ -1806,8 +1933,9 @@
             scanSuccessHandled = false; 
         };
 
+
         // ============================================================================
-        // == VII. EVENT LISTENERS Y CARGA INICIAL                                   ==
+        // == IX. EVENT LISTENERS Y CARGA INICIAL                                   ==
         // ============================================================================
         
         // --- Event Listeners ---
