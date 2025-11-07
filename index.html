@@ -611,7 +611,7 @@
         // =================================================================================
         const createClient = window.supabase ? window.supabase.createClient : null;
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImex"
         let supabase = null;
         if (createClient) {
             supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1853,15 +1853,19 @@
             const onScanSuccess = async (decodedText, decodedResult) => {
                 if (scanSuccessHandled) return;
                 scanSuccessHandled = true; 
-                scannerStatusEl.textContent = `Código detectado: ${decodedText}. Procesando...`;
                 
-                await closeScannerModal(false); 
+                await closeScannerModal(false); // Detener el escáner inmediatamente
 
                 try {
                     const scannedId = String(decodedText).trim();
                     console.log(`[SCANNER LOG] Código escaneado (ID): ${scannedId}`);
                     
-                    const product = allProducts.find(p => p.id === scannedId) || allProductsElTransito.find(p => p.id === scannedId);
+                    // VALIDACIÓN DE ID: Si el ID está vacío, forzar un error.
+                    if (!scannedId || scannedId === "") {
+                        throw new Error(`El código QR escaneado es inválido o no contiene un ID de producto.`);
+                    }
+
+                    const product = allProducts.find(p => String(p.id).trim() === scannedId) || allProductsElTransito.find(p => String(p.id).trim() === scannedId);
                     
                     if (!product) {
                         throw new Error(`El producto con ID "${scannedId}" no existe en el inventario.`);
@@ -1871,11 +1875,11 @@
                         throw new Error(`Stock insuficiente: El producto "${product.name}" tiene 0 unidades disponibles.`);
                     }
                     
-                    console.log(`[SCANNER LOG] Producto encontrado: ${product.name} (Inventario: ${allProducts.some(p => p.id === scannedId) ? 'Principal' : 'El Transito'})`);
+                    const isMainInventory = allProducts.some(p => String(p.id).trim() === scannedId);
                     
-                    const isMainInventory = allProducts.some(p => p.id === scannedId);
+                    console.log(`[SCANNER LOG] Producto encontrado: ${product.name} (Inventario: ${isMainInventory ? 'Principal' : 'El Transito'})`);
                     
-                    // 1. Cargar datos en el formulario para revisión (y si hay nombre de cliente pre-escrito)
+                    // 1. Cargar datos en el formulario y cambiar a la vista de ventas
                     if (isMainInventory) {
                         toggleView('sales');
                         const productNameWithCategory = product.name + (product.category ? ` (${product.category})` : '');
@@ -1883,6 +1887,7 @@
                         salePriceIn.value = Number(product.price).toFixed(2);
                         saleDateIn.value = new Date().toISOString().split('T')[0];
                         saleStatusInput.value = 'Pagado';
+                        // ENFOCAR AL DESTINATARIO
                         recipientNameIn.focus();
                     } else {
                         toggleView('sales_el_transito');
@@ -1891,28 +1896,26 @@
                         salePriceInET.value = Number(product.price).toFixed(2);
                         saleDateInET.value = new Date().toISOString().split('T')[0];
                         saleStatusInputET.value = 'Pagado';
+                        // ENFOCAR AL DESTINATARIO
                         recipientNameInET.focus();
                     }
                     
-                    // 2. Ejecutar la lógica de registro de venta y descuento de stock (¡El Fix!)
+                    // 2. Registrar la venta y descontar stock automáticamente
                     await registerScannedSale(product, isMainInventory); 
 
                 } catch (error) {
                     console.error("Error al procesar escaneo:", error);
                     alert(`❌ Error en Escaneo: ${error.message}`);
+                    scanSuccessHandled = false; // Re-habilitar si se quiere volver a intentar sin cerrar el modal
                 }
             };
 
             const onScanError = (errorMessage) => {
-                if (!scanSuccessHandled) {
-                    if (errorMessage.includes("QR code parse error") || errorMessage.includes("-D")) {
-                        scannerStatusEl.textContent = 'Escaneando... Apunta el código QR al centro.';
-                    }
-                    else if (errorMessage.includes("No camera found")) {
+                if (!scanSuccessHandled && !errorMessage.includes("code parse error") && !errorMessage.includes("-D")) {
+                     if (errorMessage.includes("No camera found")) {
                         scannerStatusEl.textContent = 'Error: No se detectó ninguna cámara. Asegúrate de dar permiso.';
-                    }
-                    else if (!errorMessage.includes("code parse error")) {
-                        scannerStatusEl.textContent = `Escaneando... (Error: ${errorMessage.slice(0, 30)}...)`;
+                    } else {
+                        scannerStatusEl.textContent = 'Escaneando... Apunta el código QR al centro.';
                     }
                 }
             };
