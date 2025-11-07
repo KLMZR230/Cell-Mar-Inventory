@@ -47,6 +47,8 @@
                 min-height: 100vh;
                 margin: 0;
                 padding: 0;
+                /* Forzar fondo blanco para el área de etiquetas */
+                background-color: white !important;
             }
             .labels-container > div {
                 width: 100mm; /* Ancho deseado de la etiqueta */
@@ -60,11 +62,13 @@
                 align-items: center;
                 justify-content: flex-start;
                 page-break-after: avoid;
+                /* Asegurar que el fondo de cada etiqueta es blanco */
+                background-color: white !important;
             }
             .labels-container .qr-box { margin-right: 10px; width: 35mm; height: 35mm; display: flex; justify-content: center; align-items: center; }
             .labels-container canvas, .labels-container img { width: 30mm !important; height: 30mm !important; }
             #qr-modal {
-                /* Forzamos fondo blanco para impresión de QR */
+                /* Forzamos fondo blanco para impresión de QR individual */
                 display: flex !important;
                 position: fixed;
                 top: 0; left: 0; right: 0; bottom: 0;
@@ -1711,14 +1715,16 @@
             qrCodeContainer.innerHTML = ''; 
             currentQrCanvas = null;
             qrProductInfo.textContent = `Producto: ${productName} (ID: ${productId})`;
+            
             if (typeof QRCode !== 'undefined') {
                 const tempDiv = document.createElement('div');
+                // Aseguramos que el QR se genera con fondo blanco (colorLight) para impresión
                 new QRCode(tempDiv, {
                     text: productId,
                     width: 256,
                     height: 256,
                     colorDark : "#000000",
-                    colorLight : "#ffffff",
+                    colorLight : "#ffffff", // Fondo blanco
                     correctLevel : QRCode.CorrectLevel.H
                 });
                 setTimeout(() => {
@@ -1862,14 +1868,14 @@
                     const scannedId = String(decodedText).trim();
                     console.log(`[SCANNER LOG] Código escaneado (ID): ${scannedId}`);
                     
-                    // --- Detener y cerrar el modal ANTES de procesar, para evitar errores visuales ---
-                    scanSuccessHandled = true; 
-                    await closeScannerModal(true); 
-
                     // VALIDACIÓN DE ID: Si el ID está vacío, forzar un error.
                     if (!scannedId || scannedId === "") {
                         throw new Error(`El código QR escaneado es inválido o no contiene un ID de producto.`);
                     }
+
+                    // --- Detener y cerrar el modal ANTES de procesar, para evitar errores visuales ---
+                    scanSuccessHandled = true; 
+                    await closeScannerModal(true); 
 
                     // Búsqueda del producto, asegurando la comparación de strings
                     const product = allProducts.find(p => String(p.id).trim() === scannedId) || allProductsElTransito.find(p => String(p.id).trim() === scannedId);
@@ -1893,7 +1899,7 @@
                         productNameSoldIn.value = productNameWithCategory;
                         salePriceIn.value = Number(product.price).toFixed(2);
                         saleDateIn.value = new Date().toISOString().split('T')[0];
-                        saleStatusInput.value = 'Pendiente'; // Se cambia a Pendiente para que el usuario pueda ingresar el destinatario y luego registrar la venta, para ventas de crédito
+                        saleStatusInput.value = 'Pendiente'; // Se cambia a Pendiente para que el usuario pueda ingresar el destinatario
                         // ENFOCAR AL DESTINATARIO
                         recipientNameIn.focus();
                     } else {
@@ -1907,9 +1913,7 @@
                         recipientNameInET.focus();
                     }
                     
-                    // 2. Si el cliente tiene la opción de registrar la venta como pendiente (para poner el nombre), no se llama a registerScannedSale aquí.
-                    // Si la quieres automática, puedes descomentar la siguiente línea.
-                    // await registerScannedSale(product, isMainInventory); 
+                    // 2. La venta se registra manualmente al presionar "Registrar Venta" en el formulario.
 
                 } catch (error) {
                     console.error("Error al procesar escaneo:", error);
@@ -2193,7 +2197,10 @@
             const qrPromises = [];
             productsToPrint.forEach((product, index) => {
                 const label = document.createElement('div');
-                label.className = 'label-tag border border-gray-400 p-1 flex items-center justify-start';
+                // Aseguramos el fondo blanco de la etiqueta en la previsualización del DOM
+                label.className = 'label-tag border border-gray-400 p-1 flex items-center justify-start'; 
+                label.style.backgroundColor = 'white'; 
+                
                 const tempDiv = document.createElement('div');
                 const infoBox = document.createElement('div');
                 infoBox.className = 'flex-grow text-xs text-black';
@@ -2212,7 +2219,7 @@
                         width: 100, 
                         height: 100,
                         colorDark : "#000000",
-                        colorLight : "#ffffff",
+                        colorLight : "#ffffff", // Fondo blanco para impresión
                         correctLevel : QRCode.CorrectLevel.L
                     });
                     setTimeout(() => {
