@@ -1776,7 +1776,7 @@
             
             // Obtener el destinatario, usando un valor por defecto si no se ha ingresado nada aún
             const recipientNameEl = isMainInventory ? recipientNameIn : recipientNameInET;
-            // Corregir: No requerimos que el input tenga el nombre aún, solo lo usamos si está lleno.
+            // Usamos el valor actual del input (que fue enfocado)
             const recipientName = recipientNameEl.value.trim() || 'Cliente Rápido QR'; 
             
             const productNameSold = product.name + (product.category ? ` (${product.category})` : '');
@@ -1857,14 +1857,15 @@
 
             const onScanSuccess = async (decodedText, decodedResult) => {
                 if (scanSuccessHandled) return;
-                scanSuccessHandled = true; 
                 
-                await closeScannerModal(false); // Detener el escáner inmediatamente
-
                 try {
                     const scannedId = String(decodedText).trim();
                     console.log(`[SCANNER LOG] Código escaneado (ID): ${scannedId}`);
                     
+                    // --- Detener y cerrar el modal ANTES de procesar, para evitar errores visuales ---
+                    scanSuccessHandled = true; 
+                    await closeScannerModal(true); 
+
                     // VALIDACIÓN DE ID: Si el ID está vacío, forzar un error.
                     if (!scannedId || scannedId === "") {
                         throw new Error(`El código QR escaneado es inválido o no contiene un ID de producto.`);
@@ -1892,7 +1893,7 @@
                         productNameSoldIn.value = productNameWithCategory;
                         salePriceIn.value = Number(product.price).toFixed(2);
                         saleDateIn.value = new Date().toISOString().split('T')[0];
-                        saleStatusInput.value = 'Pagado';
+                        saleStatusInput.value = 'Pendiente'; // Se cambia a Pendiente para que el usuario pueda ingresar el destinatario y luego registrar la venta, para ventas de crédito
                         // ENFOCAR AL DESTINATARIO
                         recipientNameIn.focus();
                     } else {
@@ -1901,21 +1902,24 @@
                         productNameSoldInET.value = productNameWithCategoryET;
                         salePriceInET.value = Number(product.price).toFixed(2);
                         saleDateInET.value = new Date().toISOString().split('T')[0];
-                        saleStatusInputET.value = 'Pagado';
+                        saleStatusInputET.value = 'Pendiente';
                         // ENFOCAR AL DESTINATARIO
                         recipientNameInET.focus();
                     }
                     
-                    // 2. Registrar la venta y descontar stock automáticamente
-                    await registerScannedSale(product, isMainInventory); 
+                    // 2. Si el cliente tiene la opción de registrar la venta como pendiente (para poner el nombre), no se llama a registerScannedSale aquí.
+                    // Si la quieres automática, puedes descomentar la siguiente línea.
+                    // await registerScannedSale(product, isMainInventory); 
 
                 } catch (error) {
                     console.error("Error al procesar escaneo:", error);
+                    // Restablecer la bandera antes de la alerta para permitir reintentar
+                    scanSuccessHandled = false; 
                     alert(`❌ Error en Escaneo: ${error.message}`);
-                    // Reabrir el escáner si no es por un error crítico (como cámara no encontrada)
-                    if (!error.message.includes("cámara")) {
-                        scanSuccessHandled = false;
-                        openScannerModal();
+                    
+                    // Reabrir el escáner si el modal fue cerrado y el error no es de la cámara
+                    if (!error.message.includes("cámara") && !error.message.includes("Html5QrcodeScanner")) {
+                         openScannerModal();
                     } else {
                         closeScannerModal(true);
                     }
@@ -1923,11 +1927,12 @@
             };
 
             const onScanError = (errorMessage) => {
-                if (!scanSuccessHandled && !errorMessage.includes("code parse error") && !errorMessage.includes("-D")) {
-                     if (errorMessage.includes("No camera found")) {
+                if (!scanSuccessHandled) {
+                    // Solo actualizamos el estado si no es un error de parseo común (QR not found)
+                    if (errorMessage.includes("No camera found")) {
                         scannerStatusEl.textContent = 'Error: No se detectó ninguna cámara. Asegúrate de dar permiso.';
-                    } else {
-                        scannerStatusEl.textContent = 'Escaneando... Apunta el código QR al centro.';
+                    } else if (!errorMessage.includes("code parse error") && !errorMessage.includes("-D")) {
+                         scannerStatusEl.textContent = 'Escaneando... Apunta el código QR al centro.';
                     }
                 }
             };
