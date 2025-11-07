@@ -948,13 +948,17 @@
             const categoryEl = document.getElementById(`${elementPrefix}category${idSuffix}-${product.id}`);
             const imgEl = document.getElementById(`${elementPrefix}img${idSuffix}-${product.id}`);
             const boxNumberEl = document.getElementById(`${elementPrefix}box-number${idSuffix}-${product.id}`);
+            
             if (boxNumberEl) {
                 boxNumberEl.querySelector('span').textContent = product.box_number || 'N/A';
             }
+            
             if (stockEl) stockEl.textContent = `Stock: ${product.quantity}`;
             if (nameEl) nameEl.textContent = product.name;
-            if (priceEl) priceEl.textContent = `$${Number(p.price).toFixed(2)}`;
+            // CORRECCIÓN: Usar 'product.price' en lugar de 'p.price'
+            if (priceEl) priceEl.textContent = `$${Number(product.price).toFixed(2)}`; 
             if (categoryEl) categoryEl.textContent = product.category;
+            
             if (imgEl) {
                 const newSrc = product.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
                 imgEl.src = `${newSrc}?t=${new Date().getTime()}`;
