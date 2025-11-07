@@ -1703,14 +1703,15 @@
             }
         });
 
-        // --- Lógica del QR Modal ---
+        // --- Lógica del QR Modal (Individual) ---
 
         window.openQrModal = function() {
             if (!currentEditingProduct || !currentEditingProduct.id) {
                 alert("Error: No hay producto seleccionado para generar el QR.");
                 return;
             }
-            const productId = currentEditingProduct.id;
+            // Aseguramos que el ID es un String limpio para el QR
+            const productId = String(currentEditingProduct.id).trim(); 
             const productName = currentEditingProduct.name;
             qrCodeContainer.innerHTML = ''; 
             currentQrCanvas = null;
@@ -1757,7 +1758,7 @@
                 const dataURL = currentQrCanvas.toDataURL("image/png");
                 const link = document.createElement('a');
                 link.href = dataURL;
-                link.download = `QR_${currentEditingProduct.name.replace(/[^a-zA-Z0-9]/g, '_')}_${currentEditingProduct.id.substring(0, 8)}.png`;
+                link.download = `QR_${currentEditingProduct.name.replace(/[^a-zA-Z0-9]/g, '_')}_${String(currentEditingProduct.id).substring(0, 8)}.png`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -1865,6 +1866,7 @@
                 if (scanSuccessHandled) return;
                 
                 try {
+                    // CORRECCIÓN CRÍTICA: Asegurar que el ID escaneado sea un string limpio
                     const scannedId = String(decodedText).trim();
                     console.log(`[SCANNER LOG] Código escaneado (ID): ${scannedId}`);
                     
@@ -1913,7 +1915,8 @@
                         recipientNameInET.focus();
                     }
                     
-                    // 2. La venta se registra manualmente al presionar "Registrar Venta" en el formulario.
+                    // Si se desea la venta automática, se debe llamar a registerScannedSale(product, isMainInventory); aquí.
+                    // Si el proceso es manual (para ingresar Destinatario), el usuario debe presionar "Registrar Venta" en el formulario.
 
                 } catch (error) {
                     console.error("Error al procesar escaneo:", error);
@@ -2214,8 +2217,11 @@
                     <p style="font-size: 9px; margin: 0;">Caja: ${product.box_number || 'N/A'}</p>
                 `;
                 const qrPromise = new Promise(resolve => {
+                    // Limpiamos el ID antes de generar el QR
+                    const cleanProductId = String(product.id).trim(); 
+
                     const qr = new QRCode(tempDiv, {
-                        text: product.id, 
+                        text: cleanProductId, // Usamos el ID limpio
                         width: 100, 
                         height: 100,
                         colorDark : "#000000",
