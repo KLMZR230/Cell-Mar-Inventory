@@ -195,24 +195,12 @@
             border-color: #b91c1c !important;
         }
     </style>
-    <script>
-        (function() {
-            try {
-                const theme = localStorage.getItem('selectedTheme');
-                if (theme && ['theme-dark', 'theme-infernal', 'theme-gold'].includes(theme)) {
-                    document.documentElement.className = theme;
-                } else {
-                    document.documentElement.className = 'theme-dark';
-                }
-            } catch (e) {
-                document.documentElement.className = 'theme-dark';
-            }
-        })();
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
-    </head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
 <body class="" onclick="closeSettingsDropdown(event)"> 
     <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
         <div class="flex items-center space-x-4">
@@ -299,7 +287,7 @@
                 <p class="text-sm text-gray-400 mt-3">Recuerda: Cada etiqueta QR representa **un tipo de producto** (una ficha) y debe colocarse en la caja de ese artículo, no en cada unidad.</p>
             </section>
             <div id="labels-output" class="labels-container flex flex-wrap gap-4 mt-8">
-                <p class="p-4 text-gray-400">Selecciona el inventario y presiona "Generar e Imprimir Etiquetas".</p>
+                <p class="p-4 text-gray-400">Selecciona el inventario y presiona "Generar e Imprimir Etiquetas" o "Descargar QRs".</p>
             </div>
         </div>
         <div id="inventory-view" class="view-section hidden">
@@ -1270,7 +1258,7 @@
             const table = isMainSales ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
             const localArray = isMainSales ? allSales : allSalesElTransito;
             const sale = localArray.find(s => s.id === id);
-            if (!sale || !supabase) return alert("❌ Error: Supabase no está cargado.");
+            if (!sale || !supabase) return alert("❌ Error: Venta no encontrada o Supabase no cargado.");
 
             const oldPrice = sale.price;
             sale.price = newPrice; // Optimistic update
@@ -2182,7 +2170,7 @@
             const filtered = selectedProducts.filter(p => categoryFilter === 'all' || p.category === categoryFilter);
             labelsCountSpan.textContent = `${filtered.length} Productos seleccionados`;
             if (labelsOutputDiv.children.length === 0 || labelsOutputDiv.children[0].tagName === 'P') {
-                labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Presiona "Generar e Imprimir Etiquetas" o "Descargar QRs" para crear ${filtered.length} etiquetas.</p>`;
+                labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Selecciona el inventario y presiona "Generar e Imprimir Etiquetas" o "Descargar QRs".</p>`;
             }
         }
         
@@ -2259,14 +2247,11 @@
             });
         };
 
-        // --- NUEVA FUNCIÓN: Descarga de Etiquetas Masivas como ZIP ---
+        // --- FUNCIÓN: Descarga de Etiquetas Masivas como ZIP ---
         window.downloadAllLabelsAsZip = async function() {
-            // Verificar si las librerías necesarias están disponibles (Simulación)
-            if (typeof QRCode === 'undefined') {
-                return alert("❌ Error: La librería QRCode no está cargada.");
-            }
-            if (typeof JSZip === 'undefined' || typeof saveAs === 'undefined') {
-                 return alert("❌ Error: Las librerías JSZip y FileSaver son necesarias para la descarga ZIP y deben cargarse manualmente. (Ver comentarios en el código)");
+            // Verificar si las librerías necesarias están disponibles (FileSaver se carga en el HEAD)
+            if (typeof QRCode === 'undefined' || typeof JSZip === 'undefined' || typeof saveAs === 'undefined') {
+                 return alert("❌ Error: Las librerías JSZip y FileSaver son necesarias para la descarga ZIP y no se han cargado. Asegúrate que las etiquetas <script> en el HEAD estén correctas.");
             }
 
             const location = labelsLocationSelect.value;
@@ -2307,12 +2292,13 @@
                     
                     const canvas = tempDiv.querySelector('canvas');
                     if (canvas) {
-                        // 2. Convertir el Canvas a Blob para guardarlo en el ZIP
-                        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-                        
+                        // 2. Obtener la base64 de la imagen PNG y convertirla a binario
+                        const dataURL = canvas.toDataURL("image/png");
+                        const base64Data = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+
                         // 3. Añadir al ZIP
                         const filename = `${product.name.replace(/[^a-zA-Z0-9]/g, '_')}_${cleanProductId.substring(0, 8)}.png`;
-                        zip.file(filename, blob);
+                        zip.file(filename, base64Data, { base64: true });
                     }
                 }
 
@@ -2320,11 +2306,9 @@
                 const zipContent = await zip.generateAsync({ type: "blob" });
                 saveAs(zipContent, `CellSmar_QR_Etiquetas_${new Date().toISOString().split('T')[0]}.zip`);
                 
-                alert(`✅ ${productsToPrint.length} QRs descargados en formato ZIP.`);
-
             } catch (error) {
                 console.error("Error al generar o descargar el ZIP:", error);
-                alert("❌ Error: Falló la generación del archivo ZIP. Asegúrate de que las librerías FileSaver y JSZip estén cargadas.");
+                alert("❌ Error: Falló la generación del archivo ZIP. Revisa la consola para más detalles.");
             } finally {
                 loadingButton.disabled = false;
                 loadingButton.textContent = originalText;
