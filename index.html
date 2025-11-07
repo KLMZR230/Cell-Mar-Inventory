@@ -37,9 +37,14 @@
             animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         @keyframes pulse { 50% { opacity: .4; } }
+        
+        /********************************/
         /* Estilos para impresión de QR */
+        /********************************/
         @media print {
             body > *:not(.labels-container):not(#qr-modal) { display: none !important; }
+            
+            /* Contenedor principal de etiquetas: Forzar blanco */
             .labels-container { 
                 display: flex !important;
                 flex-wrap: wrap;
@@ -47,7 +52,6 @@
                 min-height: 100vh;
                 margin: 0;
                 padding: 0;
-                /* Forzar fondo blanco para el área de etiquetas */
                 background-color: white !important;
             }
             .labels-container > div {
@@ -64,11 +68,13 @@
                 page-break-after: avoid;
                 /* Asegurar que el fondo de cada etiqueta es blanco */
                 background-color: white !important;
+                color: black !important; /* Texto de etiqueta en negro */
             }
             .labels-container .qr-box { margin-right: 10px; width: 35mm; height: 35mm; display: flex; justify-content: center; align-items: center; }
             .labels-container canvas, .labels-container img { width: 30mm !important; height: 30mm !important; }
+            
+            /* Modal de QR individual (para asegurar fondo blanco en impresión) */
             #qr-modal {
-                /* Forzamos fondo blanco para impresión de QR individual */
                 display: flex !important;
                 position: fixed;
                 top: 0; left: 0; right: 0; bottom: 0;
@@ -81,6 +87,7 @@
             #qr-modal .border-purple-500 { border-color: black !important; }
             #qr-modal .print\:hidden { display: none !important; }
         }
+        
         /********************************/
         /* TEMA 1: Dark (Predeterminado) */
         /********************************/
@@ -97,6 +104,7 @@
             --font-main: 'Poppins', sans-serif;
             --font-headings: 'Poppins', sans-serif;
         }
+        
         /********************************/
         /* Fondo del Escáner siempre blanco */
         /********************************/
@@ -107,6 +115,7 @@
         #scanner-modal .modal-content h3, #scanner-modal .modal-content p {
             color: black !important;
         }
+        
         /********************************/
         /* TEMA 2: Fuego Infernal */
         /********************************/
@@ -125,6 +134,7 @@
         }
         .theme-infernal { background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
         .theme-infernal .product-card:hover, .theme-infernal .tool-card:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.5); border-color: rgba(255, 69, 0, 0.7); }
+        
         /********************************/
         /* TEMA 3: Luxury Gold */
         /********************************/
@@ -145,6 +155,7 @@
         .theme-gold .product-card:hover, .theme-gold .tool-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
         .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
         .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
+        
         /********************************/
         /* Aplicación de Variables CSS */
         /********************************/
@@ -154,21 +165,31 @@
             font-family: var(--font-main);
         }
         h1, h2, h3, h4, h5, h6 { font-family: var(--font-headings); }
+        
+        /* Aplicación de colores para fondo de headers y cards */
         .bg-gray-800, .bg-gray-900\/50 {
             background-color: var(--bg-header);
             border: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
             backdrop-filter: blur(10px);
+            color: var(--text-primary); /* Restaurar color de texto */
         }
+        
+        /* Asegurar que el fondo secundario de inputs y selectores es visible */
+        .bg-gray-600 { background-color: var(--bg-secondary) !important; }
+        .bg-gray-700\/50 { background-color: var(--bg-secondary); }
+
         .text-gray-300 { color: var(--text-secondary); }
         .text-gray-400 { color: var(--text-muted); }
-        .bg-gray-600 { background-color: var(--bg-secondary) !important; }
+        
         .border-gray-500, .border-gray-600, .border-gray-700 { border-color: var(--border-color); }
+        
         /* Acentos */
         .text-indigo-400, .text-indigo-300 { color: var(--accent-color); }
         .border-indigo-500 { border-color: var(--accent-color); }
         .bg-indigo-500 { background-color: var(--accent-color-dark); color: var(--text-primary); }
         .hover\:bg-indigo-600:hover { background-color: var(--accent-color); }
         .focus\:ring-indigo-500:focus { --tw-ring-color: var(--accent-color); }
+        
         input:focus, select:focus, textarea:focus {
             border-color: var(--accent-color) !important;
             box-shadow: 0 0 0 1px var(--accent-color);
@@ -176,6 +197,7 @@
         }
         .bg-blue-600, .bg-green-600 { background-color: var(--accent-color-dark); }
         .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover { background-color: var(--accent-color); }
+        
         /********************************/
         /* ESTILOS FIJOS PARA ESTADOS DE VENTA */
         /********************************/
@@ -195,6 +217,20 @@
             border-color: #b91c1c !important;
         }
     </style>
+    <script>
+        (function() {
+            try {
+                const theme = localStorage.getItem('selectedTheme');
+                if (theme && ['theme-dark', 'theme-infernal', 'theme-gold'].includes(theme)) {
+                    document.documentElement.className = theme;
+                } else {
+                    document.documentElement.className = 'theme-dark';
+                }
+            } catch (e) {
+                document.documentElement.className = 'theme-dark';
+            }
+        })();
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
@@ -1258,7 +1294,7 @@
             const table = isMainSales ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
             const localArray = isMainSales ? allSales : allSalesElTransito;
             const sale = localArray.find(s => s.id === id);
-            if (!sale || !supabase) return alert("❌ Error: Venta no encontrada o Supabase no cargado.");
+            if (!sale || !supabase) return alert("❌ Error: Supabase no está cargado.");
 
             const oldPrice = sale.price;
             sale.price = newPrice; // Optimistic update
@@ -2138,7 +2174,7 @@
             } finally {
                 editingToolId = null; 
                 toolImageEditorInput.value = ''; 
-                if(editButton) editButton.textContent = originalButtonText; 
+                if(editButton) editButton.textContent = originalText; 
             }
         });
         document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', () => toggleView(btn.dataset.view)));
@@ -2249,7 +2285,7 @@
 
         // --- FUNCIÓN: Descarga de Etiquetas Masivas como ZIP ---
         window.downloadAllLabelsAsZip = async function() {
-            // Verificar si las librerías necesarias están disponibles (FileSaver se carga en el HEAD)
+            // Verificar si las librerías necesarias están disponibles (Se cargaron en el HEAD)
             if (typeof QRCode === 'undefined' || typeof JSZip === 'undefined' || typeof saveAs === 'undefined') {
                  return alert("❌ Error: Las librerías JSZip y FileSaver son necesarias para la descarga ZIP y no se han cargado. Asegúrate que las etiquetas <script> en el HEAD estén correctas.");
             }
@@ -2287,12 +2323,12 @@
                         correctLevel: QRCode.CorrectLevel.H
                     });
 
-                    // Esperar un micro ciclo para que el canvas se dibuje
+                    // Esperar un micro ciclo para que el canvas se dibuje (necesario para QRCode.js)
                     await new Promise(resolve => setTimeout(resolve, 50)); 
                     
                     const canvas = tempDiv.querySelector('canvas');
                     if (canvas) {
-                        // 2. Obtener la base64 de la imagen PNG y convertirla a binario
+                        // 2. Obtener la base64 de la imagen PNG y convertirla a binario para JSZip
                         const dataURL = canvas.toDataURL("image/png");
                         const base64Data = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
 
@@ -2306,6 +2342,8 @@
                 const zipContent = await zip.generateAsync({ type: "blob" });
                 saveAs(zipContent, `CellSmar_QR_Etiquetas_${new Date().toISOString().split('T')[0]}.zip`);
                 
+                alert(`✅ ${productsToPrint.length} QRs descargados en formato ZIP.`);
+
             } catch (error) {
                 console.error("Error al generar o descargar el ZIP:", error);
                 alert("❌ Error: Falló la generación del archivo ZIP. Revisa la consola para más detalles.");
