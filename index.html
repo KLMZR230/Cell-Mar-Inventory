@@ -212,7 +212,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
-</head>
+    </head>
 <body class="" onclick="closeSettingsDropdown(event)"> 
     <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
         <div class="flex items-center space-x-4">
@@ -287,9 +287,14 @@
                 </div>
                 <div class="mt-6 flex justify-between items-center">
                     <span id="labels-count" class="text-sm text-gray-400">0 Productos seleccionados</span>
-                    <button onclick="generateAndPrintLabels()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 rounded shadow-lg disabled:bg-gray-500">
-                        Generar e Imprimir Etiquetas
-                    </button>
+                    <div class="flex space-x-3">
+                        <button onclick="downloadAllLabelsAsZip()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow-lg disabled:bg-gray-500">
+                            Descargar todos los QRs (.zip) 💾
+                        </button>
+                        <button onclick="generateAndPrintLabels()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 rounded shadow-lg disabled:bg-gray-500">
+                            Generar e Imprimir Etiquetas 🖨️
+                        </button>
+                    </div>
                 </div>
                 <p class="text-sm text-gray-400 mt-3">Recuerda: Cada etiqueta QR representa **un tipo de producto** (una ficha) y debe colocarse en la caja de ese artículo, no en cada unidad.</p>
             </section>
@@ -1205,7 +1210,7 @@
             const table = isMainSales ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
             const localArray = isMainSales ? allSales : allSalesElTransito;
             const sale = localArray.find(s => s.id === id);
-            if (!sale || !supabase) return alert("❌ Error: Venta no encontrada o Supabase no cargado.");
+            if (!sale || !supabase) return alert("❌ Error: Supabase no está cargado.");
 
             const oldStatus = sale.status;
             sale.status = newStatus; // Optimistic update (for status select color)
@@ -1265,7 +1270,7 @@
             const table = isMainSales ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
             const localArray = isMainSales ? allSales : allSalesElTransito;
             const sale = localArray.find(s => s.id === id);
-            if (!sale || !supabase) return alert("❌ Error: Venta no encontrada o Supabase no cargado.");
+            if (!sale || !supabase) return alert("❌ Error: Supabase no está cargado.");
 
             const oldPrice = sale.price;
             sale.price = newPrice; // Optimistic update
@@ -2150,7 +2155,7 @@
         });
         document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', () => toggleView(btn.dataset.view)));
 
-        // --- Lógica de Impresión de Etiquetas ---
+        // --- Lógica de Impresión y Descarga de Etiquetas ---
         function populateLabelCategories(products) {
             const categories = new Set();
             products.forEach(p => {
@@ -2177,9 +2182,10 @@
             const filtered = selectedProducts.filter(p => categoryFilter === 'all' || p.category === categoryFilter);
             labelsCountSpan.textContent = `${filtered.length} Productos seleccionados`;
             if (labelsOutputDiv.children.length === 0 || labelsOutputDiv.children[0].tagName === 'P') {
-                labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Presiona "Generar e Imprimir Etiquetas" para crear ${filtered.length} etiquetas.</p>`;
+                labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Presiona "Generar e Imprimir Etiquetas" o "Descargar QRs" para crear ${filtered.length} etiquetas.</p>`;
             }
         }
+        
         window.generateAndPrintLabels = function() {
             if (typeof QRCode === 'undefined') {
                 return alert("❌ Error: La librería QRCode no está cargada.");
@@ -2252,6 +2258,79 @@
                 labelsOutputDiv.classList.remove('labels-container'); 
             });
         };
+
+        // --- NUEVA FUNCIÓN: Descarga de Etiquetas Masivas como ZIP ---
+        window.downloadAllLabelsAsZip = async function() {
+            // Verificar si las librerías necesarias están disponibles (Simulación)
+            if (typeof QRCode === 'undefined') {
+                return alert("❌ Error: La librería QRCode no está cargada.");
+            }
+            if (typeof JSZip === 'undefined' || typeof saveAs === 'undefined') {
+                 return alert("❌ Error: Las librerías JSZip y FileSaver son necesarias para la descarga ZIP y deben cargarse manualmente. (Ver comentarios en el código)");
+            }
+
+            const location = labelsLocationSelect.value;
+            const categoryFilter = labelsCategorySelect.value;
+            const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
+            const productsToPrint = selectedProducts.filter(p => 
+                categoryFilter === 'all' || p.category === categoryFilter
+            );
+
+            if (productsToPrint.length === 0) {
+                return alert("No hay productos que coincidan con el filtro seleccionado para descargar.");
+            }
+
+            const zip = new JSZip();
+            const loadingButton = document.querySelector('button[onclick="downloadAllLabelsAsZip()"]');
+            loadingButton.disabled = true;
+            const originalText = loadingButton.textContent;
+            loadingButton.textContent = 'Generando ZIP... Por favor espere.';
+
+            try {
+                for (const product of productsToPrint) {
+                    // 1. Generar el QR
+                    const tempDiv = document.createElement('div');
+                    const cleanProductId = String(product.id).trim();
+
+                    // Generamos el QR en un elemento temporal
+                    new QRCode(tempDiv, {
+                        text: cleanProductId,
+                        width: 256,
+                        height: 256,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+
+                    // Esperar un micro ciclo para que el canvas se dibuje
+                    await new Promise(resolve => setTimeout(resolve, 50)); 
+                    
+                    const canvas = tempDiv.querySelector('canvas');
+                    if (canvas) {
+                        // 2. Convertir el Canvas a Blob para guardarlo en el ZIP
+                        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                        
+                        // 3. Añadir al ZIP
+                        const filename = `${product.name.replace(/[^a-zA-Z0-9]/g, '_')}_${cleanProductId.substring(0, 8)}.png`;
+                        zip.file(filename, blob);
+                    }
+                }
+
+                // 4. Generar y descargar el archivo ZIP
+                const zipContent = await zip.generateAsync({ type: "blob" });
+                saveAs(zipContent, `CellSmar_QR_Etiquetas_${new Date().toISOString().split('T')[0]}.zip`);
+                
+                alert(`✅ ${productsToPrint.length} QRs descargados en formato ZIP.`);
+
+            } catch (error) {
+                console.error("Error al generar o descargar el ZIP:", error);
+                alert("❌ Error: Falló la generación del archivo ZIP. Asegúrate de que las librerías FileSaver y JSZip estén cargadas.");
+            } finally {
+                loadingButton.disabled = false;
+                loadingButton.textContent = originalText;
+            }
+        };
+
 
         // --- Lógica de Carga Inicial de Datos (Faltantes) ---
         async function fetchMissingProducts() {
