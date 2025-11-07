@@ -953,7 +953,7 @@
             }
             if (stockEl) stockEl.textContent = `Stock: ${product.quantity}`;
             if (nameEl) nameEl.textContent = product.name;
-            if (priceEl) priceEl.textContent = `$${Number(product.price).toFixed(2)}`;
+            if (priceEl) priceEl.textContent = `$${Number(p.price).toFixed(2)}`;
             if (categoryEl) categoryEl.textContent = product.category;
             if (imgEl) {
                 const newSrc = product.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
@@ -1578,11 +1578,23 @@
             modalStatus.textContent = '';
             
             // 1. Determinar el array de productos y buscar el producto por ID
-            const productArray = isMain ? allProducts : allProductsElTransito;
-            const product = productArray.find(p => p.id === productId);
+            let productArray = isMain ? allProducts : allProductsElTransito;
+            // CORRECCIÓN APLICADA: Usar String() y .trim() para asegurar la comparación entre tipos de datos de string
+            let product = productArray.find(p => String(p.id).trim() === String(productId).trim());
 
             if (!product) {
-                alert("Error: Producto no encontrado en el inventario local. Intente recargar la página.");
+                // Fallback de seguridad: Buscar en el inventario opuesto por si el 'isMain' es incorrecto
+                productArray = isMain ? allProductsElTransito : allProducts;
+                product = productArray.find(p => String(p.id).trim() === String(productId).trim());
+                if (product) {
+                    isMain = !isMain; // Corregir la bandera si se encontró en el otro array
+                    console.warn("⚠️ Producto encontrado en el inventario opuesto. Se ajustó la vista a:", isMain ? 'Principal' : 'El Transito');
+                }
+            }
+            
+            if (!product) {
+                // Si aún no se encuentra, mostrar el error
+                alert("Error: Producto no encontrado en el inventario local. Intente recargar la página. ID Buscado: " + productId);
                 return;
             }
 
