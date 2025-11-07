@@ -611,7 +611,8 @@
         // =================================================================================
         const createClient = window.supabase ? window.supabase.createClient : null;
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImex"
+        // CORRECCIÓN CRÍTICA: Restauración de la clave ANON completa.
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
         let supabase = null;
         if (createClient) {
             supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -955,7 +956,7 @@
             
             if (stockEl) stockEl.textContent = `Stock: ${product.quantity}`;
             if (nameEl) nameEl.textContent = product.name;
-            // CORRECCIÓN: Usar 'product.price' en lugar de 'p.price'
+            // Corregido: Usar 'product.price' en lugar de 'p.price'
             if (priceEl) priceEl.textContent = `$${Number(product.price).toFixed(2)}`; 
             if (categoryEl) categoryEl.textContent = product.category;
             
@@ -1773,13 +1774,15 @@
             const stockLocalArray = isMainInventory ? allProducts : allProductsElTransito;
             const statusEl = isMainInventory ? saleStatus : saleStatusET;
             
-            // Asumiendo valores por defecto tras el escaneo. Si el campo está vacío en el formulario, se usa 'Cliente Rápido QR'.
+            // Obtener el destinatario, usando un valor por defecto si no se ha ingresado nada aún
             const recipientNameEl = isMainInventory ? recipientNameIn : recipientNameInET;
-            const recipientName = recipientNameEl.value.trim() || 'Cliente Rápido QR';
+            // Corregir: No requerimos que el input tenga el nombre aún, solo lo usamos si está lleno.
+            const recipientName = recipientNameEl.value.trim() || 'Cliente Rápido QR'; 
+            
             const productNameSold = product.name + (product.category ? ` (${product.category})` : '');
             const salePrice = Number(product.price);
             const saleDate = new Date().toISOString().split('T')[0];
-            const saleStatusValue = 'Pagado'; // Por defecto tras un escaneo.
+            const saleStatusValue = 'Pagado'; 
 
             const newSale = {
                 recipient_name: recipientName,
@@ -1795,18 +1798,20 @@
                 const { data: insertedSale, error: saleError } = await supabase.from(salesTable).insert(newSale).select().single();
                 if (saleError) throw saleError;
                 
-                // DESCUENTO DE STOCK OBLIGATORIO si es Pagado (Estado por defecto al escanear)
+                // DESCUENTO DE STOCK OBLIGATORIO si es Pagado
                 if (newSale.status === 'Pagado') {
                     await updateProductStock(product.name, stockTable, stockLocalArray, -1);
                 }
                 
-                // Limpiar los inputs (excepto fecha) y dejar listos para la siguiente venta rápida
+                // Limpiar inputs, excepto el nombre del destinatario si no fue "Cliente Rápido QR", para facilitar ventas rápidas consecutivas al mismo cliente
                 if (isMainInventory) {
-                    salesForm.reset(); 
+                    productNameSoldIn.value = ''; // Limpiar solo el producto
+                    salePriceIn.value = ''; 
                     saleDateIn.value = new Date().toISOString().split('T')[0]; 
                     saleStatusInput.value = 'Pagado';
                 } else {
-                    salesFormET.reset(); 
+                    productNameSoldInET.value = ''; 
+                    salePriceInET.value = ''; 
                     saleDateInET.value = new Date().toISOString().split('T')[0]; 
                     saleStatusInputET.value = 'Pagado';
                 }
@@ -1865,6 +1870,7 @@
                         throw new Error(`El código QR escaneado es inválido o no contiene un ID de producto.`);
                     }
 
+                    // Búsqueda del producto, asegurando la comparación de strings
                     const product = allProducts.find(p => String(p.id).trim() === scannedId) || allProductsElTransito.find(p => String(p.id).trim() === scannedId);
                     
                     if (!product) {
@@ -1906,7 +1912,13 @@
                 } catch (error) {
                     console.error("Error al procesar escaneo:", error);
                     alert(`❌ Error en Escaneo: ${error.message}`);
-                    scanSuccessHandled = false; // Re-habilitar si se quiere volver a intentar sin cerrar el modal
+                    // Reabrir el escáner si no es por un error crítico (como cámara no encontrada)
+                    if (!error.message.includes("cámara")) {
+                        scanSuccessHandled = false;
+                        openScannerModal();
+                    } else {
+                        closeScannerModal(true);
+                    }
                 }
             };
 
