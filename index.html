@@ -809,6 +809,28 @@
             }
         }
         
+        // --- Carga de Logo ---
+        const LOGO_CONFIG_KEY = "current_logo_url";
+        async function loadLogo() {
+            if (!supabase) return;
+            try {
+                const { data, error } = await supabase
+                    .from(CONFIG_TABLE)
+                    .select("value")
+                    .eq("key", LOGO_CONFIG_KEY)
+                    .single();
+                if (error || !data || !data.value) {
+                    if (error && error.code !== 'PGRST116') { 
+                       console.warn("No se encontró URL de logo en config:", error?.message);
+                    }
+                    return; 
+                }
+                businessLogo.src = `${data.value}?t=${new Date().getTime()}`; 
+            } catch (err) {
+                console.error("Error en loadLogo:", err);
+            }
+        }
+        
         // ============================================================================
         // == V. LÓGICA DE VISTAS Y RENDERS (Producto, Venta, Faltantes, Herramienta) ==
         // ============================================================================
@@ -1516,7 +1538,7 @@
                 ).subscribe((status, err) => console.log(`Canal ${TOOLS_TABLE}: ${status}`, err || ''));
         }
 
-        // --- Lógica de Carga Inicial de Datos (Faltantes) ---
+        // --- Lógica de Carga Inicial de Datos (Faltantes y Ventas) ---
         async function fetchSales() {
             if (!supabase) return;
             const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
@@ -1867,7 +1889,7 @@
                 setStatusMessage(saleStatusET, "Venta (El Transito) registrada con éxito ✅", true); 
             } catch (err) { 
                 console.error("Error al registrar venta ET:", err);
-                setStatusMessage(saleStatusET, "Error: " + err.message, false); 
+                setStatusMessage(statusET, "Error: " + err.message, false); 
             } finally { 
                 submitBtn.disabled = false; 
             } 
@@ -1896,17 +1918,144 @@
         });
         document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', () => toggleView(btn.dataset.view)));
 
-        // --- Carga de Logo ---
-        logoUpload.addEventListener("change", (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                selectedLogoFile = file;
-                const reader = new FileReader();
-                reader.onload = (ev) => { businessLogo.src = ev.target.result; }; 
-                reader.readAsDataURL(file);
-                logoSaveButton.disabled = false;
+        // --- Lógica de Impresión de Etiquetas ---
+        function populateLabelCategories(products) {
+            const categories = new Set();
+            products.forEach(p => {
+                if (p.category) categories.add(p.category);
+            });
+            const sortedCategories = Array.from(categories).sort();
+            const currentCategory = labelsCategorySelect.value;
+            labelsCategorySelect.innerHTML = '<option value="all">Todas las Categorías</option>';
+            sortedCategories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                labelsCategorySelect.appendChild(option);
+            });
+            labelsCategorySelect.value = sortedCategories.includes(currentCategory) ? currentCategory : 'all';
+        }
+        labelsLocationSelect.addEventListener('change', updateLabelView);
+        labelsCategorySelect.addEventListener('change', updateLabelView);
+        function updateLabelView() {
+            const location = labelsLocationSelect.value;
+            const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
+            populateLabelCategories(selectedProducts);
+            const categoryFilter = labelsCategorySelect.value;
+            const filtered = selectedProducts.filter(p => categoryFilter === 'all' || p.category === categoryFilter);
+            labelsCountSpan.textContent = `${filtered.length} Productos seleccionados`;
+            if (labelsOutputDiv.children.length === 0 || labelsOutputDiv.children[0].tagName === 'P') {
+                labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Presiona "Generar e Imprimir Etiquetas" para crear ${filtered.length} etiquetas.</p>`;
             }
-        });
+        }
+        window.generateAndPrintLabels = function() {
+            if (typeof QRCode === 'undefined') {
+                return alert("❌ Error: La librería QRCode no está cargada.");
+            }
+            const location = labelsLocationSelect.value;
+            const categoryFilter = labelsCategorySelect.value;
+            const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
+            const productsToPrint = selectedProducts.filter(p => 
+                categoryFilter === 'all' || p.category === categoryFilter
+            );
+            if (productsToPrint.length === 0) {
+                return alert("No hay productos que coincidan con el filtro seleccionado.");
+            }
+            labelsOutputDiv.innerHTML = '';
+            labelsOutputDiv.classList.add('labels-container');
+            const qrPromises = [];
+            productsToPrint.forEach((product, index) => {
+                const label = document.createElement('div');
+                label.className = 'label-tag border border-gray-400 p-1 flex items-center justify-start';
+                const tempDiv = document.createElement('div');
+                const infoBox = document.createElement('div');
+                infoBox.className = 'flex-grow text-xs text-black';
+                infoBox.style.color = '#000';
+                infoBox.style.fontFamily = 'sans-serif';
+                const productName = product.name.length > 30 ? product.name.substring(0, 27) + '...' : product.name;
+                infoBox.innerHTML = `
+                    <p style="font-weight: bold; font-size: 11px; margin: 0;">${productName}</p>
+                    <p style="font-size: 10px; margin: 0;">Cat: ${product.category || 'N/A'}</p>
+                    <p style="font-weight: bold; color: #10b981; font-size: 11px; margin: 0;">$${Number(product.price).toFixed(2)}</p>
+                    <p style="font-size: 9px; margin: 0;">Caja: ${product.box_number || 'N/A'}</p>
+                `;
+                const qrPromise = new Promise(resolve => {
+                    const qr = new QRCode(tempDiv, {
+                        text: product.id, 
+                        width: 100, 
+                        height: 100,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.L
+                    });
+                    setTimeout(() => {
+                        const canvas = tempDiv.querySelector('canvas');
+                        if (canvas) {
+                            const imgUrl = canvas.toDataURL("image/png");
+                            const imgBox = document.createElement('div');
+                            imgBox.className = 'qr-box mr-2';
+                            const img = document.createElement('img');
+                            img.src = imgUrl;
+                            img.style.width = '30mm';
+                            img.style.height = '30mm';
+                            imgBox.appendChild(img);
+                            label.appendChild(infoBox);
+                            labelsOutputDiv.appendChild(label);
+                        }
+                        resolve();
+                    }, 100); 
+                });
+                qrPromises.push(qrPromise);
+            });
+            Promise.all(qrPromises).then(() => {
+                console.log("Todos los QR generados. Abriendo diálogo de impresión.");
+                window.print();
+                labelsOutputDiv.classList.remove('labels-container'); 
+            });
+        };
+
+        // --- Lógica de Carga Inicial de Datos (Faltantes) ---
+        async function fetchMissingProducts() {
+            if (!supabase) return;
+            const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false });
+            if (error) { console.error("Error cargando faltantes:", error); return; }
+            allMissingProducts = data;
+            renderMissingProducts(allMissingProducts);
+        }
+        function renderMissingProducts(items) {
+            missingListLoader.innerHTML = "";
+            missingListEl.innerHTML = "";
+            totalMissingCount.textContent = `${items.length} productos pendientes`;
+            if (items.length === 0) {
+                missingListEl.innerHTML = `<p class="p-4 text-gray-400">¡Genial! No hay productos faltantes en la lista.</p>`;
+                return;
+            }
+            const listItems = items.map(p => {
+                const date = new Date(p.created_at).toLocaleDateString('es-SV', { day: 'numeric', month: 'short' });
+                return `
+                    <div id="missing-row-${p.id}" class="flex items-center justify-between p-4 border-b border-gray-700 hover:bg-gray-700/50 transition">
+                        <div>
+                            <p class="font-medium text-white">${p.product_name}</p>
+                            <p class="text-xs text-gray-400">${p.notes || 'Sin notas'}</p>
+                            <p class="text-xs text-indigo-400 mt-1">Registrado el ${date}</p>
+                        </div>
+                        <button onclick="deleteMissingProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Comprado</button>
+                    </div>
+                `;
+            }).join('');
+            missingListEl.innerHTML = listItems;
+        }
+        window.deleteMissingProduct = async function(id) {
+            if (!confirm("¿Marcar este producto como 'Comprado' y eliminarlo de la lista?")) return;
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
+            try {
+                const { error } = await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq("id", id);
+                if (error) throw error;
+            } catch (error) {
+                console.error("Error al eliminar faltante:", error);
+                alert("❌ Error al eliminar: " + error.message);
+            }
+        }
         
         // --- Evento de Carga Principal ---
         window.addEventListener("load", async () => {
@@ -1934,7 +2083,7 @@
                     initializeRealtimeSubscriptions();
                 } catch (error) {
                     console.error("Error crítico durante la carga de datos inicial:", error);
-                    alert("Error crítico durante la carga de datos inicial. Revisa la consola para más detalles.");
+                    // No alert() aquí, ya que el Promise.all contiene sus propios manejadores de error.
                 }
             } else {
                 alert("Error Crítico: No se pudo cargar Supabase. La aplicación no funcionará correctamente.");
