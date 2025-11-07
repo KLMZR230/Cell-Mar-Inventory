@@ -1619,6 +1619,64 @@
             }
         };
 
+
+        // ============================================================================
+        // == VIII. NUEVA FUNCIÓN: Registro de Venta Escaneada (CRÍTICA PARA ARREGLO) ==
+        // ============================================================================
+        async function registerScannedSale(product, isMainInventory) {
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
+            const salesTable = isMainInventory ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
+            const stockTable = isMainInventory ? PRODUCTS_TABLE : PRODUCTS_EL_TRANSITO_TABLE;
+            const stockLocalArray = isMainInventory ? allProducts : allProductsElTransito;
+            const statusEl = isMainInventory ? saleStatus : saleStatusET;
+            
+            // Asumiendo valores por defecto tras el escaneo. Si el campo está vacío en el formulario, se usa 'Cliente Rápido QR'.
+            const recipientNameEl = isMainInventory ? recipientNameIn : recipientNameInET;
+            const recipientName = recipientNameEl.value.trim() || 'Cliente Rápido QR';
+            const productNameSold = product.name + (product.category ? ` (${product.category})` : '');
+            const salePrice = Number(product.price);
+            const saleDate = new Date().toISOString().split('T')[0];
+            const saleStatusValue = 'Pagado'; // Por defecto tras un escaneo.
+
+            const newSale = {
+                recipient_name: recipientName,
+                product_name_sold: productNameSold,
+                price: salePrice,
+                sale_date: saleDate,
+                status: saleStatusValue
+            };
+            
+            setStatusMessage(statusEl, `Registrando venta de ${product.name}...`, true);
+            
+            try { 
+                const { data: insertedSale, error: saleError } = await supabase.from(salesTable).insert(newSale).select().single();
+                if (saleError) throw saleError;
+                
+                // DESCUENTO DE STOCK OBLIGATORIO si es Pagado (Estado por defecto al escanear)
+                if (newSale.status === 'Pagado') {
+                    await updateProductStock(product.name, stockTable, stockLocalArray, -1);
+                }
+                
+                // Limpiar los inputs (excepto fecha) y dejar listos para la siguiente venta rápida
+                if (isMainInventory) {
+                    salesForm.reset(); 
+                    saleDateIn.value = new Date().toISOString().split('T')[0]; 
+                    saleStatusInput.value = 'Pagado';
+                } else {
+                    salesFormET.reset(); 
+                    saleDateInET.value = new Date().toISOString().split('T')[0]; 
+                    saleStatusInputET.value = 'Pagado';
+                }
+                
+                alert(`✅ Venta de "${product.name}" registrada con éxito para ${recipientName}. Stock descontado.`);
+                setStatusMessage(statusEl, `Venta de ${product.name} registrada con éxito y stock descontado ✅`, true); 
+                
+            } catch (err) { 
+                console.error("Error al registrar venta escaneada:", err);
+                setStatusMessage(statusEl, "Error al registrar venta y descontar stock: " + err.message, false); 
+            }
+        }
+
         window.openScannerModal = async function() {
             if (isScannerRunning) return;
             if (typeof Html5QrcodeScanner === 'undefined') {
@@ -1665,32 +1723,37 @@
                     if (!product) {
                         throw new Error(`El producto con ID "${scannedId}" no existe en el inventario.`);
                     }
+
+                    if (parseInt(product.quantity) <= 0) {
+                        throw new Error(`Stock insuficiente: El producto "${product.name}" tiene 0 unidades disponibles.`);
+                    }
                     
                     console.log(`[SCANNER LOG] Producto encontrado: ${product.name} (Inventario: ${allProducts.some(p => p.id === scannedId) ? 'Principal' : 'El Transito'})`);
                     
                     const isMainInventory = allProducts.some(p => p.id === scannedId);
                     
+                    // 1. Cargar datos en el formulario para revisión (y si hay nombre de cliente pre-escrito)
                     if (isMainInventory) {
                         toggleView('sales');
-                        recipientNameIn.value = '';
                         const productNameWithCategory = product.name + (product.category ? ` (${product.category})` : '');
                         productNameSoldIn.value = productNameWithCategory;
                         salePriceIn.value = Number(product.price).toFixed(2);
                         saleDateIn.value = new Date().toISOString().split('T')[0];
                         saleStatusInput.value = 'Pagado';
-                        alert(`✅ Producto "${product.name}" cargado en Venta Principal.`);
                         recipientNameIn.focus();
                     } else {
                         toggleView('sales_el_transito');
-                        recipientNameInET.value = '';
                         const productNameWithCategoryET = product.name + (product.category ? ` (${product.category})` : '');
                         productNameSoldInET.value = productNameWithCategoryET;
                         salePriceInET.value = Number(product.price).toFixed(2);
                         saleDateInET.value = new Date().toISOString().split('T')[0];
                         saleStatusInputET.value = 'Pagado';
-                        alert(`✅ Producto "${product.name}" cargado en Venta El Transito.`);
                         recipientNameInET.focus();
                     }
+                    
+                    // 2. Ejecutar la lógica de registro de venta y descuento de stock (¡El Fix!)
+                    await registerScannedSale(product, isMainInventory); 
+
                 } catch (error) {
                     console.error("Error al procesar escaneo:", error);
                     alert(`❌ Error en Escaneo: ${error.message}`);
@@ -1999,6 +2062,7 @@
                             img.style.width = '30mm';
                             img.style.height = '30mm';
                             imgBox.appendChild(img);
+                            label.appendChild(imgBox); // Asegurar que el QR va primero
                             label.appendChild(infoBox);
                             labelsOutputDiv.appendChild(label);
                         }
