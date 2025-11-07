@@ -1781,9 +1781,8 @@
             const stockLocalArray = isMainInventory ? allProducts : allProductsElTransito;
             const statusEl = isMainInventory ? saleStatus : saleStatusET;
             
-            // Obtener el destinatario, usando un valor por defecto si no se ha ingresado nada aún
+            // Obtener el destinatario, usando el valor actual del input (que fue enfocado)
             const recipientNameEl = isMainInventory ? recipientNameIn : recipientNameInET;
-            // Usamos el valor actual del input (que fue enfocado)
             const recipientName = recipientNameEl.value.trim() || 'Cliente Rápido QR'; 
             
             const productNameSold = product.name + (product.category ? ` (${product.category})` : '');
@@ -1810,7 +1809,7 @@
                     await updateProductStock(product.name, stockTable, stockLocalArray, -1);
                 }
                 
-                // Limpiar inputs, excepto el nombre del destinatario si no fue "Cliente Rápido QR", para facilitar ventas rápidas consecutivas al mismo cliente
+                // Limpiar inputs
                 if (isMainInventory) {
                     productNameSoldIn.value = ''; // Limpiar solo el producto
                     salePriceIn.value = ''; 
@@ -1866,7 +1865,7 @@
                 if (scanSuccessHandled) return;
                 
                 try {
-                    // CORRECCIÓN CRÍTICA: Asegurar que el ID escaneado sea un string limpio
+                    // CORRECCIÓN CRÍTICA: Asegurar que el ID escaneado es una cadena limpia
                     const scannedId = String(decodedText).trim();
                     console.log(`[SCANNER LOG] Código escaneado (ID): ${scannedId}`);
                     
@@ -1901,7 +1900,7 @@
                         productNameSoldIn.value = productNameWithCategory;
                         salePriceIn.value = Number(product.price).toFixed(2);
                         saleDateIn.value = new Date().toISOString().split('T')[0];
-                        saleStatusInput.value = 'Pendiente'; // Se cambia a Pendiente para que el usuario pueda ingresar el destinatario
+                        saleStatusInput.value = 'Pendiente'; 
                         // ENFOCAR AL DESTINATARIO
                         recipientNameIn.focus();
                     } else {
@@ -1915,8 +1914,7 @@
                         recipientNameInET.focus();
                     }
                     
-                    // Si se desea la venta automática, se debe llamar a registerScannedSale(product, isMainInventory); aquí.
-                    // Si el proceso es manual (para ingresar Destinatario), el usuario debe presionar "Registrar Venta" en el formulario.
+                    // Nota: La venta se registra manualmente al presionar "Registrar Venta" en el formulario.
 
                 } catch (error) {
                     console.error("Error al procesar escaneo:", error);
