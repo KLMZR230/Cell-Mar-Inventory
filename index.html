@@ -252,8 +252,11 @@
             </h1>
         </div>
         <div class="flex items-center space-x-4 relative">
-             <button id="scan-button" onclick="openScannerModal()" class="text-white hover:text-green-400 p-2 rounded-lg bg-green-600 hover:bg-green-700 transition duration-300 shadow-md text-sm font-medium" title="Escanear Producto y Registrar Venta">
-                 📞 Escanear Venta
+             <button id="scan-button" onclick="openScannerModal()" class="text-white py-1 px-3 rounded-lg bg-green-600 hover:bg-green-700 transition duration-300 shadow-md text-sm flex items-center space-x-1" title="Escanear Producto y Registrar Venta">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
+                 </svg>
+                 <span>Escanear QR</span>
              </button>
             <div id="view-buttons" class="flex items-center space-x-2 bg-black/20 p-1 rounded-lg border border-gray-700">
                 <button data-view="inventory" class="view-btn bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg text-sm shadow-md transition duration-300">📦 Inventario</button>
