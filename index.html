@@ -528,7 +528,10 @@
                  <div id="tools-list" class="grid grid-cols-1 md:col-cols-2 lg:grid-cols-3 gap-6"></div>
             </section>
         </div>
-        <footer class="mt-10 text-center text-gray-400 text-sm">Panel de Inventario — Cell Smart</footer>
+        <footer class="mt-10 text-center text-gray-400 text-sm">
+            <p>Panel de Inventario — Cell Smart</p>
+            <p>&copy; 2025 Derechos Reservados. Desarrollado por Freddy Granados.</p>
+        </footer>
     </div>
     <div id="product-editor-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -911,15 +914,14 @@
                 updateLabelView();
             }
             
-            // --- CORRECCIÓN: Desplazar la vista al inicio de la sección de Ventas ---
+            // CORRECCIÓN: Desplazar la vista al inicio de la sección de Ventas o Ventas El Tránsito
             if (viewName === 'sales' || viewName === 'sales_el_transito') {
                 const targetEl = views[viewName].el;
                 if (targetEl) {
-                    // Usar scrollIntoView para desplazar el contenedor de la vista al inicio
+                    // Desplazar el contenedor de la vista al inicio del scroll
                     targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             }
-            // --- FIN CORRECCIÓN ---
         }
         function showSkeletonLoaders() { 
             const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div><div class="h-4 w-1/2 skeleton-line"></div><div class="h-8 w-1/4 skeleton-line"></div></div>`).join('');
