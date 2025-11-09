@@ -529,7 +529,7 @@
             </section>
         </div>
         <footer class="mt-10 text-center text-gray-400 text-sm">
-            <p>Panel de Inventario — Cell Smart</p>
+            <p>Panel de Inventario — Cell Smar</p>
             <p>&copy; 2025 Derechos Reservados. Desarrollado por Freddy Granados.</p>
         </footer>
     </div>
@@ -914,12 +914,14 @@
                 updateLabelView();
             }
             
-            // CORRECCIÓN: Desplazar la vista al inicio de la sección de Ventas o Ventas El Tránsito
+            // CORRECCIÓN: Desplazar la vista al inicio de la sección de Ventas o Ventas El Transito
             if (viewName === 'sales' || viewName === 'sales_el_transito') {
                 const targetEl = views[viewName].el;
                 if (targetEl) {
-                    // Desplazar el contenedor de la vista al inicio del scroll
-                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // Usar window.scrollTo con top 0 para asegurar que la cabecera es visible
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    // Opcional: usar scrollIntoView en el div principal, con block: 'start'
+                    // targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             }
         }
@@ -2156,7 +2158,7 @@
                     status: saleStatusInputET.value
                 };
                 const { data: insertedSale, error: saleErrorET } = await supabase.from(SALES_EL_TRANSITO_TABLE).insert(newSaleET).select().single();
-                if (saleErrorET) throw saleErrorET;
+                if (error) throw error;
                 if (newSaleET.status === 'Pagado') {
                     await updateProductStock(soldProductNameET, PRODUCTS_EL_TRANSITO_TABLE, allProductsElTransito, -1);
                 }
