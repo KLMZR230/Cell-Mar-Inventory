@@ -8,6 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         /********************************/
         /* Estilos Base (Comunes a todos los temas) */
@@ -558,7 +562,7 @@
                 <p id="sale-status" class="text-sm text-gray-400 mt-3"></p>
             </section>
             <section>
-                <div class="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex flex-wrap items-center gap-4">
+                <div class="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex flex-wrap items-center justify-between gap-4">
                     <div class="flex-grow min-w-[250px]">
                         <label for="search-sales-input" class="block text-sm font-medium text-gray-300 mb-1">🔍 Buscar por Nombre o Producto</label>
                         <input type="text" id="search-sales-input" placeholder="Ej: Juan Pérez o Pantalla A32..." class="p-2 border rounded-md w-full focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" />
@@ -567,6 +571,9 @@
                         <input type="checkbox" id="pending-only-checkbox" class="h-4 w-4 text-indigo-600 border-gray-500 rounded bg-gray-600 focus:ring-indigo-500">
                         <label for="pending-only-checkbox" class="ml-2 block text-sm font-medium text-gray-200">🔔 Mostrar solo pendientes</label>
                     </div>
+                    <button onclick="downloadSalesPDF(true)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow w-full md:w-auto mt-4 md:mt-0">
+                         Descargar PDF 📄
+                    </button>
                 </div>
                 <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
                     <h2 class="text-xl font-semibold text-indigo-300">📊 Historial de Ventas</h2>
@@ -608,7 +615,7 @@
                 <p id="sale-status-et" class="text-sm text-gray-400 mt-3"></p>
             </section>
             <section>
-                <div class="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex flex-wrap items-center gap-4">
+                <div class="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex flex-wrap items-center justify-between gap-4">
                     <div class="flex-grow min-w-[250px]">
                         <label for="search-sales-input-et" class="block text-sm font-medium text-gray-300 mb-1">🔍 Buscar por Nombre o Producto (El Transito)</label>
                         <input type="text" id="search-sales-input-et" placeholder="Ej: Ana Gómez o Batería iPhone..." class="p-2 border rounded-md w-full focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" />
@@ -617,6 +624,9 @@
                         <input type="checkbox" id="pending-only-checkbox-et" class="h-4 w-4 text-indigo-600 border-gray-500 rounded bg-gray-600 focus:ring-indigo-500">
                         <label for="pending-only-checkbox-et" class="ml-2 block text-sm font-medium text-gray-200">🔔 Mostrar solo pendientes</label>
                     </div>
+                    <button onclick="downloadSalesPDF(false)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow w-full md:w-auto mt-4 md:mt-0">
+                         Descargar PDF 📄
+                    </button>
                 </div>
                 <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
                     <h2 class="text-xl font-semibold text-indigo-300">📊 Historial de Ventas (El Transito)</h2>
@@ -1656,6 +1666,100 @@
             return deleteSale(id, false);
         }
 
+        // --- ADICIÓN: Lógica para Descargar PDF de Ventas ---
+        window.downloadSalesPDF = async function(isMainSales) {
+            if (typeof window.jspdf.jsPDF === 'undefined' || typeof html2canvas === 'undefined') {
+                return alert("❌ Error: Las librerías jsPDF y html2canvas no están cargadas.");
+            }
+            
+            const listContainer = isMainSales ? salesListContainer : salesListContainerET;
+            const title = isMainSales ? 'Registro de Ventas Principal' : 'Registro de Ventas El Transito';
+            const fileName = isMainSales ? 'Ventas_Principal_' : 'Ventas_El_Transito_';
+
+            if (!listContainer.children.length) {
+                return alert("No hay datos de ventas para descargar.");
+            }
+
+            const Doc = window.jspdf.jsPDF;
+            const doc = new Doc('p', 'mm', 'a4'); // 'p' for portrait, 'mm' units, 'a4' size
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            let y = 10;
+            
+            // Título
+            doc.setFontSize(16);
+            doc.text(title, 10, y);
+            y += 8;
+
+            // Totales Generales
+            const totalSoldEl = document.getElementById(isMainSales ? 'total-sold-amount' : 'total-sold-amount-et');
+            const totalPaidEl = document.getElementById(isMainSales ? 'total-paid-amount' : 'total-paid-amount-et');
+            const paidPercentageEl = document.getElementById(isMainSales ? 'paid-percentage' : 'paid-percentage-et');
+            
+            doc.setFontSize(10);
+            doc.text(`Total Vendido: ${totalSoldEl.textContent}`, 10, y);
+            doc.text(`Total Pagado: ${totalPaidEl.textContent}`, 70, y);
+            doc.text(`Progreso: ${paidPercentageEl.textContent}`, 130, y);
+            y += 8;
+            
+            doc.setLineWidth(0.1);
+            doc.line(10, y, pageWidth - 10, y);
+            y += 5;
+
+            // Clonar el contenedor de listas para evitar modificar el DOM visible
+            const salesListClone = listContainer.cloneNode(true);
+            salesListClone.classList.add('export-pdf-style');
+            
+            // Ocultar elementos no deseados en la exportación
+            salesListClone.querySelectorAll('button').forEach(btn => btn.style.display = 'none');
+            salesListClone.querySelectorAll('select').forEach(select => {
+                const span = document.createElement('span');
+                span.textContent = select.value;
+                select.parentNode.insertBefore(span, select);
+                select.style.display = 'none';
+            });
+            
+            // Crear un contenedor temporal para la clonación y darle estilos de escritorio
+            const tempExportDiv = document.createElement('div');
+            tempExportDiv.style.width = '1000px'; 
+            tempExportDiv.style.backgroundColor = '#ffffff';
+            tempExportDiv.style.color = '#000000';
+            tempExportDiv.appendChild(salesListClone);
+            document.body.appendChild(tempExportDiv);
+
+
+            html2canvas(tempExportDiv, { scale: 2 }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 190; // A4 size minus margin (210 - 20)
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                // Añadir imagen al PDF (puede ser de varias páginas)
+                doc.addImage(imgData, 'PNG', 10, y, imgWidth, imgHeight);
+                heightLeft -= (pageHeight - y);
+                position = -imgHeight + heightLeft;
+                
+                while (heightLeft >= pageHeight) {
+                    doc.addPage();
+                    doc.addImage(imgData, 'PNG', 10, -heightLeft + 10, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                doc.save(`${fileName}${new Date().toISOString().split('T')[0]}.pdf`);
+                
+                // Limpiar DOM temporal
+                document.body.removeChild(tempExportDiv);
+                alert(`✅ PDF de ${title} descargado con éxito.`);
+            }).catch(error => {
+                console.error("Error al generar PDF:", error);
+                document.body.removeChild(tempExportDiv);
+                alert("❌ Error: No se pudo generar el PDF. Asegúrate de que todos los datos se hayan cargado.");
+            });
+        };
+
+
         // --- Lógica de Faltantes ---
         async function fetchMissingProducts() {
             if (!supabase) return;
@@ -2679,7 +2783,7 @@
         };
 
 
-        // --- Lógica de Carga Inicial de Datos (Faltantes) ---
+        // --- Lógica de Faltantes ---
         async function fetchMissingProducts() {
             if (!supabase) return;
             const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false });
