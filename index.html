@@ -224,25 +224,36 @@
         }
 
         /********************************/
-        /* ESTILOS MÓVIL (Menú de Hamburguesa) */
+        /* ESTILOS MÓVIL (Menú de Hamburguesa y Columnas) */
         /********************************/
         #mobile-menu-button {
-            display: none; /* Oculto por defecto en escritorio */
+            display: none; 
+        }
+        
+        @media (min-width: 769px) {
+            #mobile-scan-button {
+                display: none !important;
+            }
         }
         
         @media (max-width: 768px) {
-            #view-buttons {
-                display: none !important; /* Ocultar botones de barra en móvil */
+            #view-buttons, #desktop-scan-button {
+                display: none !important; 
             }
             #mobile-menu-button {
-                display: block; /* Mostrar botón de hamburguesa */
+                display: block; 
             }
+            /* Inventario en 2 columnas en móvil */
+            #products .grid, #products-et .grid, #products-loader, #products-loader-et, #tools-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            }
+
             #mobile-menu-dropdown {
                 position: absolute;
                 right: 0;
-                top: 100%; /* Debajo del header */
+                top: 100%; 
                 width: 250px;
-                background-color: var(--pastel-bg); /* Fondo pastel */
+                background-color: var(--pastel-bg); 
                 color: var(--pastel-text);
                 border: 1px solid var(--border-color);
                 border-top: none;
@@ -303,7 +314,7 @@
             </h1>
         </div>
         <div class="flex items-center space-x-4 relative">
-             <button id="scan-button" onclick="openScannerModal()" class="text-white py-1 px-3 rounded-lg bg-green-600 hover:bg-green-700 transition duration-300 shadow-md text-sm flex items-center space-x-1" title="Escanear Producto y Registrar Venta">
+             <button id="desktop-scan-button" onclick="openScannerModal()" class="text-white py-1 px-3 rounded-lg bg-green-600 hover:bg-green-700 transition duration-300 shadow-md text-sm flex items-center space-x-1" title="Escanear Producto y Registrar Venta">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
                  </svg>
@@ -324,6 +335,12 @@
                 </svg>
             </button>
             <div id="mobile-menu-dropdown" class="rounded-md shadow-lg divide-y divide-gray-300 z-50 hidden">
+                 <button id="mobile-scan-button" onclick="openScannerModal()" class="text-sm font-medium flex items-center space-x-2">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
+                     </svg>
+                     <span>Escanear QR (Venta)</span>
+                 </button>
                 <button data-view="inventory" class="view-btn text-sm">📦 Inventario Principal</button>
                 <button data-view="sales" class="view-btn text-sm">💰 Ventas Principal</button>
                 <button data-view="inventory_el_transito" class="view-btn text-sm">🚚 Inventario El Transito</button>
@@ -1154,7 +1171,8 @@
                 section.className = "mb-10"; 
                 section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; 
                 const grid = document.createElement("div"); 
-                grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
+                // Ajuste de columnas: 2 en móvil, 3 en sm, 4 en lg, 4 en xl (Tailwind)
+                grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
                 grouped[category].forEach(p => { 
                     const card = document.createElement("div");
                     card.id = `product-card-${p.id}`; 
@@ -1266,7 +1284,8 @@
                 section.className = "mb-10"; 
                 section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; 
                 const grid = document.createElement("div"); 
-                grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
+                // Ajuste de columnas: 2 en móvil, 3 en sm, 4 en lg, 4 en xl (Tailwind)
+                grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
                 grouped[category].forEach(p => { 
                     const card = document.createElement("div"); 
                     card.id = `product-card-et-${p.id}`;
@@ -1370,92 +1389,8 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.product_name_sold || 'N/A'}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500" id="sale-price-cell${idSuffix}-${sale.id}">$${Number(sale.price).toFixed(2)} <button onclick="${editFn}('${sale.id}', ${sale.price}, ${isMainSales})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button></td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${statusSelectHtml}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="${deleteFn}('${sale.id}', ${isMainSales})" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="${deleteFn}('${p.id}', ${isMainSales})" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td>
                 </tr>`;
-        }
-        function renderSales(items) {
-            salesListLoader.innerHTML = "";
-            salesListContainer.innerHTML = ""; 
-            updateGeneralTotals(items, true); 
-            if (items.length === 0) {
-                const isSearching = searchSalesInput.value || pendingOnlyCheckbox.checked;
-                salesListContainer.innerHTML = `<p class="p-4 text-gray-400">${isSearching ? 'No se encontraron ventas que coincidan con el filtro.' : 'No hay ventas registradas.'}</p>`;
-                return;
-            } 
-            const groupedByDate = items.reduce((acc, sale) => {
-                const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
-                if (!acc[saleDate]) acc[saleDate] = [];
-                acc[saleDate].push(sale);
-                return acc;
-            }, {});
-            const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
-            let fullHTML = '';
-            sortedDates.forEach(date => {
-                const dailySales = groupedByDate[date];
-                const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
-                const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
-                const displayDate = new Date(date + 'T00:00:00Z').toLocaleDateString('es-SV', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
-                const headerHTML = `
-                    <div class="bg-gray-900/70 p-3 rounded-t-lg mt-6 flex justify-between items-center border-t border-x border-gray-700">
-                        <h3 class="font-bold text-lg text-white">${displayDate}</h3>
-                        <div class="text-sm font-semibold">
-                            <span class="mr-4 text-gray-400">Vendido (día): <span class="text-green-400" id="daily-sold-${date}">$${dailyTotalSold.toFixed(2)}</span></span>
-                            <span class="text-gray-400">Pagado (día): <span class="text-green-500" id="daily-paid-${date}">$${dailyTotalPaid.toFixed(2)}</span></span>
-                        </div>
-                    </div>`;
-                const rowsHTML = dailySales.map(sale => createSaleRowHTML(sale, true)).join('');
-                const tableHTML = `
-                    <table class="min-w-full divide-y divide-gray-700 shadow-md">
-                        <thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead>
-                        <tbody id="sales-tbody-${date}" class="bg-gray-800 divide-y divide-gray-700">
-                            ${rowsHTML}
-                        </tbody>
-                    </table>`;
-                fullHTML += `<div id="date-block-${date}">${headerHTML}${tableHTML}</div>`;
-            });
-            salesListContainer.innerHTML = fullHTML;
-        }
-        function renderSalesElTransito(items) {
-            salesListLoaderET.innerHTML = "";
-            salesListContainerET.innerHTML = ""; 
-            updateGeneralTotals(items, false); 
-            if (items.length === 0) {
-                const isSearching = searchSalesInputET.value || pendingOnlyCheckboxET.checked;
-                salesListContainerET.innerHTML = `<p class="p-4 text-gray-400">${isSearching ? 'No se encontraron ventas que coincidan con el filtro.' : 'No hay ventas registradas en El Transito.'}</p>`;
-                return;
-            } 
-            const groupedByDate = items.reduce((acc, sale) => {
-                const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
-                if (!acc[saleDate]) acc[saleDate] = [];
-                acc[saleDate].push(sale);
-                return acc;
-            }, {});
-            const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
-            let fullHTML = '';
-            sortedDates.forEach(date => {
-                const dailySales = groupedByDate[date];
-                const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
-                const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
-                const displayDate = new Date(date + 'T00:00:00Z').toLocaleDateString('es-SV', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
-                const headerHTML = `
-                    <div class="bg-gray-900/70 p-3 rounded-t-lg mt-6 flex justify-between items-center border-t border-x border-gray-700">
-                        <h3 class="font-bold text-lg text-white">${displayDate}</h3>
-                        <div class="text-sm font-semibold">
-                            <span class="mr-4 text-gray-400">Vendido (día): <span class="text-green-400" id="daily-sold-et-${date}">$${dailyTotalSold.toFixed(2)}</span></span>
-                            <span class="text-gray-400">Pagado (día): <span class="text-green-500" id="daily-paid-et-${date}">$${dailyTotalPaid.toFixed(2)}</span></span>
-                        </div>
-                    </div>`;
-                const rowsHTML = dailySales.map(sale => createSaleRowHTML(sale, false)).join('');
-                const tableHTML = `
-                    <table class="min-w-full divide-y divide-gray-700 shadow-md">
-                        <thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead>
-                        <tbody id="sales-tbody-et-${date}" class="bg-gray-800 divide-y divide-gray-700">
-                            ${rowsHTML}
-                        </tbody>
-                    </table>`;
-                fullHTML += `<div id="date-block-et-${date}">${headerHTML}${tableHTML}</div>`;
-            });
-            salesListContainerET.innerHTML = fullHTML;
         }
         window.changeSaleStatus = async function(id, newStatus, productName, isMainSales) {
             const table = isMainSales ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
@@ -2653,14 +2588,6 @@
             // LÓGICA DE CARGA MÓVIL
             if (isMobile()) {
                 toggleView('inventory'); // Carga inicial en Inventario Principal
-                // Asegurar que solo Inventario y Ventas principales están visibles al inicio en móvil
-                document.querySelectorAll('#mobile-menu-dropdown .view-btn').forEach(btn => {
-                    const view = btn.dataset.view;
-                    if (view !== 'inventory' && view !== 'sales') {
-                        // Ocultamos la vista actual y mostramos la deseada
-                        views[view].el.classList.add('hidden');
-                    }
-                });
             } else {
                 toggleView('inventory'); // Carga inicial en Inventario Principal (Desktop)
             }
