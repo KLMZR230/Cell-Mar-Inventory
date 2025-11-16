@@ -212,6 +212,23 @@
             --pastel-bg: #ffebee; /* Rojo pálido pastel para móvil */
             --pastel-text: #1e3a8a;
         }
+        /* TEMA 6: Sunrise Glow */
+        .theme-sunrise {
+            --bg-primary: #1a0000; /* Rojo oscuro */
+            --bg-secondary: #3d0000;
+            --bg-header: rgba(26, 0, 0, 0.8);
+            --text-primary: #ffe0b2; /* Amarillo/Naranja pálido */
+            --text-secondary: #ffcc80;
+            --text-muted: #ff9800;
+            --border-color: #5d0000;
+            --accent-color: #ff9800; /* Naranja ámbar */
+            --accent-color-dark: #f57c00;
+            --font-main: 'Poppins', sans-serif;
+            --font-headings: 'Playfair Display', serif;
+            --pastel-bg: #fff3e0; /* Naranja muy claro pastel para móvil */
+            --pastel-text: #1a0000;
+        }
+
         /* KEYFRAMES para la nieve */
         @keyframes snowfall {
             0% { background-position: 0 0; }
@@ -1038,6 +1055,13 @@
             root.className = theme;
             localStorage.setItem('selectedTheme', theme);
             themeSelector.value = theme;
+            
+            // Si es el tema de nieve, iniciamos o paramos la animación
+            if (theme === 'theme-christmas') {
+                document.body.classList.add('theme-christmas');
+            } else {
+                document.body.classList.remove('theme-christmas');
+            }
         }
         themeSelector.addEventListener('change', (e) => {
             applyTheme(e.target.value);
@@ -1049,15 +1073,26 @@
             mobileMenuDropdown.classList.add('hidden');
         };
         window.closeSettingsDropdown = function(event) {
-            if (settingsDropdown && !settingsDropdown.classList.contains('hidden')) {
-                let target = event.target;
-                while (target) {
-                    if (target === settingsDropdown || target === settingsButton) {
-                        return;
-                    }
-                    target = target.parentNode;
+            // CORRECCIÓN CRÍTICA: No cierres el menú si el clic fue dentro de la barra de encabezado, o si fue un botón clave.
+            const header = document.querySelector('header');
+            const target = event.target;
+            
+            // Si el clic fue dentro del header, no cierres el dropdown
+            if (header.contains(target)) {
+                 if (target.closest('#settings-button') || target.closest('#mobile-menu-button') || target.closest('#desktop-scan-button') || target.closest('#mobile-scan-button')) {
+                    // Clic en botones principales: Ignora el cierre global
+                    return; 
                 }
+            }
+
+            // Si el clic no fue dentro del dropdown, ciérralo
+            if (settingsDropdown && !settingsDropdown.classList.contains('hidden') && !settingsDropdown.contains(target) && target !== settingsButton) {
                 settingsDropdown.classList.add('hidden');
+            }
+            
+            // Si el clic no fue dentro del dropdown móvil, ciérralo
+            if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden') && !mobileMenuDropdown.contains(target) && target !== mobileMenuButton) {
+                mobileMenuDropdown.classList.add('hidden');
             }
         };
         
@@ -1068,15 +1103,6 @@
             // Cierra el menú de configuración si está abierto
             settingsDropdown.classList.add('hidden');
         };
-        // Cierra los menús al hacer clic fuera
-        document.body.addEventListener('click', (event) => {
-             if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden') && !mobileMenuButton.contains(event.target)) {
-                mobileMenuDropdown.classList.add('hidden');
-             }
-             if (settingsDropdown && !settingsDropdown.classList.contains('hidden') && !settingsButton.contains(event.target)) {
-                 settingsDropdown.classList.add('hidden');
-             }
-        });
 
 
         // ============================================================================
@@ -1717,7 +1743,6 @@
             
             const table = isMainSales ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
             const localArray = isMainSales ? allSales : allSalesElTransito;
-            // CORRECCIÓN: Buscamos la venta por ID para saber el status
             const sale = localArray.find(s => s.id === id);
 
             if (!sale) return;
@@ -1814,13 +1839,22 @@
                 let position = 0;
                 
                 // Añadir imagen al PDF (puede ser de varias páginas)
-                doc.addImage(imgData, 'PNG', 10, y, imgWidth, imgHeight);
+                const addImageFn = (imgData, yPos) => {
+                    if (yPos > pageHeight) {
+                        doc.addPage();
+                        doc.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+                    } else {
+                        doc.addImage(imgData, 'PNG', 10, yPos, imgWidth, imgHeight);
+                    }
+                };
+
+                addImageFn(imgData, y);
                 heightLeft -= (pageHeight - y);
-                position = -imgHeight + heightLeft;
-                
-                while (heightLeft >= pageHeight) {
+
+                while (heightLeft >= -pageHeight) {
                     doc.addPage();
-                    doc.addImage(imgData, 'PNG', 10, -heightLeft + 10, imgWidth, imgHeight);
+                    // Usamos una posición negativa para simular el desplazamiento
+                    doc.addImage(imgData, 'PNG', 10, - (imgHeight - heightLeft - 10), imgWidth, imgHeight);
                     heightLeft -= pageHeight;
                 }
 
@@ -1885,7 +1919,10 @@
 
         // --- Evento de Carga Principal ---
         window.addEventListener("load", async () => {
-            themeSelector.value = root.className || 'theme-dark'; 
+            // Aplica el tema guardado o por defecto (y activa la nieve si corresponde)
+            const initialTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
+            applyTheme(initialTheme); 
+            
             saleDateIn.value = new Date().toISOString().split('T')[0];
             saleDateInET.value = new Date().toISOString().split('T')[0];
             
