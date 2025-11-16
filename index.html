@@ -685,6 +685,19 @@
         let currentEditingProduct = null;
         let isMainInventory = true;
         let selectedProductImageFile = null; // Variable para almacenar el archivo de imagen a subir en el modal de edición
+        
+        // --- ADICIÓN: Variables para almacenar totales por categoría ---
+        let categoryTotals = {};
+        let categoryTotalsET = {};
+        
+        // --- ADICIÓN: Elementos para mostrar los totales ---
+        const categoryTotalsEl = document.createElement("div"); 
+        categoryTotalsEl.id = "category-totals";
+        categoryTotalsEl.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
+        
+        const categoryTotalsElET = document.createElement("div"); 
+        categoryTotalsElET.id = "category-totals-et";
+        categoryTotalsElET.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
 
         // --- Elementos de Configuración General ---
         const themeSelector = document.getElementById('theme-selector');
@@ -825,6 +838,7 @@
             if (productToUpdate) {
                 const currentQty = parseInt(productToUpdate.quantity) || 0;
                 const newQty = Math.max(0, currentQty + delta);
+                const isMain = (table === PRODUCTS_TABLE); 
 
                 if (delta < 0 && currentQty <= 0) {
                     console.warn(`⚠️ Advertencia: Stock de ${productName} ya es 0. No se puede descontar.`);
@@ -833,10 +847,14 @@
                 
                 // Optimistic Update (Local)
                 productToUpdate.quantity = newQty;
-                let isMain = (table === PRODUCTS_TABLE); 
                 updateProductCardInDOM(productToUpdate, isMain); 
                 let datalistEl = isMain ? inventorySuggestions : inventorySuggestionsET;
                 updateAutocompleteList(localArray, datalistEl);
+                // ADICIÓN: Recalcular totales después de la actualización local optimista
+                calculateCategoryTotals(localArray, isMain);
+                if(isMain) renderProducts(localArray.filter(p => true)); 
+                else renderProductsET(localArray.filter(p => true));
+
 
                 if (!supabase) return console.error("❌ Error: Supabase no está cargado para actualizar stock.");
 
@@ -852,6 +870,10 @@
                     productToUpdate.quantity = currentQty;
                     updateProductCardInDOM(productToUpdate, isMain);
                     updateAutocompleteList(localArray, datalistEl);
+                    calculateCategoryTotals(localArray, isMain);
+                    if(isMain) renderProducts(localArray.filter(p => true)); 
+                    else renderProductsET(localArray.filter(p => true));
+
                     alert(`❌ Error al actualizar stock de ${productName}. El stock local ha sido revertido.`);
                 } else {
                     console.log(`✅ Stock actualizado para: ${productName}. Nuevo stock: ${newQty}`);
@@ -887,6 +909,22 @@
         // == V. LÓGICA DE VISTAS Y RENDERS (Producto, Venta, Faltantes, Herramienta) ==
         // ============================================================================
 
+        // --- ADICIÓN: Función para calcular los totales de categoría ---
+        function calculateCategoryTotals(productsArray, isMain) {
+            const totals = productsArray.reduce((acc, p) => {
+                const cat = p.category || 'Otros';
+                acc[cat] = (acc[cat] || 0) + parseInt(p.quantity || 0);
+                return acc;
+            }, {});
+            if (isMain) {
+                categoryTotals = totals;
+            } else {
+                categoryTotalsET = totals;
+            }
+            return totals;
+        }
+
+
         // --- Funciones de Vistas ---
         const views = { 
             inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario' }, 
@@ -920,8 +958,6 @@
                 if (targetEl) {
                     // Usar window.scrollTo con top 0 para asegurar que la cabecera es visible
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                    // Opcional: usar scrollIntoView en el div principal, con block: 'start'
-                    // targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             }
         }
@@ -942,15 +978,31 @@
             const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
             if (error) { console.error("Error cargando productos:", error); totalCount.textContent = "Error al cargar"; productsEl.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
             allProducts = data; 
+            calculateCategoryTotals(allProducts, true); // <--- MODIFICACIÓN
             filterAndRenderProducts(); 
             updateAutocompleteList(allProducts, inventorySuggestions);
         }
-        function filterAndRenderProducts() { const term = (searchInput.value || "").toLowerCase().trim(); const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProducts(filtered); }
+        function filterAndRenderProducts() { 
+            const term = (searchInput.value || "").toLowerCase().trim(); 
+            const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); 
+            renderProducts(filtered); 
+        }
         function renderProducts(items) { 
             productsLoader.innerHTML = ""; 
             productsEl.innerHTML = ""; 
             totalCount.textContent = `${items.length} productos`; 
-            if (items.length === 0) { productsEl.innerHTML = `<p class="text-gray-400">No se encontraron productos${searchInput.value ? ' para "' + searchInput.value + '"' : ''}.</p>`; return; } 
+
+            // --- ADICIÓN: Renderizar Totales de Categoría ---
+            categoryTotalsEl.innerHTML = `
+                <span class="font-bold text-indigo-300">Total por Categoría:</span>
+                ${Object.keys(categoryTotals).sort().map(cat => 
+                    `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotals[cat]}</span> u.</span>`
+                ).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
+            `;
+            productsEl.appendChild(categoryTotalsEl);
+            // --- FIN ADICIÓN ---
+
+            if (items.length === 0) { productsEl.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos${searchInput.value ? ' para "' + searchInput.value + '"' : ''}.</p>`; return; } 
             const grouped = items.reduce((acc, p) => { 
                 const cat = p.category || 'Sin Categoría'; 
                 if (!acc[cat]) acc[cat] = []; 
@@ -1024,6 +1076,7 @@
                 alert("❌ Error al eliminar: " + error.message);
             } else {
                 allProducts = allProducts.filter(p => p.id !== id);
+                calculateCategoryTotals(allProducts, true); // <--- ADICIÓN
                 filterAndRenderProducts(); 
                 updateAutocompleteList(allProducts, inventorySuggestions);
                 updateLabelView();
@@ -1036,16 +1089,32 @@
             const { data, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
             if (error) { console.error("Error cargando productos (El Transito):", error); totalCountET.textContent = "Error al cargar"; productsElET.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
             allProductsElTransito = data; 
+            calculateCategoryTotals(allProductsElTransito, false); // <--- MODIFICACIÓN
             filterAndRenderProductsET(); 
             updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             if (labelsLocationSelect.value === 'et') populateLabelCategories(allProductsElTransito);
         }
-        function filterAndRenderProductsET() { const term = (searchInputET.value || "").toLowerCase().trim(); const filtered = allProductsElTransito.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); renderProductsET(filtered); }
+        function filterAndRenderProductsET() { 
+            const term = (searchInputET.value || "").toLowerCase().trim(); 
+            const filtered = allProductsElTransito.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); 
+            renderProductsET(filtered); 
+        }
         function renderProductsET(items) { 
             productsLoaderET.innerHTML = ""; 
             productsElET.innerHTML = ""; 
             totalCountET.textContent = `${items.length} productos`; 
-            if (items.length === 0) { productsElET.innerHTML = `<p class="text-gray-400">No se encontraron productos${searchInputET.value ? ' para "' + searchInputET.value + '"' : ''}.</p>`; return; } 
+            
+            // --- ADICIÓN: Renderizar Totales de Categoría (El Transito) ---
+            categoryTotalsElET.innerHTML = `
+                <span class="font-bold text-indigo-300">Total por Categoría (ET):</span>
+                ${Object.keys(categoryTotalsET).sort().map(cat => 
+                    `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotalsET[cat]}</span> u.</span>`
+                ).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
+            `;
+            productsElET.appendChild(categoryTotalsElET);
+            // --- FIN ADICIÓN ---
+
+            if (items.length === 0) { productsElET.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos${searchInputET.value ? ' para "' + searchInputET.value + '"' : ''}.</p>`; return; } 
             const grouped = items.reduce((acc, p) => { 
                 const cat = p.category || 'Sin Categoría'; 
                 if (!acc[cat]) acc[cat] = []; 
@@ -1093,6 +1162,7 @@
                 alert("❌ Error al eliminar: " + error.message);
             } else {
                 allProductsElTransito = allProductsElTransito.filter(p => p.id !== id);
+                calculateCategoryTotals(allProductsElTransito, false); // <--- ADICIÓN
                 filterAndRenderProductsET(); 
                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
                 updateLabelView();
@@ -1528,8 +1598,10 @@
                         if (index !== -1) {
                             const oldCategory = localArray[index].category;
                             const newCategory = newRecord.category;
+                            const oldQuantity = localArray[index].quantity; 
+                            const newQuantity = newRecord.quantity; 
                             Object.assign(localArray[index], newRecord); 
-                            if (oldCategory !== newCategory) {
+                            if (oldCategory !== newCategory || oldQuantity !== newQuantity) { 
                                 needsFullRender = true;
                             } else {
                                 updateProductCardInDOM(newRecord, isMainProducts); 
@@ -1547,9 +1619,16 @@
                         }
                         break;
                 }
+                
+                // --- ADICIÓN: Recalcular totales ANTES de renderizar ---
+                const isMain = isMainProducts;
+                calculateCategoryTotals(localArray, isMain);
+                
                 if (needsFullRender) {
+                    // Esto recalcula los grupos y re-renderiza la lista de tarjetas Y los totales
                     renderFunction(); 
                 }
+                
                 if (isMainProducts) updateAutocompleteList(allProducts, inventorySuggestions);
                 if (isElTransitoProducts) updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
                 return; 
@@ -1737,6 +1816,12 @@
                 // 4. Actualizar localmente y en el DOM (Realtime debería hacer esto, pero por robustez)
                 Object.assign(currentEditingProduct, updatePayload);
                 updateProductCardInDOM(currentEditingProduct, isMainInventory);
+                
+                // ADICIÓN: Recalcular totales después de la actualización exitosa
+                const localArray = isMainInventory ? allProducts : allProductsElTransito;
+                calculateCategoryTotals(localArray, isMainInventory);
+                if(isMainInventory) filterAndRenderProducts();
+                else filterAndRenderProductsET();
                 
                 modalStatus.textContent = 'Producto actualizado con éxito. ✅';
                 setTimeout(closeProductEditorModal, 1000);
