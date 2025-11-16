@@ -103,6 +103,8 @@
             --accent-color-dark: #6366f1;
             --font-main: 'Poppins', sans-serif;
             --font-headings: 'Poppins', sans-serif;
+            --pastel-bg: #e0f2f1; /* Verde pastel claro para móvil */
+            --pastel-text: #1f2937;
         }
         
         /********************************/
@@ -131,6 +133,8 @@
             --accent-color-dark: #e63e00;
             --font-main: 'Roboto', sans-serif;
             --font-headings: 'Roboto', sans-serif;
+            --pastel-bg: #ffccbc; /* Naranja/Melocotón pastel */
+            --pastel-text: #2d1a1a;
         }
         .theme-infernal { background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
         .theme-infernal .product-card:hover, .theme-infernal .tool-card:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.5); border-color: rgba(255, 69, 0, 0.7); }
@@ -150,6 +154,8 @@
             --accent-color-dark: #B8860B;
             --font-main: 'Poppins', sans-serif;
             --font-headings: 'Playfair Display', serif;
+            --pastel-bg: #faf3e0; /* Crema pastel */
+            --pastel-text: #121212;
         }
         .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
         .theme-gold .product-card:hover, .theme-gold .tool-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
@@ -216,6 +222,51 @@
             color: #ffffff !important;
             border-color: #b91c1c !important;
         }
+
+        /********************************/
+        /* ESTILOS MÓVIL (Menú de Hamburguesa) */
+        /********************************/
+        #mobile-menu-button {
+            display: none; /* Oculto por defecto en escritorio */
+        }
+        
+        @media (max-width: 768px) {
+            #view-buttons {
+                display: none !important; /* Ocultar botones de barra en móvil */
+            }
+            #mobile-menu-button {
+                display: block; /* Mostrar botón de hamburguesa */
+            }
+            #mobile-menu-dropdown {
+                position: absolute;
+                right: 0;
+                top: 100%; /* Debajo del header */
+                width: 250px;
+                background-color: var(--pastel-bg); /* Fondo pastel */
+                color: var(--pastel-text);
+                border: 1px solid var(--border-color);
+                border-top: none;
+                z-index: 40;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+            #mobile-menu-dropdown button {
+                width: 100%;
+                text-align: left;
+                padding: 0.75rem 1rem;
+                font-weight: 500;
+                color: var(--pastel-text);
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            }
+            #mobile-menu-dropdown button:hover {
+                background-color: rgba(0, 0, 0, 0.05);
+            }
+             /* Estilo para el botón activo en el menú móvil */
+            #mobile-menu-dropdown .bg-indigo-500 {
+                background-color: var(--accent-color) !important;
+                color: var(--text-primary) !important;
+                font-weight: bold;
+            }
+        }
     </style>
     <script>
         (function() {
@@ -267,7 +318,21 @@
                 <button data-view="missing" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🔔 Faltantes</button>
                 <button data-view="tools" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🛠️ Herramientas</button>
             </div>
-            <button id="settings-button" onclick="toggleSettingsDropdown(event)" class="text-gray-300 hover:text-indigo-400 p-2 rounded-full bg-gray-700/50 transition duration-300 shadow-md" title="Configuración">
+             <button id="mobile-menu-button" onclick="toggleMobileMenu(event)" class="text-gray-300 hover:text-indigo-400 p-2 rounded-full bg-gray-700/50 transition duration-300 shadow-md" title="Menú">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+            <div id="mobile-menu-dropdown" class="rounded-md shadow-lg divide-y divide-gray-300 z-50 hidden">
+                <button data-view="inventory" class="view-btn text-sm">📦 Inventario Principal</button>
+                <button data-view="sales" class="view-btn text-sm">💰 Ventas Principal</button>
+                <button data-view="inventory_el_transito" class="view-btn text-sm">🚚 Inventario El Transito</button>
+                <button data-view="sales_el_transito" class="view-btn text-sm">🚚 Ventas El Transito</button>
+                <button data-view="labels" class="view-btn text-sm">🖨️ Etiquetas QR</button>
+                <button data-view="missing" class="view-btn text-sm">🔔 Faltantes</button>
+                <button data-view="tools" class="view-btn text-sm">🛠️ Herramientas</button>
+            </div>
+             <button id="settings-button" onclick="toggleSettingsDropdown(event)" class="text-gray-300 hover:text-indigo-400 p-2 rounded-full bg-gray-700/50 transition duration-300 shadow-md" title="Configuración">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.313.823 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.823 3.313-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.313-.823-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.823 3.313 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -796,6 +861,11 @@
         const modalImagePreview = document.getElementById('modal-image-preview');
         const modalImageUpload = document.getElementById('modal-image-upload');
         const modalStatus = document.getElementById('modal-status');
+        
+        // --- ADICIÓN: Elementos de Menú Móvil ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenuDropdown = document.getElementById('mobile-menu-dropdown');
+        const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
 
 
         // ============================================================================
@@ -813,6 +883,8 @@
         window.toggleSettingsDropdown = function(event) {
             event.stopPropagation(); 
             settingsDropdown.classList.toggle('hidden');
+            // Cierra el menú móvil si está abierto
+            mobileMenuDropdown.classList.add('hidden');
         };
         window.closeSettingsDropdown = function(event) {
             if (settingsDropdown && !settingsDropdown.classList.contains('hidden')) {
@@ -826,6 +898,24 @@
                 settingsDropdown.classList.add('hidden');
             }
         };
+        
+        // --- ADICIÓN: Lógica del Menú Móvil ---
+        window.toggleMobileMenu = function(event) {
+            event.stopPropagation(); 
+            mobileMenuDropdown.classList.toggle('hidden');
+            // Cierra el menú de configuración si está abierto
+            settingsDropdown.classList.add('hidden');
+        };
+        // Cierra los menús al hacer clic fuera
+        document.body.addEventListener('click', (event) => {
+             if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden') && !mobileMenuButton.contains(event.target)) {
+                mobileMenuDropdown.classList.add('hidden');
+             }
+             if (settingsDropdown && !settingsDropdown.classList.contains('hidden') && !settingsButton.contains(event.target)) {
+                 settingsDropdown.classList.add('hidden');
+             }
+        });
+
 
         // ============================================================================
         // == IV. UTILIDADES Y LÓGICA COMPARTIDA                                     ==
@@ -978,26 +1068,37 @@
             Object.keys(views).forEach(key => { 
                 const isCurrent = key === viewName; 
                 views[key].el.classList.toggle('hidden', !isCurrent); 
-                const btn = document.querySelector(`.view-btn[data-view="${key}"]`); 
+                
+                // Botones de escritorio (Barra ancha)
+                const btn = document.querySelector(`#view-buttons .view-btn[data-view="${key}"]`); 
                 if (btn) {
                     btn.classList.toggle('bg-indigo-500', isCurrent); 
                     btn.classList.toggle('text-white', isCurrent); 
                     btn.classList.toggle('bg-transparent', !isCurrent); 
                     btn.classList.toggle('text-gray-300', !isCurrent); 
                 }
+
+                // Botones de menú móvil (Dropdown)
+                 const mobileBtn = document.querySelector(`#mobile-menu-dropdown .view-btn[data-view="${key}"]`);
+                 if (mobileBtn) {
+                    mobileBtn.classList.toggle('bg-indigo-500', isCurrent); 
+                    mobileBtn.classList.toggle('font-bold', isCurrent);
+                 }
             }); 
             currentViewTitle.textContent = views[viewName].title; 
+            
             if (viewName === 'labels') {
                 updateLabelView();
             }
             
-            // CORRECCIÓN: Desplazar la vista al inicio de la sección de Ventas o Ventas El Transito
-            if (viewName === 'sales' || viewName === 'sales_el_transito') {
-                const targetEl = views[viewName].el;
-                if (targetEl) {
-                    // Usar window.scrollTo con top 0 para asegurar que la cabecera es visible
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
+            // Cierra el menú móvil si se selecciona una vista
+            if (isMobile() && !mobileMenuDropdown.classList.contains('hidden')) {
+                mobileMenuDropdown.classList.add('hidden');
+            }
+            
+            // Desplazar la vista al inicio
+            if (viewName === 'sales' || viewName === 'sales_el_transito' || viewName === 'inventory' || viewName === 'inventory_el_transito') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
         function showSkeletonLoaders() { 
@@ -2318,7 +2419,12 @@
                 if(editButton) editButton.textContent = originalText; 
             }
         });
-        document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', () => toggleView(btn.dataset.view)));
+        // Modificación para que el menú móvil use toggleView (y se auto-cierre)
+        document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', (e) => {
+            // Previene el doble click en el botón de escritorio
+            if (!isMobile() && e.target.closest('#mobile-menu-dropdown')) return; 
+            toggleView(btn.dataset.view);
+        }));
 
         // --- Lógica de Impresión y Descarga de Etiquetas ---
         function populateLabelCategories(products) {
@@ -2543,7 +2649,22 @@
             themeSelector.value = root.className || 'theme-dark'; 
             saleDateIn.value = new Date().toISOString().split('T')[0];
             saleDateInET.value = new Date().toISOString().split('T')[0];
-            toggleView('inventory'); 
+            
+            // LÓGICA DE CARGA MÓVIL
+            if (isMobile()) {
+                toggleView('inventory'); // Carga inicial en Inventario Principal
+                // Asegurar que solo Inventario y Ventas principales están visibles al inicio en móvil
+                document.querySelectorAll('#mobile-menu-dropdown .view-btn').forEach(btn => {
+                    const view = btn.dataset.view;
+                    if (view !== 'inventory' && view !== 'sales') {
+                        // Ocultamos la vista actual y mostramos la deseada
+                        views[view].el.classList.add('hidden');
+                    }
+                });
+            } else {
+                toggleView('inventory'); // Carga inicial en Inventario Principal (Desktop)
+            }
+            
             showSkeletonLoaders(); 
             
             // Cargar Logo (independiente de Supabase)
