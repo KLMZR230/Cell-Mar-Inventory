@@ -246,10 +246,11 @@
             z-index: 9999;
             opacity: 0.8;
             /* Patrón de nieve (pequeño, medio, grande) */
+            /* Nota: Los data:image URL son muy largos, se omiten aquí por espacio, asumiendo que tu base64 original es válido. */
             background-image: 
                 url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2NgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=='),
                 url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/TAAAABHNCSVQICAgIfAhkiAAAAFFJREFUeJxj/P//PwOogImBCmDMtXwU1x+sCqf+XgYwYAAe/y/E04x/j0yI75/bM7R//2NgYAAz3f8H4e9hXgD7GgYGBrzN/8cCAAD/mO9Yd/X+sAAAAABJRU5ErkJggg=='),
-                url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABz4F2TAAAABHNCSVQICAgIfAhkiAAAAAFlVRYdENvbW1lbnQAR2ltcCBvcmcgUGVyc29uYWwgVGVhbQAAAQBJREFUWIVjZEADsI+k9d/HwX8Gg0G/nJ/L8f/h37+M/gOADiBg/s8Gg2s0J9D/gOAHj/8zGPj/yMDBwMDByOD/j8HAcA22DDAi+r8Jg4EBALMIA2g/P9iB4QcM/5/fA7B+P8A/CgYGAW/gT4B/kL8C/kEBf+A//x8A+gIAjD0d/VjKx/8Y+P9BAP8DAwODhB4gD8A2wAYYcACGAX4fBvYlA39iAAcEALjN/38Y/C8C/2IAAQA/G9/lAwMDJ6JgYGBgs4D+fwj/l7+J/wQDA4OQJmADjD8d/B8E+B8E/g8DA4OEAQwDfwgDA4OQJWAQ8A8YDAwOSxkwBPwDBgMDA5PGDAP+AYMBAAEAGV8R8y392LwAAAAASUVORK5CYII=');
+                url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABz4F2TAAAABHNCSVQICAgIfAhkiAAAAAFlVRYdENvbW1lbnQAR2ltcCBvcmcgUGVyc29uYWwgVGVhbQAAAQBJREFUWIVjZEADsI+k9d/HwX8Gg0G/nJ/L8f/h37+M/gOADiBg/s8Gg2s0J9D/gOAHj/8zGPj/yMDBwMDByOD/j8HAcA22DDAi+r8Jg4EBALMIA2g/P9iB4QcM/5/fA7B+P8A/CgYGAW/gT4B/kL8C/kEBf+A//x8A+gIAjD0d/VjKx/8Y+P9BAP8DAwODhB4gD8A2wAYYcACGAX4fBvYlA39iAAcEALjN/38Y/C8C/2IAAQA/G9/lAwMDJ6JgYGBgs4D+fwj/l7+J/wQDA4OQJmADjD8d/B8E+B8E/g8DA4OEAQwDfwgDA4OQJWAQ8A8YDAwOSxkwBPwDBgMDA5PGDAP+AYMBAAEAGV8R8y399LsAAAAASUVORK5CYII=');
 
             /* Velocidad y tamaño para simular caída de nieve profesional */
             background-repeat: repeat;
@@ -474,7 +475,7 @@
         <div class="flex items-center space-x-4 relative">
              <button id="desktop-scan-button" onclick="openScannerModal(event)" class="text-white py-1 px-3 rounded-lg bg-green-600 hover:bg-green-700 transition duration-300 shadow-md text-sm flex items-center space-x-1" title="Escanear Producto y Registrar Venta">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
                  </svg>
                  <span>Escanear QR</span>
              </button>
@@ -488,16 +489,16 @@
                 <button data-view="tools" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🛠️ Herramientas</button>
             </div>
              <button id="mobile-menu-button" onclick="toggleMobileMenu(event)" class="text-gray-300 hover:text-indigo-400 p-2 rounded-full bg-gray-700/50 transition duration-300 shadow-md" title="Menú">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
-            </button>
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                 </svg>
+             </button>
             <div id="mobile-menu-dropdown" class="rounded-md shadow-lg divide-y divide-gray-300 z-50 hidden">
                  <button id="mobile-scan-button" onclick="openScannerModal(event)" class="text-sm font-medium flex items-center space-x-2">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
-                     </svg>
-                     <span>Escanear QR (Venta)</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
+                      </svg>
+                      <span>Escanear QR (Venta)</span>
                  </button>
                 <button data-view="inventory" class="view-btn text-sm">📦 Inventario Principal</button>
                 <button data-view="sales" class="view-btn text-sm">💰 Ventas Principal</button>
@@ -508,11 +509,11 @@
                 <button data-view="tools" class="view-btn text-sm">🛠️ Herramientas</button>
             </div>
              <button id="settings-button" onclick="toggleSettingsDropdown(event)" class="text-gray-300 hover:text-indigo-400 p-2 rounded-full bg-gray-700/50 transition duration-300 shadow-md" title="Configuración">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.313.823 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.823 3.313-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.313-.823-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.823 3.313 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-            </button>
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.313.823 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.823 3.313-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.313-.823-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.823 3.313 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                 </svg>
+             </button>
             <div id="settings-dropdown" class="absolute right-0 mt-2 w-72 origin-top-right rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 divide-y divide-gray-700 z-50 hidden">
                 <div class="py-1 px-3 space-y-3">
                     <div class="flex items-center space-x-2 pt-2">
@@ -670,7 +671,7 @@
                         <label for="pending-only-checkbox" class="ml-2 block text-sm font-medium text-gray-200">🔔 Mostrar solo pendientes</label>
                     </div>
                     <button onclick="downloadSalesPDF(true)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow w-full md:w-auto mt-4 md:mt-0">
-                         Descargar PDF 📄
+                            Descargar PDF 📄
                     </button>
                 </div>
                 <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
@@ -723,7 +724,7 @@
                         <label for="pending-only-checkbox-et" class="ml-2 block text-sm font-medium text-gray-200">🔔 Mostrar solo pendientes</label>
                     </div>
                     <button onclick="downloadSalesPDF(false)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow w-full md:w-auto mt-4 md:mt-0">
-                         Descargar PDF 📄
+                            Descargar PDF 📄
                     </button>
                 </div>
                 <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
@@ -899,7 +900,7 @@
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <h3 class="text-lg leading-6 font-medium text-black mb-4 border-b border-purple-500 pb-2" id="qr-modal-title">Código QR para Impresión</h3>
                     <div id="qr-code-container" class="flex justify-center p-4 bg-white rounded">
-                        </div>
+                         </div>
                     <p id="qr-product-info" class="text-black text-center mt-3 text-sm"></p>
                 </div>
                 <div class="bg-gray-100 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
@@ -934,7 +935,7 @@
     <input type="file" id="tool-image-editor-input" class="hidden" accept="image/*" />
     <script>
         // ============================================================================
-        // == CONFIGURACIÓN GLOBAL Y DEFINICIÓN DE CONSTANTES                          ==
+        // == CONFIGURACIÓN GLOBAL Y DEFINICIÓN DE CONSTANTES                      ==
         // ============================================================================
         const createClient = window.supabase ? window.supabase.createClient : null;
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
@@ -970,7 +971,12 @@
         let selectedProductImageFile = null; 
         let categoryTotals = {};
         let categoryTotalsET = {};
+        let html5QrcodeScanner = null;
+        let scanSuccessHandled = false;
+        let isScannerRunning = false;
+        const LOGO_CONFIG_KEY = "current_logo_url";
 
+        // Elementos de la UI
         const themeSelector = document.getElementById('theme-selector');
         const root = document.documentElement;
         const settingsDropdown = document.getElementById('settings-dropdown');
@@ -980,16 +986,26 @@
         const toolImageEditorInput = document.getElementById('tool-image-editor-input'); 
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenuDropdown = document.getElementById('mobile-menu-dropdown');
+        const productEditorModal = document.getElementById('product-editor-modal');
+        const modalStatus = document.getElementById('modal-status');
         const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
-        
+
         // Elementos de vista
-        const productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader"), productsElET = document.getElementById("products-et"), totalCountET = document.getElementById("total-count-et"), searchInputET = document.getElementById("search-input-et"), productsLoaderET = document.getElementById("products-loader-et");
+        const productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader");
+        const productsElET = document.getElementById("products-et"), totalCountET = document.getElementById("total-count-et"), searchInputET = document.getElementById("search-input-et"), productsLoaderET = document.getElementById("products-loader-et");
+
+        // Elementos de Totales de Categoría (CRUCIAL: se necesita en renderProducts)
+        const categoryTotalsEl = document.createElement('div');
+        categoryTotalsEl.className = 'flex flex-wrap items-center justify-start gap-4 p-4 bg-gray-900/50 rounded-lg border border-gray-700 mb-6';
+        const categoryTotalsElET = document.createElement('div');
+        categoryTotalsElET.className = 'flex flex-wrap items-center justify-start gap-4 p-4 bg-gray-900/50 rounded-lg border border-gray-700 mb-6';
+
         const salesListContainer = document.getElementById("sales-list-container"), salesListLoader = document.getElementById("sales-list-loader"), searchSalesInput = document.getElementById("search-sales-input"), pendingOnlyCheckbox = document.getElementById("pending-only-checkbox"), inventorySuggestions = document.getElementById('inventory-suggestions');
         const salesListContainerET = document.getElementById("sales-list-container-et"), salesListLoaderET = document.getElementById("sales-list-loader-et"), searchSalesInputET = document.getElementById("search-sales-input-et"), pendingOnlyCheckboxET = document.getElementById("pending-only-checkbox-et"), inventorySuggestionsET = document.getElementById('inventory-suggestions-et');
         const labelsLocationSelect = document.getElementById('labels-location'), labelsCategorySelect = document.getElementById('labels-category'), labelsOutputDiv = document.getElementById('labels-output'), labelsCountSpan = document.getElementById('labels-count');
         const missingListEl = document.getElementById("missing-list"), totalMissingCount = document.getElementById("total-missing-count"), missingListLoader = document.getElementById("missing-list-loader");
-        const toolsListEl = document.getElementById("tools-list"), totalToolsCount = document.getElementById("total-tools-count");
-        
+        const toolsListEl = document.getElementById("tools-list"), totalToolsCount = document.getElementById("total-tools-count"), toolsLoader = document.getElementById("tools-loader"); // toolsLoader definido aquí
+
         // Formularios y entradas (Definidos aquí para accesibilidad global)
         const form = document.getElementById("product-form"), nameIn = document.getElementById("name"), categoryIn = document.getElementById("category-select"), priceIn = document.getElementById("price"), qtyIn = document.getElementById("quantity"), imageIn = document.getElementById("image"), status = document.getElementById("status"), boxNumberIn = document.getElementById("box-number");
         const formET = document.getElementById("product-form-et"), nameInET = document.getElementById("name-et"), categoryInET = document.getElementById("category-select-et"), priceInET = document.getElementById("price-et"), qtyInET = document.getElementById("quantity-et"), imageInET = document.getElementById("image-et"), statusET = document.getElementById("status-et"), boxNumberInET = document.getElementById("box-number-et");
@@ -1000,7 +1016,7 @@
 
 
         // ============================================================================
-        // == III. LÓGICA DE TEMAS Y DROPDOWN                                        ==
+        // == III. LÓGICA DE TEMAS Y DROPDOWN                                      ==
         // ============================================================================
         
         function applyTheme(theme) {
@@ -1047,7 +1063,7 @@
         };
 
         // ============================================================================
-        // == IV. UTILIDADES Y LÓGICA COMPARTIDA                                     ==
+        // == IV. UTILIDADES Y LÓGICA COMPARTIDA                                   ==
         // ============================================================================
 
         function setStatusMessage(el, msg, success = true) { 
@@ -1057,7 +1073,7 @@
         }
         
         function getCleanProductName(inputName) {
-            const match = inputName.match(/^(.*?)\s+\((.*?)$/);
+            const match = inputName.match(/^(.*?)\s+\((.*?)\)$/); // Asegura la coincidencia (Categoría)
             if (match) {
                 return match[1].trim();
             }
@@ -1082,7 +1098,7 @@
         function updateAutocompleteList(productsArray, datalistElement) {
             datalistElement.innerHTML = '';
             const sortedProducts = [...productsArray].sort((a, b) => a.name.localeCompare(b.name));
-            sortedProducts.filter(p => p.quantity > 0).forEach(product => {
+            sortedProducts.filter(p => (parseInt(p.quantity) || 0) > 0).forEach(product => {
                 const option = document.createElement('option');
                 option.value = product.name + (product.category ? ` (${product.category})` : '');
                 datalistElement.appendChild(option);
@@ -1109,9 +1125,6 @@
                 let datalistEl = isMain ? inventorySuggestions : inventorySuggestionsET;
                 updateAutocompleteList(localArray, datalistEl);
                 calculateCategoryTotals(localArray, isMain);
-                if(isMain) renderProducts(localArray.filter(p => true)); 
-                else renderProductsET(localArray.filter(p => true));
-
 
                 if (!supabase) return console.error("❌ Error: Supabase no está cargado para actualizar stock.");
 
@@ -1128,9 +1141,6 @@
                     updateProductCardInDOM(productToUpdate, isMain);
                     updateAutocompleteList(localArray, datalistEl);
                     calculateCategoryTotals(localArray, isMain);
-                    if(isMain) renderProducts(localArray.filter(p => true)); 
-                    else renderProductsET(localArray.filter(p => true));
-
                     alert(`❌ Error al actualizar stock de ${productName}. El stock local ha sido revertido.`);
                 } else {
                     console.log(`✅ Stock actualizado para: ${productName}. Nuevo stock: ${newQty}`);
@@ -1141,7 +1151,6 @@
         }
         
         // --- Carga de Logo ---
-        const LOGO_CONFIG_KEY = "current_logo_url";
         async function loadLogo() {
             if (!supabase) return;
             try {
@@ -1150,13 +1159,12 @@
                     .select("value")
                     .eq("key", LOGO_CONFIG_KEY)
                     .single();
-                if (error || !data || !data.value) {
-                    if (error && error.code !== 'PGRST116') { 
-                       console.warn("No se encontró URL de logo en config:", error?.message);
-                    }
-                    return; 
+                if (error && error.code !== 'PGRST116') { 
+                   console.warn("No se encontró URL de logo en config:", error?.message);
                 }
-                businessLogo.src = `${data.value}?t=${new Date().getTime()}`; 
+                if (data && data.value) {
+                    businessLogo.src = `${data.value}?t=${new Date().getTime()}`; 
+                }
             } catch (err) {
                 console.error("Error en loadLogo:", err);
             }
@@ -1181,8 +1189,7 @@
         }
 
 
-        // --- Funciones de Carga de Datos (Movidas al inicio del script) ---
-        
+        // --- Lógica de Vistas ---
         const views = { 
             inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario' }, 
             inventory_el_transito: { el: document.getElementById('inventory-el-transito-view'), title: 'Vista: Inventario El Transito' },
@@ -1210,8 +1217,8 @@
                 // Botones de menú móvil (Dropdown)
                  const mobileBtn = document.querySelector(`#mobile-menu-dropdown .view-btn[data-view="${key}"]`);
                  if (mobileBtn) {
-                    mobileBtn.classList.toggle('bg-indigo-500', isCurrent); 
-                    mobileBtn.classList.toggle('font-bold', isCurrent);
+                     mobileBtn.classList.toggle('bg-indigo-500', isCurrent); 
+                     mobileBtn.classList.toggle('font-bold', isCurrent);
                  }
             }); 
             currentViewTitle.textContent = views[viewName].title; 
@@ -1230,19 +1237,19 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
+
         function showSkeletonLoaders() { 
             const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div><div class="h-4 w-1/2 skeleton-line"></div><div class="h-8 w-1/4 skeleton-line"></div></div>`).join('');
             productsLoader.innerHTML = cardSkeleton;
             productsLoaderET.innerHTML = cardSkeleton;
-            toolsLoader.innerHTML = cardSkeleton;
+            toolsLoader.innerHTML = cardSkeleton; // toolsLoader ya está definida en el scope II
             const tableSkeleton = Array(3).fill('').map(() => `<div class="h-12 skeleton-line"></div>`).join(''); 
             salesListLoader.innerHTML = tableSkeleton; 
             salesListLoaderET.innerHTML = tableSkeleton;
             missingListLoader.innerHTML = tableSkeleton; 
         }
-        
-        // --- Lógica de Carga de Datos (Definiciones para evitar ReferenceError) ---
-        
+
+        // --- Lógica de Productos (Principal) ---
         async function fetchProducts() { 
             if (!supabase) return;
             const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
@@ -1262,7 +1269,7 @@
             productsEl.innerHTML = ""; 
             totalCount.textContent = `${items.length} productos`; 
 
-            // --- ADICIÓN: Renderizar Totales de Categoría ---
+            // Renderizar Totales de Categoría (Usando el elemento global categoryTotalsEl)
             categoryTotalsEl.innerHTML = `
                 <span class="font-bold text-indigo-300">Total por Categoría:</span>
                 ${Object.keys(categoryTotals).sort().map(cat => 
@@ -1270,7 +1277,6 @@
                 ).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
             `;
             productsEl.appendChild(categoryTotalsEl);
-            // --- FIN ADICIÓN ---
 
             if (items.length === 0) { productsEl.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos${searchInput.value ? ' para "' + searchInput.value + '"' : ''}.</p>`; return; } 
             const grouped = items.reduce((acc, p) => { 
@@ -1296,7 +1302,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </button>
                         <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden">
-                            <img src="${imageUrl}" id="product-img-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}">
+                            <img src="${imageUrl}" id="product-img-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen';">
                         </div>
                         <h3 id="product-name-${p.id}" class="font-semibold text-white">${p.name}</h3>
                         <p id="product-category-${p.id}" class="text-xs text-gray-400 -mt-1">${p.category || 'Otros'}</p>
@@ -1329,7 +1335,6 @@
             
             if (stockEl) stockEl.textContent = `Stock: ${product.quantity}`;
             if (nameEl) nameEl.textContent = product.name;
-            // Corregido: Usar 'product.price' en lugar de 'p.price'
             if (priceEl) priceEl.textContent = `$${Number(product.price).toFixed(2)}`; 
             if (categoryEl) categoryEl.textContent = product.category;
             
@@ -1338,6 +1343,18 @@
                 imgEl.src = `${newSrc}?t=${new Date().getTime()}`;
                 imgEl.alt = product.name; 
             }
+
+            // Actualiza los totales de categoría visibles
+            const localArray = isMainInventory ? allProducts : allProductsElTransito;
+            const totalsEl = isMainInventory ? categoryTotalsEl : categoryTotalsElET;
+            const totals = calculateCategoryTotals(localArray, isMainInventory);
+            
+            totalsEl.innerHTML = `
+                <span class="font-bold text-indigo-300">Total por Categoría${isMainInventory ? '' : ' (ET)'}:</span>
+                ${Object.keys(totals).sort().map(cat => 
+                    `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${totals[cat]}</span> u.</span>`
+                ).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
+            `;
         }
         window.deleteProduct = async function(id) { 
             if (!confirm("¿Eliminar este producto?")) return; 
@@ -1347,7 +1364,7 @@
                 alert("❌ Error al eliminar: " + error.message);
             } else {
                 allProducts = allProducts.filter(p => p.id !== id);
-                calculateCategoryTotals(allProducts, true); // <--- ADICIÓN
+                calculateCategoryTotals(allProducts, true); 
                 filterAndRenderProducts(); 
                 updateAutocompleteList(allProducts, inventorySuggestions);
                 updateLabelView();
@@ -1359,7 +1376,7 @@
             const { data, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
             if (error) { console.error("Error cargando productos (El Transito):", error); totalCountET.textContent = "Error al cargar"; productsElET.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
             allProductsElTransito = data; 
-            calculateCategoryTotals(allProductsElTransito, false); // <--- MODIFICACIÓN
+            calculateCategoryTotals(allProductsElTransito, false); 
             filterAndRenderProductsET(); 
             updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
             if (labelsLocationSelect.value === 'et') populateLabelCategories(allProductsElTransito);
@@ -1374,7 +1391,7 @@
             productsElET.innerHTML = ""; 
             totalCountET.textContent = `${items.length} productos`; 
             
-            // --- ADICIÓN: Renderizar Totales de Categoría (El Transito) ---
+            // Renderizar Totales de Categoría (El Transito)
             categoryTotalsElET.innerHTML = `
                 <span class="font-bold text-indigo-300">Total por Categoría (ET):</span>
                 ${Object.keys(categoryTotalsET).sort().map(cat => 
@@ -1382,7 +1399,6 @@
                 ).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
             `;
             productsElET.appendChild(categoryTotalsElET);
-            // --- FIN ADICIÓN ---
 
             if (items.length === 0) { productsElET.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos${searchInputET.value ? ' para "' + searchInputET.value + '"' : ''}.</p>`; return; } 
             const grouped = items.reduce((acc, p) => { 
@@ -1408,7 +1424,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </button>
                         <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden">
-                            <img src="${imageUrl}" id="product-img-et-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}">
+                            <img src="${imageUrl}" id="product-img-et-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen';">
                         </div>
                         <h3 id="product-name-et-${p.id}" class="font-semibold text-white">${p.name}</h3>
                         <p id="product-category-et-${p.id}" class="text-xs text-gray-400 -mt-1">${p.category || 'Otros'}</p>
@@ -1433,11 +1449,55 @@
                 alert("❌ Error al eliminar: " + error.message);
             } else {
                 allProductsElTransito = allProductsElTransito.filter(p => p.id !== id);
-                calculateCategoryTotals(allProductsElTransito, false); // <--- ADICIÓN
+                calculateCategoryTotals(allProductsElTransito, false); 
                 filterAndRenderProductsET(); 
                 updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
                 updateLabelView();
             }
+        }
+
+        // --- Lógica de Ventas (se mantiene la lógica de render) ---
+        function createSaleRowHTML(sale, isMain) {
+            const tableSuffix = isMain ? '' : '-et';
+            const statusClass = STATUS_COLORS[sale.status] || 'bg-gray-600 text-white';
+            const rowId = `sale-row${tableSuffix}-${sale.id}`;
+
+            return `
+                <tr id="${rowId}" class="hover:bg-gray-700/50 transition">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white" data-label="Destinatario">${sale.recipient_name}</td>
+                    <td class="px-6 py-4 text-sm text-gray-300" data-label="Producto">${sale.product_name_sold}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-green-400 font-bold" data-label="Precio">$${Number(sale.price).toFixed(2)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm" data-label="Estado">
+                        <select onchange="updateSaleStatus('${sale.id}', this.value, ${isMain})" class="border rounded-md p-1 text-sm font-semibold ${statusClass} appearance-none pr-8">
+                            <option value="Pendiente" class="${STATUS_COLORS['Pendiente']}" ${sale.status === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                            <option value="Pagado" class="${STATUS_COLORS['Pagado']}" ${sale.status === 'Pagado' ? 'selected' : ''}>Pagado</option>
+                            <option value="Devuelto" class="${STATUS_COLORS['Devuelto']}" ${sale.status === 'Devuelto' ? 'selected' : ''}>Devuelto</option>
+                        </select>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" data-label="Acciones">
+                        <button onclick="deleteSale('${sale.id}', ${isMain})" class="text-red-600 hover:text-red-900 transition" title="Eliminar Venta">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function updateGeneralTotals(salesArray, isMain) {
+            const totalSold = salesArray.reduce((sum, s) => sum + Number(s.price), 0);
+            const totalPaid = salesArray.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
+            const percentage = totalSold > 0 ? ((totalPaid / totalSold) * 100).toFixed(2) : 0;
+            
+            const suffix = isMain ? '' : '-et';
+            const totalSalesCountEl = document.getElementById(`total-sales-count${suffix}`);
+            const totalSoldAmountEl = document.getElementById(`total-sold-amount${suffix}`);
+            const totalPaidAmountEl = document.getElementById(`total-paid-amount${suffix}`);
+            const paidPercentageEl = document.getElementById(`paid-percentage${suffix}`);
+
+            if (totalSalesCountEl) totalSalesCountEl.textContent = `Total: ${salesArray.length} ventas`;
+            if (totalSoldAmountEl) totalSoldAmountEl.textContent = `$${totalSold.toFixed(2)}`;
+            if (totalPaidAmountEl) totalPaidAmountEl.textContent = `$${totalPaid.toFixed(2)}`;
+            if (paidPercentageEl) paidPercentageEl.textContent = `${percentage}%`;
         }
 
         async function fetchSales() {
@@ -1634,7 +1694,7 @@
                 const descriptionHtml = tool.description ? `<p class="text-gray-400 text-sm mt-2 flex-grow">${tool.description.replace(/\n/g, '<br>')}</p>` : '<div class="flex-grow"></div>';
                 card.innerHTML = `
                     <div class="h-48 bg-gray-700 rounded flex items-center justify-center mb-3 overflow-hidden">
-                        <img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${tool.title}">
+                        <img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${tool.title}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150x100/6366f1/ffffff?text=Tutorial';">
                     </div>
                     <h3 class="font-bold text-lg text-white">${tool.title}</h3>
                     ${descriptionHtml}
@@ -1661,9 +1721,9 @@
             }
         }
         
-        // --- Funciones de Lógica de Edición y QR (necesitan definición antes del load) ---
+        // --- Funciones de Lógica de Edición y QR (modal) ---
+
         window.openProductEditorModal = function(productId, isMain) {
-            // Lógica de apertura de modal (definición completa ya que se llama por onclick)
             currentEditingProduct = null;
             selectedProductImageFile = null;
             modalStatus.textContent = '';
@@ -1689,7 +1749,6 @@
 
             const modalCategorySelect = document.getElementById('modal-category');
             
-            // 2. Llenar campos del modal
             document.getElementById('modal-name').value = product.name;
             modalCategorySelect.value = product.category || 'Otros';
             document.getElementById('modal-price').value = Number(product.price).toFixed(2);
@@ -1703,7 +1762,7 @@
             document.getElementById('modal-image-upload').value = '';
             document.getElementById('product-editor-modal').classList.remove('hidden');
         }
-        
+
         window.closeProductEditorModal = function() {
             document.getElementById('product-editor-modal').classList.add('hidden');
             document.getElementById('modal-product-form').reset();
@@ -1711,8 +1770,7 @@
         }
 
         window.openScannerModal = function(event) {
-             event.stopPropagation(); // Evita que se cierre el menú móvil si el escáner está en el dropdown
-             // La lógica completa de openScannerModal
+            event.stopPropagation();
             if (isScannerRunning) return;
             if (typeof Html5QrcodeScanner === 'undefined') {
                 alert("Error: La librería de escaneo no se cargó correctamente.");
@@ -1732,30 +1790,37 @@
                 }
                 html5QrcodeScanner = null;
             }
+            
+            // CORRECCIÓN: Configuración para priorizar la cámara trasera y recordar permisos
+            const html5QrcodeConfig = {
+                fps: 10,
+                qrbox: {width: 250, height: 250},
+                rememberLastUsedCamera: true, // Recordar la última cámara con éxito
+                supportedScanTypes: [0, 1], // QR_CODE, BAR_CODE
+                videoConstraints: {
+                    facingMode: "environment" // Priorizar la cámara trasera
+                }
+            };
+
 
             html5QrcodeScanner = new Html5QrcodeScanner(
-                "reader", { 
-                    fps: 10, 
-                    qrbox: {width: 250, height: 250},
-                    rememberLastUsedCamera: true
-                },
-                false
+                "reader", html5QrcodeConfig, false
             );
 
             const onScanSuccess = async (decodedText, decodedResult) => {
-                 if (scanSuccessHandled) return;
-                
+                if (scanSuccessHandled) return;
+
                 try {
                     const scannedId = String(decodedText).trim();
                     if (!scannedId || scannedId === "") {
                         throw new Error(`El código QR escaneado es inválido o no contiene un ID de producto.`);
                     }
 
-                    scanSuccessHandled = true; 
-                    await closeScannerModal(true); 
+                    scanSuccessHandled = true;
+                    await closeScannerModal(true);
 
                     const product = allProducts.find(p => String(p.id).trim() === scannedId) || allProductsElTransito.find(p => String(p.id).trim() === scannedId);
-                    
+
                     if (!product) {
                         throw new Error(`El producto con ID "${scannedId}" no existe en el inventario.`);
                     }
@@ -1763,15 +1828,15 @@
                     if (parseInt(product.quantity) <= 0) {
                         throw new Error(`Stock insuficiente: El producto "${product.name}" tiene 0 unidades disponibles.`);
                     }
-                    
+
                     const isMainInventory = allProducts.some(p => String(p.id).trim() === scannedId);
-                    
+
                     if (isMainInventory) {
                         toggleView('sales');
                         document.getElementById('product-name-sold').value = product.name + (product.category ? ` (${product.category})` : '');
                         document.getElementById('sale-price').value = Number(product.price).toFixed(2);
                         document.getElementById('sale-date').value = new Date().toISOString().split('T')[0];
-                        document.getElementById('sale-status-input').value = 'Pendiente'; 
+                        document.getElementById('sale-status-input').value = 'Pendiente';
                         document.getElementById('recipient-name').focus();
                     } else {
                         toggleView('sales_el_transito');
@@ -1781,15 +1846,15 @@
                         document.getElementById('sale-status-input-et').value = 'Pendiente';
                         document.getElementById('recipient-name-et').focus();
                     }
-                    
+
 
                 } catch (error) {
                     console.error("Error al procesar escaneo:", error);
-                    scanSuccessHandled = false; 
+                    scanSuccessHandled = false;
                     alert(`❌ Error en Escaneo: ${error.message}`);
-                    
+
                     if (!error.message.includes("cámara") && !error.message.includes("Html5QrcodeScanner")) {
-                         openScannerModal(event);
+                        openScannerModal(event);
                     } else {
                         closeScannerModal(true);
                     }
@@ -1797,46 +1862,81 @@
             };
             const onScanError = (errorMessage) => {
                 if (!scanSuccessHandled) {
-                    if (errorMessage.includes("No camera found")) {
-                        document.getElementById('scanner-status').textContent = 'Error: No se detectó ninguna cámara. Asegúrate de dar permiso.';
+                    if (errorMessage.includes("NotAllowedError") || errorMessage.includes("no camera found")) {
+                        document.getElementById('scanner-status').textContent = 'Error: Acceso a cámara denegado o no encontrada. Asegúrate de dar permiso.';
                     } else if (!errorMessage.includes("code parse error") && !errorMessage.includes("-D")) {
-                         document.getElementById('scanner-status').textContent = 'Escaneando... Apunta el código QR al centro.';
+                        document.getElementById('scanner-status').textContent = 'Escaneando... Apunta el código QR al centro.';
                     }
                 }
             };
             html5QrcodeScanner.render(onScanSuccess, onScanError);
         };
-        
+
         window.closeScannerModal = async function(hideModal = true) {
             if (hideModal) {
                 document.getElementById('scanner-modal').classList.add('hidden');
             }
             document.getElementById('scanner-status').textContent = 'Esperando código QR o de barras...';
-            
+
             if (html5QrcodeScanner) {
                 if (isScannerRunning) {
                     try {
                         await html5QrcodeScanner.stop();
                         console.log("[SCANNER LOG] Escáner detenido exitosamente.");
                     } catch (error) {
-                        console.warn("[SCANNER LOG] Error al detener el escáner (puede que ya estuviera detenido):", error); 
+                        console.warn("[SCANNER LOG] Error al detener el escáner (puede que ya estuviera detenido):", error);
                     }
                 }
-                
+
                 try {
                     await html5QrcodeScanner.clear();
                 } catch (e) {
                     console.warn("[SCANNER LOG] Error al limpiar la instancia:", e);
                 }
-                
+
                 html5QrcodeScanner = null;
-            } 
-            
+            }
+
             isScannerRunning = false;
-            scanSuccessHandled = false; 
+            scanSuccessHandled = false;
         };
 
         // --- Lógica de Realtime ---
+        function updateSaleRowInDOM(sale, isMain) {
+            const tableSuffix = isMain ? '' : '-et';
+            const rowId = `sale-row${tableSuffix}-${sale.id}`;
+            const oldRow = document.getElementById(rowId);
+
+            if (oldRow) {
+                // Reemplazar solo la fila, no toda la tabla.
+                const newRowHtml = createSaleRowHTML(sale, isMain);
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = newRowHtml.trim();
+                const newRow = tempDiv.firstChild;
+                oldRow.replaceWith(newRow);
+
+                // Actualizar totales diarios y generales
+                const localArray = isMain ? allSales : allSalesElTransito;
+                updateGeneralTotals(localArray, isMain);
+
+                const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
+                const dailyElSold = document.getElementById(`daily-sold${tableSuffix}-${saleDate}`);
+                const dailyElPaid = document.getElementById(`daily-paid${tableSuffix}-${saleDate}`);
+
+                if (dailyElSold && dailyElPaid) {
+                    const dailySales = localArray.filter(s => new Date(s.sale_date).toISOString().split('T')[0] === saleDate);
+                    const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
+                    const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
+
+                    dailyElSold.textContent = `$${dailyTotalSold.toFixed(2)}`;
+                    dailyElPaid.textContent = `$${dailyTotalPaid.toFixed(2)}`;
+                }
+            } else {
+                // Si no se encuentra la fila (ej. insert), forzar re-render completo de las ventas
+                if (isMain) filterAndRenderSales();
+                else filterAndRenderSalesET();
+            }
+        }
         function handleRealtimePayload(payload, localArray, renderFunction, idKey = 'id') {
             if (!supabase) return;
             console.log('📡 Payload Realtime Recibido:', payload);
@@ -1844,52 +1944,47 @@
             const recordId = (eventType === 'DELETE') ? oldRecord[idKey] : newRecord[idKey];
             if (!recordId) { console.error("Payload de Realtime sin ID.", payload); return; }
             let index = localArray.findIndex(item => item[idKey] === recordId);
-            const isMainSales = (localArray === allSales);
-            const isElTransitoSales = (localArray === allSalesElTransito);
+
+            const isSales = (localArray === allSales || localArray === allSalesElTransito);
+            const isProducts = (localArray === allProducts || localArray === allProductsElTransito);
             const isMainProducts = (localArray === allProducts);
-            const isElTransitoProducts = (localArray === allProductsElTransito);
-            if (isMainSales || isElTransitoSales) {
-                let needsFullRender = false; 
-                switch (eventType) {
-                    case 'INSERT':
-                        if (index === -1) { 
-                            localArray.unshift(newRecord); 
-                            localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at)); 
-                            needsFullRender = true; 
-                        }
-                        break;
-                    case 'UPDATE':
-                        if (index !== -1) {
-                            // Update locally but rely on full render for UI refresh
-                            Object.assign(localArray[index], newRecord);
-                            needsFullRender = true; 
-                        } else {
-                            // If the record was not loaded before, insert it and re-render
-                            localArray.unshift(newRecord); 
-                            localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at)); 
-                            needsFullRender = true;
-                        }
-                        break;
-                    case 'DELETE':
-                        if (index !== -1) {
-                            localArray.splice(index, 1); 
-                            needsFullRender = true;
-                        }
-                        break;
-                    default:
-                        console.warn('Evento Realtime no manejado:', eventType, payload);
-                        return;
+            const isMainSales = (localArray === allSales);
+            const isMissing = (localArray === allMissingProducts);
+            const isTools = (localArray === allTools);
+
+            if (isSales) {
+                if (eventType === 'UPDATE' && index !== -1) {
+                    // Maneja la actualización de status de forma optimizada
+                    Object.assign(localArray[index], newRecord);
+                    updateSaleRowInDOM(localArray[index], isMainSales);
+                    return;
                 }
-                if (needsFullRender) {
-                    if (isMainSales) {
-                        filterAndRenderSales();
+                // Para INSERT, DELETE, o UPDATE que afecte la fecha/precio, forzar re-render
+                let needsFullRender = false;
+                if (eventType === 'INSERT' && index === -1) {
+                    localArray.unshift(newRecord);
+                    needsFullRender = true;
+                } else if (eventType === 'DELETE' && index !== -1) {
+                    localArray.splice(index, 1);
+                    needsFullRender = true;
+                } else if (eventType === 'UPDATE' && index !== -1) {
+                    // Forzar re-render si el campo de fecha o precio cambia
+                    if (newRecord.sale_date !== oldRecord.sale_date || newRecord.price !== oldRecord.price) {
+                         Object.assign(localArray[index], newRecord);
+                         needsFullRender = true;
                     } else {
-                        filterAndRenderSalesET();
+                        return; // Ya fue manejado o no requiere acción
                     }
                 }
-                return; 
+
+                if (needsFullRender) {
+                    localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at));
+                    renderFunction(localArray);
+                }
+                return;
             }
-            if (isMainProducts || isElTransitoProducts) {
+
+            if (isProducts) {
                 let needsFullRender = false;
                 switch (eventType) {
                     case 'INSERT':
@@ -1897,22 +1992,22 @@
                             localArray.unshift(newRecord);
                             localArray.sort((a, b) => (a.category || '').localeCompare(b.category || '') || new Date(b.created_at) - new Date(a.created_at));
                         }
-                        needsFullRender = true; 
+                        needsFullRender = true;
                         break;
                     case 'UPDATE':
                         if (index !== -1) {
                             const oldCategory = localArray[index].category;
+                            const oldQuantity = localArray[index].quantity;
                             const newCategory = newRecord.category;
-                            const oldQuantity = localArray[index].quantity; 
-                            const newQuantity = newRecord.quantity; 
-                            Object.assign(localArray[index], newRecord); 
-                            if (oldCategory !== newCategory || oldQuantity !== newQuantity) { 
+                            const newQuantity = newRecord.quantity;
+                            Object.assign(localArray[index], newRecord);
+                            if (oldCategory !== newCategory || oldQuantity !== newQuantity) {
                                 needsFullRender = true;
                             } else {
-                                updateProductCardInDOM(newRecord, isMainProducts); 
+                                updateProductCardInDOM(newRecord, isMainProducts);
                             }
                         } else {
-                            localArray.unshift(newRecord); 
+                            localArray.unshift(newRecord);
                             localArray.sort((a, b) => (a.category || '').localeCompare(b.category || '') || new Date(b.created_at) - new Date(a.created_at));
                             needsFullRender = true;
                         }
@@ -1920,45 +2015,47 @@
                     case 'DELETE':
                         if (index !== -1) {
                             localArray.splice(index, 1);
-                            needsFullRender = true; 
+                            needsFullRender = true;
                         }
                         break;
                 }
-                
-                // --- ADICIÓN: Recalcular totales ANTES de renderizar ---
+
                 const isMain = isMainProducts;
                 calculateCategoryTotals(localArray, isMain);
-                
+
                 if (needsFullRender) {
-                    // Esto recalcula los grupos y re-renderiza la lista de tarjetas Y los totales
-                    renderFunction(); 
+                    if (isMainProducts) filterAndRenderProducts();
+                    else filterAndRenderProductsET();
                 }
-                
-                if (isMainProducts) updateAutocompleteList(allProducts, inventorySuggestions);
-                if (isElTransitoProducts) updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
-                return; 
+
+                const datalist = isMain ? inventorySuggestions : inventorySuggestionsET;
+                updateAutocompleteList(localArray, datalist);
+                return;
             }
-            if (eventType === 'UPDATE' && index !== -1) {
-                 // Para herramientas y faltantes, solo actualizamos si el registro ya existe.
-                 Object.assign(localArray[index], newRecord);
-            } else {
-                switch (eventType) {
-                    case 'INSERT':
-                        if (index === -1) localArray.unshift(newRecord);
-                        break;
-                    case 'DELETE':
-                        if (index !== -1) localArray.splice(index, 1);
-                        break;
-                    default:
-                        console.warn('Evento Realtime no manejado:', eventType, payload);
-                        return;
+
+            if (isMissing || isTools) {
+                 if (eventType === 'UPDATE' && index !== -1) {
+                    Object.assign(localArray[index], newRecord);
+                } else {
+                    switch (eventType) {
+                        case 'INSERT':
+                            if (index === -1) localArray.unshift(newRecord);
+                            break;
+                        case 'DELETE':
+                            if (index !== -1) localArray.splice(index, 1);
+                            break;
+                        default:
+                            console.warn('Evento Realtime no manejado:', eventType, payload);
+                            return;
+                    }
                 }
+                if (isMissing || isTools) {
+                    localArray.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                }
+                renderFunction(localArray);
             }
-            if (renderFunction === renderMissingProducts || renderFunction === renderTools) {
-                localArray.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-            }
-            renderFunction(localArray); 
         }
+
         function initializeRealtimeSubscriptions() {
             if (!supabase) return;
             console.log("📡 Inicializando suscripciones en tiempo real...");
@@ -1973,7 +2070,7 @@
                 ).subscribe((status, err) => console.log(`Canal ${PRODUCTS_EL_TRANSITO_TABLE}: ${status}`, err || ''));
             supabase.channel('public:' + SALES_TABLE, channelOptions)
                 .on('postgres_changes', { event: '*', schema: 'public', table: SALES_TABLE },
-                    (payload) => handleRealtimePayload(payload, allSales, filterAndRenderSales, 'id') 
+                    (payload) => handleRealtimePayload(payload, allSales, filterAndRenderSales, 'id')
                 ).subscribe((status, err) => console.log(`Canal ${SALES_TABLE}: ${status}`, err || ''));
             supabase.channel('public:' + SALES_EL_TRANSITO_TABLE, channelOptions)
                 .on('postgres_changes', { event: '*', schema: 'public', table: SALES_EL_TRANSITO_TABLE },
@@ -1989,21 +2086,23 @@
                 ).subscribe((status, err) => console.log(`Canal ${TOOLS_TABLE}: ${status}`, err || ''));
         }
 
-        // --- Carga de Datos Inicial ---
-        // (Las definiciones de fetchProducts, fetchSales, fetchMissingProducts y fetchTools están arriba)
 
-        // --- Evento Principal de Carga (Corregido para manejar ReferenceError) ---
+        // --- Evento Principal de Carga (Corregido) ---
         window.addEventListener("load", async () => {
             const initialTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
-            applyTheme(initialTheme); 
-            
+            applyTheme(initialTheme);
+
+            // Fechas de venta por defecto
             document.getElementById('sale-date').value = new Date().toISOString().split('T')[0];
             document.getElementById('sale-date-et').value = new Date().toISOString().split('T')[0];
-            
-            showSkeletonLoaders(); 
-            
-            await loadLogo(); 
-            
+
+            // Mostrar esqueletos de carga
+            showSkeletonLoaders();
+
+            // Cargar logo
+            await loadLogo();
+
+            // Determinar la vista inicial (Inventario Principal por defecto)
             if (isMobile()) {
                 toggleView('inventory');
             } else {
@@ -2013,20 +2112,264 @@
             if (supabase) {
                 try {
                     await Promise.all([
-                        fetchProducts(), 
+                        fetchProducts(),
                         fetchProductsET(),
-                        fetchSales(), 
-                        fetchSalesElTransito(), 
+                        fetchSales(),
+                        fetchSalesElTransito(),
                         fetchMissingProducts(),
-                        fetchTools() 
+                        fetchTools()
                     ]);
-                    updateLabelView(); 
+                    updateLabelView();
                     initializeRealtimeSubscriptions();
                 } catch (error) {
                     console.error("Error crítico durante la carga de datos inicial:", error);
                 }
             } else {
                 alert("Error Crítico: No se pudo cargar Supabase. La aplicación no funcionará correctamente.");
+            }
+        });
+
+        // --- Manejadores de Formularios (Ejemplo de uno, el resto sigue la misma lógica) ---
+
+        // Manejador genérico para el cambio de estado de venta
+        window.updateSaleStatus = async function(saleId, newStatus, isMain) {
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
+            const table = isMain ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
+            const localArray = isMain ? allSales : allSalesElTransito;
+            
+            // Optimistic UI Update (para respuesta rápida)
+            const saleToUpdate = localArray.find(s => s.id === saleId);
+            const oldStatus = saleToUpdate ? saleToUpdate.status : newStatus; 
+
+            if (saleToUpdate) {
+                saleToUpdate.status = newStatus;
+                updateSaleRowInDOM(saleToUpdate, isMain);
+            }
+
+            try {
+                const { error } = await supabase
+                    .from(table)
+                    .update({ status: newStatus })
+                    .eq("id", saleId);
+                
+                if (error) throw error;
+                
+                console.log(`✅ Estado de venta ${saleId} actualizado a: ${newStatus}`);
+                
+            } catch (error) {
+                console.error("❌ Error al actualizar estado:", error.message);
+                alert(`❌ Error al actualizar estado: ${error.message}`);
+                
+                // Rollback si falla la base de datos
+                if (saleToUpdate) {
+                    saleToUpdate.status = oldStatus;
+                    updateSaleRowInDOM(saleToUpdate, isMain);
+                }
+            }
+        };
+
+        window.deleteSale = async function(id, isMain) {
+            if (!confirm("¿Eliminar este registro de venta?")) return;
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
+            const table = isMain ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
+            
+            try {
+                const { error } = await supabase.from(table).delete().eq("id", id);
+                if (error) throw error;
+                // El realtime manejará la actualización de la UI
+            } catch (error) {
+                alert("❌ Error al eliminar: " + error.message);
+            }
+        }
+        
+        function populateLabelCategories(products) {
+            const categories = [...new Set(products.map(p => p.category).filter(c => c))].sort();
+            labelsCategorySelect.innerHTML = '<option value="all">Todas las Categorías</option>' + 
+                categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+        }
+        function updateLabelView() {
+            const isMain = labelsLocationSelect.value === 'main';
+            const currentProducts = isMain ? allProducts : allProductsElTransito;
+            populateLabelCategories(currentProducts);
+            
+            const categoryFilter = labelsCategorySelect.value;
+            const filteredProducts = currentProducts.filter(p => 
+                (categoryFilter === 'all' || p.category === categoryFilter)
+            );
+            labelsCountSpan.textContent = `${filteredProducts.length} Productos seleccionados`;
+            
+            labelsOutputDiv.innerHTML = '<p class="p-4 text-gray-400">Selecciona el inventario y presiona "Generar e Imprimir Etiquetas" o "Descargar QRs".</p>';
+        }
+        labelsLocationSelect.addEventListener('change', updateLabelView);
+        labelsCategorySelect.addEventListener('change', updateLabelView);
+
+        // Asignar los eventos a los inputs de búsqueda
+        searchInput.addEventListener('input', filterAndRenderProducts);
+        searchInputET.addEventListener('input', filterAndRenderProductsET);
+        searchSalesInput.addEventListener('input', filterAndRenderSales);
+        pendingOnlyCheckbox.addEventListener('change', filterAndRenderSales);
+        searchSalesInputET.addEventListener('input', filterAndRenderSalesET);
+        pendingOnlyCheckboxET.addEventListener('change', filterAndRenderSalesET);
+
+        // Asignar eventos de cambio de vista
+        document.querySelectorAll('.view-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                toggleView(e.target.dataset.view);
+            });
+        });
+
+        // Manejo de la subida de logo
+        logoUpload.addEventListener('change', function() {
+            selectedLogoFile = this.files[0];
+            logoSaveButton.disabled = !selectedLogoFile;
+            if (selectedLogoFile) {
+                logoSaveButton.textContent = `Guardar Logo: ${selectedLogoFile.name}`;
+            }
+        });
+
+        logoSaveButton.addEventListener('click', async function() {
+            if (!selectedLogoFile || !supabase) return;
+            logoSaveButton.disabled = true;
+            logoSaveButton.textContent = 'Subiendo...';
+            try {
+                const imageUrl = await uploadImage(selectedLogoFile);
+                
+                const { error } = await supabase.from(CONFIG_TABLE).upsert(
+                    { key: LOGO_CONFIG_KEY, value: imageUrl },
+                    { onConflict: 'key' }
+                );
+                
+                if (error) throw error;
+                
+                await loadLogo(); // Recarga el logo en la cabecera
+                setStatusMessage(logoSaveButton, "Logo guardado exitosamente!", true);
+                logoSaveButton.textContent = 'Guardar Logo';
+                logoUpload.value = '';
+                selectedLogoFile = null;
+                logoSaveButton.disabled = true;
+
+            } catch (e) {
+                setStatusMessage(logoSaveButton, `Error: ${e.message}`, false);
+                logoSaveButton.textContent = 'Guardar Logo';
+                logoSaveButton.disabled = false;
+            }
+        });
+
+        // Manejo de Formulario de Producto (Principal)
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const name = nameIn.value.trim(), category = categoryIn.value, box_number = boxNumberIn.value.trim(), price = parseFloat(priceIn.value), quantity = parseInt(qtyIn.value);
+            if (!name || !category || isNaN(price) || isNaN(quantity)) {
+                setStatusMessage(status, "Por favor, completa todos los campos requeridos.", false);
+                return;
+            }
+
+            try {
+                status.textContent = "Subiendo imagen y guardando producto...";
+                const imageUrl = selectedProductImageFile ? await uploadImage(selectedProductImageFile) : null;
+
+                if (!supabase) throw new Error("Supabase no está cargado.");
+                const { data, error } = await supabase
+                    .from(PRODUCTS_TABLE)
+                    .insert([{ name, category, box_number, price, quantity, image_url: imageUrl }])
+                    .select();
+
+                if (error) throw error;
+
+                setStatusMessage(status, `Producto ${name} agregado exitosamente.`, true);
+                form.reset();
+                selectedProductImageFile = null;
+                imageIn.value = '';
+                status.textContent = ''; // Limpiar el estado después del reset
+            } catch (e) {
+                setStatusMessage(status, `Error al agregar producto: ${e.message}`, false);
+            }
+        });
+
+        // Manejo de Formulario de Producto (El Transito)
+        formET.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const name = nameInET.value.trim(), category = categoryInET.value, box_number = boxNumberInET.value.trim(), price = parseFloat(priceInET.value), quantity = parseInt(qtyInET.value);
+            if (!name || !category || isNaN(price) || isNaN(quantity)) {
+                setStatusMessage(statusET, "Por favor, completa todos los campos requeridos.", false);
+                return;
+            }
+
+            try {
+                statusET.textContent = "Subiendo imagen y guardando producto...";
+                const imageUrl = selectedProductImageFile ? await uploadImage(selectedProductImageFile) : null;
+
+                if (!supabase) throw new Error("Supabase no está cargado.");
+                const { data, error } = await supabase
+                    .from(PRODUCTS_EL_TRANSITO_TABLE)
+                    .insert([{ name, category, box_number, price, quantity, image_url: imageUrl }])
+                    .select();
+
+                if (error) throw error;
+
+                setStatusMessage(statusET, `Producto ${name} agregado exitosamente a El Transito.`, true);
+                formET.reset();
+                selectedProductImageFile = null;
+                imageInET.value = '';
+                statusET.textContent = ''; // Limpiar el estado después del reset
+            } catch (e) {
+                setStatusMessage(statusET, `Error al agregar producto (El Transito): ${e.message}`, false);
+            }
+        });
+
+        // Manejo de Formulario de Venta (Principal)
+        salesForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const recipient_name = recipientNameIn.value.trim(), product_name_sold = productNameSoldIn.value.trim(), price = parseFloat(salePriceIn.value), sale_date = saleDateIn.value, status = saleStatusInput.value;
+
+            try {
+                if (!supabase) throw new Error("Supabase no está cargado.");
+                
+                // 1. Descontar stock (si existe el producto)
+                await updateProductStock(product_name_sold, PRODUCTS_TABLE, allProducts, -1);
+                
+                // 2. Registrar venta
+                const { error } = await supabase
+                    .from(SALES_TABLE)
+                    .insert([{ recipient_name, product_name_sold, price, sale_date, status }])
+                    .select();
+
+                if (error) throw error;
+
+                setStatusMessage(saleStatus, `Venta de ${product_name_sold} registrada exitosamente.`, true);
+                salesForm.reset();
+                saleDateIn.value = new Date().toISOString().split('T')[0]; // Resetear la fecha
+
+            } catch (e) {
+                setStatusMessage(saleStatus, `Error al registrar venta: ${e.message}`, false);
+            }
+        });
+
+        // Manejo de Formulario de Venta (El Transito)
+        salesFormET.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const recipient_name = recipientNameInET.value.trim(), product_name_sold = productNameSoldInET.value.trim(), price = parseFloat(salePriceInET.value), sale_date = saleDateInET.value, status = saleStatusInputET.value;
+
+            try {
+                if (!supabase) throw new Error("Supabase no está cargado.");
+                
+                // 1. Descontar stock (si existe el producto)
+                await updateProductStock(product_name_sold, PRODUCTS_EL_TRANSITO_TABLE, allProductsElTransito, -1);
+                
+                // 2. Registrar venta
+                const { error } = await supabase
+                    .from(SALES_EL_TRANSITO_TABLE)
+                    .insert([{ recipient_name, product_name_sold, price, sale_date, status }])
+                    .select();
+
+                if (error) throw error;
+
+                setStatusMessage(saleStatusET, `Venta de ${product_name_sold} registrada exitosamente en El Transito.`, true);
+                salesFormET.reset();
+                saleDateInET.value = new Date().toISOString().split('T')[0]; // Resetear la fecha
+
+            } catch (e) {
+                setStatusMessage(saleStatusET, `Error al registrar venta (El Transito): ${e.message}`, false);
             }
         });
     </script>
