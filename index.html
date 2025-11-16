@@ -24,6 +24,7 @@
             display: flex;
             flex-direction: column;
             transition: background-color 0.5s ease;
+            position: relative; /* Necesario para el efecto de nieve */
         }
         .container.mx-auto {
             flex-grow: 1;
@@ -166,6 +167,78 @@
         .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
         .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
         
+        /********************************/
+        /* TEMA 4: Blue Neon */
+        /********************************/
+        .theme-neon {
+            --bg-primary: #050a11;
+            --bg-secondary: #0f1a26;
+            --bg-header: rgba(5, 10, 17, 0.9);
+            --text-primary: #e0f7fa;
+            --text-secondary: #b3e5fc;
+            --text-muted: #4fc3f7;
+            --border-color: #0d47a1;
+            --accent-color: #00e5ff; /* Cyan brillante */
+            --accent-color-dark: #00b8d4;
+            --font-main: 'Roboto', sans-serif;
+            --font-headings: 'Roboto', sans-serif;
+            --pastel-bg: #80deea; /* Azul claro pastel para móvil */
+            --pastel-text: #050a11;
+        }
+        .theme-neon .product-card:hover, .theme-neon .tool-card:hover { 
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.8), 0 0 5px rgba(0, 229, 255, 0.5); 
+            border-color: var(--accent-color);
+        }
+        .theme-neon .text-indigo-400, .theme-neon .text-indigo-300 { 
+            color: var(--accent-color); 
+            text-shadow: 0 0 5px var(--accent-color);
+        }
+
+        /********************************/
+        /* TEMA 5: Christmas Snow */
+        /********************************/
+        .theme-christmas {
+            --bg-primary: #f0f4f7; /* Fondo nieve / blanco cremoso */
+            --bg-secondary: #ffffff;
+            --bg-header: rgba(255, 255, 255, 0.9);
+            --text-primary: #1e3a8a; /* Azul oscuro navidadeño */
+            --text-secondary: #3b82f6;
+            --text-muted: #9ca3af;
+            --border-color: #d1d5db;
+            --accent-color: #ef4444; /* Rojo brillante navideño */
+            --accent-color-dark: #dc2626;
+            --font-main: 'Poppins', sans-serif;
+            --font-headings: 'Playfair Display', serif;
+            --pastel-bg: #ffebee; /* Rojo pálido pastel para móvil */
+            --pastel-text: #1e3a8a;
+        }
+        /* KEYFRAMES para la nieve */
+        @keyframes snowfall {
+            0% { background-position: 0 0; }
+            100% { background-position: 500px 1000px; }
+        }
+        
+        .theme-christmas::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.8;
+            /* Patrón de nieve (pequeño, medio, grande) */
+            background-image: 
+                url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2NgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=='),
+                url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/TAAAABHNCSVQICAgIfAhkiAAAAFFJREFUeJxj/P//PwOogImBCmDMtXwU1x+sCqf+XgYwYAAe/y/E04x/j0yI75/bM7R//2NgYAAz3f8H4e9hXgD7GgYGBrzN/8cCAAD/mO9Yd/X+sAAAAABJRU5ErkJggg=='),
+                url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABz4F2TAAAABHNCSVQICAgIfAhkiAAAAAFlVRYdENvbW1lbnQAR2ltcCBvcmcgUGVyc29uYWwgVGVhbQAAAQBJREFUWIVjZEADsI+k9d/HwX8Gg0G/nJ/L8f/h37+M/gOADiBg/s8Gg2s0J9D/gOAHj/8zGPj/yMDBwMDByOD/j8HAcA22DDAi+r8Jg4EBALMIA2g/P9iB4QcM/5/fA7B+P8A/CgYGAW/gT4B/kL8C/kEBf+A//x8A+gIAjD0d/VjKx/8Y+P9BAP8DAwODhB4gD8A2wAYYcACGAX4fBvYlA39iAAcEALjN/38Y/C8C/2IAAQA/G9/lAwMDJ6JgYGBgs4D+fwj/l7+J/wQDA4OQJmADjD8d/B8E+B8E/g8DA4OEAQwDfwgDA4OQJWAQ8A8YDAwOSxkwBPwDBgMDA5PGDAP+AYMBAAEAGV8R8y392LwAAAAASUVORK5CYII=');
+
+            /* Velocidad y tamaño para simular caída de nieve profesional */
+            background-repeat: repeat;
+            animation: snowfall 30s linear infinite;
+        }
+
         /********************************/
         /* Aplicación de Variables CSS */
         /********************************/
@@ -346,7 +419,7 @@
         (function() {
             try {
                 const theme = localStorage.getItem('selectedTheme');
-                if (theme && ['theme-dark', 'theme-infernal', 'theme-gold'].includes(theme)) {
+                if (theme && ['theme-dark', 'theme-infernal', 'theme-gold', 'theme-neon', 'theme-christmas', 'theme-sunrise'].includes(theme)) {
                     document.documentElement.className = theme;
                 } else {
                     document.documentElement.className = 'theme-dark';
@@ -426,6 +499,9 @@
                             <option value="theme-dark">Predeterminado</option>
                             <option value="theme-infernal">Fuego Infernal</option>
                             <option value="theme-gold">Luxury Gold</option>
+                            <option value="theme-neon">Blue Neon</option>
+                            <option value="theme-christmas">Christmas Snow</option>
+                            <option value="theme-sunrise">Sunrise Glow</option>
                         </select>
                     </div>
                     <div class="flex items-center space-x-2 pt-2">
@@ -1641,6 +1717,7 @@
             
             const table = isMainSales ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
             const localArray = isMainSales ? allSales : allSalesElTransito;
+            // CORRECCIÓN: Buscamos la venta por ID para saber el status
             const sale = localArray.find(s => s.id === id);
 
             if (!sale) return;
@@ -1754,7 +1831,10 @@
                 alert(`✅ PDF de ${title} descargado con éxito.`);
             }).catch(error => {
                 console.error("Error al generar PDF:", error);
-                document.body.removeChild(tempExportDiv);
+                // Limpiar DOM temporal incluso si falla
+                if (document.body.contains(tempExportDiv)) {
+                    document.body.removeChild(tempExportDiv);
+                }
                 alert("❌ Error: No se pudo generar el PDF. Asegúrate de que todos los datos se hayan cargado.");
             });
         };
@@ -1803,1029 +1883,6 @@
             }
         }
 
-        // --- Lógica de Herramientas ---
-        async function fetchTools() {
-            if (!supabase) return;
-            const { data, error } = await supabase.from(TOOLS_TABLE).select("*").order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando herramientas:", error); totalToolsCount.textContent = "Error al cargar"; return; }
-            allTools = data;
-            renderTools(allTools);
-        }
-        function renderTools(items) {
-            toolsLoader.innerHTML = "";
-            toolsListEl.innerHTML = "";
-            totalToolsCount.textContent = `${items.length} herramientas`;
-            if (items.length === 0) {
-                toolsListEl.innerHTML = `<p class="text-gray-400 md:col-span-3">No hay herramientas o tutoriales guardados.</p>`;
-                return;
-            }
-            items.forEach(tool => {
-                const card = document.createElement("div");
-                card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col tool-card border border-gray-700 relative";
-                const imageUrl = tool.image_url ? `${tool.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/6366f1/ffffff?text=Tutorial`;
-                const descriptionHtml = tool.description ? `<p class="text-gray-400 text-sm mt-2 flex-grow">${tool.description.replace(/\n/g, '<br>')}</p>` : '<div class="flex-grow"></div>';
-                card.innerHTML = `
-                    <div class="h-48 bg-gray-700 rounded flex items-center justify-center mb-3 overflow-hidden">
-                        <img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${tool.title}">
-                    </div>
-                    <h3 class="font-bold text-lg text-white">${tool.title}</h3>
-                    ${descriptionHtml}
-                    <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
-                        <button onclick="editToolImage('${tool.id}')" class="px-3 py-1 rounded bg-indigo-500 hover:bg-indigo-600 text-white shadow-md text-sm transition mr-2">Editar Foto</button>
-                        <button onclick="deleteTool('${tool.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
-                    </div>`;
-                toolsListEl.appendChild(card);
-            });
-        }
-        window.editToolImage = async function(id) {
-            editingToolId = id;
-            toolImageEditorInput.click();
-        }
-        window.deleteTool = async function(id) {
-            if (!confirm("¿Estás seguro de que quieres eliminar esta herramienta?")) return;
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const { error } = await supabase.from(TOOLS_TABLE).delete().eq("id", id);
-            if (error) {
-                alert("❌ Error al eliminar: " + error.message);
-            } else {
-                allTools = allTools.filter(t => t.id !== id);
-                renderTools(allTools);
-            }
-        }
-
-        // --- Lógica de Realtime ---
-        function handleRealtimePayload(payload, localArray, renderFunction, idKey = 'id') {
-            if (!supabase) return;
-            console.log('📡 Payload Realtime Recibido:', payload);
-            const { eventType, new: newRecord, old: oldRecord } = payload;
-            const recordId = (eventType === 'DELETE') ? oldRecord[idKey] : newRecord[idKey];
-            if (!recordId) { console.error("Payload de Realtime sin ID.", payload); return; }
-            let index = localArray.findIndex(item => item[idKey] === recordId);
-            const isMainSales = (localArray === allSales);
-            const isElTransitoSales = (localArray === allSalesElTransito);
-            const isMainProducts = (localArray === allProducts);
-            const isElTransitoProducts = (localArray === allProductsElTransito);
-            if (isMainSales || isElTransitoSales) {
-                let needsFullRender = false; 
-                switch (eventType) {
-                    case 'INSERT':
-                        if (index === -1) { 
-                            localArray.unshift(newRecord); 
-                            localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at)); 
-                            needsFullRender = true; 
-                        }
-                        break;
-                    case 'UPDATE':
-                        if (index !== -1) {
-                            // Update locally but rely on full render for UI refresh
-                            Object.assign(localArray[index], newRecord);
-                            needsFullRender = true; 
-                        } else {
-                            // If the record was not loaded before, insert it and re-render
-                            localArray.unshift(newRecord); 
-                            localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at)); 
-                            needsFullRender = true;
-                        }
-                        break;
-                    case 'DELETE':
-                        if (index !== -1) {
-                            localArray.splice(index, 1); 
-                            needsFullRender = true;
-                        }
-                        break;
-                    default:
-                        console.warn('Evento Realtime no manejado:', eventType, payload);
-                        return;
-                }
-                if (needsFullRender) {
-                    if (isMainSales) {
-                        filterAndRenderSales();
-                    } else {
-                        filterAndRenderSalesET();
-                    }
-                }
-                return; 
-            }
-            if (isMainProducts || isElTransitoProducts) {
-                let needsFullRender = false;
-                switch (eventType) {
-                    case 'INSERT':
-                        if (index === -1) {
-                            localArray.unshift(newRecord);
-                            localArray.sort((a, b) => (a.category || '').localeCompare(b.category || '') || new Date(b.created_at) - new Date(a.created_at));
-                        }
-                        needsFullRender = true; 
-                        break;
-                    case 'UPDATE':
-                        if (index !== -1) {
-                            const oldCategory = localArray[index].category;
-                            const newCategory = newRecord.category;
-                            const oldQuantity = localArray[index].quantity; 
-                            const newQuantity = newRecord.quantity; 
-                            Object.assign(localArray[index], newRecord); 
-                            if (oldCategory !== newCategory || oldQuantity !== newQuantity) { 
-                                needsFullRender = true;
-                            } else {
-                                updateProductCardInDOM(newRecord, isMainProducts); 
-                            }
-                        } else {
-                            localArray.unshift(newRecord); 
-                            localArray.sort((a, b) => (a.category || '').localeCompare(b.category || '') || new Date(b.created_at) - new Date(a.created_at));
-                            needsFullRender = true;
-                        }
-                        break;
-                    case 'DELETE':
-                        if (index !== -1) {
-                            localArray.splice(index, 1);
-                            needsFullRender = true; 
-                        }
-                        break;
-                }
-                
-                // --- ADICIÓN: Recalcular totales ANTES de renderizar ---
-                const isMain = isMainProducts;
-                calculateCategoryTotals(localArray, isMain);
-                
-                if (needsFullRender) {
-                    // Esto recalcula los grupos y re-renderiza la lista de tarjetas Y los totales
-                    renderFunction(); 
-                }
-                
-                if (isMainProducts) updateAutocompleteList(allProducts, inventorySuggestions);
-                if (isElTransitoProducts) updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
-                return; 
-            }
-            if (eventType === 'UPDATE' && index !== -1) {
-                 // Para herramientas y faltantes, solo actualizamos si el registro ya existe.
-                 Object.assign(localArray[index], newRecord);
-            } else {
-                switch (eventType) {
-                    case 'INSERT':
-                        if (index === -1) localArray.unshift(newRecord);
-                        break;
-                    case 'DELETE':
-                        if (index !== -1) localArray.splice(index, 1);
-                        break;
-                    default:
-                        console.warn('Evento Realtime no manejado:', eventType, payload);
-                        return;
-                }
-            }
-            if (renderFunction === renderMissingProducts || renderFunction === renderTools) {
-                localArray.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-            }
-            renderFunction(localArray); 
-        }
-        function initializeRealtimeSubscriptions() {
-            if (!supabase) return;
-            console.log("📡 Inicializando suscripciones en tiempo real...");
-            const channelOptions = { config: { broadcast: { ack: true } } };
-            supabase.channel('public:' + PRODUCTS_TABLE, channelOptions)
-                .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_TABLE },
-                    (payload) => handleRealtimePayload(payload, allProducts, filterAndRenderProducts, 'id')
-                ).subscribe((status, err) => console.log(`Canal ${PRODUCTS_TABLE}: ${status}`, err || ''));
-            supabase.channel('public:' + PRODUCTS_EL_TRANSITO_TABLE, channelOptions)
-                .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_EL_TRANSITO_TABLE },
-                    (payload) => handleRealtimePayload(payload, allProductsElTransito, filterAndRenderProductsET, 'id')
-                ).subscribe((status, err) => console.log(`Canal ${PRODUCTS_EL_TRANSITO_TABLE}: ${status}`, err || ''));
-            supabase.channel('public:' + SALES_TABLE, channelOptions)
-                .on('postgres_changes', { event: '*', schema: 'public', table: SALES_TABLE },
-                    (payload) => handleRealtimePayload(payload, allSales, filterAndRenderSales, 'id') 
-                ).subscribe((status, err) => console.log(`Canal ${SALES_TABLE}: ${status}`, err || ''));
-            supabase.channel('public:' + SALES_EL_TRANSITO_TABLE, channelOptions)
-                .on('postgres_changes', { event: '*', schema: 'public', table: SALES_EL_TRANSITO_TABLE },
-                    (payload) => handleRealtimePayload(payload, allSalesElTransito, filterAndRenderSalesET, 'id')
-                ).subscribe((status, err) => console.log(`Canal ${SALES_EL_TRANSITO_TABLE}: ${status}`, err || ''));
-            supabase.channel('public:' + MISSING_PRODUCTS_TABLE, channelOptions)
-                .on('postgres_changes', { event: '*', schema: 'public', table: MISSING_PRODUCTS_TABLE },
-                    (payload) => handleRealtimePayload(payload, allMissingProducts, renderMissingProducts, 'id')
-                ).subscribe((status, err) => console.log(`Canal ${MISSING_PRODUCTS_TABLE}: ${status}`, err || ''));
-            supabase.channel('public:' + TOOLS_TABLE, channelOptions)
-                .on('postgres_changes', { event: '*', schema: 'public', table: TOOLS_TABLE },
-                    (payload) => handleRealtimePayload(payload, allTools, renderTools, 'id')
-                ).subscribe((status, err) => console.log(`Canal ${TOOLS_TABLE}: ${status}`, err || ''));
-        }
-
-        // --- Lógica de Carga Inicial de Datos (Faltantes y Ventas) ---
-        async function fetchSales() {
-            if (!supabase) return;
-            const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando ventas:", error); return; }
-            allSales = data;
-            filterAndRenderSales();
-        }
-        async function fetchSalesElTransito() {
-            if (!supabase) return;
-            const { data, error } = await supabase.from(SALES_EL_TRANSITO_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando ventas (ET):", error); return; }
-            allSalesElTransito = data;
-            filterAndRenderSalesET();
-        }
-
-        // ============================================================================
-        // == VI. LÓGICA DE MODALES (QR, Scanner y EDITOR)                             ==
-        // ============================================================================
-
-        // --- Lógica del Editor de Producto (Modal) ---
-        
-        window.openProductEditorModal = function(productId, isMain) {
-            currentEditingProduct = null;
-            selectedProductImageFile = null;
-            modalStatus.textContent = '';
-            
-            // 1. Determinar el array de productos y buscar el producto por ID
-            let productArray = isMain ? allProducts : allProductsElTransito;
-            // CORRECCIÓN APLICADA: Usar String() y .trim() para asegurar la comparación entre tipos de datos de string
-            let product = productArray.find(p => String(p.id).trim() === String(productId).trim());
-
-            if (!product) {
-                // Fallback de seguridad: Buscar en el inventario opuesto por si el 'isMain' es incorrecto
-                productArray = isMain ? allProductsElTransito : allProducts;
-                product = productArray.find(p => String(p.id).trim() === String(productId).trim());
-                if (product) {
-                    isMain = !isMain; // Corregir la bandera si se encontró en el otro array
-                    console.warn("⚠️ Producto encontrado en el inventario opuesto. Se ajustó la vista a:", isMain ? 'Principal' : 'El Transito');
-                }
-            }
-            
-            if (!product) {
-                // Si aún no se encuentra, mostrar el error
-                alert("Error: Producto no encontrado en el inventario local. Intente recargar la página. ID Buscado: " + productId);
-                return;
-            }
-
-            currentEditingProduct = product;
-            isMainInventory = isMain;
-
-            // 2. Llenar campos del modal
-            modalName.value = product.name;
-            modalCategory.value = product.category || 'Otros';
-            modalPrice.value = Number(product.price).toFixed(2);
-            modalQuantity.value = product.quantity;
-            modalBoxNumber.value = product.box_number || '';
-            modalLocation.textContent = isMain ? 'Inventario Principal' : 'Inventario El Transito';
-
-            // 3. Cargar imagen de previsualización
-            // Añadimos un timestamp para forzar la recarga de la imagen si se ha actualizado
-            const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
-            modalImagePreview.src = imageUrl;
-            
-            // 4. Limpiar el input file y mostrar modal
-            modalImageUpload.value = '';
-            modal.classList.remove('hidden');
-        }
-
-        window.closeProductEditorModal = function() {
-            modal.classList.add('hidden');
-            modalProductForm.reset();
-            selectedProductImageFile = null;
-        }
-
-        modalImageUpload.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                selectedProductImageFile = file;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    modalImagePreview.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        modalProductForm.addEventListener('submit', async (ev) => {
-            ev.preventDefault();
-            const saveButton = document.getElementById('modal-save-button');
-            saveButton.disabled = true;
-            modalStatus.textContent = 'Guardando cambios...';
-
-            if (!supabase || !currentEditingProduct) {
-                modalStatus.textContent = 'Error: Supabase o producto no cargado.';
-                saveButton.disabled = false;
-                return;
-            }
-
-            const table = isMainInventory ? PRODUCTS_TABLE : PRODUCTS_EL_TRANSITO_TABLE;
-            let newImageUrl = currentEditingProduct.image_url;
-            let updatePayload = {};
-
-            try {
-                // 1. Subir nueva imagen si se seleccionó un archivo
-                if (selectedProductImageFile) {
-                    modalStatus.textContent = 'Subiendo nueva imagen...';
-                    newImageUrl = await uploadImage(selectedProductImageFile);
-                }
-
-                // 2. Preparar payload de actualización
-                updatePayload = {
-                    name: modalName.value,
-                    category: modalCategory.value,
-                    price: parseFloat(modalPrice.value),
-                    quantity: parseInt(modalQuantity.value),
-                    box_number: modalBoxNumber.value.trim() || null,
-                    image_url: newImageUrl
-                };
-
-                // 3. Actualizar en Supabase
-                modalStatus.textContent = 'Actualizando registro en la base de datos...';
-                const { error } = await supabase
-                    .from(table)
-                    .update(updatePayload)
-                    .eq('id', currentEditingProduct.id);
-                
-                if (error) throw error;
-
-                // 4. Actualizar localmente y en el DOM (Realtime debería hacer esto, pero por robustez)
-                Object.assign(currentEditingProduct, updatePayload);
-                updateProductCardInDOM(currentEditingProduct, isMainInventory);
-                
-                // ADICIÓN: Recalcular totales después de la actualización exitosa
-                const localArray = isMainInventory ? allProducts : allProductsElTransito;
-                calculateCategoryTotals(localArray, isMainInventory);
-                if(isMainInventory) filterAndRenderProducts();
-                else filterAndRenderProductsET();
-                
-                modalStatus.textContent = 'Producto actualizado con éxito. ✅';
-                setTimeout(closeProductEditorModal, 1000);
-
-            } catch (err) {
-                console.error("Error al guardar cambios del producto:", err);
-                modalStatus.textContent = 'Error al actualizar: ' + err.message;
-            } finally {
-                saveButton.disabled = false;
-            }
-        });
-
-        // --- Lógica del QR Modal (Individual) ---
-
-        window.openQrModal = function() {
-            if (!currentEditingProduct || !currentEditingProduct.id) {
-                alert("Error: No hay producto seleccionado para generar el QR.");
-                return;
-            }
-            // Aseguramos que el ID es un String limpio para el QR
-            const productId = String(currentEditingProduct.id).trim(); 
-            const productName = currentEditingProduct.name;
-            qrCodeContainer.innerHTML = ''; 
-            currentQrCanvas = null;
-            qrProductInfo.textContent = `Producto: ${productName} (ID: ${productId})`;
-            
-            if (typeof QRCode !== 'undefined') {
-                const tempDiv = document.createElement('div');
-                // Aseguramos que el QR se genera con fondo blanco (colorLight) para impresión
-                new QRCode(tempDiv, {
-                    text: productId,
-                    width: 256,
-                    height: 256,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff", // Fondo blanco
-                    correctLevel : QRCode.CorrectLevel.H
-                });
-                setTimeout(() => {
-                    const canvas = tempDiv.querySelector('canvas');
-                    if (canvas) {
-                        currentQrCanvas = canvas;
-                        const imgUrl = canvas.toDataURL("image/png");
-                        const img = document.createElement('img');
-                        img.src = imgUrl;
-                        img.style.width = '256px';
-                        img.style.height = '256px';
-                        qrCodeContainer.innerHTML = '';
-                        qrCodeContainer.appendChild(img);
-                    }
-                }, 50);
-            } else {
-                qrProductInfo.textContent = "Error: La librería QRCode no se cargó correctamente.";
-            }
-            qrModal.classList.remove('hidden');
-        };
-        window.closeQrModal = function() {
-            qrModal.classList.add('hidden');
-        };
-        window.downloadQrCode = function() {
-            if (!currentQrCanvas || !currentEditingProduct) {
-                alert("Error: No se ha generado el QR para descargar.");
-                return;
-            }
-            try {
-                const dataURL = currentQrCanvas.toDataURL("image/png");
-                const link = document.createElement('a');
-                link.href = dataURL;
-                link.download = `QR_${currentEditingProduct.name.replace(/[^a-zA-Z0-9]/g, '_')}_${String(currentEditingProduct.id).substring(0, 8)}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                alert(`✅ QR de "${currentEditingProduct.name}" descargado con éxito.`);
-            } catch (error) {
-                console.error("Error al descargar el QR:", error);
-                alert("❌ Error al descargar el QR.");
-            }
-        };
-
-
-        // ============================================================================
-        // == VIII. LÓGICA DEL ESCÁNER Y REGISTRO DE VENTA AUTOMÁTICA                 ==
-        // ============================================================================
-        
-        async function registerScannedSale(product, isMainInventory) {
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const salesTable = isMainInventory ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
-            const stockTable = isMainInventory ? PRODUCTS_TABLE : PRODUCTS_EL_TRANSITO_TABLE;
-            const stockLocalArray = isMainInventory ? allProducts : allProductsElTransito;
-            const statusEl = isMainInventory ? saleStatus : saleStatusET;
-            
-            // Obtener el destinatario, usando el valor actual del input (que fue enfocado)
-            const recipientNameEl = isMainInventory ? recipientNameIn : recipientNameInET;
-            const recipientName = recipientNameEl.value.trim() || 'Cliente Rápido QR'; 
-            
-            const productNameSold = product.name + (product.category ? ` (${product.category})` : '');
-            const salePrice = Number(product.price);
-            const saleDate = new Date().toISOString().split('T')[0];
-            const saleStatusValue = 'Pagado'; 
-
-            const newSale = {
-                recipient_name: recipientName,
-                product_name_sold: productNameSold,
-                price: salePrice,
-                sale_date: saleDate,
-                status: saleStatusValue
-            };
-            
-            setStatusMessage(statusEl, `Registrando venta de ${product.name}...`, true);
-            
-            try { 
-                const { data: insertedSale, error: saleError } = await supabase.from(salesTable).insert(newSale).select().single();
-                if (saleError) throw saleError;
-                
-                // DESCUENTO DE STOCK OBLIGATORIO si es Pagado
-                if (newSale.status === 'Pagado') {
-                    await updateProductStock(product.name, stockTable, stockLocalArray, -1);
-                }
-                
-                // Limpiar inputs
-                if (isMainInventory) {
-                    productNameSoldIn.value = ''; // Limpiar solo el producto
-                    salePriceIn.value = ''; 
-                    saleDateIn.value = new Date().toISOString().split('T')[0]; 
-                    saleStatusInput.value = 'Pagado';
-                } else {
-                    productNameSoldInET.value = ''; 
-                    salePriceInET.value = ''; 
-                    saleDateInET.value = new Date().toISOString().split('T')[0]; 
-                    saleStatusInputET.value = 'Pagado';
-                }
-                
-                alert(`✅ Venta de "${product.name}" registrada con éxito para ${recipientName}. Stock descontado.`);
-                setStatusMessage(statusEl, `Venta de ${product.name} registrada con éxito y stock descontado ✅`, true); 
-                
-            } catch (err) { 
-                console.error("Error al registrar venta escaneada:", err);
-                setStatusMessage(statusEl, "Error al registrar venta y descontar stock: " + err.message, false); 
-            }
-        }
-
-        window.openScannerModal = async function() {
-            if (isScannerRunning) return;
-            if (typeof Html5QrcodeScanner === 'undefined') {
-                alert("Error: La librería de escaneo no se cargó correctamente.");
-                return;
-            }
-
-            scannerModal.classList.remove('hidden');
-            scannerStatusEl.textContent = 'Iniciando cámara...';
-            scanSuccessHandled = false;
-            isScannerRunning = true;
-
-            if (html5QrcodeScanner) {
-                try {
-                    await html5QrcodeScanner.clear();
-                } catch (e) {
-                    console.warn("Error al intentar limpiar escáner previo:", e);
-                }
-                html5QrcodeScanner = null;
-            }
-
-            html5QrcodeScanner = new Html5QrcodeScanner(
-                "reader", { 
-                    fps: 10, 
-                    qrbox: {width: 250, height: 250},
-                    rememberLastUsedCamera: true
-                },
-                false
-            );
-
-            const onScanSuccess = async (decodedText, decodedResult) => {
-                if (scanSuccessHandled) return;
-                
-                try {
-                    // CORRECCIÓN CRÍTICA: Asegurar que el ID escaneado es una cadena limpia
-                    const scannedId = String(decodedText).trim();
-                    console.log(`[SCANNER LOG] Código escaneado (ID): ${scannedId}`);
-                    
-                    // VALIDACIÓN DE ID: Si el ID está vacío, forzar un error.
-                    if (!scannedId || scannedId === "") {
-                        throw new Error(`El código QR escaneado es inválido o no contiene un ID de producto.`);
-                    }
-
-                    // --- Detener y cerrar el modal ANTES de procesar, para evitar errores visuales ---
-                    scanSuccessHandled = true; 
-                    await closeScannerModal(true); 
-
-                    // Búsqueda del producto, asegurando la comparación de strings
-                    const product = allProducts.find(p => String(p.id).trim() === scannedId) || allProductsElTransito.find(p => String(p.id).trim() === scannedId);
-                    
-                    if (!product) {
-                        throw new Error(`El producto con ID "${scannedId}" no existe en el inventario.`);
-                    }
-
-                    if (parseInt(product.quantity) <= 0) {
-                        throw new Error(`Stock insuficiente: El producto "${product.name}" tiene 0 unidades disponibles.`);
-                    }
-                    
-                    const isMainInventory = allProducts.some(p => String(p.id).trim() === scannedId);
-                    
-                    console.log(`[SCANNER LOG] Producto encontrado: ${product.name} (Inventario: ${isMainInventory ? 'Principal' : 'El Transito'})`);
-                    
-                    // 1. Cargar datos en el formulario y cambiar a la vista de ventas
-                    if (isMainInventory) {
-                        toggleView('sales');
-                        const productNameWithCategory = product.name + (product.category ? ` (${product.category})` : '');
-                        productNameSoldIn.value = productNameWithCategory;
-                        salePriceIn.value = Number(product.price).toFixed(2);
-                        saleDateIn.value = new Date().toISOString().split('T')[0];
-                        saleStatusInput.value = 'Pendiente'; 
-                        // ENFOCAR AL DESTINATARIO
-                        recipientNameIn.focus();
-                    } else {
-                        toggleView('sales_el_transito');
-                        const productNameWithCategoryET = product.name + (product.category ? ` (${product.category})` : '');
-                        productNameSoldInET.value = productNameWithCategoryET;
-                        salePriceInET.value = Number(product.price).toFixed(2);
-                        saleDateInET.value = new Date().toISOString().split('T')[0];
-                        saleStatusInputET.value = 'Pendiente';
-                        // ENFOCAR AL DESTINATARIO
-                        recipientNameInET.focus();
-                    }
-                    
-                    // Nota: La venta se registra manualmente al presionar "Registrar Venta" en el formulario.
-
-                } catch (error) {
-                    console.error("Error al procesar escaneo:", error);
-                    // Restablecer la bandera antes de la alerta para permitir reintentar
-                    scanSuccessHandled = false; 
-                    alert(`❌ Error en Escaneo: ${error.message}`);
-                    
-                    // Reabrir el escáner si el modal fue cerrado y el error no es de la cámara
-                    if (!error.message.includes("cámara") && !error.message.includes("Html5QrcodeScanner")) {
-                         openScannerModal();
-                    } else {
-                        closeScannerModal(true);
-                    }
-                }
-            };
-
-            const onScanError = (errorMessage) => {
-                if (!scanSuccessHandled) {
-                    // Solo actualizamos el estado si no es un error de parseo común (QR not found)
-                    if (errorMessage.includes("No camera found")) {
-                        scannerStatusEl.textContent = 'Error: No se detectó ninguna cámara. Asegúrate de dar permiso.';
-                    } else if (!errorMessage.includes("code parse error") && !errorMessage.includes("-D")) {
-                         scannerStatusEl.textContent = 'Escaneando... Apunta el código QR al centro.';
-                    }
-                }
-            };
-            
-            html5QrcodeScanner.render(onScanSuccess, onScanError);
-        };
-
-        window.closeScannerModal = async function(hideModal = true) {
-            if (hideModal) {
-                scannerModal.classList.add('hidden');
-            }
-            scannerStatusEl.textContent = 'Esperando código QR o de barras...';
-            
-            if (html5QrcodeScanner) {
-                if (isScannerRunning) {
-                    try {
-                        await html5QrcodeScanner.stop();
-                        console.log("[SCANNER LOG] Escáner detenido exitosamente.");
-                    } catch (error) {
-                        console.warn("[SCANNER LOG] Error al detener el escáner (puede que ya estuviera detenido):", error); 
-                    }
-                }
-                
-                try {
-                    await html5QrcodeScanner.clear();
-                } catch (e) {
-                    console.warn("[SCANNER LOG] Error al limpiar la instancia:", e);
-                }
-                
-                html5QrcodeScanner = null;
-            } 
-            
-            isScannerRunning = false;
-            scanSuccessHandled = false; 
-        };
-
-
-        // ============================================================================
-        // == IX. EVENT LISTENERS Y CARGA INICIAL                                   ==
-        // ============================================================================
-        
-        // --- Event Listeners ---
-        searchInput.addEventListener("input", filterAndRenderProducts);
-        searchInputET.addEventListener("input", filterAndRenderProductsET);
-        searchSalesInput.addEventListener("input", filterAndRenderSales);
-        pendingOnlyCheckbox.addEventListener("change", filterAndRenderSales);
-        searchSalesInputET.addEventListener("input", filterAndRenderSalesET);
-        pendingOnlyCheckboxET.addEventListener("change", filterAndRenderSalesET);
-        
-        // --- Forms Submit Logic (Implementados anteriormente) ---
-        form.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("submit"); 
-            submitBtn.disabled = true; 
-            setStatusMessage(status, "Guardando...", true); 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            try { 
-                const imageUrl = imageIn.files[0] ? await uploadImage(imageIn.files[0]) : null; 
-                const newProduct = { name: nameIn.value, category: categoryIn.value, price: parseFloat(priceIn.value), quantity: parseInt(qtyIn.value), image_url: imageUrl, box_number: boxNumberIn.value.trim() || null };
-                const { data: insertedProduct, error: insertError } = await supabase.from(PRODUCTS_TABLE).insert(newProduct).select().single(); 
-                if (insertError) throw insertError; 
-                form.reset(); qtyIn.value = 1; 
-                setStatusMessage(status, "Producto agregado con éxito ✅", true); 
-            } catch (err) { 
-                console.error("Error al agregar producto:", err);
-                setStatusMessage(status, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-        formET.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("submit-et"); 
-            submitBtn.disabled = true; 
-            setStatusMessage(statusET, "Guardando...", true); 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            try { 
-                const imageUrl = imageInET.files[0] ? await uploadImage(imageInET.files[0]) : null; 
-                const newProductET = { name: nameInET.value, category: categoryInET.value, price: parseFloat(priceInET.value), quantity: parseInt(qtyInET.value), image_url: imageUrl, box_number: boxNumberInET.value.trim() || null };
-                const { data: insertedProduct, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).insert(newProductET).select().single();
-                if (error) throw error; 
-                formET.reset(); qtyInET.value = 1; 
-                setStatusMessage(statusET, "Producto agregado con éxito (El Transito) ✅", true); 
-            } catch (err) { 
-                console.error("Error al agregar producto ET:", err);
-                setStatusMessage(statusET, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-        missingProductForm.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("missing-product-submit"); 
-            submitBtn.disabled = true; 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            try { 
-                const newMissing = { product_name: missingProductNameIn.value, notes: missingProductNotesIn.value || null };
-                const { data: insertedMissing, error } = await supabase.from(MISSING_PRODUCTS_TABLE).insert(newMissing).select().single();
-                if (error) throw error;
-                missingProductForm.reset(); 
-                setStatusMessage(missingProductStatus, "Producto agregado a la lista ✅", true); 
-            } catch (err) { 
-                console.error("Error al agregar producto faltante:", err);
-                setStatusMessage(missingProductStatus, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-        toolForm.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("tool-submit"); 
-            submitBtn.disabled = true; 
-            setStatusMessage(toolStatus, "Guardando herramienta...", true); 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            try { 
-                const imageUrl = toolImageIn.files[0] ? await uploadImage(toolImageIn.files[0]) : null; 
-                const newTool = { title: toolTitleIn.value, description: toolDescriptionIn.value || null, image_url: imageUrl };
-                const { data: insertedTool, error } = await supabase.from(TOOLS_TABLE).insert(newTool).select().single();
-                if (error) throw error; 
-                toolForm.reset(); 
-                setStatusMessage(toolStatus, "Herramienta guardada con éxito ✅", true); 
-            } catch (err) { 
-                console.error("Error al guardar herramienta:", err);
-                setStatusMessage(toolStatus, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-        salesForm.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("sale-submit"); 
-            submitBtn.disabled = true; 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const soldProductWithCategory = productNameSoldIn.value.trim();
-            const soldProductName = getCleanProductName(soldProductWithCategory); 
-            try { 
-                const newSale = {
-                    recipient_name: recipientNameIn.value,
-                    product_name_sold: soldProductWithCategory,
-                    price: parseFloat(salePriceIn.value),
-                    sale_date: saleDateIn.value,
-                    status: saleStatusInput.value
-                };
-                const { data: insertedSale, error: saleError } = await supabase.from(SALES_TABLE).insert(newSale).select().single();
-                if (saleError) throw saleError;
-                if (newSale.status === 'Pagado') {
-                    await updateProductStock(soldProductName, PRODUCTS_TABLE, allProducts, -1);
-                }
-                salesForm.reset(); 
-                saleDateIn.value = new Date().toISOString().split('T')[0]; 
-                setStatusMessage(saleStatus, "Venta registrada con éxito ✅", true); 
-            } catch (err) { 
-                console.error("Error al registrar venta:", err);
-                setStatusMessage(saleStatus, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-        salesFormET.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("sale-submit-et"); 
-            submitBtn.disabled = true; 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const soldProductWithCategoryET = productNameSoldInET.value.trim();
-            const soldProductNameET = getCleanProductName(soldProductWithCategoryET); 
-            try { 
-                const newSaleET = {
-                    recipient_name: recipientNameInET.value,
-                    product_name_sold: soldProductWithCategoryET,
-                    price: parseFloat(salePriceInET.value),
-                    sale_date: saleDateInET.value,
-                    status: saleStatusInputET.value
-                };
-                const { data: insertedSale, error: saleErrorET } = await supabase.from(SALES_EL_TRANSITO_TABLE).insert(newSaleET).select().single();
-                if (error) throw error;
-                if (newSaleET.status === 'Pagado') {
-                    await updateProductStock(soldProductNameET, PRODUCTS_EL_TRANSITO_TABLE, allProductsElTransito, -1);
-                }
-                salesFormET.reset(); 
-                saleDateInET.value = new Date().toISOString().split('T')[0]; 
-                setStatusMessage(saleStatusET, "Venta (El Transito) registrada con éxito ✅", true); 
-            } catch (err) { 
-                console.error("Error al registrar venta ET:", err);
-                setStatusMessage(statusET, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-        toolImageEditorInput.addEventListener('change', async (event) => {
-            if (!editingToolId) return; 
-            const file = event.target.files[0];
-            if (!file) return; 
-            const originalButtonText = "Editar Foto"; 
-            const editButton = document.querySelector(`button[onclick="editToolImage('${editingToolId}')"]`);
-            if(editButton) editButton.textContent = "Subiendo..."; 
-            try {
-                const newImageUrl = await uploadImage(file);
-                if (!newImageUrl) { throw new Error("La función de subida no devolvió una URL."); }
-                const { error } = await supabase.from(TOOLS_TABLE).update({ image_url: newImageUrl }).eq('id', editingToolId);
-                if (error) throw error;
-                alert('✅ Imagen actualizada correctamente.');
-            } catch (error) {
-                console.error('Error al actualizar la imagen de la herramienta:', error);
-                alert('❌ Error: ' + error.message);
-            } finally {
-                editingToolId = null; 
-                toolImageEditorInput.value = ''; 
-                if(editButton) editButton.textContent = originalText; 
-            }
-        });
-        // Modificación para que el menú móvil use toggleView (y se auto-cierre)
-        document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', (e) => {
-            // Previene el doble click en el botón de escritorio
-            if (!isMobile() && e.target.closest('#mobile-menu-dropdown')) return; 
-            toggleView(btn.dataset.view);
-        }));
-
-        // --- Lógica de Impresión y Descarga de Etiquetas ---
-        function populateLabelCategories(products) {
-            const categories = new Set();
-            products.forEach(p => {
-                if (p.category) categories.add(p.category);
-            });
-            const sortedCategories = Array.from(categories).sort();
-            const currentCategory = labelsCategorySelect.value;
-            labelsCategorySelect.innerHTML = '<option value="all">Todas las Categorías</option>';
-            sortedCategories.forEach(cat => {
-                const option = document.createElement('option');
-                option.value = cat;
-                option.textContent = cat;
-                labelsCategorySelect.appendChild(option);
-            });
-            labelsCategorySelect.value = sortedCategories.includes(currentCategory) ? currentCategory : 'all';
-        }
-        labelsLocationSelect.addEventListener('change', updateLabelView);
-        labelsCategorySelect.addEventListener('change', updateLabelView);
-        function updateLabelView() {
-            const location = labelsLocationSelect.value;
-            const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
-            populateLabelCategories(selectedProducts);
-            const categoryFilter = labelsCategorySelect.value;
-            const filtered = selectedProducts.filter(p => categoryFilter === 'all' || p.category === categoryFilter);
-            labelsCountSpan.textContent = `${filtered.length} Productos seleccionados`;
-            if (labelsOutputDiv.children.length === 0 || labelsOutputDiv.children[0].tagName === 'P') {
-                labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Selecciona el inventario y presiona "Generar e Imprimir Etiquetas" o "Descargar QRs".</p>`;
-            }
-        }
-        
-        window.generateAndPrintLabels = function() {
-            if (typeof QRCode === 'undefined') {
-                return alert("❌ Error: La librería QRCode no está cargada.");
-            }
-            const location = labelsLocationSelect.value;
-            const categoryFilter = labelsCategorySelect.value;
-            const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
-            const productsToPrint = selectedProducts.filter(p => 
-                categoryFilter === 'all' || p.category === categoryFilter
-            );
-            if (productsToPrint.length === 0) {
-                return alert("No hay productos que coincidan con el filtro seleccionado.");
-            }
-            labelsOutputDiv.innerHTML = '';
-            labelsOutputDiv.classList.add('labels-container');
-            const qrPromises = [];
-            productsToPrint.forEach((product, index) => {
-                const label = document.createElement('div');
-                // Aseguramos el fondo blanco de la etiqueta en la previsualización del DOM
-                label.className = 'label-tag border border-gray-400 p-1 flex items-center justify-start'; 
-                label.style.backgroundColor = 'white'; 
-                
-                const tempDiv = document.createElement('div');
-                const infoBox = document.createElement('div');
-                infoBox.className = 'flex-grow text-xs text-black';
-                infoBox.style.color = '#000';
-                infoBox.style.fontFamily = 'sans-serif';
-                const productName = product.name.length > 30 ? product.name.substring(0, 27) + '...' : product.name;
-                infoBox.innerHTML = `
-                    <p style="font-weight: bold; font-size: 11px; margin: 0;">${productName}</p>
-                    <p style="font-size: 10px; margin: 0;">Cat: ${product.category || 'N/A'}</p>
-                    <p style="font-weight: bold; color: #10b981; font-size: 11px; margin: 0;">$${Number(product.price).toFixed(2)}</p>
-                    <p style="font-size: 9px; margin: 0;">Caja: ${product.box_number || 'N/A'}</p>
-                `;
-                const qrPromise = new Promise(resolve => {
-                    // Limpiamos el ID antes de generar el QR
-                    const cleanProductId = String(product.id).trim(); 
-
-                    const qr = new QRCode(tempDiv, {
-                        text: cleanProductId, // Usamos el ID limpio
-                        width: 100, 
-                        height: 100,
-                        colorDark : "#000000",
-                        colorLight : "#ffffff", // Fondo blanco para impresión
-                        correctLevel : QRCode.CorrectLevel.L
-                    });
-                    setTimeout(() => {
-                        const canvas = tempDiv.querySelector('canvas');
-                        if (canvas) {
-                            const imgUrl = canvas.toDataURL("image/png");
-                            const imgBox = document.createElement('div');
-                            imgBox.className = 'qr-box mr-2';
-                            const img = document.createElement('img');
-                            img.src = imgUrl;
-                            img.style.width = '30mm';
-                            img.style.height = '30mm';
-                            imgBox.appendChild(img);
-                            label.appendChild(infoBox); // Asegurar que el QR va primero
-                            label.appendChild(imgBox);
-                            labelsOutputDiv.appendChild(label);
-                        }
-                        resolve();
-                    }, 100); 
-                });
-                qrPromises.push(qrPromise);
-            });
-            Promise.all(qrPromises).then(() => {
-                console.log("Todos los QR generados. Abriendo diálogo de impresión.");
-                window.print();
-                labelsOutputDiv.classList.remove('labels-container'); 
-            });
-        };
-
-        // --- FUNCIÓN: Descarga de Etiquetas Masivas como ZIP ---
-        window.downloadAllLabelsAsZip = async function() {
-            // Verificar si las librerías necesarias están disponibles (Se cargaron en el HEAD)
-            if (typeof QRCode === 'undefined' || typeof JSZip === 'undefined' || typeof saveAs === 'undefined') {
-                 return alert("❌ Error: Las librerías JSZip y FileSaver son necesarias para la descarga ZIP y no se han cargado. Asegúrate que las etiquetas <script> en el HEAD estén correctas.");
-            }
-
-            const location = labelsLocationSelect.value;
-            const categoryFilter = labelsCategorySelect.value;
-            const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
-            const productsToPrint = selectedProducts.filter(p => 
-                categoryFilter === 'all' || p.category === categoryFilter
-            );
-
-            if (productsToPrint.length === 0) {
-                return alert("No hay productos que coincidan con el filtro seleccionado para descargar.");
-            }
-
-            const zip = new JSZip();
-            const loadingButton = document.querySelector('button[onclick="downloadAllLabelsAsZip()"]');
-            loadingButton.disabled = true;
-            const originalText = loadingButton.textContent;
-            loadingButton.textContent = 'Generando ZIP... Por favor espere.';
-
-            try {
-                for (const product of productsToPrint) {
-                    // 1. Generar el QR
-                    const tempDiv = document.createElement('div');
-                    const cleanProductId = String(product.id).trim();
-
-                    // Generamos el QR en un elemento temporal
-                    new QRCode(tempDiv, {
-                        text: cleanProductId,
-                        width: 256,
-                        height: 256,
-                        colorDark: "#000000",
-                        colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-
-                    // Esperar un micro ciclo para que el canvas se dibuje (necesario para QRCode.js)
-                    await new Promise(resolve => setTimeout(resolve, 50)); 
-                    
-                    const canvas = tempDiv.querySelector('canvas');
-                    if (canvas) {
-                        // 2. Obtener la base64 de la imagen PNG y convertirla a binario para JSZip
-                        const dataURL = canvas.toDataURL("image/png");
-                        const base64Data = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-
-                        // 3. Añadir al ZIP
-                        const filename = `${product.name.replace(/[^a-zA-Z0-9]/g, '_')}_${cleanProductId.substring(0, 8)}.png`;
-                        zip.file(filename, base64Data, { base64: true });
-                    }
-                }
-
-                // 4. Generar y descargar el archivo ZIP
-                const zipContent = await zip.generateAsync({ type: "blob" });
-                saveAs(zipContent, `CellSmar_QR_Etiquetas_${new Date().toISOString().split('T')[0]}.zip`);
-                
-                alert(`✅ ${productsToPrint.length} QRs descargados en formato ZIP.`);
-
-            } catch (error) {
-                console.error("Error al generar o descargar el ZIP:", error);
-                alert("❌ Error: Falló la generación del archivo ZIP. Revisa la consola para más detalles.");
-            } finally {
-                loadingButton.disabled = false;
-                loadingButton.textContent = originalText;
-            }
-        };
-
-
-        // --- Lógica de Faltantes ---
-        async function fetchMissingProducts() {
-            if (!supabase) return;
-            const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando faltantes:", error); return; }
-            allMissingProducts = data;
-            renderMissingProducts(allMissingProducts);
-        }
-        function renderMissingProducts(items) {
-            missingListLoader.innerHTML = "";
-            missingListEl.innerHTML = "";
-            totalMissingCount.textContent = `${items.length} productos pendientes`;
-            if (items.length === 0) {
-                missingListEl.innerHTML = `<p class="p-4 text-gray-400">¡Genial! No hay productos faltantes en la lista.</p>`;
-                return;
-            }
-            const listItems = items.map(p => {
-                const date = new Date(p.created_at).toLocaleDateString('es-SV', { day: 'numeric', month: 'short' });
-                return `
-                    <div id="missing-row-${p.id}" class="flex items-center justify-between p-4 border-b border-gray-700 hover:bg-gray-700/50 transition">
-                        <div>
-                            <p class="font-medium text-white">${p.product_name}</p>
-                            <p class="text-xs text-gray-400">${p.notes || 'Sin notas'}</p>
-                            <p class="text-xs text-indigo-400 mt-1">Registrado el ${date}</p>
-                        </div>
-                        <button onclick="deleteMissingProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Comprado</button>
-                    </div>
-                `;
-            }).join('');
-            missingListEl.innerHTML = listItems;
-        }
-        window.deleteMissingProduct = async function(id) {
-            if (!confirm("¿Marcar este producto como 'Comprado' y eliminarlo de la lista?")) return;
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            try {
-                const { error } = await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq("id", id);
-                if (error) throw error;
-            } catch (error) {
-                console.error("Error al eliminar faltante:", error);
-                alert("❌ Error al eliminar: " + error.message);
-            }
-        }
-        
         // --- Evento de Carga Principal ---
         window.addEventListener("load", async () => {
             themeSelector.value = root.className || 'theme-dark'; 
@@ -2847,7 +1904,6 @@
             if (supabase) {
                 try {
                     // Carga de datos inicial
-                    // Usamos Promise.all para cargar todos los datos de forma concurrente, incluso si la vista está oculta.
                     await Promise.all([
                         fetchProducts(), 
                         fetchProductsET(),
