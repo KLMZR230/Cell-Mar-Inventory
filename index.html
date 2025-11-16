@@ -198,18 +198,18 @@
         /* TEMA 5: Christmas Snow (CORREGIDO) */
         /********************************/
         .theme-christmas {
-            --bg-primary: #e0f2f7; /* Fondo azul cielo muy pálido */
+            --bg-primary: #f0f8ff; /* Fondo Azul Cielo muy suave */
             --bg-secondary: #ffffff;
             --bg-header: rgba(255, 255, 255, 0.9);
             --text-primary: #1e40af; /* Azul fuerte */
             --text-secondary: #3b82f6;
             --text-muted: #94a3b8;
             --border-color: #a8b5c7;
-            --accent-color: #ef4444; /* Rojo brillante navideño */
-            --accent-color-dark: #dc2626;
+            --accent-color: #dc2626; /* Rojo brillante navideño */
+            --accent-color-dark: #b91c1c;
             --font-main: 'Poppins', sans-serif;
             --font-headings: 'Playfair Display', serif;
-            --pastel-bg: #ffebee;
+            --pastel-bg: #e0f2f7; 
             --pastel-text: #1e3a8a;
         }
         /* KEYFRAMES para la nieve */
@@ -228,7 +228,7 @@
             pointer-events: none;
             z-index: 9999;
             opacity: 0.8;
-            /* Patrón de nieve, ajustando la opacidad en el JS si es necesario */
+            /* Patrón de nieve (Se usan patrones pequeños y suaves) */
             background-image: 
                 url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2NgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=='),
                 url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/TAAAABHNCSVQICAgIfAhkiAAAAFFJREFUeJxj/P//PwOogImBCmDMtXwU1x+sCqf+XgYwYAAe/y/E04x/j0yI75/bM7R//2NgYAAz3f8H4e9hXgD7GgYGBrzN/8cCAAD/mO9Yd/X+sAAAAABJRU5ErkJggg=='),
@@ -1149,6 +1149,7 @@
         }
         
         // --- Carga de Logo ---
+        const LOGO_CONFIG_KEY = "current_logo_url";
         async function loadLogo() {
             if (!supabase) return;
             try {
@@ -1184,55 +1185,6 @@
                 categoryTotalsET = totals;
             }
             return totals;
-        }
-
-
-        // --- Lógica de Vistas ---
-        const views = { 
-            inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario' }, 
-            inventory_el_transito: { el: document.getElementById('inventory-el-transito-view'), title: 'Vista: Inventario El Transito' },
-            labels: { el: document.getElementById('labels-view'), title: 'Vista: Generación de Etiquetas QR' },
-            sales: { el: document.getElementById('sales-view'), title: 'Vista: Ventas Registradas' },
-            sales_el_transito: { el: document.getElementById('sales-el-transito-view'), title: 'Vista: Ventas El Transito' },
-            missing: { el: document.getElementById('missing-view'), title: 'Vista: Productos Faltantes' },
-            tools: { el: document.getElementById('tools-view'), title: 'Vista: Herramientas y Tutoriales' } 
-        };
-        
-        function toggleView(viewName) { 
-            // ... (función toggleView se mantiene igual)
-             Object.keys(views).forEach(key => { 
-                const isCurrent = key === viewName; 
-                views[key].el.classList.toggle('hidden', !isCurrent); 
-                
-                // Botones de escritorio (Barra ancha)
-                const btn = document.querySelector(`#view-buttons .view-btn[data-view="${key}"]`); 
-                if (btn) {
-                    btn.classList.toggle('bg-indigo-500', isCurrent); 
-                    btn.classList.toggle('text-white', isCurrent); 
-                    btn.classList.toggle('bg-transparent', !isCurrent); 
-                    btn.classList.toggle('text-gray-300', !isCurrent); 
-                }
-
-                // Botones de menú móvil (Dropdown)
-                 const mobileBtn = document.querySelector(`#mobile-menu-dropdown .view-btn[data-view="${key}"]`);
-                 if (mobileBtn) {
-                     mobileBtn.classList.toggle('bg-indigo-500', isCurrent); 
-                     mobileBtn.classList.toggle('font-bold', isCurrent);
-                 }
-            }); 
-            currentViewTitle.textContent = views[viewName].title; 
-            
-            if (viewName === 'labels') {
-                updateLabelView();
-            }
-            
-            if (isMobile() && !mobileMenuDropdown.classList.contains('hidden')) {
-                mobileMenuDropdown.classList.add('hidden');
-            }
-            
-            if (viewName === 'sales' || viewName === 'sales_el_transito' || viewName === 'inventory' || viewName === 'inventory_el_transito') {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
         }
 
         function showSkeletonLoaders() { 
@@ -1316,8 +1268,7 @@
             }); 
         }
         function updateProductCardInDOM(product, isMainInventory) {
-            // ... (función updateProductCardInDOM se mantiene igual)
-             const idSuffix = isMainInventory ? '' : '-et'; 
+            const idSuffix = isMainInventory ? '' : '-et'; 
             const elementPrefix = 'product-';
             const stockEl = document.getElementById(`${elementPrefix}stock${idSuffix}-${product.id}`);
             const nameEl = document.getElementById(`${elementPrefix}name${idSuffix}-${product.id}`);
@@ -1452,47 +1403,36 @@
                 updateLabelView();
             }
         }
-
-        // --- Lógica de Ventas ---
         
-        function updateSaleRowInDOM(sale, isMain) {
+        // --- FUNCIÓN AGREGADA: Crea el HTML para una fila de venta (Necesario para arreglar ReferenceError) ---
+        function createSaleRowHTML(sale, isMain) {
             const tableSuffix = isMain ? '' : '-et';
-            const rowId = `sale-row${tableSuffix}-${sale.id}`;
-            const oldRow = document.getElementById(rowId);
+            const statusClass = STATUS_COLORS[sale.status] || 'bg-gray-600 text-white';
 
-            if (oldRow) {
-                // Reemplazar solo la fila, no toda la tabla.
-                const newRowHtml = createSaleRowHTML(sale, isMain);
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = newRowHtml.trim();
-                const newRow = tempDiv.firstChild;
-                oldRow.replaceWith(newRow);
-
-                // Actualizar totales diarios y generales
-                const localArray = isMain ? allSales : allSalesElTransito;
-                updateGeneralTotals(localArray, isMain);
-
-                const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
-                const dailyElSold = document.getElementById(`daily-sold${tableSuffix}-${saleDate}`);
-                const dailyElPaid = document.getElementById(`daily-paid${tableSuffix}-${saleDate}`);
-
-                if (dailyElSold && dailyElPaid) {
-                    const dailySales = localArray.filter(s => new Date(s.sale_date).toISOString().split('T')[0] === saleDate);
-                    const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
-                    const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
-
-                    dailyElSold.textContent = `$${dailyTotalSold.toFixed(2)}`;
-                    dailyElPaid.textContent = `$${dailyTotalPaid.toFixed(2)}`;
-                }
-            } else {
-                // Si no se encuentra la fila (ej. después de un filtro), forzar re-render completo
-                if (isMain) filterAndRenderSales();
-                else filterAndRenderSalesET();
-            }
+            return `
+                <tr id="sale-row${tableSuffix}-${sale.id}" class="hover:bg-gray-700/50 transition">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white" data-label="Destinatario">${sale.recipient_name}</td>
+                    <td class="px-6 py-4 text-sm text-gray-300" data-label="Producto">${sale.product_name_sold}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-green-400 font-bold" data-label="Precio">$${Number(sale.price).toFixed(2)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm" data-label="Estado">
+                        <select onchange="updateSaleStatus('${sale.id}', this.value, ${isMain})" class="border rounded-md p-1 text-sm font-semibold ${statusClass} appearance-none pr-8">
+                            <option value="Pendiente" class="${STATUS_COLORS['Pendiente']}" ${sale.status === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                            <option value="Pagado" class="${STATUS_COLORS['Pagado']}" ${sale.status === 'Pagado' ? 'selected' : ''}>Pagado</option>
+                            <option value="Devuelto" class="${STATUS_COLORS['Devuelto']}" ${sale.status === 'Devuelto' ? 'selected' : ''}>Devuelto</option>
+                        </select>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" data-label="Acciones">
+                        <button onclick="deleteSale('${sale.id}', ${isMain})" class="text-red-600 hover:text-red-900 transition" title="Eliminar Venta">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    </td>
+                </tr>
+            `;
         }
 
         function updateGeneralTotals(salesArray, isMain) {
-            const totalSold = salesArray.reduce((sum, s) => sum + Number(s.price), 0);
+            // ... (función updateGeneralTotals se mantiene igual)
+             const totalSold = salesArray.reduce((sum, s) => sum + Number(s.price), 0);
             const totalPaid = salesArray.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
             const percentage = totalSold > 0 ? ((totalPaid / totalSold) * 100).toFixed(2) : 0;
             
@@ -1531,7 +1471,8 @@
             renderSales(filtered);
         }
         function renderSales(items) {
-            salesListLoader.innerHTML = "";
+            // ... (función renderSales se mantiene igual)
+             salesListLoader.innerHTML = "";
             salesListContainer.innerHTML = ""; 
             updateGeneralTotals(items, true); 
             if (items.length === 0) {
@@ -1596,7 +1537,8 @@
             renderSalesElTransito(filtered);
         }
         function renderSalesElTransito(items) {
-            salesListLoaderET.innerHTML = "";
+            // ... (función renderSalesElTransito se mantiene igual)
+             salesListLoaderET.innerHTML = "";
             salesListContainerET.innerHTML = ""; 
             updateGeneralTotals(items, false); 
             if (items.length === 0) {
@@ -1646,7 +1588,8 @@
             renderMissingProducts(allMissingProducts);
         }
         function renderMissingProducts(items) {
-            missingListLoader.innerHTML = "";
+            // ... (función renderMissingProducts se mantiene igual)
+             missingListLoader.innerHTML = "";
             missingListEl.innerHTML = "";
             totalMissingCount.textContent = `${items.length} productos pendientes`;
             if (items.length === 0) {
@@ -1688,7 +1631,8 @@
             renderTools(allTools);
         }
         function renderTools(items) {
-            toolsLoader.innerHTML = "";
+            // ... (función renderTools se mantiene igual)
+             toolsLoader.innerHTML = "";
             toolsListEl.innerHTML = "";
             totalToolsCount.textContent = `${items.length} herramientas`;
             if (items.length === 0) {
@@ -1732,7 +1676,8 @@
         // --- Funciones de Lógica de Edición y QR (modal) ---
 
         window.openProductEditorModal = function(productId, isMain) {
-            currentEditingProduct = null;
+             // ... (lógica de openProductEditorModal se mantiene igual)
+             currentEditingProduct = null;
             selectedProductImageFile = null;
             modalStatus.textContent = '';
             
@@ -1778,7 +1723,8 @@
         }
 
         window.openScannerModal = function(event) {
-            event.stopPropagation();
+            // ... (lógica de openScannerModal se mantiene igual)
+             event.stopPropagation();
             if (isScannerRunning) return;
             if (typeof Html5QrcodeScanner === 'undefined') {
                 alert("Error: La librería de escaneo no se cargó correctamente.");
@@ -1880,7 +1826,8 @@
         };
 
         window.closeScannerModal = async function(hideModal = true) {
-            if (hideModal) {
+            // ... (lógica de closeScannerModal se mantiene igual)
+             if (hideModal) {
                 document.getElementById('scanner-modal').classList.add('hidden');
             }
             document.getElementById('scanner-status').textContent = 'Esperando código QR o de barras...';
@@ -1925,7 +1872,6 @@
 
                 // Actualizar totales diarios y generales
                 const localArray = isMain ? allSales : allSalesElTransito;
-                // Nota: Usamos el array completo para que los totales generales sean correctos
                 updateGeneralTotals(localArray, isMain);
 
                 const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
@@ -1933,8 +1879,6 @@
                 const dailyElPaid = document.getElementById(`daily-paid${tableSuffix}-${saleDate}`);
 
                 if (dailyElSold && dailyElPaid) {
-                    // Recalcular los totales diarios usando solo las ventas visibles/filtradas
-                    // Esto se hace sobre el array local completo para evitar fallos si la venta no está en el filtro actual
                     const dailySales = localArray.filter(s => new Date(s.sale_date).toISOString().split('T')[0] === saleDate);
                     const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
                     const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
@@ -1943,7 +1887,7 @@
                     dailyElPaid.textContent = `$${dailyTotalPaid.toFixed(2)}`;
                 }
             } else {
-                // Si la fila no está visible (ej. se inserta una venta), forzar re-render completo para que aparezca si coincide con el filtro
+                // Si la fila no está visible, forzar re-render completo para que aparezca si coincide con el filtro
                 if (isMain) filterAndRenderSales();
                 else filterAndRenderSalesET();
             }
@@ -1966,15 +1910,11 @@
 
             if (isSales) {
                 if (eventType === 'UPDATE' && index !== -1) {
-                    // Si el estado o cualquier otro campo (excepto fecha y precio) cambia, usa actualización local
                     Object.assign(localArray[index], newRecord);
                     updateSaleRowInDOM(localArray[index], isMainSales);
-                    // Si el filtro de pendiente está activado y el estado ya no coincide, la fila desaparecerá en el DOM, 
-                    // y el re-render de filterAndRenderSales() la eliminará de la vista.
                     return; 
                 }
                 
-                // Para INSERT, DELETE, o UPDATE que afecte la agrupación (fecha) o el precio, forzar re-render
                 let needsFullRender = false;
                 if (eventType === 'INSERT' && index === -1) {
                     localArray.unshift(newRecord);
@@ -1983,7 +1923,6 @@
                     localArray.splice(index, 1);
                     needsFullRender = true;
                 } else if (eventType === 'UPDATE' && index !== -1) {
-                    // Si la fecha o el precio cambian, necesitamos agrupar/sumar de nuevo
                     if (newRecord.sale_date !== oldRecord.sale_date || newRecord.price !== oldRecord.price) {
                          Object.assign(localArray[index], newRecord);
                          needsFullRender = true;
@@ -1994,7 +1933,6 @@
 
                 if (needsFullRender) {
                     localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at));
-                    // Llama a filterAndRenderSales/ET para asegurar que los filtros y la agrupación estén correctos
                     if(isMainSales) filterAndRenderSales();
                     else filterAndRenderSalesET();
                 }
@@ -2018,7 +1956,6 @@
                             const newCategory = newRecord.category;
                             const newQuantity = newRecord.quantity;
                             Object.assign(localArray[index], newRecord);
-                            // Si solo cambia precio, caja o imagen, solo actualiza la tarjeta (NO re-renderiza todo)
                             if (oldCategory !== newCategory || oldQuantity !== newQuantity) {
                                 needsFullRender = true;
                             } else {
@@ -2042,7 +1979,6 @@
                 calculateCategoryTotals(localArray, isMain);
 
                 if (needsFullRender) {
-                    // Solo re-renderizamos la vista de productos si es estrictamente necesario (cambio de categoría o stock)
                     if (isMainProducts) filterAndRenderProducts();
                     else filterAndRenderProductsET();
                 }
@@ -2316,6 +2252,7 @@
                 setStatusMessage(saleStatusET, `Error al registrar venta (El Transito): ${e.message}`, false);
             }
         });
+        
         // --- Manejo de la Edición de Producto ---
         document.getElementById('modal-product-form').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -2348,10 +2285,12 @@
                 // 1. Optimistic Update (Aplicar cambios localmente)
                 const productIndex = localArray.findIndex(p => p.id === currentEditingProduct.id);
                 if (productIndex !== -1) {
+                    // Actualizamos la data local directamente
                     localArray[productIndex] = {
                         ...oldProductData,
                         name, category, price, quantity, box_number, image_url: imageUrl
                     };
+                    // Actualizamos solo la tarjeta visible y los totales, sin re-renderizar todo
                     updateProductCardInDOM(localArray[productIndex], isMain);
                     calculateCategoryTotals(localArray, isMain);
                 }
@@ -2385,6 +2324,163 @@
                 }
             }
         });
+        
+        // --- Otras funciones de utilidad ---
+        
+        window.updateSaleStatus = async function(saleId, newStatus, isMain) {
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
+            const table = isMain ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
+            const localArray = isMain ? allSales : allSalesElTransito;
+            
+            // 1. Optimistic UI Update (Guardar estado viejo para rollback)
+            const saleToUpdate = localArray.find(s => s.id === saleId);
+            const oldStatus = saleToUpdate ? saleToUpdate.status : newStatus; 
+
+            if (saleToUpdate) {
+                saleToUpdate.status = newStatus;
+                updateSaleRowInDOM(saleToUpdate, isMain); // Actualiza solo la fila
+            }
+
+            try {
+                const { error } = await supabase
+                    .from(table)
+                    .update({ status: newStatus })
+                    .eq("id", saleId);
+                
+                if (error) throw error;
+                
+                console.log(`✅ Estado de venta ${saleId} actualizado a: ${newStatus}`);
+                
+            } catch (error) {
+                console.error("❌ Error al actualizar estado:", error.message);
+                alert(`❌ Error al actualizar estado: ${error.message}`);
+                
+                // Rollback si falla la base de datos
+                if (saleToUpdate) {
+                    saleToUpdate.status = oldStatus;
+                    updateSaleRowInDOM(saleToUpdate, isMain);
+                }
+            }
+        };
+
+        window.deleteSale = async function(id, isMain) {
+            if (!confirm("¿Eliminar este registro de venta?")) return;
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
+            const table = isMain ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
+            
+            try {
+                const { error } = await supabase.from(table).delete().eq("id", id);
+                if (error) throw error;
+                // El realtime manejará la actualización de la UI
+            } catch (error) {
+                alert("❌ Error al eliminar: " + error.message);
+            }
+        }
+        
+        function populateLabelCategories(products) {
+            const categories = [...new Set(products.map(p => p.category).filter(c => c))].sort();
+            labelsCategorySelect.innerHTML = '<option value="all">Todas las Categorías</option>' + 
+                categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+        }
+        function updateLabelView() {
+            const isMain = labelsLocationSelect.value === 'main';
+            const currentProducts = isMain ? allProducts : allProductsElTransito;
+            populateLabelCategories(currentProducts);
+            
+            const categoryFilter = labelsCategorySelect.value;
+            const filteredProducts = currentProducts.filter(p => 
+                (categoryFilter === 'all' || p.category === categoryFilter)
+            );
+            labelsCountSpan.textContent = `${filteredProducts.length} Productos seleccionados`;
+            
+            labelsOutputDiv.innerHTML = '<p class="p-4 text-gray-400">Selecciona el inventario y presiona "Generar e Imprimir Etiquetas" o "Descargar QRs".</p>';
+        }
+        labelsLocationSelect.addEventListener('change', updateLabelView);
+        labelsCategorySelect.addEventListener('change', updateLabelView);
+
+        // Asignar los eventos a los inputs de búsqueda
+        searchInput.addEventListener('input', filterAndRenderProducts);
+        searchInputET.addEventListener('input', filterAndRenderProductsET);
+        searchSalesInput.addEventListener('input', filterAndRenderSales);
+        pendingOnlyCheckbox.addEventListener('change', filterAndRenderSales);
+        searchSalesInputET.addEventListener('input', filterAndRenderSalesET);
+        pendingOnlyCheckboxET.addEventListener('change', filterAndRenderSalesET);
+        
+        // Asignar eventos de cambio de vista
+        document.querySelectorAll('.view-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                toggleView(e.target.dataset.view);
+            });
+        });
+        
+        document.getElementById('modal-image-upload').addEventListener('change', function() {
+            selectedProductImageFile = this.files[0];
+            if (selectedProductImageFile) {
+                document.getElementById('modal-image-preview').src = URL.createObjectURL(selectedProductImageFile);
+            }
+        });
+        toolImageEditorInput.addEventListener('change', async function() {
+            if (!this.files[0] || !editingToolId) return;
+            if (!confirm("¿Deseas reemplazar la imagen de esta herramienta?")) return;
+            
+            const file = this.files[0];
+            const originalTool = allTools.find(t => t.id === editingToolId);
+            if (!originalTool) return;
+            
+            try {
+                const statusEl = toolStatus;
+                statusEl.textContent = 'Subiendo imagen...';
+                
+                const imageUrl = await uploadImage(file);
+                
+                const { error } = await supabase
+                    .from(TOOLS_TABLE)
+                    .update({ image_url: imageUrl })
+                    .eq("id", editingToolId);
+                
+                if (error) throw error;
+
+                setStatusMessage(toolStatus, `Imagen de ${originalTool.title} actualizada.`, true);
+
+            } catch (e) {
+                setStatusMessage(toolStatus, `Error al actualizar imagen: ${e.message}`, false);
+            } finally {
+                editingToolId = null;
+                this.value = '';
+            }
+        });
+
+        // Manejo de Formulario de Herramienta
+        toolForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const title = toolTitleIn.value.trim(), description = toolDescriptionIn.value.trim(), imageFile = toolImageIn.files[0];
+
+            if (!title) {
+                setStatusMessage(toolStatus, "El título es obligatorio.", false);
+                return;
+            }
+
+            try {
+                toolStatus.textContent = "Subiendo imagen y guardando herramienta...";
+                const imageUrl = imageFile ? await uploadImage(imageFile) : null;
+
+                if (!supabase) throw new Error("Supabase no está cargado.");
+                const { error } = await supabase
+                    .from(TOOLS_TABLE)
+                    .insert([{ title, description, image_url: imageUrl }])
+                    .select();
+
+                if (error) throw error;
+
+                setStatusMessage(toolStatus, `Herramienta ${title} guardada exitosamente.`, true);
+                toolForm.reset();
+                toolImageIn.value = '';
+                // El realtime se encargará de actualizar el DOM.
+            } catch (e) {
+                setStatusMessage(toolStatus, `Error al guardar herramienta: ${e.message}`, false);
+            }
+        });
+
     </script>
 </body>
 </html>
