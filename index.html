@@ -975,7 +975,7 @@
         let html5QrcodeScanner = null;
         let scanSuccessHandled = false;
         let isScannerRunning = false;
-        const LOGO_CONFIG_KEY = "current_logo_url";
+        const LOGO_CONFIG_KEY = "current_logo_url"; // Mantenida como única declaración const
 
         // Elementos de la UI
         const themeSelector = document.getElementById('theme-selector');
@@ -1149,7 +1149,6 @@
         }
         
         // --- Carga de Logo ---
-        const LOGO_CONFIG_KEY = "current_logo_url";
         async function loadLogo() {
             if (!supabase) return;
             try {
@@ -1431,8 +1430,7 @@
         }
 
         function updateGeneralTotals(salesArray, isMain) {
-            // ... (función updateGeneralTotals se mantiene igual)
-             const totalSold = salesArray.reduce((sum, s) => sum + Number(s.price), 0);
+            const totalSold = salesArray.reduce((sum, s) => sum + Number(s.price), 0);
             const totalPaid = salesArray.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
             const percentage = totalSold > 0 ? ((totalPaid / totalSold) * 100).toFixed(2) : 0;
             
@@ -1471,7 +1469,6 @@
             renderSales(filtered);
         }
         function renderSales(items) {
-            // ... (función renderSales se mantiene igual)
              salesListLoader.innerHTML = "";
             salesListContainer.innerHTML = ""; 
             updateGeneralTotals(items, true); 
@@ -1537,7 +1534,6 @@
             renderSalesElTransito(filtered);
         }
         function renderSalesElTransito(items) {
-            // ... (función renderSalesElTransito se mantiene igual)
              salesListLoaderET.innerHTML = "";
             salesListContainerET.innerHTML = ""; 
             updateGeneralTotals(items, false); 
@@ -1588,7 +1584,6 @@
             renderMissingProducts(allMissingProducts);
         }
         function renderMissingProducts(items) {
-            // ... (función renderMissingProducts se mantiene igual)
              missingListLoader.innerHTML = "";
             missingListEl.innerHTML = "";
             totalMissingCount.textContent = `${items.length} productos pendientes`;
@@ -1631,7 +1626,6 @@
             renderTools(allTools);
         }
         function renderTools(items) {
-            // ... (función renderTools se mantiene igual)
              toolsLoader.innerHTML = "";
             toolsListEl.innerHTML = "";
             totalToolsCount.textContent = `${items.length} herramientas`;
@@ -1676,7 +1670,6 @@
         // --- Funciones de Lógica de Edición y QR (modal) ---
 
         window.openProductEditorModal = function(productId, isMain) {
-             // ... (lógica de openProductEditorModal se mantiene igual)
              currentEditingProduct = null;
             selectedProductImageFile = null;
             modalStatus.textContent = '';
@@ -1723,7 +1716,6 @@
         }
 
         window.openScannerModal = function(event) {
-            // ... (lógica de openScannerModal se mantiene igual)
              event.stopPropagation();
             if (isScannerRunning) return;
             if (typeof Html5QrcodeScanner === 'undefined') {
@@ -1826,7 +1818,6 @@
         };
 
         window.closeScannerModal = async function(hideModal = true) {
-            // ... (lógica de closeScannerModal se mantiene igual)
              if (hideModal) {
                 document.getElementById('scanner-modal').classList.add('hidden');
             }
@@ -2475,7 +2466,6 @@
                 setStatusMessage(toolStatus, `Herramienta ${title} guardada exitosamente.`, true);
                 toolForm.reset();
                 toolImageIn.value = '';
-                // El realtime se encargará de actualizar el DOM.
             } catch (e) {
                 setStatusMessage(toolStatus, `Error al guardar herramienta: ${e.message}`, false);
             }
