@@ -195,40 +195,23 @@
         }
 
         /********************************/
-        /* TEMA 5: Christmas Snow */
+        /* TEMA 5: Christmas Snow (CORREGIDO) */
         /********************************/
         .theme-christmas {
-            --bg-primary: #f0f4f7; /* Fondo nieve / blanco cremoso */
+            --bg-primary: #e0f2f7; /* Fondo azul cielo muy pálido */
             --bg-secondary: #ffffff;
             --bg-header: rgba(255, 255, 255, 0.9);
-            --text-primary: #1e3a8a; /* Azul oscuro navidadeño */
+            --text-primary: #1e40af; /* Azul fuerte */
             --text-secondary: #3b82f6;
-            --text-muted: #9ca3af;
-            --border-color: #d1d5db;
+            --text-muted: #94a3b8;
+            --border-color: #a8b5c7;
             --accent-color: #ef4444; /* Rojo brillante navideño */
             --accent-color-dark: #dc2626;
             --font-main: 'Poppins', sans-serif;
             --font-headings: 'Playfair Display', serif;
-            --pastel-bg: #ffebee; /* Rojo pálido pastel para móvil */
+            --pastel-bg: #ffebee;
             --pastel-text: #1e3a8a;
         }
-        /* TEMA 6: Sunrise Glow */
-        .theme-sunrise {
-            --bg-primary: #1a0000; /* Rojo oscuro */
-            --bg-secondary: #3d0000;
-            --bg-header: rgba(26, 0, 0, 0.8);
-            --text-primary: #ffe0b2; /* Amarillo/Naranja pálido */
-            --text-secondary: #ffcc80;
-            --text-muted: #ff9800;
-            --border-color: #5d0000;
-            --accent-color: #ff9800; /* Naranja ámbar */
-            --accent-color-dark: #f57c00;
-            --font-main: 'Poppins', sans-serif;
-            --font-headings: 'Playfair Display', serif;
-            --pastel-bg: #fff3e0; /* Naranja muy claro pastel para móvil */
-            --pastel-text: #1a0000;
-        }
-
         /* KEYFRAMES para la nieve */
         @keyframes snowfall {
             0% { background-position: 0 0; }
@@ -245,8 +228,7 @@
             pointer-events: none;
             z-index: 9999;
             opacity: 0.8;
-            /* Patrón de nieve (pequeño, medio, grande) */
-            /* Nota: Los data:image URL son muy largos, se omiten aquí por espacio, asumiendo que tu base64 original es válido. */
+            /* Patrón de nieve, ajustando la opacidad en el JS si es necesario */
             background-image: 
                 url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2NgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=='),
                 url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/TAAAABHNCSVQICAgIfAhkiAAAAFFJREFUeJxj/P//PwOogImBCmDMtXwU1x+sCqf+XgYwYAAe/y/E04x/j0yI75/bM7R//2NgYAAz3f8H4e9hXgD7GgYGBrzN/8cCAAD/mO9Yd/X+sAAAAABJRU5ErkJggg=='),
@@ -255,6 +237,25 @@
             /* Velocidad y tamaño para simular caída de nieve profesional */
             background-repeat: repeat;
             animation: snowfall 30s linear infinite;
+        }
+
+        /********************************/
+        /* TEMA 6: Sunrise Glow */
+        /********************************/
+        .theme-sunrise {
+            --bg-primary: #1a0000; /* Rojo oscuro */
+            --bg-secondary: #3d0000;
+            --bg-header: rgba(26, 0, 0, 0.8);
+            --text-primary: #ffe0b2; /* Amarillo/Naranja pálido */
+            --text-secondary: #ffcc80;
+            --text-muted: #ff9800;
+            --border-color: #5d0000;
+            --accent-color: #ff9800; /* Naranja ámbar */
+            --accent-color-dark: #f57c00;
+            --font-main: 'Poppins', sans-serif;
+            --font-headings: 'Playfair Display', serif;
+            --pastel-bg: #fff3e0; /* Naranja muy claro pastel para móvil */
+            --pastel-text: #1a0000;
         }
 
         /********************************/
@@ -994,7 +995,7 @@
         const productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader");
         const productsElET = document.getElementById("products-et"), totalCountET = document.getElementById("total-count-et"), searchInputET = document.getElementById("search-input-et"), productsLoaderET = document.getElementById("products-loader-et");
 
-        // Elementos de Totales de Categoría (CRUCIAL: se necesita en renderProducts)
+        // Elementos de Totales de Categoría
         const categoryTotalsEl = document.createElement('div');
         categoryTotalsEl.className = 'flex flex-wrap items-center justify-start gap-4 p-4 bg-gray-900/50 rounded-lg border border-gray-700 mb-6';
         const categoryTotalsElET = document.createElement('div');
@@ -1004,7 +1005,7 @@
         const salesListContainerET = document.getElementById("sales-list-container-et"), salesListLoaderET = document.getElementById("sales-list-loader-et"), searchSalesInputET = document.getElementById("search-sales-input-et"), pendingOnlyCheckboxET = document.getElementById("pending-only-checkbox-et"), inventorySuggestionsET = document.getElementById('inventory-suggestions-et');
         const labelsLocationSelect = document.getElementById('labels-location'), labelsCategorySelect = document.getElementById('labels-category'), labelsOutputDiv = document.getElementById('labels-output'), labelsCountSpan = document.getElementById('labels-count');
         const missingListEl = document.getElementById("missing-list"), totalMissingCount = document.getElementById("total-missing-count"), missingListLoader = document.getElementById("missing-list-loader");
-        const toolsListEl = document.getElementById("tools-list"), totalToolsCount = document.getElementById("total-tools-count"), toolsLoader = document.getElementById("tools-loader"); // toolsLoader definido aquí
+        const toolsListEl = document.getElementById("tools-list"), totalToolsCount = document.getElementById("total-tools-count"), toolsLoader = document.getElementById("tools-loader");
 
         // Formularios y entradas (Definidos aquí para accesibilidad global)
         const form = document.getElementById("product-form"), nameIn = document.getElementById("name"), categoryIn = document.getElementById("category-select"), priceIn = document.getElementById("price"), qtyIn = document.getElementById("quantity"), imageIn = document.getElementById("image"), status = document.getElementById("status"), boxNumberIn = document.getElementById("box-number");
@@ -1041,21 +1042,17 @@
             mobileMenuDropdown.classList.add('hidden');
         };
         window.closeSettingsDropdown = function(event) {
-            // CORRECCIÓN: Manejo de clic para evitar interferencia
             const target = event.target;
             
-            // Cierra solo el menú de configuración si el clic fue fuera de él y fuera del botón de configuración
             if (settingsDropdown && !settingsDropdown.classList.contains('hidden') && !settingsDropdown.contains(target) && target !== settingsButton) {
                 settingsDropdown.classList.add('hidden');
             }
             
-            // Cierra solo el menú móvil si el clic fue fuera de él y fuera del botón de menú
             if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden') && !mobileMenuDropdown.contains(target) && target !== mobileMenuButton) {
                 mobileMenuDropdown.classList.add('hidden');
             }
         };
         
-        // --- ADICIÓN: Lógica del Menú Móvil ---
         window.toggleMobileMenu = function(event) {
             event.stopPropagation(); 
             mobileMenuDropdown.classList.toggle('hidden');
@@ -1073,7 +1070,7 @@
         }
         
         function getCleanProductName(inputName) {
-            const match = inputName.match(/^(.*?)\s+\((.*?)\)$/); // Asegura la coincidencia (Categoría)
+            const match = inputName.match(/^(.*?)\s+\((.*?)\)$/); 
             if (match) {
                 return match[1].trim();
             }
@@ -1104,7 +1101,8 @@
                 datalistElement.appendChild(option);
             });
         }
-
+        
+        // --- FUNCIÓN PRINCIPAL DE ACTUALIZACIÓN DE STOCK (Optimista) ---
         async function updateProductStock(productName, table, localArray, delta) {
             const cleanProductName = getCleanProductName(productName);
             const productToUpdate = localArray.find(p => getCleanProductName(p.name).trim() === cleanProductName);
@@ -1119,7 +1117,7 @@
                     return;
                 }
                 
-                // Optimistic Update (Local)
+                // Optimistic Update (Local): Actualiza la data local y la tarjeta visible
                 productToUpdate.quantity = newQty;
                 updateProductCardInDOM(productToUpdate, isMain); 
                 let datalistEl = isMain ? inventorySuggestions : inventorySuggestionsET;
@@ -1201,7 +1199,8 @@
         };
         
         function toggleView(viewName) { 
-            Object.keys(views).forEach(key => { 
+            // ... (función toggleView se mantiene igual)
+             Object.keys(views).forEach(key => { 
                 const isCurrent = key === viewName; 
                 views[key].el.classList.toggle('hidden', !isCurrent); 
                 
@@ -1227,12 +1226,10 @@
                 updateLabelView();
             }
             
-            // Cierra el menú móvil si se selecciona una vista
             if (isMobile() && !mobileMenuDropdown.classList.contains('hidden')) {
                 mobileMenuDropdown.classList.add('hidden');
             }
             
-            // Desplazar la vista al inicio
             if (viewName === 'sales' || viewName === 'sales_el_transito' || viewName === 'inventory' || viewName === 'inventory_el_transito') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
@@ -1242,7 +1239,7 @@
             const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div><div class="h-4 w-1/2 skeleton-line"></div><div class="h-8 w-1/4 skeleton-line"></div></div>`).join('');
             productsLoader.innerHTML = cardSkeleton;
             productsLoaderET.innerHTML = cardSkeleton;
-            toolsLoader.innerHTML = cardSkeleton; // toolsLoader ya está definida en el scope II
+            toolsLoader.innerHTML = cardSkeleton;
             const tableSkeleton = Array(3).fill('').map(() => `<div class="h-12 skeleton-line"></div>`).join(''); 
             salesListLoader.innerHTML = tableSkeleton; 
             salesListLoaderET.innerHTML = tableSkeleton;
@@ -1269,7 +1266,7 @@
             productsEl.innerHTML = ""; 
             totalCount.textContent = `${items.length} productos`; 
 
-            // Renderizar Totales de Categoría (Usando el elemento global categoryTotalsEl)
+            // Renderizar Totales de Categoría
             categoryTotalsEl.innerHTML = `
                 <span class="font-bold text-indigo-300">Total por Categoría:</span>
                 ${Object.keys(categoryTotals).sort().map(cat => 
@@ -1290,7 +1287,6 @@
                 section.className = "mb-10"; 
                 section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; 
                 const grid = document.createElement("div"); 
-                // Ajuste de columnas: 2 en móvil, 3 en sm, 4 en lg, 4 en xl (Tailwind)
                 grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
                 grouped[category].forEach(p => { 
                     const card = document.createElement("div");
@@ -1320,7 +1316,8 @@
             }); 
         }
         function updateProductCardInDOM(product, isMainInventory) {
-            const idSuffix = isMainInventory ? '' : '-et'; 
+            // ... (función updateProductCardInDOM se mantiene igual)
+             const idSuffix = isMainInventory ? '' : '-et'; 
             const elementPrefix = 'product-';
             const stockEl = document.getElementById(`${elementPrefix}stock${idSuffix}-${product.id}`);
             const nameEl = document.getElementById(`${elementPrefix}name${idSuffix}-${product.id}`);
@@ -1371,6 +1368,7 @@
             }
         }
 
+        // --- Lógica de Productos (El Transito) ---
         async function fetchProductsET() { 
             if (!supabase) return;
             const { data, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
@@ -1412,7 +1410,6 @@
                 section.className = "mb-10"; 
                 section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; 
                 const grid = document.createElement("div"); 
-                // Ajuste de columnas: 2 en móvil, 3 en sm, 4 en lg, 4 en xl (Tailwind)
                 grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
                 grouped[category].forEach(p => { 
                     const card = document.createElement("div"); 
@@ -1456,31 +1453,42 @@
             }
         }
 
-        // --- Lógica de Ventas (se mantiene la lógica de render) ---
-        function createSaleRowHTML(sale, isMain) {
+        // --- Lógica de Ventas ---
+        
+        function updateSaleRowInDOM(sale, isMain) {
             const tableSuffix = isMain ? '' : '-et';
-            const statusClass = STATUS_COLORS[sale.status] || 'bg-gray-600 text-white';
             const rowId = `sale-row${tableSuffix}-${sale.id}`;
+            const oldRow = document.getElementById(rowId);
 
-            return `
-                <tr id="${rowId}" class="hover:bg-gray-700/50 transition">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white" data-label="Destinatario">${sale.recipient_name}</td>
-                    <td class="px-6 py-4 text-sm text-gray-300" data-label="Producto">${sale.product_name_sold}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-green-400 font-bold" data-label="Precio">$${Number(sale.price).toFixed(2)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm" data-label="Estado">
-                        <select onchange="updateSaleStatus('${sale.id}', this.value, ${isMain})" class="border rounded-md p-1 text-sm font-semibold ${statusClass} appearance-none pr-8">
-                            <option value="Pendiente" class="${STATUS_COLORS['Pendiente']}" ${sale.status === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
-                            <option value="Pagado" class="${STATUS_COLORS['Pagado']}" ${sale.status === 'Pagado' ? 'selected' : ''}>Pagado</option>
-                            <option value="Devuelto" class="${STATUS_COLORS['Devuelto']}" ${sale.status === 'Devuelto' ? 'selected' : ''}>Devuelto</option>
-                        </select>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" data-label="Acciones">
-                        <button onclick="deleteSale('${sale.id}', ${isMain})" class="text-red-600 hover:text-red-900 transition" title="Eliminar Venta">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
-                    </td>
-                </tr>
-            `;
+            if (oldRow) {
+                // Reemplazar solo la fila, no toda la tabla.
+                const newRowHtml = createSaleRowHTML(sale, isMain);
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = newRowHtml.trim();
+                const newRow = tempDiv.firstChild;
+                oldRow.replaceWith(newRow);
+
+                // Actualizar totales diarios y generales
+                const localArray = isMain ? allSales : allSalesElTransito;
+                updateGeneralTotals(localArray, isMain);
+
+                const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
+                const dailyElSold = document.getElementById(`daily-sold${tableSuffix}-${saleDate}`);
+                const dailyElPaid = document.getElementById(`daily-paid${tableSuffix}-${saleDate}`);
+
+                if (dailyElSold && dailyElPaid) {
+                    const dailySales = localArray.filter(s => new Date(s.sale_date).toISOString().split('T')[0] === saleDate);
+                    const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
+                    const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
+
+                    dailyElSold.textContent = `$${dailyTotalSold.toFixed(2)}`;
+                    dailyElPaid.textContent = `$${dailyTotalPaid.toFixed(2)}`;
+                }
+            } else {
+                // Si no se encuentra la fila (ej. después de un filtro), forzar re-render completo
+                if (isMain) filterAndRenderSales();
+                else filterAndRenderSalesET();
+            }
         }
 
         function updateGeneralTotals(salesArray, isMain) {
@@ -1791,11 +1799,10 @@
                 html5QrcodeScanner = null;
             }
             
-            // CORRECCIÓN: Configuración para priorizar la cámara trasera y recordar permisos
             const html5QrcodeConfig = {
                 fps: 10,
                 qrbox: {width: 250, height: 250},
-                rememberLastUsedCamera: true, // Recordar la última cámara con éxito
+                rememberLastUsedCamera: true, 
                 supportedScanTypes: [0, 1], // QR_CODE, BAR_CODE
                 videoConstraints: {
                     facingMode: "environment" // Priorizar la cámara trasera
@@ -1901,7 +1908,8 @@
             scanSuccessHandled = false;
         };
 
-        // --- Lógica de Realtime ---
+        // --- Lógica de Realtime (Corregida para usar updateSaleRowInDOM) ---
+        
         function updateSaleRowInDOM(sale, isMain) {
             const tableSuffix = isMain ? '' : '-et';
             const rowId = `sale-row${tableSuffix}-${sale.id}`;
@@ -1917,6 +1925,7 @@
 
                 // Actualizar totales diarios y generales
                 const localArray = isMain ? allSales : allSalesElTransito;
+                // Nota: Usamos el array completo para que los totales generales sean correctos
                 updateGeneralTotals(localArray, isMain);
 
                 const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
@@ -1924,6 +1933,8 @@
                 const dailyElPaid = document.getElementById(`daily-paid${tableSuffix}-${saleDate}`);
 
                 if (dailyElSold && dailyElPaid) {
+                    // Recalcular los totales diarios usando solo las ventas visibles/filtradas
+                    // Esto se hace sobre el array local completo para evitar fallos si la venta no está en el filtro actual
                     const dailySales = localArray.filter(s => new Date(s.sale_date).toISOString().split('T')[0] === saleDate);
                     const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
                     const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
@@ -1932,11 +1943,12 @@
                     dailyElPaid.textContent = `$${dailyTotalPaid.toFixed(2)}`;
                 }
             } else {
-                // Si no se encuentra la fila (ej. insert), forzar re-render completo de las ventas
+                // Si la fila no está visible (ej. se inserta una venta), forzar re-render completo para que aparezca si coincide con el filtro
                 if (isMain) filterAndRenderSales();
                 else filterAndRenderSalesET();
             }
         }
+        
         function handleRealtimePayload(payload, localArray, renderFunction, idKey = 'id') {
             if (!supabase) return;
             console.log('📡 Payload Realtime Recibido:', payload);
@@ -1954,12 +1966,15 @@
 
             if (isSales) {
                 if (eventType === 'UPDATE' && index !== -1) {
-                    // Maneja la actualización de status de forma optimizada
+                    // Si el estado o cualquier otro campo (excepto fecha y precio) cambia, usa actualización local
                     Object.assign(localArray[index], newRecord);
                     updateSaleRowInDOM(localArray[index], isMainSales);
-                    return;
+                    // Si el filtro de pendiente está activado y el estado ya no coincide, la fila desaparecerá en el DOM, 
+                    // y el re-render de filterAndRenderSales() la eliminará de la vista.
+                    return; 
                 }
-                // Para INSERT, DELETE, o UPDATE que afecte la fecha/precio, forzar re-render
+                
+                // Para INSERT, DELETE, o UPDATE que afecte la agrupación (fecha) o el precio, forzar re-render
                 let needsFullRender = false;
                 if (eventType === 'INSERT' && index === -1) {
                     localArray.unshift(newRecord);
@@ -1968,18 +1983,20 @@
                     localArray.splice(index, 1);
                     needsFullRender = true;
                 } else if (eventType === 'UPDATE' && index !== -1) {
-                    // Forzar re-render si el campo de fecha o precio cambia
+                    // Si la fecha o el precio cambian, necesitamos agrupar/sumar de nuevo
                     if (newRecord.sale_date !== oldRecord.sale_date || newRecord.price !== oldRecord.price) {
                          Object.assign(localArray[index], newRecord);
                          needsFullRender = true;
                     } else {
-                        return; // Ya fue manejado o no requiere acción
+                        return;
                     }
                 }
 
                 if (needsFullRender) {
                     localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at));
-                    renderFunction(localArray);
+                    // Llama a filterAndRenderSales/ET para asegurar que los filtros y la agrupación estén correctos
+                    if(isMainSales) filterAndRenderSales();
+                    else filterAndRenderSalesET();
                 }
                 return;
             }
@@ -2001,6 +2018,7 @@
                             const newCategory = newRecord.category;
                             const newQuantity = newRecord.quantity;
                             Object.assign(localArray[index], newRecord);
+                            // Si solo cambia precio, caja o imagen, solo actualiza la tarjeta (NO re-renderiza todo)
                             if (oldCategory !== newCategory || oldQuantity !== newQuantity) {
                                 needsFullRender = true;
                             } else {
@@ -2024,6 +2042,7 @@
                 calculateCategoryTotals(localArray, isMain);
 
                 if (needsFullRender) {
+                    // Solo re-renderizamos la vista de productos si es estrictamente necesario (cambio de categoría o stock)
                     if (isMainProducts) filterAndRenderProducts();
                     else filterAndRenderProductsET();
                 }
@@ -2129,96 +2148,9 @@
             }
         });
 
-        // --- Manejadores de Formularios (Ejemplo de uno, el resto sigue la misma lógica) ---
+        // --- Manejadores de Formularios ---
 
-        // Manejador genérico para el cambio de estado de venta
-        window.updateSaleStatus = async function(saleId, newStatus, isMain) {
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const table = isMain ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
-            const localArray = isMain ? allSales : allSalesElTransito;
-            
-            // Optimistic UI Update (para respuesta rápida)
-            const saleToUpdate = localArray.find(s => s.id === saleId);
-            const oldStatus = saleToUpdate ? saleToUpdate.status : newStatus; 
-
-            if (saleToUpdate) {
-                saleToUpdate.status = newStatus;
-                updateSaleRowInDOM(saleToUpdate, isMain);
-            }
-
-            try {
-                const { error } = await supabase
-                    .from(table)
-                    .update({ status: newStatus })
-                    .eq("id", saleId);
-                
-                if (error) throw error;
-                
-                console.log(`✅ Estado de venta ${saleId} actualizado a: ${newStatus}`);
-                
-            } catch (error) {
-                console.error("❌ Error al actualizar estado:", error.message);
-                alert(`❌ Error al actualizar estado: ${error.message}`);
-                
-                // Rollback si falla la base de datos
-                if (saleToUpdate) {
-                    saleToUpdate.status = oldStatus;
-                    updateSaleRowInDOM(saleToUpdate, isMain);
-                }
-            }
-        };
-
-        window.deleteSale = async function(id, isMain) {
-            if (!confirm("¿Eliminar este registro de venta?")) return;
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const table = isMain ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
-            
-            try {
-                const { error } = await supabase.from(table).delete().eq("id", id);
-                if (error) throw error;
-                // El realtime manejará la actualización de la UI
-            } catch (error) {
-                alert("❌ Error al eliminar: " + error.message);
-            }
-        }
-        
-        function populateLabelCategories(products) {
-            const categories = [...new Set(products.map(p => p.category).filter(c => c))].sort();
-            labelsCategorySelect.innerHTML = '<option value="all">Todas las Categorías</option>' + 
-                categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
-        }
-        function updateLabelView() {
-            const isMain = labelsLocationSelect.value === 'main';
-            const currentProducts = isMain ? allProducts : allProductsElTransito;
-            populateLabelCategories(currentProducts);
-            
-            const categoryFilter = labelsCategorySelect.value;
-            const filteredProducts = currentProducts.filter(p => 
-                (categoryFilter === 'all' || p.category === categoryFilter)
-            );
-            labelsCountSpan.textContent = `${filteredProducts.length} Productos seleccionados`;
-            
-            labelsOutputDiv.innerHTML = '<p class="p-4 text-gray-400">Selecciona el inventario y presiona "Generar e Imprimir Etiquetas" o "Descargar QRs".</p>';
-        }
-        labelsLocationSelect.addEventListener('change', updateLabelView);
-        labelsCategorySelect.addEventListener('change', updateLabelView);
-
-        // Asignar los eventos a los inputs de búsqueda
-        searchInput.addEventListener('input', filterAndRenderProducts);
-        searchInputET.addEventListener('input', filterAndRenderProductsET);
-        searchSalesInput.addEventListener('input', filterAndRenderSales);
-        pendingOnlyCheckbox.addEventListener('change', filterAndRenderSales);
-        searchSalesInputET.addEventListener('input', filterAndRenderSalesET);
-        pendingOnlyCheckboxET.addEventListener('change', filterAndRenderSalesET);
-
-        // Asignar eventos de cambio de vista
-        document.querySelectorAll('.view-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                toggleView(e.target.dataset.view);
-            });
-        });
-
-        // Manejo de la subida de logo
+        // Manejador de Logo (se mantiene igual)
         logoUpload.addEventListener('change', function() {
             selectedLogoFile = this.files[0];
             logoSaveButton.disabled = !selectedLogoFile;
@@ -2241,7 +2173,7 @@
                 
                 if (error) throw error;
                 
-                await loadLogo(); // Recarga el logo en la cabecera
+                await loadLogo(); 
                 setStatusMessage(logoSaveButton, "Logo guardado exitosamente!", true);
                 logoSaveButton.textContent = 'Guardar Logo';
                 logoUpload.value = '';
@@ -2256,6 +2188,12 @@
         });
 
         // Manejo de Formulario de Producto (Principal)
+        document.getElementById('image').addEventListener('change', function() {
+            selectedProductImageFile = this.files[0];
+            if (selectedProductImageFile) {
+                status.textContent = `Archivo seleccionado: ${selectedProductImageFile.name}`;
+            }
+        });
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             const name = nameIn.value.trim(), category = categoryIn.value, box_number = boxNumberIn.value.trim(), price = parseFloat(priceIn.value), quantity = parseInt(qtyIn.value);
@@ -2279,14 +2217,20 @@
                 setStatusMessage(status, `Producto ${name} agregado exitosamente.`, true);
                 form.reset();
                 selectedProductImageFile = null;
-                imageIn.value = '';
-                status.textContent = ''; // Limpiar el estado después del reset
+                document.getElementById('image').value = '';
+                status.textContent = ''; 
             } catch (e) {
                 setStatusMessage(status, `Error al agregar producto: ${e.message}`, false);
             }
         });
 
         // Manejo de Formulario de Producto (El Transito)
+        document.getElementById('image-et').addEventListener('change', function() {
+            selectedProductImageFile = this.files[0];
+            if (selectedProductImageFile) {
+                statusET.textContent = `Archivo seleccionado: ${selectedProductImageFile.name}`;
+            }
+        });
         formET.addEventListener('submit', async function(e) {
             e.preventDefault();
             const name = nameInET.value.trim(), category = categoryInET.value, box_number = boxNumberInET.value.trim(), price = parseFloat(priceInET.value), quantity = parseInt(qtyInET.value);
@@ -2310,8 +2254,8 @@
                 setStatusMessage(statusET, `Producto ${name} agregado exitosamente a El Transito.`, true);
                 formET.reset();
                 selectedProductImageFile = null;
-                imageInET.value = '';
-                statusET.textContent = ''; // Limpiar el estado después del reset
+                document.getElementById('image-et').value = '';
+                statusET.textContent = ''; 
             } catch (e) {
                 setStatusMessage(statusET, `Error al agregar producto (El Transito): ${e.message}`, false);
             }
@@ -2325,7 +2269,7 @@
             try {
                 if (!supabase) throw new Error("Supabase no está cargado.");
                 
-                // 1. Descontar stock (si existe el producto)
+                // 1. Descontar stock (Optimista y Local)
                 await updateProductStock(product_name_sold, PRODUCTS_TABLE, allProducts, -1);
                 
                 // 2. Registrar venta
@@ -2338,7 +2282,7 @@
 
                 setStatusMessage(saleStatus, `Venta de ${product_name_sold} registrada exitosamente.`, true);
                 salesForm.reset();
-                saleDateIn.value = new Date().toISOString().split('T')[0]; // Resetear la fecha
+                saleDateIn.value = new Date().toISOString().split('T')[0];
 
             } catch (e) {
                 setStatusMessage(saleStatus, `Error al registrar venta: ${e.message}`, false);
@@ -2353,7 +2297,7 @@
             try {
                 if (!supabase) throw new Error("Supabase no está cargado.");
                 
-                // 1. Descontar stock (si existe el producto)
+                // 1. Descontar stock (Optimista y Local)
                 await updateProductStock(product_name_sold, PRODUCTS_EL_TRANSITO_TABLE, allProductsElTransito, -1);
                 
                 // 2. Registrar venta
@@ -2366,10 +2310,79 @@
 
                 setStatusMessage(saleStatusET, `Venta de ${product_name_sold} registrada exitosamente en El Transito.`, true);
                 salesFormET.reset();
-                saleDateInET.value = new Date().toISOString().split('T')[0]; // Resetear la fecha
+                saleDateInET.value = new Date().toISOString().split('T')[0];
 
             } catch (e) {
                 setStatusMessage(saleStatusET, `Error al registrar venta (El Transito): ${e.message}`, false);
+            }
+        });
+        // --- Manejo de la Edición de Producto ---
+        document.getElementById('modal-product-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (!currentEditingProduct) return;
+
+            const name = document.getElementById('modal-name').value.trim();
+            const category = document.getElementById('modal-category').value;
+            const price = parseFloat(document.getElementById('modal-price').value);
+            const quantity = parseInt(document.getElementById('modal-quantity').value);
+            const box_number = document.getElementById('modal-box-number').value.trim();
+            const isMain = isMainInventory;
+            const table = isMain ? PRODUCTS_TABLE : PRODUCTS_EL_TRANSITO_TABLE;
+            const localArray = isMain ? allProducts : allProductsElTransito;
+            const oldProductData = {...currentEditingProduct};
+
+            if (!name || !category || isNaN(price) || isNaN(quantity)) {
+                setStatusMessage(modalStatus, "Por favor, completa todos los campos requeridos.", false);
+                return;
+            }
+
+            try {
+                modalStatus.textContent = "Actualizando producto...";
+                let imageUrl = oldProductData.image_url;
+
+                if (selectedProductImageFile) {
+                    modalStatus.textContent = "Subiendo nueva imagen...";
+                    imageUrl = await uploadImage(selectedProductImageFile);
+                }
+
+                // 1. Optimistic Update (Aplicar cambios localmente)
+                const productIndex = localArray.findIndex(p => p.id === currentEditingProduct.id);
+                if (productIndex !== -1) {
+                    localArray[productIndex] = {
+                        ...oldProductData,
+                        name, category, price, quantity, box_number, image_url: imageUrl
+                    };
+                    updateProductCardInDOM(localArray[productIndex], isMain);
+                    calculateCategoryTotals(localArray, isMain);
+                }
+
+
+                // 2. Database Update
+                const { error } = await supabase
+                    .from(table)
+                    .update({ name, category, price, quantity, box_number, image_url: imageUrl })
+                    .eq("id", currentEditingProduct.id);
+
+                if (error) throw error;
+
+                setStatusMessage(modalStatus, `Producto ${name} actualizado.`, true);
+                // Si la categoría cambió, debemos forzar un re-render para la re-agrupación
+                if (oldProductData.category !== category) {
+                    if (isMain) filterAndRenderProducts(); else filterAndRenderProductsET();
+                }
+                setTimeout(closeProductEditorModal, 1000);
+
+            } catch (e) {
+                setStatusMessage(modalStatus, `Error al guardar cambios: ${e.message}`, false);
+                // Rollback local si la DB falla
+                if (productIndex !== -1) {
+                     localArray[productIndex] = oldProductData;
+                     updateProductCardInDOM(oldProductData, isMain);
+                     calculateCategoryTotals(localArray, isMain);
+                     if (oldProductData.category !== category) {
+                        if (isMain) filterAndRenderProducts(); else filterAndRenderProductsET();
+                     }
+                }
             }
         });
     </script>
