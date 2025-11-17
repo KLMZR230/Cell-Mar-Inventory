@@ -466,7 +466,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
-<body class="" onclick="closeSettingsDropdown(event)"> 
+<body class="" onclick=""> 
     <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
         <div class="flex items-center space-x-4">
             <img 
@@ -1061,7 +1061,7 @@
 
 
         // ============================================================================
-        // == III. LÓGICA DE TEMAS Y DROPDOWN (MODIFICADO)                           ==
+        // == III. LÓGICA DE TEMAS Y DROPDOWN (CORREGIDO EL CIERRE DEL MENÚ)         ==
         // ============================================================================
 
         function applyTheme(theme) {
@@ -1085,18 +1085,6 @@
             // Cierra el menú móvil si está abierto
             mobileMenuDropdown.classList.add('hidden');
         };
-        window.closeSettingsDropdown = function(event) {
-            if (settingsDropdown && !settingsDropdown.classList.contains('hidden')) {
-                let target = event.target;
-                while (target) {
-                    if (target === settingsDropdown || target === settingsButton) {
-                        return;
-                    }
-                    target = target.parentNode;
-                }
-                settingsDropdown.classList.add('hidden');
-            }
-        };
         
         // --- ADICIÓN: Lógica del Menú Móvil ---
         window.toggleMobileMenu = function(event) {
@@ -1105,13 +1093,24 @@
             // Cierra el menú de configuración si está abierto
             settingsDropdown.classList.add('hidden');
         };
-        // Cierra los menús al hacer clic fuera
+        
+        // CORRECCIÓN: Nueva lógica de cierre para ambos menús (Configuración y Móvil)
+        // Se adjunta al body y solo cierra si el clic es externo al menú o su botón.
         document.body.addEventListener('click', (event) => {
-             if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden') && !mobileMenuButton.contains(event.target)) {
-                mobileMenuDropdown.classList.add('hidden');
-             }
-             if (settingsDropdown && !settingsDropdown.classList.contains('hidden') && !settingsButton.contains(event.target)) {
-                 settingsDropdown.classList.add('hidden');
+            // 1. Cierra el menú de Configuración
+            if (settingsDropdown && !settingsDropdown.classList.contains('hidden')) {
+                // Verifica si el clic fue *fuera* del menú de configuración y su botón
+                if (!settingsDropdown.contains(event.target) && !settingsButton.contains(event.target)) {
+                    settingsDropdown.classList.add('hidden');
+                }
+            }
+            
+            // 2. Cierra el menú Móvil
+             if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden')) {
+                // Verifica si el clic fue *fuera* del menú móvil y su botón
+                if (!mobileMenuDropdown.contains(event.target) && !mobileMenuButton.contains(event.target)) {
+                   mobileMenuDropdown.classList.add('hidden');
+                }
              }
         });
 
@@ -2648,7 +2647,7 @@
                     status: saleStatusInput.value
                 };
                 const { data: insertedSale, error: saleError } = await supabase.from(SALES_TABLE).insert(newSale).select().single();
-                if (saleError) throw saleError;
+                if (saleError) throw error;
                 if (newSale.status === 'Pagado') {
                     await updateProductStock(soldProductName, PRODUCTS_TABLE, allProducts, -1);
                 }
