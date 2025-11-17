@@ -169,7 +169,7 @@
         .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
         
         /********************************/
-        /* TEMA 4: Winter Christmas (CORREGIDO PARA ANIMACIÓN DE NIEVE) */
+        /* TEMA 4: Winter Christmas (ANIMACIÓN DE NIEVE CORREGIDA) */
         /********************************/
         .theme-christmas {
             --bg-primary: #004d40; /* Verde Oscuro Navideño */
@@ -208,7 +208,7 @@
             background-size: 500px 500px, 100px 100px, 30px 30px;
             /* CORRECCIÓN CRÍTICA: Animación unificada */
             animation: snowfall-3d 20s linear infinite;
-            z-index: 2;
+            z-index: 2; 
             opacity: 0.6;
         }
         /* Definición de la animación de nieve CORREGIDA */
@@ -1671,5 +1671,3 @@
                     // Went from Pending/Returned to Paid: Decrease stock
                     await updateProductStock(cleanName, stockTable, stockLocalArray, -1);
                 } else if (oldStatus === 'Pagado' && newStatus !== 'Pagado') {
-                    // Went from Paid to Pending/Returned: Increase stock
-                    await updateProductStock(cleanName, stockTable, stockLocalArray, 1);
