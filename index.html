@@ -167,6 +167,76 @@
         .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
         
         /********************************/
+        /* NUEVO TEMA 4: Winter Christmas */
+        /********************************/
+        .theme-christmas {
+            --bg-primary: #004d40; /* Verde Oscuro Navideño */
+            --bg-secondary: #00796b;
+            --bg-header: rgba(0, 77, 64, 0.8);
+            --text-primary: #ffffff;
+            --text-secondary: #e0f2f1;
+            --text-muted: #b2dfdb;
+            --border-color: #4db6ac;
+            --accent-color: #e53935; /* Rojo Navideño */
+            --accent-color-dark: #c62828;
+            --font-main: 'Poppins', sans-serif;
+            --font-headings: 'Playfair Display', serif;
+            --pastel-bg: #ffe0b2; /* Naranja/Crema Pastel */
+            --pastel-text: #004d40;
+            position: relative;
+            overflow: hidden; /* Para contener la nieve */
+        }
+        .theme-christmas::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEklEQVQIW2NoYGBg+M/AAMmUAAUoAAYQAD4Xw6+gAAAAAElFTkSuQmCC'); /* Pequeños puntos blancos */
+            z-index: 0; 
+            animation: snowfall 20s linear infinite;
+        }
+        @keyframes snowfall {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 500px 1000px; }
+        }
+        .theme-christmas .product-card:hover, .theme-christmas .tool-card:hover { box-shadow: 0 0 20px rgba(229, 57, 53, 0.5); border-color: var(--accent-color); }
+        .theme-christmas .bg-indigo-500, .theme-christmas .hover\:bg-indigo-600:hover { background-color: var(--accent-color-dark); }
+        .theme-christmas .text-indigo-400, .theme-christmas .text-indigo-300 { color: var(--accent-color); }
+
+        /********************************/
+        /* NUEVO TEMA 5: Neon Blue */
+        /********************************/
+        .theme-neon-blue {
+            --bg-primary: #0a0b25; /* Azul muy oscuro/negro */
+            --bg-secondary: #1e204a;
+            --bg-header: rgba(10, 11, 37, 0.9);
+            --text-primary: #e6f7ff;
+            --text-secondary: #c2e2ff;
+            --text-muted: #9dd3ff;
+            --border-color: #007bff; /* Azul vibrante */
+            --accent-color: #00d0ff; /* Azul Neón */
+            --accent-color-dark: #00aaff;
+            --font-main: 'Roboto', sans-serif;
+            --font-headings: 'Roboto', sans-serif;
+            --pastel-bg: #ccf2ff; /* Azul muy claro pastel */
+            --pastel-text: #0a0b25;
+            background-image: radial-gradient(circle at top left, #1a2253 0%, #0a0b25 100%);
+        }
+        .theme-neon-blue .product-card:hover, .theme-neon-blue .tool-card:hover { 
+            box-shadow: 0 0 15px var(--accent-color), 0 0 25px rgba(0, 208, 255, 0.4); 
+            border-color: var(--accent-color); 
+        }
+        .theme-neon-blue .bg-indigo-500, .theme-neon-blue .hover\:bg-indigo-600:hover { background-color: var(--accent-color-dark); }
+        .theme-neon-blue .text-indigo-400, .theme-neon-blue .text-indigo-300 { 
+             color: var(--accent-color);
+             text-shadow: 0 0 5px var(--accent-color), 0 0 10px rgba(0, 208, 255, 0.3);
+        }
+        .theme-neon-blue .border-indigo-500 { border-color: var(--accent-color); }
+        
+        /********************************/
         /* Aplicación de Variables CSS */
         /********************************/
         body {
@@ -252,7 +322,7 @@
                 display: block; 
             }
             /* Inventario en 2 columnas en móvil */
-            #products .grid, #products-et .grid, #products-loader, #products-loader-et, #tools-list {
+            #products .grid, #products-el .grid, #products-loader, #products-loader-et, #tools-list {
                 grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             }
 
@@ -345,8 +415,10 @@
     <script>
         (function() {
             try {
+                // MODIFICACIÓN: Agregar nuevos temas a la lista de válidos
+                const validThemes = ['theme-dark', 'theme-infernal', 'theme-gold', 'theme-christmas', 'theme-neon-blue'];
                 const theme = localStorage.getItem('selectedTheme');
-                if (theme && ['theme-dark', 'theme-infernal', 'theme-gold'].includes(theme)) {
+                if (theme && validThemes.includes(theme)) {
                     document.documentElement.className = theme;
                 } else {
                     document.documentElement.className = 'theme-dark';
@@ -426,7 +498,7 @@
                             <option value="theme-dark">Predeterminado</option>
                             <option value="theme-infernal">Fuego Infernal</option>
                             <option value="theme-gold">Luxury Gold</option>
-                        </select>
+                            <option value="theme-christmas">🎄 Winter Christmas</option> <option value="theme-neon-blue">💎 Neon Blue</option> </select>
                     </div>
                     <div class="flex items-center space-x-2 pt-2">
                         <label for="logo-upload" class="bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 transition duration-300 cursor-pointer text-sm shadow-sm flex-grow text-center">Subir Nuevo Logo 🖼️</label>
@@ -2583,8 +2655,9 @@
             if (!editingToolId) return; 
             const file = event.target.files[0];
             if (!file) return; 
-            const originalButtonText = "Editar Foto"; 
             const editButton = document.querySelector(`button[onclick="editToolImage('${editingToolId}')"]`);
+            // Guardamos el texto original para restaurarlo después
+            const originalText = editButton ? editButton.textContent : 'Editar Foto';
             if(editButton) editButton.textContent = "Subiendo..."; 
             try {
                 const newImageUrl = await uploadImage(file);
@@ -2592,6 +2665,8 @@
                 const { error } = await supabase.from(TOOLS_TABLE).update({ image_url: newImageUrl }).eq('id', editingToolId);
                 if (error) throw error;
                 alert('✅ Imagen actualizada correctamente.');
+                // Forzar re-renderizado para actualizar la imagen en el DOM.
+                await fetchTools();
             } catch (error) {
                 console.error('Error al actualizar la imagen de la herramienta:', error);
                 alert('❌ Error: ' + error.message);
