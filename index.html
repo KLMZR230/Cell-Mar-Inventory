@@ -8,10 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
     <style>
         /********************************/
         /* Estilos Base (Comunes a todos los temas) */
@@ -41,13 +39,11 @@
             animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         @keyframes pulse { 50% { opacity: .4; } }
-        
         /********************************/
         /* Estilos para impresión de QR */
         /********************************/
         @media print {
             body > *:not(.labels-container):not(#qr-modal) { display: none !important; }
-            
             /* Contenedor principal de etiquetas: Forzar blanco */
             .labels-container { 
                 display: flex !important;
@@ -76,7 +72,6 @@
             }
             .labels-container .qr-box { margin-right: 10px; width: 35mm; height: 35mm; display: flex; justify-content: center; align-items: center; }
             .labels-container canvas, .labels-container img { width: 30mm !important; height: 30mm !important; }
-            
             /* Modal de QR individual (para asegurar fondo blanco en impresión) */
             #qr-modal {
                 display: flex !important;
@@ -91,7 +86,6 @@
             #qr-modal .border-purple-500 { border-color: black !important; }
             #qr-modal .print\:hidden { display: none !important; }
         }
-        
         /********************************/
         /* TEMA 1: Dark (Predeterminado) */
         /********************************/
@@ -110,7 +104,6 @@
             --pastel-bg: #e0f2f1; /* Verde pastel claro para móvil */
             --pastel-text: #1f2937;
         }
-        
         /********************************/
         /* Fondo del Escáner siempre blanco */
         /********************************/
@@ -121,7 +114,6 @@
         #scanner-modal .modal-content h3, #scanner-modal .modal-content p {
             color: black !important;
         }
-        
         /********************************/
         /* TEMA 2: Fuego Infernal */
         /********************************/
@@ -142,7 +134,6 @@
         }
         .theme-infernal { background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
         .theme-infernal .product-card:hover, .theme-infernal .tool-card:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.5); border-color: rgba(255, 69, 0, 0.7); }
-        
         /********************************/
         /* TEMA 3: Luxury Gold */
         /********************************/
@@ -165,7 +156,81 @@
         .theme-gold .product-card:hover, .theme-gold .tool-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
         .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
         .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
-        
+        /********************************/
+        /* TEMA 4: Navideño */
+        /********************************/
+        .theme-xmas {
+            --bg-primary: #0a3d62;
+            --bg-secondary: #1e3799;
+            --bg-header: rgba(10, 61, 98, 0.8);
+            --text-primary: #f9f9f9;
+            --text-secondary: #dfe6e9;
+            --text-muted: #b2bec3;
+            --border-color: #6c5ce7;
+            --accent-color: #e17055;
+            --accent-color-dark: #d63031;
+            --font-main: 'Poppins', sans-serif;
+            --font-headings: 'Poppins', sans-serif;
+            --pastel-bg: #fdcb6e;
+            --pastel-text: #2d3436;
+        }
+        .theme-xmas {
+            background-image: linear-gradient(135deg, #0a3d62 0%, #1e3799 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .theme-xmas::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100; /* Asegura que esté por encima de otros elementos */
+        }
+        .snowflake {
+            position: absolute;
+            top: -20px;
+            color: #fff;
+            font-size: 1em;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+            user-select: none;
+            z-index: 100; /* Asegura que esté por encima de otros elementos */
+        }
+        /********************************/
+        /* TEMA 5: Blue Neon */
+        /********************************/
+        .theme-blue-neon {
+            --bg-primary: #0a0a23;
+            --bg-secondary: #16213e;
+            --bg-header: rgba(10, 10, 35, 0.85);
+            --text-primary: #00eeff;
+            --text-secondary: #74eeff;
+            --text-muted: #4dabf7;
+            --border-color: #00eeff;
+            --accent-color: #00eeff;
+            --accent-color-dark: #00bfff;
+            --font-main: 'Roboto', sans-serif;
+            --font-headings: 'Roboto', sans-serif;
+            --pastel-bg: #0a0a23;
+            --pastel-text: #00eeff;
+        }
+        .theme-blue-neon {
+            background-image: linear-gradient(135deg, #0a0a23 0%, #16213e 100%);
+        }
+        .theme-blue-neon .product-card, .theme-blue-neon .tool-card {
+            box-shadow: 0 0 10px rgba(0, 238, 255, 0.3), 0 0 20px rgba(0, 238, 255, 0.2);
+            border: 1px solid rgba(0, 238, 255, 0.3);
+        }
+        .theme-blue-neon .product-card:hover, .theme-blue-neon .tool-card:hover {
+            box-shadow: 0 0 15px rgba(0, 238, 255, 0.5), 0 0 30px rgba(0, 238, 255, 0.4);
+            border-color: rgba(0, 238, 255, 0.7);
+        }
+        .theme-blue-neon input:focus, .theme-blue-neon select:focus, .theme-blue-neon textarea:focus {
+            box-shadow: 0 0 0 2px rgba(0, 238, 255, 0.5);
+        }
         /********************************/
         /* Aplicación de Variables CSS */
         /********************************/
@@ -175,7 +240,6 @@
             font-family: var(--font-main);
         }
         h1, h2, h3, h4, h5, h6 { font-family: var(--font-headings); }
-        
         /* Aplicación de colores para fondo de headers y cards */
         .bg-gray-800, .bg-gray-900\/50 {
             background-color: var(--bg-header);
@@ -183,23 +247,18 @@
             backdrop-filter: blur(10px);
             color: var(--text-primary); /* Restaurar color de texto */
         }
-        
         /* Asegurar que el fondo secundario de inputs y selectores es visible */
         .bg-gray-600 { background-color: var(--bg-secondary) !important; }
         .bg-gray-700\/50 { background-color: var(--bg-secondary); }
-
         .text-gray-300 { color: var(--text-secondary); }
         .text-gray-400 { color: var(--text-muted); }
-        
         .border-gray-500, .border-gray-600, .border-gray-700 { border-color: var(--border-color); }
-        
         /* Acentos */
         .text-indigo-400, .text-indigo-300 { color: var(--accent-color); }
         .border-indigo-500 { border-color: var(--accent-color); }
         .bg-indigo-500 { background-color: var(--accent-color-dark); color: var(--text-primary); }
         .hover\:bg-indigo-600:hover { background-color: var(--accent-color); }
         .focus\:ring-indigo-500:focus { --tw-ring-color: var(--accent-color); }
-        
         input:focus, select:focus, textarea:focus {
             border-color: var(--accent-color) !important;
             box-shadow: 0 0 0 1px var(--accent-color);
@@ -207,7 +266,6 @@
         }
         .bg-blue-600, .bg-green-600 { background-color: var(--accent-color-dark); }
         .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover { background-color: var(--accent-color); }
-        
         /********************************/
         /* ESTILOS FIJOS PARA ESTADOS DE VENTA */
         /********************************/
@@ -226,14 +284,12 @@
             color: #ffffff !important;
             border-color: #b91c1c !important;
         }
-
         /********************************/
         /* ESTILOS MÓVIL (Menú de Hamburguesa y Columnas) */
         /********************************/
         #mobile-menu-button {
             display: none; 
         }
-        
         @media (min-width: 769px) {
             #mobile-scan-button {
                 display: none !important;
@@ -243,7 +299,6 @@
                 display: table;
             }
         }
-        
         @media (max-width: 768px) {
             #view-buttons, #desktop-scan-button {
                 display: none !important; 
@@ -255,7 +310,6 @@
             #products .grid, #products-et .grid, #products-loader, #products-loader-et, #tools-list {
                 grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             }
-
             #mobile-menu-dropdown {
                 position: absolute;
                 right: 0;
@@ -292,7 +346,6 @@
                 padding: 0.75rem 1rem;
                 border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             }
-
             /* Estilos para transformar la tabla de ventas en tarjetas */
             .sales-list-table, .sales-list-table thead, .sales-list-table tbody, .sales-list-table th, .sales-list-table td, .sales-list-table tr { 
                 display: block; 
@@ -346,7 +399,7 @@
         (function() {
             try {
                 const theme = localStorage.getItem('selectedTheme');
-                if (theme && ['theme-dark', 'theme-infernal', 'theme-gold'].includes(theme)) {
+                if (theme && ['theme-dark', 'theme-infernal', 'theme-gold', 'theme-xmas', 'theme-blue-neon'].includes(theme)) {
                     document.documentElement.className = theme;
                 } else {
                     document.documentElement.className = 'theme-dark';
@@ -362,7 +415,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
-<body class="" onclick="closeSettingsDropdown(event)"> 
+<body class="" onclick="closeSettingsDropdown(event)">
     <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
         <div class="flex items-center space-x-4">
             <img 
@@ -426,6 +479,8 @@
                             <option value="theme-dark">Predeterminado</option>
                             <option value="theme-infernal">Fuego Infernal</option>
                             <option value="theme-gold">Luxury Gold</option>
+                            <option value="theme-xmas">Navideño</option>
+                            <option value="theme-blue-neon">Blue Neon</option>
                         </select>
                     </div>
                     <div class="flex items-center space-x-2 pt-2">
@@ -849,7 +904,6 @@
             console.error("Error Crítico: La librería Supabase no se ha cargado.");
         }
         const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
-        
         // --- INICIO: Definición de Constantes de Tablas y Estilos ---
         const PRODUCTS_TABLE = "products";
         const PRODUCTS_EL_TRANSITO_TABLE = "products_el_transito";
@@ -864,31 +918,25 @@
             'Devuelto': 'status-returned' 
         };
         // --- FIN: Definición de Constantes de Tablas y Estilos ---
-
         // ============================================================================
         // == II. INICIALIZACIÓN DE VARIABLES GLOBALES Y ELEMENTOS DEL DOM (CRÍTICO) ==
         // ============================================================================
-
         // --- Variables de Estado ---
         let allProducts = [], allProductsElTransito = [], allSales = [], allSalesElTransito = [], allMissingProducts = [], allTools = [], selectedLogoFile = null;
         let editingToolId = null; 
         let currentEditingProduct = null;
         let isMainInventory = true;
         let selectedProductImageFile = null; 
-        
         // --- ADICIÓN: Variables para almacenar totales por categoría ---
         let categoryTotals = {};
         let categoryTotalsET = {};
-        
         // --- ADICIÓN: Elementos para mostrar los totales ---
         const categoryTotalsEl = document.createElement("div"); 
         categoryTotalsEl.id = "category-totals";
         categoryTotalsEl.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
-        
         const categoryTotalsElET = document.createElement("div"); 
         categoryTotalsElET.id = "category-totals-et";
         categoryTotalsElET.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
-
         // --- Elementos de Configuración General ---
         const themeSelector = document.getElementById('theme-selector');
         const root = document.documentElement;
@@ -897,33 +945,25 @@
         const logoUpload = document.getElementById("logo-upload"), businessLogo = document.getElementById("business-logo"), logoSaveButton = document.getElementById("logo-save-button");
         const currentViewTitle = document.getElementById("current-view-title");
         const toolImageEditorInput = document.getElementById('tool-image-editor-input'); 
-
         // --- Elementos de Inventario Principal ---
         const form = document.getElementById("product-form"), nameIn = document.getElementById("name"), categoryIn = document.getElementById("category-select"), priceIn = document.getElementById("price"), qtyIn = document.getElementById("quantity"), imageIn = document.getElementById("image"), status = document.getElementById("status"), productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader"), boxNumberIn = document.getElementById("box-number");
-
         // --- Elementos de Inventario El Transito ---
         const formET = document.getElementById("product-form-et"), nameInET = document.getElementById("name-et"), categoryInET = document.getElementById("category-select-et"), priceInET = document.getElementById("price-et"), qtyInET = document.getElementById("quantity-et"), imageInET = document.getElementById("image-et"), statusET = document.getElementById("status-et"), productsElET = document.getElementById("products-et"), totalCountET = document.getElementById("total-count-et"), searchInputET = document.getElementById("search-input-et"), productsLoaderET = document.getElementById("products-loader-et"), boxNumberInET = document.getElementById("box-number-et");
-
         // --- Elementos de Ventas Principal ---
         const salesForm = document.getElementById("sale-form"), recipientNameIn = document.getElementById("recipient-name"), productNameSoldIn = document.getElementById("product-name-sold"), salePriceIn = document.getElementById("sale-price"), saleDateIn = document.getElementById("sale-date"), saleStatusInput = document.getElementById("sale-status-input"), salesListContainer = document.getElementById("sales-list-container"), saleStatus = document.getElementById("sale-status"), totalSalesCount = document.getElementById("total-sales-count"), salesListLoader = document.getElementById("sales-list-loader"), searchSalesInput = document.getElementById("search-sales-input"), pendingOnlyCheckbox = document.getElementById("pending-only-checkbox");
         const inventorySuggestions = document.getElementById('inventory-suggestions');
-
         // --- Elementos de Ventas El Transito ---
         const salesFormET = document.getElementById("sale-el-transito-form"), recipientNameInET = document.getElementById("recipient-name-et"), productNameSoldInET = document.getElementById("product-name-sold-et"), salePriceInET = document.getElementById("sale-price-et"), saleDateInET = document.getElementById("sale-date-et"), saleStatusInputET = document.getElementById("sale-status-input-et"), salesListContainerET = document.getElementById("sales-list-container-et"), saleStatusET = document.getElementById("sale-status-et"), totalSalesCountET = document.getElementById("total-sales-count-et"), salesListLoaderET = document.getElementById("sales-list-loader-et"), searchSalesInputET = document.getElementById("search-sales-input-et"), pendingOnlyCheckboxET = document.getElementById("pending-only-checkbox-et");
         const inventorySuggestionsET = document.getElementById('inventory-suggestions-et');
-
         // --- Elementos de Etiquetas QR (Labels) ---
         const labelsLocationSelect = document.getElementById('labels-location');
         const labelsCategorySelect = document.getElementById('labels-category');
         const labelsOutputDiv = document.getElementById('labels-output');
         const labelsCountSpan = document.getElementById('labels-count');
-
         // --- Elementos de Faltantes ---
         const missingProductForm = document.getElementById("missing-product-form"), missingProductNameIn = document.getElementById("missing-product-name"), missingProductNotesIn = document.getElementById("missing-product-notes"), missingProductStatus = document.getElementById("missing-product-status"), missingListEl = document.getElementById("missing-list"), totalMissingCount = document.getElementById("total-missing-count"), missingListLoader = document.getElementById("missing-list-loader");
-        
         // --- Elementos de Herramientas ---
         const toolForm = document.getElementById("tool-form"), toolTitleIn = document.getElementById("tool-title"), toolDescriptionIn = document.getElementById("tool-description"), toolImageIn = document.getElementById("tool-image"), toolStatus = document.getElementById("tool-status"), toolsListEl = document.getElementById("tools-list"), totalToolsCount = document.getElementById("total-tools-count"), toolsLoader = document.getElementById("tools-loader");
-
         // --- Elementos de Modales y QR/Scanner ---
         const modal = document.getElementById('product-editor-modal');
         const qrModal = document.getElementById('qr-modal');
@@ -935,7 +975,6 @@
         let html5QrcodeScanner = null;
         let scanSuccessHandled = false;
         let isScannerRunning = false;
-        
         // --- Elementos del Modal de Edición de Producto ---
         const modalProductForm = document.getElementById('modal-product-form');
         const modalName = document.getElementById('modal-name');
@@ -947,21 +986,22 @@
         const modalImagePreview = document.getElementById('modal-image-preview');
         const modalImageUpload = document.getElementById('modal-image-upload');
         const modalStatus = document.getElementById('modal-status');
-        
         // --- ADICIÓN: Elementos de Menú Móvil ---
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenuDropdown = document.getElementById('mobile-menu-dropdown');
         const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
-
-
         // ============================================================================
         // == III. LÓGICA DE TEMAS Y DROPDOWN                                        ==
         // ============================================================================
-
         function applyTheme(theme) {
             root.className = theme;
             localStorage.setItem('selectedTheme', theme);
             themeSelector.value = theme;
+            if (theme === 'theme-xmas') {
+                initializeSnowfall();
+            } else {
+                cleanupSnowfall();
+            }
         }
         themeSelector.addEventListener('change', (e) => {
             applyTheme(e.target.value);
@@ -984,7 +1024,6 @@
                 settingsDropdown.classList.add('hidden');
             }
         };
-        
         // --- ADICIÓN: Lógica del Menú Móvil ---
         window.toggleMobileMenu = function(event) {
             event.stopPropagation(); 
@@ -1001,18 +1040,14 @@
                  settingsDropdown.classList.add('hidden');
              }
         });
-
-
         // ============================================================================
         // == IV. UTILIDADES Y LÓGICA COMPARTIDA                                     ==
         // ============================================================================
-
         function setStatusMessage(el, msg, success = true) { 
             el.textContent = msg; 
             el.className = `text-sm mt-3 ${success ? 'text-green-400' : 'text-red-400'}`; 
             setTimeout(() => (el.textContent = ""), 3000); 
         }
-        
         function getCleanProductName(inputName) {
             const match = inputName.match(/^(.*?)\s+\((.*?)$/);
             if (match) {
@@ -1020,7 +1055,6 @@
             }
             return inputName.trim();
         }
-
         async function uploadImage(file) {
             if (!file || !supabase) return null;
             const formData = new FormData();
@@ -1035,7 +1069,6 @@
             }
             return data.url; 
         }
-
         function updateAutocompleteList(productsArray, datalistElement) {
             datalistElement.innerHTML = '';
             const sortedProducts = [...productsArray].sort((a, b) => a.name.localeCompare(b.name));
@@ -1045,21 +1078,17 @@
                 datalistElement.appendChild(option);
             });
         }
-
         async function updateProductStock(productName, table, localArray, delta) {
             const cleanProductName = getCleanProductName(productName);
             const productToUpdate = localArray.find(p => getCleanProductName(p.name).trim() === cleanProductName);
-
             if (productToUpdate) {
                 const currentQty = parseInt(productToUpdate.quantity) || 0;
                 const newQty = Math.max(0, currentQty + delta);
                 const isMain = (table === PRODUCTS_TABLE); 
-
                 if (delta < 0 && currentQty <= 0) {
                     console.warn(`⚠️ Advertencia: Stock de ${productName} ya es 0. No se puede descontar.`);
                     return;
                 }
-                
                 // Optimistic Update (Local)
                 productToUpdate.quantity = newQty;
                 updateProductCardInDOM(productToUpdate, isMain); 
@@ -1069,16 +1098,12 @@
                 calculateCategoryTotals(localArray, isMain);
                 if(isMain) renderProducts(localArray.filter(p => true)); 
                 else renderProductsET(localArray.filter(p => true));
-
-
                 if (!supabase) return console.error("❌ Error: Supabase no está cargado para actualizar stock.");
-
                 // Database Update
                 const { error: updateError } = await supabase
                     .from(table)
                     .update({ quantity: newQty })
                     .eq("id", productToUpdate.id);
-                
                 if (updateError) {
                     console.error("❌ Error al actualizar stock:", updateError.message);
                     // Rollback optimistic update on failure
@@ -1088,7 +1113,6 @@
                     calculateCategoryTotals(localArray, isMain);
                     if(isMain) renderProducts(localArray.filter(p => true)); 
                     else renderProductsET(localArray.filter(p => true));
-
                     alert(`❌ Error al actualizar stock de ${productName}. El stock local ha sido revertido.`);
                 } else {
                     console.log(`✅ Stock actualizado para: ${productName}. Nuevo stock: ${newQty}`);
@@ -1097,7 +1121,6 @@
                 console.warn(`ℹ️ Producto no encontrado en inventario por nombre exacto: ${cleanProductName}. No se modificó stock.`);
             }
         }
-        
         // --- Carga de Logo ---
         const LOGO_CONFIG_KEY = "current_logo_url";
         async function loadLogo() {
@@ -1119,11 +1142,9 @@
                 console.error("Error en loadLogo:", err);
             }
         }
-        
         // ============================================================================
         // == V. LÓGICA DE VISTAS Y RENDERS (Producto, Venta, Faltantes, Herramienta) ==
         // ============================================================================
-
         // --- ADICIÓN: Función para calcular los totales de categoría ---
         function calculateCategoryTotals(productsArray, isMain) {
             const totals = productsArray.reduce((acc, p) => {
@@ -1138,8 +1159,6 @@
             }
             return totals;
         }
-
-
         // --- Funciones de Vistas ---
         const views = { 
             inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario' }, 
@@ -1154,7 +1173,6 @@
             Object.keys(views).forEach(key => { 
                 const isCurrent = key === viewName; 
                 views[key].el.classList.toggle('hidden', !isCurrent); 
-                
                 // Botones de escritorio (Barra ancha)
                 const btn = document.querySelector(`#view-buttons .view-btn[data-view="${key}"]`); 
                 if (btn) {
@@ -1163,7 +1181,6 @@
                     btn.classList.toggle('bg-transparent', !isCurrent); 
                     btn.classList.toggle('text-gray-300', !isCurrent); 
                 }
-
                 // Botones de menú móvil (Dropdown)
                  const mobileBtn = document.querySelector(`#mobile-menu-dropdown .view-btn[data-view="${key}"]`);
                  if (mobileBtn) {
@@ -1172,16 +1189,13 @@
                  }
             }); 
             currentViewTitle.textContent = views[viewName].title; 
-            
             if (viewName === 'labels') {
                 updateLabelView();
             }
-            
             // Cierra el menú móvil si se selecciona una vista
             if (isMobile() && !mobileMenuDropdown.classList.contains('hidden')) {
                 mobileMenuDropdown.classList.add('hidden');
             }
-            
             // Desplazar la vista al inicio
             if (viewName === 'sales' || viewName === 'sales_el_transito' || viewName === 'inventory' || viewName === 'inventory_el_transito') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1197,7 +1211,6 @@
             salesListLoaderET.innerHTML = tableSkeleton;
             missingListLoader.innerHTML = tableSkeleton; 
         }
-
         // --- Lógica de Inventario Principal ---
         async function fetchProducts() { 
             if (!supabase) return;
@@ -1217,7 +1230,6 @@
             productsLoader.innerHTML = ""; 
             productsEl.innerHTML = ""; 
             totalCount.textContent = `${items.length} productos`; 
-
             // --- ADICIÓN: Renderizar Totales de Categoría ---
             categoryTotalsEl.innerHTML = `
                 <span class="font-bold text-indigo-300">Total por Categoría:</span>
@@ -1227,7 +1239,6 @@
             `;
             productsEl.appendChild(categoryTotalsEl);
             // --- FIN ADICIÓN ---
-
             if (items.length === 0) { productsEl.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos${searchInput.value ? ' para "' + searchInput.value + '"' : ''}.</p>`; return; } 
             const grouped = items.reduce((acc, p) => { 
                 const cat = p.category || 'Sin Categoría'; 
@@ -1278,17 +1289,14 @@
             const categoryEl = document.getElementById(`${elementPrefix}category${idSuffix}-${product.id}`);
             const imgEl = document.getElementById(`${elementPrefix}img${idSuffix}-${product.id}`);
             const boxNumberEl = document.getElementById(`${elementPrefix}box-number${idSuffix}-${product.id}`);
-            
             if (boxNumberEl) {
                 boxNumberEl.querySelector('span').textContent = product.box_number || 'N/A';
             }
-            
             if (stockEl) stockEl.textContent = `Stock: ${product.quantity}`;
             if (nameEl) nameEl.textContent = product.name;
             // Corregido: Usar 'product.price' en lugar de 'p.price'
             if (priceEl) priceEl.textContent = `$${Number(product.price).toFixed(2)}`; 
             if (categoryEl) categoryEl.textContent = product.category;
-            
             if (imgEl) {
                 const newSrc = product.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
                 imgEl.src = `${newSrc}?t=${new Date().getTime()}`;
@@ -1309,7 +1317,6 @@
                 updateLabelView();
             }
         }
-
         // --- Lógica de Inventario El Transito ---
         async function fetchProductsET() { 
             if (!supabase) return;
@@ -1330,7 +1337,6 @@
             productsLoaderET.innerHTML = ""; 
             productsElET.innerHTML = ""; 
             totalCountET.textContent = `${items.length} productos`; 
-            
             // --- ADICIÓN: Renderizar Totales de Categoría (El Transito) ---
             categoryTotalsElET.innerHTML = `
                 <span class="font-bold text-indigo-300">Total por Categoría (ET):</span>
@@ -1340,7 +1346,6 @@
             `;
             productsElET.appendChild(categoryTotalsElET);
             // --- FIN ADICIÓN ---
-
             if (items.length === 0) { productsElET.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos${searchInputET.value ? ' para "' + searchInputET.value + '"' : ''}.</p>`; return; } 
             const grouped = items.reduce((acc, p) => { 
                 const cat = p.category || 'Sin Categoría'; 
@@ -1396,7 +1401,6 @@
                 updateLabelView();
             }
         }
-
         // --- Lógica de Ventas ---
         function filterAndRenderSales() {
             const term = (searchSalesInput.value || "").toLowerCase().trim();
@@ -1550,25 +1554,20 @@
             const localArray = isMainSales ? allSales : allSalesElTransito;
             const sale = localArray.find(s => s.id === id);
             if (!sale || !supabase) return alert("❌ Error: Supabase no está cargado.");
-
             const oldStatus = sale.status;
             sale.status = newStatus; // Optimistic update (for status select color)
-
             // Update status select color immediately
             const selectEl = document.getElementById(`select-status${isMainSales ? '' : '-et'}-${id}`);
             if (selectEl) {
                 selectEl.className = `p-1 border rounded text-xs font-medium ${STATUS_COLORS[newStatus] || STATUS_COLORS['Pendiente']} cursor-pointer`;
             }
-
             try {
                 const { error } = await supabase.from(table).update({ status: newStatus }).eq("id", id);
                 if (error) throw error;
-
                 // Handle stock update: Adjust stock ONLY if status changes from/to 'Pagado'
                 const stockTable = isMainSales ? PRODUCTS_TABLE : PRODUCTS_EL_TRANSITO_TABLE;
                 const stockLocalArray = isMainSales ? allProducts : allProductsElTransito;
                 const cleanName = getCleanProductName(productName);
-
                 if (oldStatus !== 'Pagado' && newStatus === 'Pagado') {
                     // Went from Pending/Returned to Paid: Decrease stock
                     await updateProductStock(cleanName, stockTable, stockLocalArray, -1);
@@ -1576,11 +1575,9 @@
                     // Went from Paid to Pending/Returned: Increase stock
                     await updateProductStock(cleanName, stockTable, stockLocalArray, 1);
                 }
-
             } catch (error) {
                 console.error("Error al actualizar estado:", error);
                 alert("❌ Error al actualizar estado: " + error.message);
-                
                 // Rollback optimistic updates
                 sale.status = oldStatus;
                 if (selectEl) {
@@ -1599,26 +1596,21 @@
             const idSuffix = isMainSales ? '' : '-et';
             const newPriceStr = prompt(`Ingresa el nuevo precio para la venta ${id}:`, currentPrice.toFixed(2));
             if (newPriceStr === null) return; 
-
             const newPrice = parseFloat(newPriceStr.replace('$', '').trim());
             if (isNaN(newPrice) || newPrice <= 0) {
                 alert("❌ Precio inválido.");
                 return;
             }
-
             const table = isMainSales ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
             const localArray = isMainSales ? allSales : allSalesElTransito;
             const sale = localArray.find(s => s.id === id);
             if (!sale || !supabase) return alert("❌ Error: Supabase no está cargado.");
-
             const oldPrice = sale.price;
             sale.price = newPrice; // Optimistic update
-
             const priceCell = document.getElementById(`sale-price-cell${idSuffix}-${id}`);
             if (priceCell) {
                 priceCell.innerHTML = `$${newPrice.toFixed(2)} <button onclick="editSalePrice('${id}', ${newPrice}, ${isMainSales})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button>`;
             }
-
             supabase.from(table).update({ price: newPrice }).eq("id", id).then(({ error }) => {
                 if (error) {
                     console.error("Error al actualizar precio:", error);
@@ -1638,13 +1630,10 @@
         window.deleteSale = async function(id, isMainSales) {
             if (!confirm("¿Eliminar este registro de venta?")) return;
             if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            
             const table = isMainSales ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
             const localArray = isMainSales ? allSales : allSalesElTransito;
             const sale = localArray.find(s => s.id === id);
-
             if (!sale) return;
-
             // Rollback stock if status was 'Pagado'
             if (sale.status === 'Pagado') {
                 const stockTable = isMainSales ? PRODUCTS_TABLE : PRODUCTS_EL_TRANSITO_TABLE;
@@ -1653,7 +1642,6 @@
                 // Increase stock by 1
                 await updateProductStock(cleanName, stockTable, stockLocalArray, 1);
             }
-
             try {
                 const { error } = await supabase.from(table).delete().eq("id", id);
                 if (error) throw error;
@@ -1665,51 +1653,41 @@
         window.deleteSaleET = function(id) {
             return deleteSale(id, false);
         }
-
         // --- ADICIÓN: Lógica para Descargar PDF de Ventas ---
         window.downloadSalesPDF = async function(isMainSales) {
             if (typeof window.jspdf.jsPDF === 'undefined' || typeof html2canvas === 'undefined') {
                 return alert("❌ Error: Las librerías jsPDF y html2canvas no están cargadas.");
             }
-            
             const listContainer = isMainSales ? salesListContainer : salesListContainerET;
             const title = isMainSales ? 'Registro de Ventas Principal' : 'Registro de Ventas El Transito';
             const fileName = isMainSales ? 'Ventas_Principal_' : 'Ventas_El_Transito_';
-
             if (!listContainer.children.length) {
                 return alert("No hay datos de ventas para descargar.");
             }
-
             const Doc = window.jspdf.jsPDF;
             const doc = new Doc('p', 'mm', 'a4'); // 'p' for portrait, 'mm' units, 'a4' size
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
             let y = 10;
-            
             // Título
             doc.setFontSize(16);
             doc.text(title, 10, y);
             y += 8;
-
             // Totales Generales
             const totalSoldEl = document.getElementById(isMainSales ? 'total-sold-amount' : 'total-sold-amount-et');
             const totalPaidEl = document.getElementById(isMainSales ? 'total-paid-amount' : 'total-paid-amount-et');
             const paidPercentageEl = document.getElementById(isMainSales ? 'paid-percentage' : 'paid-percentage-et');
-            
             doc.setFontSize(10);
             doc.text(`Total Vendido: ${totalSoldEl.textContent}`, 10, y);
             doc.text(`Total Pagado: ${totalPaidEl.textContent}`, 70, y);
             doc.text(`Progreso: ${paidPercentageEl.textContent}`, 130, y);
             y += 8;
-            
             doc.setLineWidth(0.1);
             doc.line(10, y, pageWidth - 10, y);
             y += 5;
-
             // Clonar el contenedor de listas para evitar modificar el DOM visible
             const salesListClone = listContainer.cloneNode(true);
             salesListClone.classList.add('export-pdf-style');
-            
             // Ocultar elementos no deseados en la exportación
             salesListClone.querySelectorAll('button').forEach(btn => btn.style.display = 'none');
             salesListClone.querySelectorAll('select').forEach(select => {
@@ -1718,7 +1696,6 @@
                 select.parentNode.insertBefore(span, select);
                 select.style.display = 'none';
             });
-            
             // Crear un contenedor temporal para la clonación y darle estilos de escritorio
             const tempExportDiv = document.createElement('div');
             tempExportDiv.style.width = '1000px'; 
@@ -1726,29 +1703,22 @@
             tempExportDiv.style.color = '#000000';
             tempExportDiv.appendChild(salesListClone);
             document.body.appendChild(tempExportDiv);
-
-
             html2canvas(tempExportDiv, { scale: 2 }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
                 const imgWidth = 190; // A4 size minus margin (210 - 20)
                 const imgHeight = canvas.height * imgWidth / canvas.width;
-                
                 let heightLeft = imgHeight;
                 let position = 0;
-                
                 // Añadir imagen al PDF (puede ser de varias páginas)
                 doc.addImage(imgData, 'PNG', 10, y, imgWidth, imgHeight);
                 heightLeft -= (pageHeight - y);
                 position = -imgHeight + heightLeft;
-                
                 while (heightLeft >= pageHeight) {
                     doc.addPage();
                     doc.addImage(imgData, 'PNG', 10, -heightLeft + 10, imgWidth, imgHeight);
                     heightLeft -= pageHeight;
                 }
-
                 doc.save(`${fileName}${new Date().toISOString().split('T')[0]}.pdf`);
-                
                 // Limpiar DOM temporal
                 document.body.removeChild(tempExportDiv);
                 alert(`✅ PDF de ${title} descargado con éxito.`);
@@ -1758,8 +1728,6 @@
                 alert("❌ Error: No se pudo generar el PDF. Asegúrate de que todos los datos se hayan cargado.");
             });
         };
-
-
         // --- Lógica de Faltantes ---
         async function fetchMissingProducts() {
             if (!supabase) return;
@@ -1802,7 +1770,6 @@
                 alert("❌ Error al eliminar: " + error.message);
             }
         }
-
         // --- Lógica de Herramientas ---
         async function fetchTools() {
             if (!supabase) return;
@@ -1823,7 +1790,8 @@
                 const card = document.createElement("div");
                 card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col tool-card border border-gray-700 relative";
                 const imageUrl = tool.image_url ? `${tool.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/6366f1/ffffff?text=Tutorial`;
-                const descriptionHtml = tool.description ? `<p class="text-gray-400 text-sm mt-2 flex-grow">${tool.description.replace(/\n/g, '<br>')}</p>` : '<div class="flex-grow"></div>';
+                const descriptionHtml = tool.description ? `<p class="text-gray-400 text-sm mt-2 flex-grow">${tool.description.replace(/
+/g, '<br>')}</p>` : '<div class="flex-grow"></div>';
                 card.innerHTML = `
                     <div class="h-48 bg-gray-700 rounded flex items-center justify-center mb-3 overflow-hidden">
                         <img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${tool.title}">
@@ -1852,7 +1820,6 @@
                 renderTools(allTools);
             }
         }
-
         // --- Lógica de Realtime ---
         function handleRealtimePayload(payload, localArray, renderFunction, idKey = 'id') {
             if (!supabase) return;
@@ -1941,16 +1908,13 @@
                         }
                         break;
                 }
-                
                 // --- ADICIÓN: Recalcular totales ANTES de renderizar ---
                 const isMain = isMainProducts;
                 calculateCategoryTotals(localArray, isMain);
-                
                 if (needsFullRender) {
                     // Esto recalcula los grupos y re-renderiza la lista de tarjetas Y los totales
                     renderFunction(); 
                 }
-                
                 if (isMainProducts) updateAutocompleteList(allProducts, inventorySuggestions);
                 if (isElTransitoProducts) updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
                 return; 
@@ -2005,7 +1969,6 @@
                     (payload) => handleRealtimePayload(payload, allTools, renderTools, 'id')
                 ).subscribe((status, err) => console.log(`Canal ${TOOLS_TABLE}: ${status}`, err || ''));
         }
-
         // --- Lógica de Carga Inicial de Datos (Faltantes y Ventas) ---
         async function fetchSales() {
             if (!supabase) return;
@@ -2021,23 +1984,18 @@
             allSalesElTransito = data;
             filterAndRenderSalesET();
         }
-
         // ============================================================================
         // == VI. LÓGICA DE MODALES (QR, Scanner y EDITOR)                             ==
         // ============================================================================
-
         // --- Lógica del Editor de Producto (Modal) ---
-        
         window.openProductEditorModal = function(productId, isMain) {
             currentEditingProduct = null;
             selectedProductImageFile = null;
             modalStatus.textContent = '';
-            
             // 1. Determinar el array de productos y buscar el producto por ID
             let productArray = isMain ? allProducts : allProductsElTransito;
-            // CORRECCIÓN APLICADA: Usar String() y .trim() para asegurar la comparación entre tipos de datos de string
+            // CORRECCIÓN APLICADA: Usar String() y .trim() para asegurar la comparación entre tipos de data de string
             let product = productArray.find(p => String(p.id).trim() === String(productId).trim());
-
             if (!product) {
                 // Fallback de seguridad: Buscar en el inventario opuesto por si el 'isMain' es incorrecto
                 productArray = isMain ? allProductsElTransito : allProducts;
@@ -2047,16 +2005,13 @@
                     console.warn("⚠️ Producto encontrado en el inventario opuesto. Se ajustó la vista a:", isMain ? 'Principal' : 'El Transito');
                 }
             }
-            
             if (!product) {
                 // Si aún no se encuentra, mostrar el error
                 alert("Error: Producto no encontrado en el inventario local. Intente recargar la página. ID Buscado: " + productId);
                 return;
             }
-
             currentEditingProduct = product;
             isMainInventory = isMain;
-
             // 2. Llenar campos del modal
             modalName.value = product.name;
             modalCategory.value = product.category || 'Otros';
@@ -2064,23 +2019,19 @@
             modalQuantity.value = product.quantity;
             modalBoxNumber.value = product.box_number || '';
             modalLocation.textContent = isMain ? 'Inventario Principal' : 'Inventario El Transito';
-
             // 3. Cargar imagen de previsualización
             // Añadimos un timestamp para forzar la recarga de la imagen si se ha actualizado
             const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
             modalImagePreview.src = imageUrl;
-            
             // 4. Limpiar el input file y mostrar modal
             modalImageUpload.value = '';
             modal.classList.remove('hidden');
         }
-
         window.closeProductEditorModal = function() {
             modal.classList.add('hidden');
             modalProductForm.reset();
             selectedProductImageFile = null;
         }
-
         modalImageUpload.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -2092,30 +2043,25 @@
                 reader.readAsDataURL(file);
             }
         });
-
         modalProductForm.addEventListener('submit', async (ev) => {
             ev.preventDefault();
             const saveButton = document.getElementById('modal-save-button');
             saveButton.disabled = true;
             modalStatus.textContent = 'Guardando cambios...';
-
             if (!supabase || !currentEditingProduct) {
                 modalStatus.textContent = 'Error: Supabase o producto no cargado.';
                 saveButton.disabled = false;
                 return;
             }
-
             const table = isMainInventory ? PRODUCTS_TABLE : PRODUCTS_EL_TRANSITO_TABLE;
             let newImageUrl = currentEditingProduct.image_url;
             let updatePayload = {};
-
             try {
                 // 1. Subir nueva imagen si se seleccionó un archivo
                 if (selectedProductImageFile) {
                     modalStatus.textContent = 'Subiendo nueva imagen...';
                     newImageUrl = await uploadImage(selectedProductImageFile);
                 }
-
                 // 2. Preparar payload de actualización
                 updatePayload = {
                     name: modalName.value,
@@ -2125,29 +2071,23 @@
                     box_number: modalBoxNumber.value.trim() || null,
                     image_url: newImageUrl
                 };
-
                 // 3. Actualizar en Supabase
                 modalStatus.textContent = 'Actualizando registro en la base de datos...';
                 const { error } = await supabase
                     .from(table)
                     .update(updatePayload)
                     .eq('id', currentEditingProduct.id);
-                
                 if (error) throw error;
-
                 // 4. Actualizar localmente y en el DOM (Realtime debería hacer esto, pero por robustez)
                 Object.assign(currentEditingProduct, updatePayload);
                 updateProductCardInDOM(currentEditingProduct, isMainInventory);
-                
                 // ADICIÓN: Recalcular totales después de la actualización exitosa
                 const localArray = isMainInventory ? allProducts : allProductsElTransito;
                 calculateCategoryTotals(localArray, isMainInventory);
                 if(isMainInventory) filterAndRenderProducts();
                 else filterAndRenderProductsET();
-                
                 modalStatus.textContent = 'Producto actualizado con éxito. ✅';
                 setTimeout(closeProductEditorModal, 1000);
-
             } catch (err) {
                 console.error("Error al guardar cambios del producto:", err);
                 modalStatus.textContent = 'Error al actualizar: ' + err.message;
@@ -2155,9 +2095,7 @@
                 saveButton.disabled = false;
             }
         });
-
         // --- Lógica del QR Modal (Individual) ---
-
         window.openQrModal = function() {
             if (!currentEditingProduct || !currentEditingProduct.id) {
                 alert("Error: No hay producto seleccionado para generar el QR.");
@@ -2169,7 +2107,6 @@
             qrCodeContainer.innerHTML = ''; 
             currentQrCanvas = null;
             qrProductInfo.textContent = `Producto: ${productName} (ID: ${productId})`;
-            
             if (typeof QRCode !== 'undefined') {
                 const tempDiv = document.createElement('div');
                 // Aseguramos que el QR se genera con fondo blanco (colorLight) para impresión
@@ -2221,28 +2158,22 @@
                 alert("❌ Error al descargar el QR.");
             }
         };
-
-
         // ============================================================================
         // == VIII. LÓGICA DEL ESCÁNER Y REGISTRO DE VENTA AUTOMÁTICA                 ==
         // ============================================================================
-        
         async function registerScannedSale(product, isMainInventory) {
             if (!supabase) return alert("❌ Error: Supabase no está cargado.");
             const salesTable = isMainInventory ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
             const stockTable = isMainInventory ? PRODUCTS_TABLE : PRODUCTS_EL_TRANSITO_TABLE;
             const stockLocalArray = isMainInventory ? allProducts : allProductsElTransito;
             const statusEl = isMainInventory ? saleStatus : saleStatusET;
-            
             // Obtener el destinatario, usando el valor actual del input (que fue enfocado)
             const recipientNameEl = isMainInventory ? recipientNameIn : recipientNameInET;
             const recipientName = recipientNameEl.value.trim() || 'Cliente Rápido QR'; 
-            
             const productNameSold = product.name + (product.category ? ` (${product.category})` : '');
             const salePrice = Number(product.price);
             const saleDate = new Date().toISOString().split('T')[0];
             const saleStatusValue = 'Pagado'; 
-
             const newSale = {
                 recipient_name: recipientName,
                 product_name_sold: productNameSold,
@@ -2250,18 +2181,14 @@
                 sale_date: saleDate,
                 status: saleStatusValue
             };
-            
             setStatusMessage(statusEl, `Registrando venta de ${product.name}...`, true);
-            
             try { 
                 const { data: insertedSale, error: saleError } = await supabase.from(salesTable).insert(newSale).select().single();
                 if (saleError) throw saleError;
-                
                 // DESCUENTO DE STOCK OBLIGATORIO si es Pagado
                 if (newSale.status === 'Pagado') {
                     await updateProductStock(product.name, stockTable, stockLocalArray, -1);
                 }
-                
                 // Limpiar inputs
                 if (isMainInventory) {
                     productNameSoldIn.value = ''; // Limpiar solo el producto
@@ -2274,28 +2201,23 @@
                     saleDateInET.value = new Date().toISOString().split('T')[0]; 
                     saleStatusInputET.value = 'Pagado';
                 }
-                
                 alert(`✅ Venta de "${product.name}" registrada con éxito para ${recipientName}. Stock descontado.`);
                 setStatusMessage(statusEl, `Venta de ${product.name} registrada con éxito y stock descontado ✅`, true); 
-                
             } catch (err) { 
                 console.error("Error al registrar venta escaneada:", err);
                 setStatusMessage(statusEl, "Error al registrar venta y descontar stock: " + err.message, false); 
             }
         }
-
         window.openScannerModal = async function() {
             if (isScannerRunning) return;
             if (typeof Html5QrcodeScanner === 'undefined') {
                 alert("Error: La librería de escaneo no se cargó correctamente.");
                 return;
             }
-
             scannerModal.classList.remove('hidden');
             scannerStatusEl.textContent = 'Iniciando cámara...';
             scanSuccessHandled = false;
             isScannerRunning = true;
-
             if (html5QrcodeScanner) {
                 try {
                     await html5QrcodeScanner.clear();
@@ -2304,7 +2226,6 @@
                 }
                 html5QrcodeScanner = null;
             }
-
             html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader", { 
                     fps: 10, 
@@ -2313,39 +2234,29 @@
                 },
                 false
             );
-
             const onScanSuccess = async (decodedText, decodedResult) => {
                 if (scanSuccessHandled) return;
-                
                 try {
                     // CORRECCIÓN CRÍTICA: Asegurar que el ID escaneado es una cadena limpia
                     const scannedId = String(decodedText).trim();
                     console.log(`[SCANNER LOG] Código escaneado (ID): ${scannedId}`);
-                    
                     // VALIDACIÓN DE ID: Si el ID está vacío, forzar un error.
                     if (!scannedId || scannedId === "") {
                         throw new Error(`El código QR escaneado es inválido o no contiene un ID de producto.`);
                     }
-
                     // --- Detener y cerrar el modal ANTES de procesar, para evitar errores visuales ---
                     scanSuccessHandled = true; 
                     await closeScannerModal(true); 
-
                     // Búsqueda del producto, asegurando la comparación de strings
                     const product = allProducts.find(p => String(p.id).trim() === scannedId) || allProductsElTransito.find(p => String(p.id).trim() === scannedId);
-                    
                     if (!product) {
                         throw new Error(`El producto con ID "${scannedId}" no existe en el inventario.`);
                     }
-
                     if (parseInt(product.quantity) <= 0) {
                         throw new Error(`Stock insuficiente: El producto "${product.name}" tiene 0 unidades disponibles.`);
                     }
-                    
                     const isMainInventory = allProducts.some(p => String(p.id).trim() === scannedId);
-                    
                     console.log(`[SCANNER LOG] Producto encontrado: ${product.name} (Inventario: ${isMainInventory ? 'Principal' : 'El Transito'})`);
-                    
                     // 1. Cargar datos en el formulario y cambiar a la vista de ventas
                     if (isMainInventory) {
                         toggleView('sales');
@@ -2366,15 +2277,12 @@
                         // ENFOCAR AL DESTINATARIO
                         recipientNameInET.focus();
                     }
-                    
                     // Nota: La venta se registra manualmente al presionar "Registrar Venta" en el formulario.
-
                 } catch (error) {
                     console.error("Error al procesar escaneo:", error);
                     // Restablecer la bandera antes de la alerta para permitir reintentar
                     scanSuccessHandled = false; 
                     alert(`❌ Error en Escaneo: ${error.message}`);
-                    
                     // Reabrir el escáner si el modal fue cerrado y el error no es de la cámara
                     if (!error.message.includes("cámara") && !error.message.includes("Html5QrcodeScanner")) {
                          openScannerModal();
@@ -2383,7 +2291,6 @@
                     }
                 }
             };
-
             const onScanError = (errorMessage) => {
                 if (!scanSuccessHandled) {
                     // Solo actualizamos el estado si no es un error de parseo común (QR not found)
@@ -2394,16 +2301,13 @@
                     }
                 }
             };
-            
             html5QrcodeScanner.render(onScanSuccess, onScanError);
         };
-
         window.closeScannerModal = async function(hideModal = true) {
             if (hideModal) {
                 scannerModal.classList.add('hidden');
             }
             scannerStatusEl.textContent = 'Esperando código QR o de barras...';
-            
             if (html5QrcodeScanner) {
                 if (isScannerRunning) {
                     try {
@@ -2413,25 +2317,19 @@
                         console.warn("[SCANNER LOG] Error al detener el escáner (puede que ya estuviera detenido):", error); 
                     }
                 }
-                
                 try {
                     await html5QrcodeScanner.clear();
                 } catch (e) {
                     console.warn("[SCANNER LOG] Error al limpiar la instancia:", e);
                 }
-                
                 html5QrcodeScanner = null;
             } 
-            
             isScannerRunning = false;
             scanSuccessHandled = false; 
         };
-
-
         // ============================================================================
         // == IX. EVENT LISTENERS Y CARGA INICIAL                                   ==
         // ============================================================================
-        
         // --- Event Listeners ---
         searchInput.addEventListener("input", filterAndRenderProducts);
         searchInputET.addEventListener("input", filterAndRenderProductsET);
@@ -2439,7 +2337,6 @@
         pendingOnlyCheckbox.addEventListener("change", filterAndRenderSales);
         searchSalesInputET.addEventListener("input", filterAndRenderSalesET);
         pendingOnlyCheckboxET.addEventListener("change", filterAndRenderSalesET);
-        
         // --- Forms Submit Logic (Implementados anteriormente) ---
         form.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
@@ -2607,7 +2504,6 @@
             if (!isMobile() && e.target.closest('#mobile-menu-dropdown')) return; 
             toggleView(btn.dataset.view);
         }));
-
         // --- Lógica de Impresión y Descarga de Etiquetas ---
         function populateLabelCategories(products) {
             const categories = new Set();
@@ -2638,7 +2534,6 @@
                 labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Selecciona el inventario y presiona "Generar e Imprimir Etiquetas" o "Descargar QRs".</p>`;
             }
         }
-        
         window.generateAndPrintLabels = function() {
             if (typeof QRCode === 'undefined') {
                 return alert("❌ Error: La librería QRCode no está cargada.");
@@ -2660,7 +2555,6 @@
                 // Aseguramos el fondo blanco de la etiqueta en la previsualización del DOM
                 label.className = 'label-tag border border-gray-400 p-1 flex items-center justify-start'; 
                 label.style.backgroundColor = 'white'; 
-                
                 const tempDiv = document.createElement('div');
                 const infoBox = document.createElement('div');
                 infoBox.className = 'flex-grow text-xs text-black';
@@ -2676,7 +2570,6 @@
                 const qrPromise = new Promise(resolve => {
                     // Limpiamos el ID antes de generar el QR
                     const cleanProductId = String(product.id).trim(); 
-
                     const qr = new QRCode(tempDiv, {
                         text: cleanProductId, // Usamos el ID limpio
                         width: 100, 
@@ -2711,37 +2604,31 @@
                 labelsOutputDiv.classList.remove('labels-container'); 
             });
         };
-
         // --- FUNCIÓN: Descarga de Etiquetas Masivas como ZIP ---
         window.downloadAllLabelsAsZip = async function() {
             // Verificar si las librerías necesarias están disponibles (Se cargaron en el HEAD)
             if (typeof QRCode === 'undefined' || typeof JSZip === 'undefined' || typeof saveAs === 'undefined') {
                  return alert("❌ Error: Las librerías JSZip y FileSaver son necesarias para la descarga ZIP y no se han cargado. Asegúrate que las etiquetas <script> en el HEAD estén correctas.");
             }
-
             const location = labelsLocationSelect.value;
             const categoryFilter = labelsCategorySelect.value;
             const selectedProducts = (location === 'main') ? allProducts : allProductsElTransito;
             const productsToPrint = selectedProducts.filter(p => 
                 categoryFilter === 'all' || p.category === categoryFilter
             );
-
             if (productsToPrint.length === 0) {
                 return alert("No hay productos que coincidan con el filtro seleccionado para descargar.");
             }
-
             const zip = new JSZip();
             const loadingButton = document.querySelector('button[onclick="downloadAllLabelsAsZip()"]');
             loadingButton.disabled = true;
             const originalText = loadingButton.textContent;
             loadingButton.textContent = 'Generando ZIP... Por favor espere.';
-
             try {
                 for (const product of productsToPrint) {
                     // 1. Generar el QR
                     const tempDiv = document.createElement('div');
                     const cleanProductId = String(product.id).trim();
-
                     // Generamos el QR en un elemento temporal
                     new QRCode(tempDiv, {
                         text: cleanProductId,
@@ -2751,28 +2638,22 @@
                         colorLight: "#ffffff",
                         correctLevel: QRCode.CorrectLevel.H
                     });
-
                     // Esperar un micro ciclo para que el canvas se dibuje (necesario para QRCode.js)
                     await new Promise(resolve => setTimeout(resolve, 50)); 
-                    
                     const canvas = tempDiv.querySelector('canvas');
                     if (canvas) {
                         // 2. Obtener la base64 de la imagen PNG y convertirla a binario para JSZip
                         const dataURL = canvas.toDataURL("image/png");
                         const base64Data = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-
                         // 3. Añadir al ZIP
                         const filename = `${product.name.replace(/[^a-zA-Z0-9]/g, '_')}_${cleanProductId.substring(0, 8)}.png`;
                         zip.file(filename, base64Data, { base64: true });
                     }
                 }
-
                 // 4. Generar y descargar el archivo ZIP
                 const zipContent = await zip.generateAsync({ type: "blob" });
                 saveAs(zipContent, `CellSmar_QR_Etiquetas_${new Date().toISOString().split('T')[0]}.zip`);
-                
                 alert(`✅ ${productsToPrint.length} QRs descargados en formato ZIP.`);
-
             } catch (error) {
                 console.error("Error al generar o descargar el ZIP:", error);
                 alert("❌ Error: Falló la generación del archivo ZIP. Revisa la consola para más detalles.");
@@ -2781,8 +2662,6 @@
                 loadingButton.textContent = originalText;
             }
         };
-
-
         // --- Lógica de Faltantes ---
         async function fetchMissingProducts() {
             if (!supabase) return;
@@ -2825,25 +2704,20 @@
                 alert("❌ Error al eliminar: " + error.message);
             }
         }
-        
         // --- Evento de Carga Principal ---
         window.addEventListener("load", async () => {
             themeSelector.value = root.className || 'theme-dark'; 
             saleDateIn.value = new Date().toISOString().split('T')[0];
             saleDateInET.value = new Date().toISOString().split('T')[0];
-            
             showSkeletonLoaders(); 
-            
             // Cargar Logo (independiente de Supabase)
             await loadLogo(); 
-            
             // LÓGICA DE CARGA MÓVIL/ESCRITORIO
             if (isMobile()) {
                 toggleView('inventory'); // Carga inicial en Inventario Principal en móvil
             } else {
                 toggleView('inventory'); // Carga inicial en Inventario Principal (Desktop)
             }
-
             if (supabase) {
                 try {
                     // Carga de datos inicial
@@ -2866,6 +2740,55 @@
                 alert("Error Crítico: No se pudo cargar Supabase. La aplicación no funcionará correctamente.");
             }
         });
+
+        // ===================================================================
+        // == X. FUNCIONES PARA NUEVOS TEMAS (Navideño y Blue Neon)         ==
+        // ===================================================================
+        let snowflakes = [];
+        let snowInterval;
+
+        function initializeSnowfall() {
+            if (document.querySelector('.theme-xmas')) {
+                cleanupSnowfall(); // Limpia si ya había copos
+                const snowContainer = document.createElement('div');
+                snowContainer.id = 'snow-container';
+                snowContainer.style.position = 'fixed';
+                snowContainer.style.top = '0';
+                snowContainer.style.left = '0';
+                snowContainer.style.width = '100%';
+                snowContainer.style.height = '100%';
+                snowContainer.style.pointerEvents = 'none';
+                snowContainer.style.zIndex = '9999'; // Asegura que esté por encima de otros elementos
+                document.body.appendChild(snowContainer);
+
+                const createSnowflake = () => {
+                    const flake = document.createElement('div');
+                    flake.innerHTML = '❄';
+                    flake.classList.add('snowflake');
+                    flake.style.left = Math.random() * 100 + 'vw';
+                    flake.style.fontSize = (Math.random() * 10 + 10) + 'px';
+                    flake.style.opacity = Math.random() * 0.5 + 0.5;
+                    flake.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                    flake.style.animationDelay = (Math.random() * 5) + 's';
+                    document.getElementById('snow-container').appendChild(flake);
+
+                    setTimeout(() => {
+                        flake.remove();
+                    }, 10000); // Duración de la animación
+                };
+
+                snowInterval = setInterval(createSnowflake, 300); // Crear copos cada 300ms
+            }
+        }
+
+        function cleanupSnowfall() {
+            clearInterval(snowInterval);
+            const container = document.getElementById('snow-container');
+            if (container) {
+                container.remove();
+            }
+        }
+
     </script>
 </body>
 </html>
