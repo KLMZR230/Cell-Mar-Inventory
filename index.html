@@ -24,6 +24,8 @@
             display: flex;
             flex-direction: column;
             transition: background-color 0.5s ease;
+            position: relative; /* Asegura que la capa de nieve tenga contexto */
+            z-index: 1; /* Asegura que el contenido quede por encima de la nieve */
         }
         .container.mx-auto {
             flex-grow: 1;
@@ -167,7 +169,7 @@
         .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
         
         /********************************/
-        /* NUEVO TEMA 4: Winter Christmas */
+        /* TEMA 4: Winter Christmas (CORREGIDO) */
         /********************************/
         .theme-christmas {
             --bg-primary: #004d40; /* Verde Oscuro Navideño */
@@ -183,10 +185,12 @@
             --font-headings: 'Playfair Display', serif;
             --pastel-bg: #ffe0b2; /* Naranja/Crema Pastel */
             --pastel-text: #004d40;
+            background-color: var(--bg-primary); 
             position: relative;
-            overflow: hidden; /* Para contener la nieve */
         }
-        .theme-christmas::before {
+        
+        /* Capa de nieve aplicada al body */
+        body.theme-christmas::before {
             content: '';
             position: fixed;
             top: 0;
@@ -194,20 +198,38 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEklEQVQIW2NoYGBg+M/AAMmUAAUoAAYQAD4Xw6+gAAAAAElFTkSuQmCC'); /* Pequeños puntos blancos */
-            z-index: 0; 
-            animation: snowfall 20s linear infinite;
+            /* Usar múltiples fondos para la nieve */
+            background-image: 
+                url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2NoYGDgBwAEhQGAhZgUdwAAAABJRU5ErkJggg=='), /* Fondo base (evita problemas) */
+                url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAFklEQVQIW2NgYGAgBEGAh/8C8E6QfQAAWJ8H1rY/xAAAAABJRU5ErkJggg=='), /* Copo grande */
+                url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAD0lEQVQIW2NgoBCwAAMgAFEGAh0nAw0AAAAASUVORK5CYII='); /* Copo pequeño */
+            background-repeat: repeat;
+            /* Ajuste de tamaños y velocidades para el efecto 3D */
+            background-size: 500px 500px, 100px 100px, 30px 30px;
+            animation: snowfall 20s linear infinite, snowfall-slow 30s linear infinite, snowfall-fast 15s linear infinite;
+            z-index: 2; /* Asegura que la nieve esté sobre el fondo principal pero debajo del contenido (z-index:100 del header) */
+            opacity: 0.6;
         }
+        /* Definición de la animación de nieve */
         @keyframes snowfall {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 500px 1000px; }
+            0% { background-position: 0 0, 0 0, 0 0; }
+            100% { background-position: 500px 1000px, 100px 500px, 30px 300px; }
         }
+        @keyframes snowfall-slow {
+            0% { background-position: 0 0; }
+            100% { background-position: 100px 2000px; }
+        }
+        @keyframes snowfall-fast {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 500px; }
+        }
+        
         .theme-christmas .product-card:hover, .theme-christmas .tool-card:hover { box-shadow: 0 0 20px rgba(229, 57, 53, 0.5); border-color: var(--accent-color); }
         .theme-christmas .bg-indigo-500, .theme-christmas .hover\:bg-indigo-600:hover { background-color: var(--accent-color-dark); }
         .theme-christmas .text-indigo-400, .theme-christmas .text-indigo-300 { color: var(--accent-color); }
 
         /********************************/
-        /* NUEVO TEMA 5: Neon Blue */
+        /* TEMA 5: Neon Blue */
         /********************************/
         .theme-neon-blue {
             --bg-primary: #0a0b25; /* Azul muy oscuro/negro */
@@ -498,7 +520,9 @@
                             <option value="theme-dark">Predeterminado</option>
                             <option value="theme-infernal">Fuego Infernal</option>
                             <option value="theme-gold">Luxury Gold</option>
-                            <option value="theme-christmas">🎄 Winter Christmas</option> <option value="theme-neon-blue">💎 Neon Blue</option> </select>
+                            <option value="theme-christmas">🎄 Winter Christmas</option>
+                            <option value="theme-neon-blue">💎 Neon Blue</option>
+                        </select>
                     </div>
                     <div class="flex items-center space-x-2 pt-2">
                         <label for="logo-upload" class="bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 transition duration-300 cursor-pointer text-sm shadow-sm flex-grow text-center">Subir Nuevo Logo 🖼️</label>
