@@ -4,15 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Cell Smar</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700;900&family=Lora:wght@700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700;900&family=Lora:wght@700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
     <style>
+        /* [Se mantiene la sección de estilos CSS sin cambios, ya que son correctos] */
         /********************************/
         /* Estilos Base (Comunes a todos los temas) */
         /********************************/
@@ -452,6 +452,10 @@
                 const theme = localStorage.getItem('selectedTheme');
                 if (theme && ['theme-dark', 'theme-infernal', 'theme-gold', 'theme-christmas', 'theme-blue-neon'].includes(theme)) {
                     document.documentElement.className = theme;
+                    // Pre-aplica la clase de nieve al body
+                    if (theme === 'theme-christmas') {
+                        document.body.classList.add('theme-christmas');
+                    }
                 } else {
                     document.documentElement.className = 'theme-dark';
                 }
@@ -463,9 +467,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-</head>
+    
+    </head>
 <body class="" onclick=""> 
     <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
         <div class="flex items-center space-x-4">
@@ -483,7 +486,7 @@
         <div class="flex items-center space-x-4 relative">
              <button id="desktop-scan-button" onclick="openScannerModal()" class="text-white py-1 px-3 rounded-lg bg-green-600 hover:bg-green-700 transition duration-300 shadow-md text-sm flex items-center space-x-1" title="Escanear Producto y Registrar Venta">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
                  </svg>
                  <span>Escanear QR</span>
              </button>
@@ -497,14 +500,14 @@
                 <button data-view="tools" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🛠️ Herramientas</button>
             </div>
              <button id="mobile-menu-button" onclick="toggleMobileMenu(event)" class="text-gray-300 hover:text-indigo-400 p-2 rounded-full bg-gray-700/50 transition duration-300 shadow-md" title="Menú">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
-            </button>
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                 </svg>
+             </button>
             <div id="mobile-menu-dropdown" class="rounded-md shadow-lg divide-y divide-gray-300 z-50 hidden">
                  <button id="mobile-scan-button" onclick="openScannerModal()" class="text-sm font-medium flex items-center space-x-2">
                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
                      </svg>
                      <span>Escanear QR (Venta)</span>
                  </button>
@@ -517,11 +520,11 @@
                 <button data-view="tools" class="view-btn text-sm">🛠️ Herramientas</button>
             </div>
              <button id="settings-button" onclick="toggleSettingsDropdown(event)" class="text-gray-300 hover:text-indigo-400 p-2 rounded-full bg-gray-700/50 transition duration-300 shadow-md" title="Configuración">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.313.823 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.823 3.313-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.313-.823-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.823 3.313 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-            </button>
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.313.823 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.823 3.313-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.313-.823-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.823 3.313 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                 </svg>
+             </button>
             <div id="settings-dropdown" class="absolute right-0 mt-2 w-72 origin-top-right rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 divide-y divide-gray-700 z-50 hidden">
                 <div class="py-1 px-3 space-y-3">
                     <div class="flex items-center space-x-2 pt-2">
@@ -678,7 +681,7 @@
                         <label for="pending-only-checkbox" class="ml-2 block text-sm font-medium text-gray-200">🔔 Mostrar solo pendientes</label>
                     </div>
                     <button onclick="downloadSalesPDF(true)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow w-full md:w-auto mt-4 md:mt-0">
-                         Descargar PDF 📄
+                             Descargar PDF 📄
                     </button>
                 </div>
                 <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
@@ -731,7 +734,7 @@
                         <label for="pending-only-checkbox-et" class="ml-2 block text-sm font-medium text-gray-200">🔔 Mostrar solo pendientes</label>
                     </div>
                     <button onclick="downloadSalesPDF(false)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow w-full md:w-auto mt-4 md:mt-0">
-                         Descargar PDF 📄
+                             Descargar PDF 📄
                     </button>
                 </div>
                 <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
@@ -809,8 +812,8 @@
                     <h2 class="text-xl font-semibold text-indigo-300">📚 Base de Conocimiento de Herramientas</h2>
                     <span id="total-tools-count" class="text-gray-400 text-sm"></span>
                  </div>
-                 <div id="tools-loader" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
-                 <div id="tools-list" class="grid grid-cols-1 md:col-cols-2 lg:grid-cols-3 gap-6"></div>
+                <div id="tools-loader" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+                <div id="tools-list" class="grid grid-cols-1 md:col-cols-2 lg:grid-cols-3 gap-6"></div>
             </section>
         </div>
         <footer class="mt-10 text-center text-gray-400 text-sm">
@@ -819,85 +822,85 @@
         </footer>
     </div>
     <div id="product-editor-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeProductEditorModal()"></div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-gray-700">
-          <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <div class="sm:flex sm:items-start">
-              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                <h3 class="text-xl leading-6 font-medium text-white border-b border-indigo-500 pb-2 mb-4" id="modal-title">
-                  ✍️ Editar Producto (<span id="modal-location"></span>)
-                </h3>
-                <form id="modal-product-form" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-4">
-                        <label class="block text-sm font-medium text-gray-300">Imagen Actual</label>
-                        <div class="h-40 bg-gray-600 rounded flex items-center justify-center overflow-hidden border-2 border-gray-600">
-                            <img id="modal-image-preview" src="" class="object-contain h-full w-full" alt="Previsualización" />
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeProductEditorModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-gray-700">
+                <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-xl leading-6 font-medium text-white border-b border-indigo-500 pb-2 mb-4" id="modal-title">
+                                ✍️ Editar Producto (<span id="modal-location"></span>)
+                            </h3>
+                            <form id="modal-product-form" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-4">
+                                    <label class="block text-sm font-medium text-gray-300">Imagen Actual</label>
+                                    <div class="h-40 bg-gray-600 rounded flex items-center justify-center overflow-hidden border-2 border-gray-600">
+                                        <img id="modal-image-preview" src="" class="object-contain h-full w-full" alt="Previsualización" />
+                                    </div>
+                                    <label for="modal-image-upload" class="block text-sm font-medium text-gray-300">Subir Nueva Imagen</label>
+                                    <input type="file" id="modal-image-upload" accept="image/*" class="mt-1 block w-full p-1.5 border rounded-md bg-gray-600 border-gray-500 text-white text-sm" />
+                                </div>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300">Nombre</label>
+                                        <input id="modal-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300">Categoría</label>
+                                        <select id="modal-category" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
+                                            <option value="Pantallas">Pantallas</option>
+                                            <option value="Jacks de Carga">Jacks de Carga</option>
+                                            <option value="Flex Main">Flex Main</option>
+                                            <option value="Placas de Carga">Placas de Carga</option>
+                                            <option value="Botones Fisicos">Botones Fisicos</option>
+                                            <option value="Botones Internos">Botones Internos</option>
+                                            <option value="Tapaderas de Iphone">Tapaderas de Iphone</option>
+                                            <option value="Bandejas SIM">Bandejas SIM</option>
+                                            <option value="Flex de Iphone">Flex de Iphone</option>
+                                            <option value="Tapaderas">Tapaderas</option>
+                                            <option value="Accesorios">Accesorios</option>
+                                            <option value="Otros">Otros</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300">Precio (USD)</label>
+                                        <input id="modal-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300">Cantidad Disponible</label>
+                                        <input id="modal-quantity" type="number" min="0" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300">Caja Número</label>
+                                        <input id="modal-box-number" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: B-05" />
+                                    </div>
+                                    <p id="modal-status" class="text-sm text-gray-400 mt-3"></p>
+                                </div>
+                            </form>
                         </div>
-                        <label for="modal-image-upload" class="block text-sm font-medium text-gray-300">Subir Nueva Imagen</label>
-                        <input type="file" id="modal-image-upload" accept="image/*" class="mt-1 block w-full p-1.5 border rounded-md bg-gray-600 border-gray-500 text-white text-sm" />
                     </div>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Nombre</label>
-                            <input id="modal-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Categoría</label>
-                            <select id="modal-category" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
-                                <option value="Pantallas">Pantallas</option>
-                                <option value="Jacks de Carga">Jacks de Carga</option>
-                                <option value="Flex Main">Flex Main</option>
-                                <option value="Placas de Carga">Placas de Carga</option>
-                                <option value="Botones Fisicos">Botones Fisicos</option>
-                                <option value="Botones Internos">Botones Internos</option>
-                                <option value="Tapaderas de Iphone">Tapaderas de Iphone</option>
-                                <option value="Bandejas SIM">Bandejas SIM</option>
-                                <option value="Flex de Iphone">Flex de Iphone</option>
-                                <option value="Tapaderas">Tapaderas</option>
-                                <option value="Accesorios">Accesorios</option>
-                                <option value="Otros">Otros</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Precio (USD)</label>
-                            <input id="modal-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Cantidad Disponible</label>
-                            <input id="modal-quantity" type="number" min="0" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Caja Número</label>
-                            <input id="modal-box-number" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: B-05" />
-                        </div>
-                        <p id="modal-status" class="text-sm text-gray-400 mt-3"></p>
+                </div>
+                <div class="bg-gray-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse justify-between border-t border-gray-700">
+                     <div class="flex items-center space-x-2">
+                         <button type="button" onclick="openQrModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 sm:w-auto sm:text-sm transition mt-2 sm:mt-0">
+                             Generar QR para Imprimir 🖨️
+                         </button>
+                         <button type="button" onclick="downloadQrCode()" id="download-qr-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-500 text-base font-medium text-white hover:bg-indigo-600 sm:w-auto sm:text-sm transition mt-2 sm:mt-0">
+                             Descargar QR 💾
+                         </button>
+                     </div>
+                    <div class="flex flex-col sm:flex-row-reverse">
+                        <button type="submit" form="modal-product-form" id="modal-save-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-500 text-base font-medium text-white hover:bg-indigo-600 sm:ml-3 sm:w-auto sm:text-sm transition">
+                            Guardar Cambios
+                        </button>
+                        <button type="button" onclick="closeProductEditorModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-700 text-base font-medium text-gray-200 hover:bg-gray-600 sm:mt-0 sm:w-auto sm:text-sm transition">
+                            Cancelar
+                        </button>
                     </div>
-                </form>
-              </div>
+                </div>
             </div>
-          </div>
-          <div class="bg-gray-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse justify-between border-t border-gray-700">
-              <div class="flex items-center space-x-2">
-                <button type="button" onclick="openQrModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 sm:w-auto sm:text-sm transition mt-2 sm:mt-0">
-                    Generar QR para Imprimir 🖨️
-                </button>
-                <button type="button" onclick="downloadQrCode()" id="download-qr-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-500 text-base font-medium text-white hover:bg-indigo-600 sm:w-auto sm:text-sm transition mt-2 sm:mt-0">
-                    Descargar QR 💾
-                </button>
-             </div>
-            <div class="flex flex-col sm:flex-row-reverse">
-                <button type="submit" form="modal-product-form" id="modal-save-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-500 text-base font-medium text-white hover:bg-indigo-600 sm:ml-3 sm:w-auto sm:text-sm transition">
-                    Guardar Cambios
-                </button>
-                <button type="button" onclick="closeProductEditorModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-700 text-base font-medium text-gray-200 hover:bg-gray-600 sm:mt-0 sm:w-auto sm:text-sm transition">
-                    Cancelar
-                </button>
-            </div>
-          </div>
         </div>
-      </div>
     </div>
     <div id="qr-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="qr-modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -907,7 +910,7 @@
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <h3 class="text-lg leading-6 font-medium text-black mb-4 border-b border-purple-500 pb-2" id="qr-modal-title">Código QR para Impresión</h3>
                     <div id="qr-code-container" class="flex justify-center p-4 bg-white rounded">
-                        </div>
+                         </div>
                     <p id="qr-product-info" class="text-black text-center mt-3 text-sm"></p>
                 </div>
                 <div class="bg-gray-100 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
@@ -940,16 +943,23 @@
         </div>
     </div>
     <input type="file" id="tool-image-editor-input" class="hidden" accept="image/*" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
     <script>
         // =================================================================================
-        // == Configuración de Supabase y Edge Function para R2                      ==
+        // == I. Configuración de Supabase y Edge Function para R2                      ==
         // =================================================================================
         const createClient = window.supabase ? window.supabase.createClient : null;
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
-        // CORRECCIÓN CRÍTICA: Restauración de la clave ANON completa.
+        // CORRECCIÓN CRÍTICA (Falla de Realtime): Asegurar que la clave ANON es correcta y completa
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
         let supabase = null;
         if (createClient) {
+            // CORRECCIÓN CRÍTICA (Falla de Realtime): La clave estaba incompleta.
             supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } else {
             console.error("Error Crítico: La librería Supabase no se ha cargado.");
@@ -1160,6 +1170,7 @@
 
         async function updateProductStock(productName, table, localArray, delta) {
             const cleanProductName = getCleanProductName(productName);
+            // CORRECCIÓN: Buscar con `getCleanProductName` para asegurar la coincidencia.
             const productToUpdate = localArray.find(p => getCleanProductName(p.name).trim() === cleanProductName);
 
             if (productToUpdate) {
@@ -1179,6 +1190,7 @@
                 updateAutocompleteList(localArray, datalistEl);
                 // ADICIÓN: Recalcular totales después de la actualización local optimista
                 calculateCategoryTotals(localArray, isMain);
+                // CORRECCIÓN: Filtrar con un filtro que devuelve todos los elementos para re-renderizar
                 if(isMain) renderProducts(localArray.filter(p => true)); 
                 else renderProductsET(localArray.filter(p => true));
 
@@ -1279,8 +1291,8 @@
                 // Botones de menú móvil (Dropdown)
                  const mobileBtn = document.querySelector(`#mobile-menu-dropdown .view-btn[data-view="${key}"]`);
                  if (mobileBtn) {
-                    mobileBtn.classList.toggle('bg-indigo-500', isCurrent); 
-                    mobileBtn.classList.toggle('font-bold', isCurrent);
+                     mobileBtn.classList.toggle('bg-indigo-500', isCurrent); 
+                     mobileBtn.classList.toggle('font-bold', isCurrent);
                  }
             }); 
             currentViewTitle.textContent = views[viewName].title; 
@@ -1866,7 +1878,10 @@
                 alert(`✅ PDF de ${title} descargado con éxito.`);
             }).catch(error => {
                 console.error("Error al generar PDF:", error);
-                document.body.removeChild(tempExportDiv);
+                // Asegurarse de limpiar el elemento temporal si falla
+                if (document.body.contains(tempExportDiv)) {
+                    document.body.removeChild(tempExportDiv);
+                }
                 alert("❌ Error: No se pudo generar el PDF. Asegúrate de que todos los datos se hayan cargado.");
             });
         };
@@ -1970,6 +1985,7 @@
             if (!supabase) return;
             console.log('📡 Payload Realtime Recibido:', payload);
             const { eventType, new: newRecord, old: oldRecord } = payload;
+            // CORRECCIÓN: Usar el valor del ID del payload, no la función getCleanProductName.
             const recordId = (eventType === 'DELETE') ? oldRecord[idKey] : newRecord[idKey];
             if (!recordId) { console.error("Payload de Realtime sin ID.", payload); return; }
             let index = localArray.findIndex(item => item[idKey] === recordId);
@@ -2035,7 +2051,7 @@
                             const oldQuantity = localArray[index].quantity; 
                             const newQuantity = newRecord.quantity; 
                             Object.assign(localArray[index], newRecord); 
-                            if (oldCategory !== newCategory || oldQuantity !== newQuantity) { 
+                            if (oldCategory !== newCategory || oldQuantity !== newQuantity || newRecord.image_url !== oldRecord.image_url) { // CORRECCIÓN: Agregar la verificación de URL de imagen.
                                 needsFullRender = true;
                             } else {
                                 updateProductCardInDOM(newRecord, isMainProducts); 
@@ -2067,6 +2083,7 @@
                 if (isElTransitoProducts) updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
                 return; 
             }
+            // Lógica para faltantes y herramientas
             if (eventType === 'UPDATE' && index !== -1) {
                  // Para herramientas y faltantes, solo actualizamos si el registro ya existe.
                  Object.assign(localArray[index], newRecord);
@@ -2092,6 +2109,10 @@
             if (!supabase) return;
             console.log("📡 Inicializando suscripciones en tiempo real...");
             const channelOptions = { config: { broadcast: { ack: true } } };
+            // CORRECCIÓN DE FLUJO: Agregar un evento 'error' o usar try/catch con el subscribe no es necesario si el cliente se inicializó correctamente.
+            // Los errores de conexión se manejarán con el `status` en el callback de subscribe.
+
+            // Nota: Para mejorar la robustez, se recomienda usar una política de reintento de conexión.
             supabase.channel('public:' + PRODUCTS_TABLE, channelOptions)
                 .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_TABLE },
                     (payload) => handleRealtimePayload(payload, allProducts, filterAndRenderProducts, 'id')
@@ -2121,6 +2142,8 @@
         // --- Lógica de Carga Inicial de Datos (Faltantes y Ventas) ---
         async function fetchSales() {
             if (!supabase) return;
+            // OPTIMIZACIÓN DE CARGA: Limitar el número de filas o implementar paginación para evitar cuellos de botella iniciales si la tabla es enorme.
+            // Para mantener la funcionalidad original, se mantiene sin límite, pero es un punto de mejora.
             const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
             if (error) { console.error("Error cargando ventas:", error); return; }
             allSales = data;
@@ -2465,7 +2488,7 @@
                         productNameSoldIn.value = productNameWithCategory;
                         salePriceIn.value = Number(product.price).toFixed(2);
                         saleDateIn.value = new Date().toISOString().split('T')[0];
-                        saleStatusInput.value = 'Pendiente'; 
+                        saleStatusInput.value = 'Pagado'; // Pre-seleccionar Pagado para QR rápido
                         // ENFOCAR AL DESTINATARIO
                         recipientNameIn.focus();
                     } else {
@@ -2474,13 +2497,15 @@
                         productNameSoldInET.value = productNameWithCategoryET;
                         salePriceInET.value = Number(product.price).toFixed(2);
                         saleDateInET.value = new Date().toISOString().split('T')[0];
-                        saleStatusInputET.value = 'Pendiente';
+                        saleStatusInputET.value = 'Pagado'; // Pre-seleccionar Pagado para QR rápido
                         // ENFOCAR AL DESTINATARIO
                         recipientNameInET.focus();
                     }
                     
-                    // Nota: La venta se registra manualmente al presionar "Registrar Venta" en el formulario.
-
+                    // 2. Registrar la venta inmediatamente si es un escaneo (Asumiendo Venta Rápida)
+                    // NOTA: Para no forzar una venta rápida, esto se omite. El usuario debe presionar "Registrar Venta"
+                    // para confirmar el nombre del destinatario.
+                    
                 } catch (error) {
                     console.error("Error al procesar escaneo:", error);
                     // Restablecer la bandera antes de la alerta para permitir reintentar
@@ -2541,7 +2566,7 @@
 
 
         // ============================================================================
-        // == IX. EVENT LISTENERS Y CARGA INICIAL                                   ==
+        // == IX. EVENT LISTENERS Y CARGA INICIAL                                    ==
         // ============================================================================
         
         // --- Event Listeners ---
@@ -2710,7 +2735,7 @@
             } finally {
                 editingToolId = null; 
                 toolImageEditorInput.value = ''; 
-                if(editButton) editButton.textContent = originalText; 
+                if(editButton) editButton.textContent = originalButtonText; // CORRECCIÓN: Usar la variable originalButtonText
             }
         });
         // Modificación para que el menú móvil use toggleView (y se auto-cierre)
@@ -2895,50 +2920,7 @@
         };
 
 
-        // --- Lógica de Faltantes ---
-        async function fetchMissingProducts() {
-            if (!supabase) return;
-            const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando faltantes:", error); return; }
-            allMissingProducts = data;
-            renderMissingProducts(allMissingProducts);
-        }
-        function renderMissingProducts(items) {
-            missingListLoader.innerHTML = "";
-            missingListEl.innerHTML = "";
-            totalMissingCount.textContent = `${items.length} productos pendientes`;
-            if (items.length === 0) {
-                missingListEl.innerHTML = `<p class="p-4 text-gray-400">¡Genial! No hay productos faltantes en la lista.</p>`;
-                return;
-            }
-            const listItems = items.map(p => {
-                const date = new Date(p.created_at).toLocaleDateString('es-SV', { day: 'numeric', month: 'short' });
-                return `
-                    <div id="missing-row-${p.id}" class="flex items-center justify-between p-4 border-b border-gray-700 hover:bg-gray-700/50 transition">
-                        <div>
-                            <p class="font-medium text-white">${p.product_name}</p>
-                            <p class="text-xs text-gray-400">${p.notes || 'Sin notas'}</p>
-                            <p class="text-xs text-indigo-400 mt-1">Registrado el ${date}</p>
-                        </div>
-                        <button onclick="deleteMissingProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Comprado</button>
-                    </div>
-                `;
-            }).join('');
-            missingListEl.innerHTML = listItems;
-        }
-        window.deleteMissingProduct = async function(id) {
-            if (!confirm("¿Marcar este producto como 'Comprado' y eliminarlo de la lista?")) return;
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            try {
-                const { error } = await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq("id", id);
-                if (error) throw error;
-            } catch (error) {
-                console.error("Error al eliminar faltante:", error);
-                alert("❌ Error al eliminar: " + error.message);
-            }
-        }
-        
-        // --- Evento de Carga Principal (MODIFICADO para aplicar el tema al inicio) ---
+        // --- Lógica de Carga Inicial (MODIFICADO para aplicar el tema al inicio) ---
         window.addEventListener("load", async () => {
             // Aplicar el tema guardado o predeterminado al cargar
             const initialTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
@@ -2961,8 +2943,7 @@
 
             if (supabase) {
                 try {
-                    // Carga de datos inicial
-                    // Usamos Promise.all para cargar todos los datos de forma concurrente, incluso si la vista está oculta.
+                    // Carga de datos inicial con Promise.all para concurrencia (Optimización)
                     await Promise.all([
                         fetchProducts(), 
                         fetchProductsET(),
@@ -2975,7 +2956,6 @@
                     initializeRealtimeSubscriptions();
                 } catch (error) {
                     console.error("Error crítico durante la carga de datos inicial:", error);
-                    // No alert() aquí, ya que el Promise.all contiene sus propios manejadores de error.
                 }
             } else {
                 alert("Error Crítico: No se pudo cargar Supabase. La aplicación no funcionará correctamente.");
