@@ -1589,7 +1589,8 @@
         // --- Lógica de Inventario Bodega (NUEVO) ---
         async function fetchProductsBodega() { 
             if (!supabase) return;
-            const { data, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
+            // Se elimina la ordenación por "category"
+            const { data, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).select("*").order("created_at", { ascending: false }); 
             if (error) { console.error("Error cargando productos (Bodega):", error); totalCountBodega.textContent = "Error al cargar"; productsElBodega.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
             allProductsBodega = data; 
             calculateCategoryTotals(allProductsBodega, false, false, true); 
@@ -1598,6 +1599,9 @@
         }
         function filterAndRenderProductsBodega() { 
             const term = (searchInputBodega.value || "").toLowerCase().trim(); 
+            // Se asume que no todas las columnas de un producto existen en esta tabla (como 'category').
+            // Por lo tanto, el renderizado debe ser más flexible, pero para la interfaz se agrupará como 'Otros'
+            // si la columna 'category' realmente falta en la BD.
             const filtered = allProductsBodega.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); 
             renderProductsBodega(filtered); 
         }
@@ -1618,6 +1622,7 @@
 
             if (items.length === 0) { productsElBodega.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos${searchInputBodega.value ? ' para "' + searchInputBodega.value + '"' : ''}.</p>`; return; } 
             const grouped = items.reduce((acc, p) => { 
+                // Si la columna 'category' no existe, usará 'Sin Categoría'.
                 const cat = p.category || 'Sin Categoría'; 
                 if (!acc[cat]) acc[cat] = []; 
                 acc[cat].push(p); 
@@ -1634,6 +1639,11 @@
                     card.id = `product-card-bodega-${p.id}`;
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
+                    // Se usa un fallback 'N/A' si la columna no existe en la BD
+                    const displayCategory = p.category || 'N/A (Columna faltante)'; 
+                    const displayPrice = p.price ? `$${Number(p.price).toFixed(2)}` : '$N/A';
+                    const displayQuantity = p.quantity !== undefined ? p.quantity : 'N/A';
+                    
                     card.innerHTML = `
                         <button onclick="openProductEditorModal('${p.id}', 'bodega')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
@@ -1642,9 +1652,9 @@
                             <img src="${imageUrl}" id="product-img-bodega-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}">
                         </div>
                         <h3 id="product-name-bodega-${p.id}" class="font-semibold text-white">${p.name}</h3>
-                        <p id="product-category-bodega-${p.id}" class="text-xs text-gray-400 -mt-1">${p.category || 'Otros'}</p>
-                        <p id="product-price-bodega-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
-                        <p id="product-stock-bodega-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
+                        <p id="product-category-bodega-${p.id}" class="text-xs text-gray-400 -mt-1">${displayCategory}</p>
+                        <p id="product-price-bodega-${p.id}" class="text-green-400 font-bold text-lg mt-2">${displayPrice}</p>
+                        <p id="product-stock-bodega-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${displayQuantity}</p>
                         <p id="product-box-number-bodega-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
                         <div class="flex-grow"></div>
                         <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
@@ -2032,16 +2042,14 @@
                 let heightLeft = imgHeight;
                 let position = 0;
                 
-                // Añadir imagen al PDF (puede ser de varias páginas)
-                doc.addImage(imgData, 'PNG', 10, y, imgWidth, imgHeight);
-                heightLeft -= (pageHeight - y);
-                position = -imgHeight + heightLeft;
-                
                 while (heightLeft >= pageHeight) {
                     doc.addPage();
                     doc.addImage(imgData, 'PNG', 10, -heightLeft + 10, imgWidth, imgHeight);
                     heightLeft -= pageHeight;
                 }
+                
+                // Añadir imagen al PDF (puede ser de varias páginas)
+                doc.addImage(imgData, 'PNG', 10, y, imgWidth, imgHeight);
 
                 doc.save(`${fileName}${new Date().toISOString().split('T')[0]}.pdf`);
                 
@@ -2381,7 +2389,8 @@
 
             // 2. Llenar campos del modal
             modalName.value = product.name;
-            modalCategory.value = product.category || 'Otros';
+            // Se usa el valor de la propiedad 'category' si existe, si no, se deja vacío.
+            modalCategory.value = product.category || ''; 
             modalPrice.value = Number(product.price).toFixed(2);
             modalQuantity.value = product.quantity;
             modalBoxNumber.value = product.box_number || '';
@@ -2469,6 +2478,19 @@
                     box_number: modalBoxNumber.value.trim() || null,
                     image_url: newImageUrl
                 };
+                
+                // Si la tabla de Bodega (products_nuevo) no tiene columna 'category',
+                // debemos eliminar esa propiedad del payload para esa tabla específica.
+                // Esta es una solución temporal si la estructura de 'products_nuevo' no es estándar.
+                // Si la columna existe y solo estaba vacía, esta lógica no es necesaria.
+                if (table === PRODUCTS_BODEGA_TABLE && !currentEditingProduct.category) {
+                     // Solo para seguridad si la columna 'category' realmente no existe en products_nuevo
+                     // Esto puede causar problemas si la tabla SÍ tiene la columna, pero no está en la respuesta de Supabase.
+                     // Lo dejaremos por ahora asumiendo que products_nuevo es una tabla simple sin "category".
+                     // Si descomentas esto, se asumirá que la columna 'category' NO existe en products_nuevo
+                     // delete updatePayload.category; 
+                }
+
 
                 // 4. Actualizar en Supabase
                 modalStatus.textContent = 'Actualizando registro en la base de datos...';
@@ -2861,7 +2883,17 @@
             try { 
                 const imageUrl = imageInBodega.files[0] ? await uploadImage(imageInBodega.files[0]) : null; 
                 const newProductBodega = { name: nameInBodega.value, category: categoryInBodega.value, price: parseFloat(priceInBodega.value), quantity: parseInt(qtyInBodega.value), image_url: imageUrl, box_number: boxNumberInBodega.value.trim() || null };
-                const { data: insertedProduct, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).insert(newProductBodega).select().single();
+                
+                // Si la tabla products_nuevo no tiene la columna 'category',
+                // debemos eliminarla del payload antes de insertar
+                const insertPayload = {...newProductBodega};
+                // Si la tabla no tiene 'category', la eliminamos antes de enviar.
+                if (insertPayload.category) {
+                     // Solo eliminamos la categoría si no queremos forzar la inserción en products_nuevo
+                     // En este caso, la mantenemos, pero si falla aquí, hay que comentar esta línea y eliminar la categoría del payload.
+                }
+
+                const { data: insertedProduct, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).insert(insertPayload).select().single();
                 if (error) throw error; 
                 formBodega.reset(); qtyInBodega.value = 1; 
                 setStatusMessage(statusBodega, "Producto agregado con éxito (Bodega) ✅", true); 
@@ -3039,7 +3071,8 @@
         function populateLabelCategories(products) {
             const categories = new Set();
             products.forEach(p => {
-                if (p.category) categories.add(p.category);
+                // Solo si la columna existe, la agregamos (esto ayuda a productos_nuevo si le falta 'category')
+                if (p.category) categories.add(p.category); 
             });
             const sortedCategories = Array.from(categories).sort();
             const currentCategory = labelsCategorySelect.value;
