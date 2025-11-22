@@ -493,8 +493,8 @@
             <div id="view-buttons" class="flex items-center space-x-2 bg-black/20 p-1 rounded-lg border border-gray-700">
                 <button data-view="inventory" class="view-btn bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg text-sm shadow-md transition duration-300">📦 Inventario</button>
                 <button data-view="inventory_el_transito" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🚚 Inventario El Transito</button>
-                                <button data-view="inventory_nuevo" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🆕 Nuevo Inventario</button>
-                                <button data-view="labels" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🖨️ Etiquetas QR</button>
+                <button data-view="inventory_nuevo" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🆕 Nuevo Inventario</button>
+                <button data-view="labels" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🖨️ Etiquetas QR</button>
                 <button data-view="sales" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">💰 Ventas</button>
                 <button data-view="sales_el_transito" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🚚 Ventas El Transito</button>
                 <button data-view="missing" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🔔 Faltantes</button>
@@ -516,8 +516,8 @@
                 <button data-view="sales" class="view-btn text-sm">💰 Ventas Principal</button>
                 <button data-view="inventory_el_transito" class="view-btn text-sm">🚚 Inventario El Transito</button>
                 <button data-view="sales_el_transito" class="view-btn text-sm">🚚 Ventas El Transito</button>
-                                <button data-view="inventory_nuevo" class="view-btn text-sm">🆕 Nuevo Inventario</button>
-                                <button data-view="labels" class="view-btn text-sm">🖨️ Etiquetas QR</button>
+                <button data-view="inventory_nuevo" class="view-btn text-sm">🆕 Nuevo Inventario</button>
+                <button data-view="labels" class="view-btn text-sm">🖨️ Etiquetas QR</button>
                 <button data-view="missing" class="view-btn text-sm">🔔 Faltantes</button>
                 <button data-view="tools" class="view-btn text-sm">🛠️ Herramientas</button>
             </div>
@@ -559,8 +559,8 @@
                         <select id="labels-location" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
                             <option value="main">Inventario Principal</option>
                             <option value="et">Inventario El Transito</option>
-                                                        <option value="nuevo">Nuevo Inventario</option>
-                                                    </select>
+                            <option value="nuevo">Nuevo Inventario</option>
+                        </select>
                     </div>
                     <div>
                         <label for="labels-category" class="block text-sm font-medium text-gray-300">Filtrar por Categoría (Opcional)</label>
@@ -1007,9 +1007,8 @@
         // --- INICIO: Definición de Constantes de Tablas y Estilos ---
         const PRODUCTS_TABLE = "products";
         const PRODUCTS_EL_TRANSITO_TABLE = "products_el_transito";
-        // INICIO: Nueva constante de tabla
+        // CORRECCIÓN: Agregar la nueva tabla
         const PRODUCTS_NUEVO_TABLE = "products_nuevo_inventario";
-        // FIN: Nueva constante de tabla
         const SALES_TABLE = "sales";
         const SALES_EL_TRANSITO_TABLE = "sales_el_transito"; 
         const MISSING_PRODUCTS_TABLE = "missing_products";
@@ -1026,22 +1025,19 @@
         // == II. INICIALIZACIÓN DE VARIABLES GLOBALES Y ELEMENTOS DEL DOM (CRÍTICO) ==
         // ============================================================================
 
-        // --- Variables de Estado ---
-        // MODIFICACIÓN: Añadir el nuevo array de productos
+        // --- Variables de Estado (CORREGIDO: Se incluyó el nuevo array) ---
         let allProducts = [], allProductsElTransito = [], allProductsNuevo = [], allSales = [], allSalesElTransito = [], allMissingProducts = [], allTools = [], selectedLogoFile = null;
         let editingToolId = null; 
         let currentEditingProduct = null;
         let isMainInventory = true;
         let selectedProductImageFile = null; 
         
-        // --- ADICIÓN: Variables para almacenar totales por categoría ---
+        // --- ADICIÓN: Variables para almacenar totales por categoría (CORREGIDO: Se incluyó el nuevo total) ---
         let categoryTotals = {};
         let categoryTotalsET = {};
-        // INICIO: Nuevo Total de Categoría
         let categoryTotalsNuevo = {};
-        // FIN: Nuevo Total de Categoría
         
-        // --- ADICIÓN: Elementos para mostrar los totales ---
+        // --- ADICIÓN: Elementos para mostrar los totales (CORREGIDO: Se incluyó el nuevo elemento) ---
         const categoryTotalsEl = document.createElement("div"); 
         categoryTotalsEl.id = "category-totals";
         categoryTotalsEl.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
@@ -1050,11 +1046,9 @@
         categoryTotalsElET.id = "category-totals-et";
         categoryTotalsElET.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
 
-        // INICIO: Nuevo Elemento de Total de Categoría
         const categoryTotalsElNuevo = document.createElement("div"); 
         categoryTotalsElNuevo.id = "category-totals-nuevo";
         categoryTotalsElNuevo.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
-        // FIN: Nuevo Elemento de Total de Categoría
 
         // --- Elementos de Configuración General ---
         const themeSelector = document.getElementById('theme-selector');
@@ -1071,9 +1065,8 @@
         // --- Elementos de Inventario El Transito ---
         const formET = document.getElementById("product-form-et"), nameInET = document.getElementById("name-et"), categoryInET = document.getElementById("category-select-et"), priceInET = document.getElementById("price-et"), qtyInET = document.getElementById("quantity-et"), imageInET = document.getElementById("image-et"), statusET = document.getElementById("status-et"), productsElET = document.getElementById("products-et"), totalCountET = document.getElementById("total-count-et"), searchInputET = document.getElementById("search-input-et"), productsLoaderET = document.getElementById("products-loader-et"), boxNumberInET = document.getElementById("box-number-et");
 
-        // INICIO: Nuevos Elementos de Inventario (Nuevo)
-        const formNuevo = document.getElementById("product-form-nuevo"), nameInNuevo = document.getElementById("name-nuevo"), categoryInNuevo = document.getElementById("category-select-nuevo"), priceInNuevo = document.getElementById("price-nuevo"), qtyInNuevo = document.getElementById("quantity-nuevo"), imageInNuevo = document.getElementById("image-nuevo"), statusNuevo = document.getElementById("status-nuevo"), productsElNuevo = document.getElementById("products-nuevo"), totalCountNuevo = document.getElementById("total-count-nuevo"), searchInputNuevo = document.getElementById("search-input-nuevo"), productsLoaderNuevo = document.getElementById("products-loader-nuevo"), boxNumberInNuevo = document.getElementById("box-number-nuevo");
-        // FIN: Nuevos Elementos de Inventario (Nuevo)
+        // --- Elementos de Inventario Nuevo (CORREGIDO: Se incluyeron los nuevos elementos) ---
+        const formNuevo = document.getElementById("product-form-nuevo"), nameInNuevo = document.getElementById("name-nuevo"), categoryInNuevo = document.getElementById("category-select-nuevo"), priceInNuevo = document.getElementById("price-nuevo"), qtyInNuevo = document.getElementById("quantity-nuevo"), imageInNuevo = document.getElementById("image-nuevo"), statusNuevo = document.getElementById("status-nuevo"), productsElNuevo = document.getElementById("products-nuevo"), totalCountNuevo = document.getElementById("total-count-nuevo"), searchInputNuevo = document.getElementById("search-input-nuevo"), productsLoaderNuevo = document.getElementById("products-loader-nuevo"), boxNumberInNuevo = document.getElementById("box-number-nuevo");
 
         // --- Elementos de Ventas Principal ---
         const salesForm = document.getElementById("sale-form"), recipientNameIn = document.getElementById("recipient-name"), productNameSoldIn = document.getElementById("product-name-sold"), salePriceIn = document.getElementById("sale-price"), saleDateIn = document.getElementById("sale-date"), saleStatusInput = document.getElementById("sale-status-input"), salesListContainer = document.getElementById("sales-list-container"), saleStatus = document.getElementById("sale-status"), totalSalesCount = document.getElementById("total-sales-count"), salesListLoader = document.getElementById("sales-list-loader"), searchSalesInput = document.getElementById("search-sales-input"), pendingOnlyCheckbox = document.getElementById("pending-only-checkbox");
@@ -1082,6 +1075,17 @@
         // --- Elementos de Ventas El Transito ---
         const salesFormET = document.getElementById("sale-el-transito-form"), recipientNameInET = document.getElementById("recipient-name-et"), productNameSoldInET = document.getElementById("product-name-sold-et"), salePriceInET = document.getElementById("sale-price-et"), saleDateInET = document.getElementById("sale-date-et"), saleStatusInputET = document.getElementById("sale-status-input-et"), salesListContainerET = document.getElementById("sales-list-container-et"), saleStatusET = document.getElementById("sale-status-et"), totalSalesCountET = document.getElementById("total-sales-count-et"), salesListLoaderET = document.getElementById("sales-list-loader-et"), searchSalesInputET = document.getElementById("search-sales-input-et"), pendingOnlyCheckboxET = document.getElementById("pending-only-checkbox-et");
         const inventorySuggestionsET = document.getElementById('inventory-suggestions-et');
+
+        // --- Datalist de Inventario Nuevo ---
+        const inventorySuggestionsNuevo = document.createElement('datalist');
+        inventorySuggestionsNuevo.id = 'inventory-suggestions-nuevo';
+        
+        // CORRECCIÓN: Adjuntar el datalist al formulario para que esté disponible en el DOM
+        // Aunque no hay un formulario de ventas directo para 'Nuevo Inventario', lo adjuntamos a un elemento discreto.
+        if (document.getElementById('inventory-view')) {
+            document.getElementById('inventory-view').appendChild(inventorySuggestionsNuevo);
+        }
+
 
         // --- Elementos de Etiquetas QR (Labels) ---
         const labelsLocationSelect = document.getElementById('labels-location');
@@ -1223,18 +1227,17 @@
             });
         }
 
+        // CORRECCIÓN CRÍTICA: Se corrigió la lógica para manejar el nuevo inventario
         async function updateProductStock(productName, table, localArray, delta) {
             const cleanProductName = getCleanProductName(productName);
             // CORRECCIÓN: Buscar con `getCleanProductName` para asegurar la coincidencia.
             const productToUpdate = localArray.find(p => getCleanProductName(p.name).trim() === cleanProductName);
-            
+            
             if (productToUpdate) {
                 const currentQty = parseInt(productToUpdate.quantity) || 0;
                 const newQty = Math.max(0, currentQty + delta);
                 const isMain = (table === PRODUCTS_TABLE);
-                // INICIO: Variable para el nuevo inventario
                 const isNuevo = (table === PRODUCTS_NUEVO_TABLE); 
-                // FIN: Variable para el nuevo inventario
 
                 if (delta < 0 && currentQty <= 0) {
                     console.warn(`⚠️ Advertencia: Stock de ${productName} ya es 0. No se puede descontar.`);
@@ -1243,15 +1246,14 @@
                 
                 // Optimistic Update (Local)
                 productToUpdate.quantity = newQty;
-                // MODIFICACIÓN: Llamada a la función de actualización del DOM
                 updateProductCardInDOM(productToUpdate, isMain, isNuevo); 
-                let datalistEl = isMain ? inventorySuggestions : (isNuevo ? document.getElementById('inventory-suggestions-nuevo') : inventorySuggestionsET);
+                let datalistEl = isMain ? inventorySuggestions : (isNuevo ? inventorySuggestionsNuevo : inventorySuggestionsET);
                 updateAutocompleteList(localArray, datalistEl);
                 // ADICIÓN: Recalcular totales después de la actualización local optimista
                 calculateCategoryTotals(localArray, isMain, isNuevo);
-                // CORRECCIÓN: Filtrar con un filtro que devuelve todos los elementos para re-renderizar
+                // CORRECCIÓN: Filtrar y renderizar correctamente
                 if(isMain) filterAndRenderProducts(); 
-                else if (isNuevo) filterAndRenderProductsNuevo();
+                else if(isNuevo) filterAndRenderProductsNuevo();
                 else filterAndRenderProductsET();
 
 
@@ -1271,7 +1273,7 @@
                     updateAutocompleteList(localArray, datalistEl);
                     calculateCategoryTotals(localArray, isMain, isNuevo);
                     if(isMain) filterAndRenderProducts(); 
-                    else if (isNuevo) filterAndRenderProductsNuevo();
+                    else if(isNuevo) filterAndRenderProductsNuevo();
                     else filterAndRenderProductsET();
 
                     alert(`❌ Error al actualizar stock de ${productName}. El stock local ha sido revertido.`);
@@ -1310,7 +1312,6 @@
         // ============================================================================
 
         // --- ADICIÓN: Función para calcular los totales de categoría ---
-        // MODIFICACIÓN: Añadir el parámetro isNuevo
         function calculateCategoryTotals(productsArray, isMain, isNuevo = false) {
             const totals = productsArray.reduce((acc, p) => {
                 const cat = p.category || 'Otros';
@@ -1320,9 +1321,7 @@
             if (isMain) {
                 categoryTotals = totals;
             } else if (isNuevo) {
-                // INICIO: Asignar el nuevo total
                 categoryTotalsNuevo = totals;
-                // FIN: Asignar el nuevo total
             } else {
                 categoryTotalsET = totals;
             }
@@ -1330,8 +1329,7 @@
         }
 
 
-        // --- Funciones de Vistas ---
-        // MODIFICACIÓN: Añadir la nueva vista
+        // --- Funciones de Vistas (CORREGIDO: Se incluyó la nueva vista) ---
         const views = { 
             inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario' }, 
             inventory_el_transito: { el: document.getElementById('inventory-el-transito-view'), title: 'Vista: Inventario El Transito' },
@@ -1383,9 +1381,7 @@
             const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div><div class="h-4 w-1/2 skeleton-line"></div><div class="h-8 w-1/4 skeleton-line"></div></div>`).join('');
             productsLoader.innerHTML = cardSkeleton;
             productsLoaderET.innerHTML = cardSkeleton;
-            // INICIO: Nuevo loader
-            productsLoaderNuevo.innerHTML = cardSkeleton;
-            // FIN: Nuevo loader
+            productsLoaderNuevo.innerHTML = cardSkeleton; // CORREGIDO
             toolsLoader.innerHTML = cardSkeleton;
             const tableSkeleton = Array(3).fill('').map(() => `<div class="h-12 skeleton-line"></div>`).join(''); 
             salesListLoader.innerHTML = tableSkeleton; 
@@ -1443,7 +1439,7 @@
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
                     card.innerHTML = `
-                        <button onclick="openProductEditorModal('${p.id}', true)" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
+                        <button onclick="openProductEditorModal('${p.id}', true, false)" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </button>
                         <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden">
@@ -1464,7 +1460,7 @@
                 productsEl.appendChild(section); 
             }); 
         }
-        // MODIFICACIÓN: Añadir isNuevo para manejar el prefijo de ID
+        // MODIFICACIÓN: Se unificó la lógica para evitar repetición
         function updateProductCardInDOM(product, isMainInventory, isNuevo = false) {
             let idSuffix = '';
             if (!isMainInventory) {
@@ -1560,7 +1556,7 @@
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
                     card.innerHTML = `
-                        <button onclick="openProductEditorModal('${p.id}', false)" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
+                        <button onclick="openProductEditorModal('${p.id}', false, false)" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </button>
                         <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden">
@@ -1596,15 +1592,15 @@
             }
         }
         
-        // --- INICIO: Lógica del Nuevo Inventario ---
+        // --- Lógica del Nuevo Inventario (CORREGIDO: Se incluyeron las nuevas funciones) ---
         async function fetchProductsNuevo() { 
             if (!supabase) return;
             const { data, error } = await supabase.from(PRODUCTS_NUEVO_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
             if (error) { console.error("Error cargando productos (Nuevo Inventario):", error); totalCountNuevo.textContent = "Error al cargar"; productsElNuevo.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
             allProductsNuevo = data; 
-            calculateCategoryTotals(allProductsNuevo, false, true); // <--- MODIFICACIÓN
+            calculateCategoryTotals(allProductsNuevo, false, true); 
             filterAndRenderProductsNuevo(); 
-            updateAutocompleteList(allProductsNuevo, document.getElementById('inventory-suggestions-nuevo'));
+            updateAutocompleteList(allProductsNuevo, inventorySuggestionsNuevo);
             if (labelsLocationSelect.value === 'nuevo') populateLabelCategories(allProductsNuevo);
         }
         function filterAndRenderProductsNuevo() { 
@@ -1642,4 +1638,5 @@
                 // Ajuste de columnas: 2 en móvil, 3 en sm, 4 en lg, 4 en xl (Tailwind)
                 grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
                 grouped[category].forEach(p => { 
-                    const card = document.createElement("div");
+                    const card = document.createElement("div"); 
+                    card.id = `product
