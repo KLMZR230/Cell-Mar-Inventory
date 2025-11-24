@@ -355,7 +355,7 @@
                 display: block; 
             }
             /* Inventario en 2 columnas en móvil */
-            #products .grid, #products-et .grid, #products-bodega .grid, #products-loader, #products-loader-et, #products-loader-bodega, #tools-list {
+            #products .grid, #products-bodega .grid, #products-loader, #products-loader-bodega, #tools-list {
                 grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             }
 
@@ -481,14 +481,11 @@
             </h1>
         </div>
         <div class="flex items-center space-x-4 relative">
-             <!-- Se eliminó el botón de Escanear QR de la cabecera -->
             <div id="view-buttons" class="flex items-center space-x-2 bg-black/20 p-1 rounded-lg border border-gray-700">
-                <button data-view="inventory" class="view-btn bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg text-sm shadow-md transition duration-300">📦 Inventario</button>
-                <button data-view="inventory_el_transito" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🚚 Inventario El Transito</button>
-                <button data-view="inventory_bodega" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🏠 Inventario Bodega</button>
+                <button data-view="inventory" class="view-btn bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg text-sm shadow-md transition duration-300">📦 Inventario Principal</button>
+                <button data-view="inventory_bodega" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🏠 Nuevo Inventario</button>
                 <button data-view="labels" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🖨️ Etiquetas QR</button>
                 <button data-view="sales" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">💰 Ventas</button>
-                <button data-view="sales_el_transito" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🚚 Ventas El Transito</button>
                 <button data-view="missing" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🔔 Faltantes</button>
                 <button data-view="tools" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🛠️ Herramientas</button>
             </div>
@@ -500,22 +497,20 @@
             <div id="mobile-menu-dropdown" class="rounded-md shadow-lg divide-y divide-gray-300 z-50 hidden">
                  <button id="mobile-scan-button" onclick="openScannerModal()" class="text-sm font-medium flex items-center space-x-2">
                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
                      </svg>
                      <span>Escanear QR (Venta)</span>
                  </button>
                 <button data-view="inventory" class="view-btn text-sm">📦 Inventario Principal</button>
-                <button data-view="inventory_el_transito" class="view-btn text-sm">🚚 Inventario El Transito</button>
-                <button data-view="inventory_bodega" class="view-btn text-sm">🏠 Inventario Bodega</button>
-                <button data-view="sales" class="view-btn text-sm">💰 Ventas Principal</button>
-                <button data-view="sales_el_transito" class="view-btn text-sm">🚚 Ventas El Transito</button>
+                <button data-view="inventory_bodega" class="view-btn text-sm">🏠 Nuevo Inventario</button>
+                <button data-view="sales" class="view-btn text-sm">💰 Ventas</button>
                 <button data-view="labels" class="view-btn text-sm">🖨️ Etiquetas QR</button>
                 <button data-view="missing" class="view-btn text-sm">🔔 Faltantes</button>
                 <button data-view="tools" class="view-btn text-sm">🛠️ Herramientas</button>
             </div>
              <button id="settings-button" onclick="toggleSettingsDropdown(event)" class="text-gray-300 hover:text-indigo-400 p-2 rounded-full bg-gray-700/50 transition duration-300 shadow-md" title="Configuración">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.313.823 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.823 3.313-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.313-.823-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.823 3.313 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.313.823 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.823 3.313-2.37-2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.313-.823-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.823 3.313 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
             </button>
@@ -541,7 +536,7 @@
         </div>
     </header>
     <div class="container mx-auto px-4 py-6">
-        <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario</p>
+        <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario Principal</p>
         <div id="labels-view" class="view-section hidden">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
                 <h2 class="text-xl font-semibold mb-4 text-indigo-300">🖨️ Generar e Imprimir Etiquetas QR Masivas</h2>
@@ -550,15 +545,14 @@
                         <label for="labels-location" class="block text-sm font-medium text-gray-300">Seleccionar Inventario</label>
                         <select id="labels-location" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
                             <option value="main">Inventario Principal</option>
-                            <option value="et">Inventario El Transito</option>
-                            <option value="bodega">Inventario Bodega</option>
+                            <option value="bodega">Nuevo Inventario</option>
                         </select>
                     </div>
                     <div>
                         <label for="labels-category" class="block text-sm font-medium text-gray-300">Filtrar por Categoría (Opcional)</label>
                         <select id="labels-category" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
                             <option value="all">Todas las Categorías</option>
-                             </select>
+                            </select>
                     </div>
                 </div>
                 <div class="mt-6 flex justify-between items-center">
@@ -578,9 +572,11 @@
                 <p class="p-4 text-gray-400">Selecciona el inventario y presiona "Generar e Imprimir Etiquetas" o "Descargar QRs".</p>
             </div>
         </div>
+        
+        <!-- INICIO: Inventario Principal (products) -->
         <div id="inventory-view" class="view-section hidden">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto</h2>
+                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (Inventario Principal)</h2>
                 <form id="product-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                     <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Flex de Botones" /></div>
                     <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
@@ -607,51 +603,18 @@
                 <p id="status" class="text-sm text-gray-400 mt-3"></p>
             </section>
             <section>
-                <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">📦 Inventario por Categoría</h2><span id="total-count" class="text-gray-400 text-sm"></span></div>
+                <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">📦 Inventario Principal por Categoría</h2><span id="total-count" class="text-gray-400 text-sm"></span></div>
                 <div class="mb-6 flex items-center space-x-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" id="search-input" placeholder="Buscar por nombre o categoría..." class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" /></div>
                 <div id="products-loader" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
                 <div id="products"></div>
             </section>
         </div>
-        <div id="inventory-el-transito-view" class="view-section hidden">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (El Transito)</h2>
-                <form id="product-form-et" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-                    <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name-et" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Flex de Botones" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select-et" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
-                        <option value="">Seleccionar</option>
-                        <option value="Pantallas">Pantallas</option>
-                        <option value="Jacks de Carga">Jacks de Carga</option>
-                        <option value="Flex Main">Flex Main</option>
-                        <option value="Placas de Carga">Placas de Carga</option>
-                        <option value="Botones Fisicos">Botones Fisicos</option>
-                        <option value="Botones Internos">Botones Internos</option>
-                        <option value="Tapaderas de Iphone">Tapaderas de Iphone</option>
-                        <option value="Bandejas SIM">Bandejas SIM</option>
-                        <option value="Flex de Iphone">Flex de Iphone</option>
-                        <option value="Tapaderas">Tapaderas</option>
-                        <option value="Accesorios">Accesorios</option>
-                        <option value="Otros">Otros</option>
-                    </select></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Caja N°</label><input id="box-number-et" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: A-01" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="price-et" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="12.50" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Cantidad</label><input id="quantity-et" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Imagen</label><input id="image-et" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" /></div>
-                    <div class="md:col-span-6 text-right"><button id="submit-et" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
-                </form>
-                <p id="status-et" class="text-sm text-gray-400 mt-3"></p>
-            </section>
-            <section>
-                <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">🚚 Inventario por Categoría (El Transito)</h2><span id="total-count-et" class="text-gray-400 text-sm"></span></div>
-                <div class="mb-6 flex items-center space-x-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" id="search-input-et" placeholder="Buscar por nombre o categoría..." class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" /></div>
-                <div id="products-loader-et" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
-                <div id="products-et"></div>
-            </section>
-        </div>
-        <!-- INICIO: Nuevo Inventario Bodega -->
+        <!-- FIN: Inventario Principal (products) -->
+
+        <!-- INICIO: Nuevo Inventario (products_nuevo) -->
         <div id="inventory-bodega-view" class="view-section hidden">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (Bodega)</h2>
+                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (Nuevo Inventario)</h2>
                 <form id="product-form-bodega" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                     <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name-bodega" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Batería iPhone 11" /></div>
                     <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select-bodega" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
@@ -678,22 +641,24 @@
                 <p id="status-bodega" class="text-sm text-gray-400 mt-3"></p>
             </section>
             <section>
-                <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">🏠 Inventario por Categoría (Bodega)</h2><span id="total-count-bodega" class="text-gray-400 text-sm"></span></div>
+                <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">🏠 Nuevo Inventario por Categoría</h2><span id="total-count-bodega" class="text-gray-400 text-sm"></span></div>
                 <div class="mb-6 flex items-center space-x-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" id="search-input-bodega" placeholder="Buscar por nombre o categoría..." class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" /></div>
                 <div id="products-loader-bodega" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
                 <div id="products-bodega"></div>
             </section>
         </div>
-        <!-- FIN: Nuevo Inventario Bodega -->
+        <!-- FIN: Nuevo Inventario (products_nuevo) -->
+        
+        <!-- INICIO: Ventas (sales) -->
         <div id="sales-view" class="view-section hidden">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-semibold text-indigo-300">✍️ Registrar Nueva Venta</h2>
                     <button id="sales-scan-button" onclick="openScannerModal()" class="hidden md:flex text-white py-2 px-4 rounded-lg bg-green-600 hover:bg-green-700 transition duration-300 shadow-md text-sm items-center space-x-1" title="Escanear Producto y Registrar Venta">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
-                         </svg>
-                         <span>Escanear QR</span>
+                        </svg>
+                        <span>Escanear QR</span>
                     </button>
                 </div>
                 <form id="sale-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
@@ -721,7 +686,7 @@
                         <label for="pending-only-checkbox" class="ml-2 block text-sm font-medium text-gray-200">🔔 Mostrar solo pendientes</label>
                     </div>
                     <button onclick="downloadSalesPDF(true)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow w-full md:w-auto mt-4 md:mt-0">
-                         Descargar PDF 📄
+                        Descargar PDF 📄
                     </button>
                 </div>
                 <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
@@ -746,66 +711,8 @@
                 <div id="sales-list-container"></div>
             </section>
         </div>
-        <div id="sales-el-transito-view" class="view-section hidden">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-semibold text-indigo-300">✍️ Registrar Nueva Venta (El Transito)</h2>
-                    <button id="sales-scan-button-et" onclick="openScannerModal()" class="hidden md:flex text-white py-2 px-4 rounded-lg bg-green-600 hover:bg-green-700 transition duration-300 shadow-md text-sm items-center space-x-1" title="Escanear Producto y Registrar Venta">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
-                         </svg>
-                         <span>Escanear QR</span>
-                    </button>
-                </div>
-                <form id="sale-el-transito-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-                    <div><label class="block text-sm font-medium text-gray-300">Nombre de Destinatario</label><input id="recipient-name-et" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Ana Gómez" /></div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300">Producto Vendido</label>
-                        <input id="product-name-sold-et" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Batería iPhone 11" list="inventory-suggestions-et" />
-                        <datalist id="inventory-suggestions-et"></datalist>
-                    </div>
-                    <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="sale-price-et" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="35.00" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Fecha de Venta</label><input id="sale-date-et" type="date" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Estado</label><select id="sale-status-input-et" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="Pendiente">Pendiente</option><option value="Pagado">Pagado</option><option value="Devuelto">Devuelto</option></select></div>
-                    <div class="text-right"><button id="sale-submit-et" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow w-full">Registrar Venta</button></div>
-                </form>
-                <p id="sale-status-et" class="text-sm text-gray-400 mt-3"></p>
-            </section>
-            <section>
-                <div class="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex flex-wrap items-center justify-between gap-4">
-                    <div class="flex-grow min-w-[250px]">
-                        <label for="search-sales-input-et" class="block text-sm font-medium text-gray-300 mb-1">🔍 Buscar por Nombre o Producto (El Transito)</label>
-                        <input type="text" id="search-sales-input-et" placeholder="Ej: Ana Gómez o Batería iPhone..." class="p-2 border rounded-md w-full focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" />
-                    </div>
-                    <div class="flex items-center pt-6">
-                        <input type="checkbox" id="pending-only-checkbox-et" class="h-4 w-4 text-indigo-600 border-gray-500 rounded bg-gray-600 focus:ring-indigo-500">
-                        <label for="pending-only-checkbox-et" class="ml-2 block text-sm font-medium text-gray-200">🔔 Mostrar solo pendientes</label>
-                    </div>
-                    <button onclick="downloadSalesPDF(false)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow w-full md:w-auto mt-4 md:mt-0">
-                         Descargar PDF 📄
-                    </button>
-                </div>
-                <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
-                    <h2 class="text-xl font-semibold text-indigo-300">📊 Historial de Ventas (El Transito)</h2>
-                    <div class="flex items-center space-x-4 text-sm bg-gray-900/50 p-2 rounded-lg">
-                        <span id="total-sales-count-et" class="text-gray-400 pr-2 border-r border-gray-600"></span>
-                        <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Total General Vendido:</span>
-                            <span id="total-sold-amount-et" class="font-bold text-green-400">$0.00</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Total General Pagado:</span>
-                            <span id="total-paid-amount-et" class="font-bold text-green-500">$0.00</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span id="paid-percentage-et" class="font-bold text-indigo-400">0%</span>
-                        </div>
-                    </div>
-                </div>
-                <div id="sales-list-loader-et" class="space-y-2"></div>
-                <div id="sales-list-container-et"></div>
-            </section>
-        </div>
+        <!-- FIN: Ventas (sales) -->
+        
         <div id="missing-view" class="view-section hidden">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 max-w-4xl mx-auto">
                 <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Registrar Producto Faltante</h2>
@@ -993,11 +900,10 @@
     <input type="file" id="tool-image-editor-input" class="hidden" accept="image/*" />
     <script>
         // =================================================================================
-        // == Configuración de Supabase y Edge Function para R2                      ==
+        // == Configuración de Supabase y Edge Function para R2                       ==
         // =================================================================================
         const createClient = window.supabase ? window.supabase.createClient : null;
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
-        // CORRECCIÓN CRÍTICA: Restauración de la clave ANON completa.
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
         let supabase = null;
         if (createClient) {
@@ -1009,10 +915,8 @@
         
         // --- INICIO: Definición de Constantes de Tablas y Estilos ---
         const PRODUCTS_TABLE = "products";
-        const PRODUCTS_EL_TRANSITO_TABLE = "products_el_transito";
-        const PRODUCTS_BODEGA_TABLE = "products_nuevo"; // CORREGIDO: Se cambió de "products_bodega" a "products_nuevo"
+        const PRODUCTS_BODEGA_TABLE = "products_nuevo"; // ACTUALIZADO: Nombre de la tabla de Bodega
         const SALES_TABLE = "sales";
-        const SALES_EL_TRANSITO_TABLE = "sales_el_transito"; 
         const MISSING_PRODUCTS_TABLE = "missing_products";
         const TOOLS_TABLE = "tools"; 
         const CONFIG_TABLE = "config"; 
@@ -1028,8 +932,8 @@
         // ============================================================================
 
         // --- Variables de Estado ---
-        // Se agrega allProductsBodega
-        let allProducts = [], allProductsElTransito = [], allProductsBodega = [], allSales = [], allSalesElTransito = [], allMissingProducts = [], allTools = [], selectedLogoFile = null;
+        // Se eliminan las variables de El Transito
+        let allProducts = [], allProductsBodega = [], allSales = [], allMissingProducts = [], allTools = [], selectedLogoFile = null;
         let editingToolId = null; 
         let currentEditingProduct = null;
         let isMainInventory = true;
@@ -1037,19 +941,14 @@
         
         // --- ADICIÓN: Variables para almacenar totales por categoría ---
         let categoryTotals = {};
-        let categoryTotalsET = {};
-        let categoryTotalsBodega = {}; // NUEVO
+        let categoryTotalsBodega = {}; 
         
         // --- ADICIÓN: Elementos para mostrar los totales ---
         const categoryTotalsEl = document.createElement("div"); 
         categoryTotalsEl.id = "category-totals";
         categoryTotalsEl.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
         
-        const categoryTotalsElET = document.createElement("div"); 
-        categoryTotalsElET.id = "category-totals-et";
-        categoryTotalsElET.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
-
-        const categoryTotalsElBodega = document.createElement("div"); // NUEVO
+        const categoryTotalsElBodega = document.createElement("div"); 
         categoryTotalsElBodega.id = "category-totals-bodega";
         categoryTotalsElBodega.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
 
@@ -1065,19 +964,12 @@
         // --- Elementos de Inventario Principal ---
         const form = document.getElementById("product-form"), nameIn = document.getElementById("name"), categoryIn = document.getElementById("category-select"), priceIn = document.getElementById("price"), qtyIn = document.getElementById("quantity"), imageIn = document.getElementById("image"), status = document.getElementById("status"), productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader"), boxNumberIn = document.getElementById("box-number");
 
-        // --- Elementos de Inventario El Transito ---
-        const formET = document.getElementById("product-form-et"), nameInET = document.getElementById("name-et"), categoryInET = document.getElementById("category-select-et"), priceInET = document.getElementById("price-et"), qtyInET = document.getElementById("quantity-et"), imageInET = document.getElementById("image-et"), statusET = document.getElementById("status-et"), productsElET = document.getElementById("products-et"), totalCountET = document.getElementById("total-count-et"), searchInputET = document.getElementById("search-input-et"), productsLoaderET = document.getElementById("products-loader-et"), boxNumberInET = document.getElementById("box-number-et");
-
-        // --- Elementos de Inventario Bodega (NUEVO) ---
+        // --- Elementos de Nuevo Inventario (Bodega) ---
         const formBodega = document.getElementById("product-form-bodega"), nameInBodega = document.getElementById("name-bodega"), categoryInBodega = document.getElementById("category-select-bodega"), priceInBodega = document.getElementById("price-bodega"), qtyInBodega = document.getElementById("quantity-bodega"), imageInBodega = document.getElementById("image-bodega"), statusBodega = document.getElementById("status-bodega"), productsElBodega = document.getElementById("products-bodega"), totalCountBodega = document.getElementById("total-count-bodega"), searchInputBodega = document.getElementById("search-input-bodega"), productsLoaderBodega = document.getElementById("products-loader-bodega"), boxNumberInBodega = document.getElementById("box-number-bodega");
         
-        // --- Elementos de Ventas Principal ---
+        // --- Elementos de Ventas ---
         const salesForm = document.getElementById("sale-form"), recipientNameIn = document.getElementById("recipient-name"), productNameSoldIn = document.getElementById("product-name-sold"), salePriceIn = document.getElementById("sale-price"), saleDateIn = document.getElementById("sale-date"), saleStatusInput = document.getElementById("sale-status-input"), salesListContainer = document.getElementById("sales-list-container"), saleStatus = document.getElementById("sale-status"), totalSalesCount = document.getElementById("total-sales-count"), salesListLoader = document.getElementById("sales-list-loader"), searchSalesInput = document.getElementById("search-sales-input"), pendingOnlyCheckbox = document.getElementById("pending-only-checkbox");
         const inventorySuggestions = document.getElementById('inventory-suggestions');
-
-        // --- Elementos de Ventas El Transito ---
-        const salesFormET = document.getElementById("sale-el-transito-form"), recipientNameInET = document.getElementById("recipient-name-et"), productNameSoldInET = document.getElementById("product-name-sold-et"), salePriceInET = document.getElementById("sale-price-et"), saleDateInET = document.getElementById("sale-date-et"), saleStatusInputET = document.getElementById("sale-status-input-et"), salesListContainerET = document.getElementById("sales-list-container-et"), saleStatusET = document.getElementById("sale-status-et"), totalSalesCountET = document.getElementById("total-sales-count-et"), salesListLoaderET = document.getElementById("sales-list-loader-et"), searchSalesInputET = document.getElementById("search-sales-input-et"), pendingOnlyCheckboxET = document.getElementById("pending-only-checkbox-et");
-        const inventorySuggestionsET = document.getElementById('inventory-suggestions-et');
 
         // --- Elementos de Etiquetas QR (Labels) ---
         const labelsLocationSelect = document.getElementById('labels-location');
@@ -1122,7 +1014,7 @@
 
 
         // ============================================================================
-        // == III. LÓGICA DE TEMAS Y DROPDOWN (CORREGIDO EL CIERRE DEL MENÚ)         ==
+        // == III. LÓGICA DE TEMAS Y DROPDOWN                                      ==
         // ============================================================================
 
         function applyTheme(theme) {
@@ -1155,8 +1047,7 @@
             settingsDropdown.classList.add('hidden');
         };
         
-        // CORRECCIÓN: Nueva lógica de cierre para ambos menús (Configuración y Móvil)
-        // Se adjunta al body y solo cierra si el clic es externo al menú o su botón.
+        // Cierre para ambos menús
         document.body.addEventListener('click', (event) => {
             // 1. Cierra el menú de Configuración
             if (settingsDropdown && !settingsDropdown.classList.contains('hidden')) {
@@ -1211,11 +1102,20 @@
 
         function updateAutocompleteList(productsArray, datalistElement) {
             datalistElement.innerHTML = '';
-            const sortedProducts = [...productsArray].sort((a, b) => a.name.localeCompare(b.name));
+            // Combinar todos los productos disponibles (Principal y Nuevo Inventario) en la lista de sugerencias de venta
+            const combinedProducts = [...allProducts, ...allProductsBodega];
+            const sortedProducts = [...combinedProducts].sort((a, b) => a.name.localeCompare(b.name));
+            
+            // Se usa un Map para manejar duplicados por nombre (aunque deberían tener ID distinto)
+            const uniqueNames = new Set();
             sortedProducts.filter(p => p.quantity > 0).forEach(product => {
-                const option = document.createElement('option');
-                option.value = product.name + (product.category ? ` (${product.category})` : '');
-                datalistElement.appendChild(option);
+                const nameWithCategory = product.name + (product.category ? ` (${product.category})` : '');
+                if (!uniqueNames.has(nameWithCategory)) {
+                    const option = document.createElement('option');
+                    option.value = nameWithCategory;
+                    datalistElement.appendChild(option);
+                    uniqueNames.add(nameWithCategory);
+                }
             });
         }
 
@@ -1226,11 +1126,8 @@
             if (productToUpdate) {
                 const currentQty = parseInt(productToUpdate.quantity) || 0;
                 const newQty = Math.max(0, currentQty + delta);
-                // Determinar si es Principal
+                
                 const isMain = (table === PRODUCTS_TABLE); 
-                // Determinar si es El Transito
-                const isET = (table === PRODUCTS_EL_TRANSITO_TABLE);
-                // Determinar si es Bodega
                 const isBodega = (table === PRODUCTS_BODEGA_TABLE);
 
                 if (delta < 0 && currentQty <= 0) {
@@ -1240,17 +1137,15 @@
                 
                 // Optimistic Update (Local)
                 productToUpdate.quantity = newQty;
-                updateProductCardInDOM(productToUpdate, isMain, isET, isBodega); 
+                updateProductCardInDOM(productToUpdate, isMain, false, isBodega); 
 
-                let datalistEl = isMain ? inventorySuggestions : inventorySuggestionsET;
-                updateAutocompleteList(localArray, datalistEl);
+                updateAutocompleteList(localArray, inventorySuggestions);
                 
                 // ADICIÓN: Recalcular totales después de la actualización local optimista
-                calculateCategoryTotals(localArray, isMain, isET, isBodega);
+                calculateCategoryTotals(localArray, isMain, false, isBodega);
 
-                if(isMain) renderProducts(localArray.filter(p => true)); 
-                else if(isET) renderProductsET(localArray.filter(p => true));
-                else renderProductsBodega(localArray.filter(p => true)); // NUEVO
+                if(isMain) renderProducts(allProducts.filter(p => true)); 
+                else renderProductsBodega(allProductsBodega.filter(p => true)); 
                 
                 if (!supabase) return console.error("❌ Error: Supabase no está cargado para actualizar stock.");
 
@@ -1264,12 +1159,11 @@
                     console.error("❌ Error al actualizar stock:", updateError.message);
                     // Rollback optimistic update on failure
                     productToUpdate.quantity = currentQty;
-                    updateProductCardInDOM(productToUpdate, isMain, isET, isBodega);
-                    updateAutocompleteList(localArray, datalistEl);
-                    calculateCategoryTotals(localArray, isMain, isET, isBodega);
-                    if(isMain) renderProducts(localArray.filter(p => true)); 
-                    else if(isET) renderProductsET(localArray.filter(p => true));
-                    else renderProductsBodega(localArray.filter(p => true));
+                    updateProductCardInDOM(productToUpdate, isMain, false, isBodega);
+                    updateAutocompleteList(localArray, inventorySuggestions);
+                    calculateCategoryTotals(localArray, isMain, false, isBodega);
+                    if(isMain) renderProducts(allProducts.filter(p => true)); 
+                    else renderProductsBodega(allProductsBodega.filter(p => true));
 
                     alert(`❌ Error al actualizar stock de ${productName}. El stock local ha sido revertido.`);
                 } else {
@@ -1315,11 +1209,10 @@
             }, {});
             if (isMain) {
                 categoryTotals = totals;
-            } else if (isET) {
-                categoryTotalsET = totals;
-            } else if (isBodega) { // NUEVO
+            } else if (isBodega) { 
                 categoryTotalsBodega = totals;
             }
+            // isET es falso y se ignora
             return totals;
         }
 
@@ -1327,11 +1220,9 @@
         // --- Funciones de Vistas ---
         const views = { 
             inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario Principal' }, 
-            inventory_el_transito: { el: document.getElementById('inventory-el-transito-view'), title: 'Vista: Inventario El Transito' },
-            inventory_bodega: { el: document.getElementById('inventory-bodega-view'), title: 'Vista: Inventario Bodega' }, // NUEVO
+            inventory_bodega: { el: document.getElementById('inventory-bodega-view'), title: 'Vista: Nuevo Inventario' }, 
             labels: { el: document.getElementById('labels-view'), title: 'Vista: Generación de Etiquetas QR' },
             sales: { el: document.getElementById('sales-view'), title: 'Vista: Ventas Registradas' },
-            sales_el_transito: { el: document.getElementById('sales-el-transito-view'), title: 'Vista: Ventas El Transito' },
             missing: { el: document.getElementById('missing-view'), title: 'Vista: Productos Faltantes' },
             tools: { el: document.getElementById('tools-view'), title: 'Vista: Herramientas y Tutoriales' } 
         };
@@ -1352,9 +1243,9 @@
                 // Botones de menú móvil (Dropdown)
                  const mobileBtn = document.querySelector(`#mobile-menu-dropdown .view-btn[data-view="${key}"]`);
                  if (mobileBtn) {
-                    mobileBtn.classList.toggle('bg-indigo-500', isCurrent); 
-                    mobileBtn.classList.toggle('font-bold', isCurrent);
-                 }
+                     mobileBtn.classList.toggle('bg-indigo-500', isCurrent); 
+                     mobileBtn.classList.toggle('font-bold', isCurrent);
+                   }
             }); 
             currentViewTitle.textContent = views[viewName].title; 
             
@@ -1368,19 +1259,17 @@
             }
             
             // Desplazar la vista al inicio
-            if (viewName === 'sales' || viewName === 'sales_el_transito' || viewName === 'inventory' || viewName === 'inventory_el_transito' || viewName === 'inventory_bodega') {
+            if (viewName === 'sales' || viewName === 'inventory' || viewName === 'inventory_bodega') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
         function showSkeletonLoaders() { 
             const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div><div class="h-4 w-1/2 skeleton-line"></div><div class="h-8 w-1/4 skeleton-line"></div></div>`).join('');
             productsLoader.innerHTML = cardSkeleton;
-            productsLoaderET.innerHTML = cardSkeleton;
-            productsLoaderBodega.innerHTML = cardSkeleton; // NUEVO
+            productsLoaderBodega.innerHTML = cardSkeleton; 
             toolsLoader.innerHTML = cardSkeleton;
             const tableSkeleton = Array(3).fill('').map(() => `<div class="h-12 skeleton-line"></div>`).join(''); 
             salesListLoader.innerHTML = tableSkeleton; 
-            salesListLoaderET.innerHTML = tableSkeleton;
             missingListLoader.innerHTML = tableSkeleton; 
         }
 
@@ -1457,8 +1346,8 @@
         }
         function updateProductCardInDOM(product, isMain, isET, isBodega) {
             let idSuffix = '';
-            if (isET) idSuffix = '-et';
-            if (isBodega) idSuffix = '-bodega'; // NUEVO
+            // Se asume isET siempre falso
+            if (isBodega) idSuffix = '-bodega'; 
             
             const elementPrefix = 'product-';
             const stockEl = document.getElementById(`${elementPrefix}stock${idSuffix}-${product.id}`);
@@ -1492,116 +1381,27 @@
                 alert("❌ Error al eliminar: " + error.message);
             } else {
                 allProducts = allProducts.filter(p => p.id !== id);
-                calculateCategoryTotals(allProducts, true, false, false); // <--- ADICIÓN
+                calculateCategoryTotals(allProducts, true, false, false); 
                 filterAndRenderProducts(); 
                 updateAutocompleteList(allProducts, inventorySuggestions);
                 updateLabelView();
             }
         }
 
-        // --- Lógica de Inventario El Transito ---
-        async function fetchProductsET() { 
-            if (!supabase) return;
-            const { data, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
-            if (error) { console.error("Error cargando productos (El Transito):", error); totalCountET.textContent = "Error al cargar"; productsElET.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
-            allProductsElTransito = data; 
-            calculateCategoryTotals(allProductsElTransito, false, true, false); // <--- MODIFICACIÓN
-            filterAndRenderProductsET(); 
-            updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
-            if (labelsLocationSelect.value === 'et') populateLabelCategories(allProductsElTransito);
-        }
-        function filterAndRenderProductsET() { 
-            const term = (searchInputET.value || "").toLowerCase().trim(); 
-            const filtered = allProductsElTransito.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); 
-            renderProductsET(filtered); 
-        }
-        function renderProductsET(items) { 
-            productsLoaderET.innerHTML = ""; 
-            productsElET.innerHTML = ""; 
-            totalCountET.textContent = `${items.length} productos`; 
-            
-            // --- ADICIÓN: Renderizar Totales de Categoría (El Transito) ---
-            categoryTotalsElET.innerHTML = `
-                <span class="font-bold text-indigo-300">Total por Categoría (ET):</span>
-                ${Object.keys(categoryTotalsET).sort().map(cat => 
-                    `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotalsET[cat]}</span> u.</span>`
-                ).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
-            `;
-            productsElET.appendChild(categoryTotalsElET);
-            // --- FIN ADICIÓN ---
-
-            if (items.length === 0) { productsElET.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos${searchInputET.value ? ' para "' + searchInputET.value + '"' : ''}.</p>`; return; } 
-            const grouped = items.reduce((acc, p) => { 
-                const cat = p.category || 'Sin Categoría'; 
-                if (!acc[cat]) acc[cat] = []; 
-                acc[cat].push(p); 
-                return acc; 
-            }, {}); 
-            Object.keys(grouped).sort().forEach(category => { 
-                const section = document.createElement("div"); 
-                section.className = "mb-10"; 
-                section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; 
-                const grid = document.createElement("div"); 
-                // Ajuste de columnas: 2 en móvil, 3 en sm, 4 en lg, 4 en xl (Tailwind)
-                grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
-                grouped[category].forEach(p => { 
-                    const card = document.createElement("div"); 
-                    card.id = `product-card-et-${p.id}`;
-                    card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
-                    const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
-                    card.innerHTML = `
-                        <button onclick="openProductEditorModal('${p.id}', 'et')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                        </button>
-                        <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden">
-                            <img src="${imageUrl}" id="product-img-et-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}">
-                        </div>
-                        <h3 id="product-name-et-${p.id}" class="font-semibold text-white">${p.name}</h3>
-                        <p id="product-category-et-${p.id}" class="text-xs text-gray-400 -mt-1">${p.category || 'Otros'}</p>
-                        <p id="product-price-et-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
-                        <p id="product-stock-et-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
-                        <p id="product-box-number-et-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
-                        <div class="flex-grow"></div>
-                        <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
-                            <button onclick="deleteProductET('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
-                        </div>`; 
-                    grid.appendChild(card); 
-                }); 
-                section.appendChild(grid); 
-                productsElET.appendChild(section); 
-            }); 
-        }
-        window.deleteProductET = async function(id) { 
-            if (!confirm("¿Eliminar este producto de Inventario El Transito?")) return; 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const { error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).delete().eq("id", id); 
-            if (error) {
-                alert("❌ Error al eliminar: " + error.message);
-            } else {
-                allProductsElTransito = allProductsElTransito.filter(p => p.id !== id);
-                calculateCategoryTotals(allProductsElTransito, false, true, false); // <--- ADICIÓN
-                filterAndRenderProductsET(); 
-                updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
-                updateLabelView();
-            }
-        }
-        
-        // --- Lógica de Inventario Bodega (NUEVO) ---
+        // --- Lógica de Nuevo Inventario (products_nuevo) ---
         async function fetchProductsBodega() { 
             if (!supabase) return;
-            // Se elimina la ordenación por "category"
             const { data, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).select("*").order("created_at", { ascending: false }); 
-            if (error) { console.error("Error cargando productos (Bodega):", error); totalCountBodega.textContent = "Error al cargar"; productsElBodega.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
+            if (error) { console.error("Error cargando productos (Nuevo Inventario):", error); totalCountBodega.textContent = "Error al cargar"; productsElBodega.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
             allProductsBodega = data; 
             calculateCategoryTotals(allProductsBodega, false, false, true); 
             filterAndRenderProductsBodega(); 
             if (labelsLocationSelect.value === 'bodega') populateLabelCategories(allProductsBodega);
+            // Actualizar la lista de sugerencias de venta para incluir los productos de Bodega
+            updateAutocompleteList(allProducts, inventorySuggestions);
         }
         function filterAndRenderProductsBodega() { 
             const term = (searchInputBodega.value || "").toLowerCase().trim(); 
-            // Se asume que no todas las columnas de un producto existen en esta tabla (como 'category').
-            // Por lo tanto, el renderizado debe ser más flexible, pero para la interfaz se agrupará como 'Otros'
-            // si la columna 'category' realmente falta en la BD.
             const filtered = allProductsBodega.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); 
             renderProductsBodega(filtered); 
         }
@@ -1612,7 +1412,7 @@
             
             // --- Renderizar Totales de Categoría (Bodega) ---
             categoryTotalsElBodega.innerHTML = `
-                <span class="font-bold text-indigo-300">Total por Categoría (Bodega):</span>
+                <span class="font-bold text-indigo-300">Total por Categoría (Nuevo Inventario):</span>
                 ${Object.keys(categoryTotalsBodega).sort().map(cat => 
                     `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotalsBodega[cat]}</span> u.</span>`
                 ).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
@@ -1639,8 +1439,7 @@
                     card.id = `product-card-bodega-${p.id}`;
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
-                    // Se usa un fallback 'N/A' si la columna no existe en la BD
-                    const displayCategory = p.category || 'N/A (Columna faltante)'; 
+                    const displayCategory = p.category || 'N/A'; 
                     const displayPrice = p.price ? `$${Number(p.price).toFixed(2)}` : '$N/A';
                     const displayQuantity = p.quantity !== undefined ? p.quantity : 'N/A';
                     
@@ -1667,7 +1466,7 @@
             }); 
         }
         window.deleteProductBodega = async function(id) { 
-            if (!confirm("¿Eliminar este producto de Inventario Bodega?")) return; 
+            if (!confirm("¿Eliminar este producto de Nuevo Inventario?")) return; 
             if (!supabase) return alert("❌ Error: Supabase no está cargado.");
             const { error } = await supabase.from(PRODUCTS_BODEGA_TABLE).delete().eq("id", id); 
             if (error) {
@@ -1676,10 +1475,11 @@
                 allProductsBodega = allProductsBodega.filter(p => p.id !== id);
                 calculateCategoryTotals(allProductsBodega, false, false, true); 
                 filterAndRenderProductsBodega(); 
+                updateAutocompleteList(allProducts, inventorySuggestions);
                 updateLabelView();
             }
         }
-        // --- FIN: Lógica de Inventario Bodega ---
+        // --- FIN: Lógica de Nuevo Inventario ---
 
 
         // --- Lógica de Ventas ---
@@ -1698,58 +1498,43 @@
             }
             renderSales(filtered);
         }
-        function filterAndRenderSalesET() {
-            const term = (searchSalesInputET.value || "").toLowerCase().trim();
-            const pendingOnly = pendingOnlyCheckboxET.checked;
-            let filtered = [...allSalesElTransito]; 
-            if (term) {
-                filtered = filtered.filter(s => 
-                    (s.recipient_name || '').toLowerCase().includes(term) ||
-                    (s.product_name_sold || '').toLowerCase().includes(term)
-                );
-            }
-            if (pendingOnly) {
-                filtered = filtered.filter(s => s.status === 'Pendiente');
-            }
-            renderSalesElTransito(filtered);
-        }
-        function updateGeneralTotals(filteredArray, isMainSales) {
-            const idSuffix = isMainSales ? '' : '-et'; 
-            const totalSoldEl = document.getElementById(`total-sold-amount${idSuffix}`);
-            const totalPaidEl = document.getElementById(`total-paid-amount${idSuffix}`);
-            const percentageEl = document.getElementById(`paid-percentage${idSuffix}`);
-            const countEl = document.getElementById(`total-sales-count${idSuffix}`);
-            const fullArray = isMainSales ? allSales : allSalesElTransito;
-            const totalSold = fullArray.reduce((sum, s) => sum + Number(s.price), 0);
-            const totalPaid = fullArray.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
+        
+        function updateGeneralTotals(filteredArray) {
+            // Se elimina la lógica de isMainSales ya que solo existe una tabla de ventas.
+            const totalSoldEl = document.getElementById(`total-sold-amount`);
+            const totalPaidEl = document.getElementById(`total-paid-amount`);
+            const percentageEl = document.getElementById(`paid-percentage`);
+            const countEl = document.getElementById(`total-sales-count`);
+            
+            const totalSold = allSales.reduce((sum, s) => sum + Number(s.price), 0);
+            const totalPaid = allSales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
             const percentagePaid = totalSold > 0 ? (totalPaid / totalSold) * 100 : 0;
             if(totalSoldEl) totalSoldEl.textContent = `$${totalSold.toFixed(2)}`;
             if(totalPaidEl) totalPaidEl.textContent = `$${totalPaid.toFixed(2)}`;
             if(percentageEl) percentageEl.textContent = `${percentagePaid.toFixed(1)}%`;
-            const baseArray = isMainSales ? allSales : allSalesElTransito;
-            if(countEl) countEl.textContent = `${filteredArray.length} de ${baseArray.length} ventas`;
+            if(countEl) countEl.textContent = `${filteredArray.length} de ${allSales.length} ventas`;
         }
-        function createSaleRowHTML(sale, isMainSales) {
-            const idSuffix = isMainSales ? '' : '-et'; 
+        function createSaleRowHTML(sale) {
+            // Se elimina idSuffix ya que solo hay una tabla de ventas
             const currentStatus = sale.status || 'Pendiente';
             const statusClass = STATUS_COLORS[currentStatus] || STATUS_COLORS['Pendiente'];
-            const changeFn = isMainSales ? 'changeSaleStatus' : 'changeSaleStatusET';
-            const editFn = isMainSales ? 'editSalePrice' : 'editSalePriceET';
-            const deleteFn = isMainSales ? 'deleteSale' : 'deleteSaleET';
-            const statusSelectHtml = `<select id="select-status${idSuffix}-${sale.id}" onchange="${changeFn}('${sale.id}', this.value, '${sale.product_name_sold}', ${isMainSales})" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option><option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option><option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option></select>`;
+            const changeFn = 'changeSaleStatus';
+            const editFn = 'editSalePrice';
+            const deleteFn = 'deleteSale';
+            const statusSelectHtml = `<select id="select-status-${sale.id}" onchange="${changeFn}('${sale.id}', this.value, '${sale.product_name_sold}')" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option><option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option><option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option></select>`;
             return `
-                <tr id="sale-row${idSuffix}-${sale.id}" class="hover:bg-gray-700/50 transition duration-150">
+                <tr id="sale-row-${sale.id}" class="hover:bg-gray-700/50 transition duration-150">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Destinatario">${sale.recipient_name}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Producto Vendido">${sale.product_name_sold || 'N/A'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500" id="sale-price-cell${idSuffix}-${sale.id}" data-label="Precio (USD)">$${Number(sale.price).toFixed(2)} <button onclick="${editFn}('${sale.id}', ${sale.price}, ${isMainSales})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500" id="sale-price-cell-${sale.id}" data-label="Precio (USD)">$${Number(sale.price).toFixed(2)} <button onclick="${editFn}('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button></td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm" data-label="Estado">${statusSelectHtml}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="${deleteFn}('${sale.id}', ${isMainSales})" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="${deleteFn}('${sale.id}')" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td>
                 </tr>`;
         }
         function renderSales(items) {
             salesListLoader.innerHTML = "";
             salesListContainer.innerHTML = ""; 
-            updateGeneralTotals(items, true); 
+            updateGeneralTotals(items); 
             if (items.length === 0) {
                 const isSearching = searchSalesInput.value || pendingOnlyCheckbox.checked;
                 salesListContainer.innerHTML = `<p class="p-4 text-gray-400">${isSearching ? 'No se encontraron ventas que coincidan con el filtro.' : 'No hay ventas registradas.'}</p>`;
@@ -1776,10 +1561,10 @@
                             <span class="text-gray-400">Pagado (día): <span class="text-green-500" id="daily-paid-${date}">$${dailyTotalPaid.toFixed(2)}</span></span>
                         </div>
                     </div>`;
-                const rowsHTML = dailySales.map(sale => createSaleRowHTML(sale, true)).join('');
+                const rowsHTML = dailySales.map(sale => createSaleRowHTML(sale)).join('');
                 const tableHTML = `
                     <table class="min-w-full divide-y divide-gray-700 shadow-md sales-list-table">
-                        <thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead>
+                        <thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6" data-label="Destinatario">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Producto Vendido">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Precio">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Estado">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead>
                         <tbody id="sales-tbody-${date}" class="bg-gray-800 divide-y divide-gray-700">
                             ${rowsHTML}
                         </tbody>
@@ -1788,51 +1573,10 @@
             });
             salesListContainer.innerHTML = fullHTML;
         }
-        function renderSalesElTransito(items) {
-            salesListLoaderET.innerHTML = "";
-            salesListContainerET.innerHTML = ""; 
-            updateGeneralTotals(items, false); 
-            if (items.length === 0) {
-                const isSearching = searchSalesInputET.value || pendingOnlyCheckboxET.checked;
-                salesListContainerET.innerHTML = `<p class="p-4 text-gray-400">${isSearching ? 'No se encontraron ventas que coincidan con el filtro.' : 'No hay ventas registradas en El Transito.'}</p>`;
-                return;
-            } 
-            const groupedByDate = items.reduce((acc, sale) => {
-                const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
-                if (!acc[saleDate]) acc[saleDate] = [];
-                acc[saleDate].push(sale);
-                return acc;
-            }, {});
-            const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
-            let fullHTML = '';
-            sortedDates.forEach(date => {
-                const dailySales = groupedByDate[date];
-                const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
-                const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
-                const displayDate = new Date(date + 'T00:00:00Z').toLocaleDateString('es-SV', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
-                const headerHTML = `
-                    <div class="bg-gray-900/70 p-3 rounded-t-lg mt-6 flex justify-between items-center border-t border-x border-gray-700">
-                        <h3 class="font-bold text-lg text-white">${displayDate}</h3>
-                        <div class="text-sm font-semibold">
-                            <span class="mr-4 text-gray-400">Vendido (día): <span class="text-green-400" id="daily-sold-et-${date}">$${dailyTotalSold.toFixed(2)}</span></span>
-                            <span class="text-gray-400">Pagado (día): <span class="text-green-500" id="daily-paid-et-${date}">$${dailyTotalPaid.toFixed(2)}</span></span>
-                        </div>
-                    </div>`;
-                const rowsHTML = dailySales.map(sale => createSaleRowHTML(sale, false)).join('');
-                const tableHTML = `
-                    <table class="min-w-full divide-y divide-gray-700 shadow-md sales-list-table">
-                        <thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead>
-                        <tbody id="sales-tbody-et-${date}" class="bg-gray-800 divide-y divide-gray-700">
-                            ${rowsHTML}
-                        </tbody>
-                    </table>`;
-                fullHTML += `<div id="date-block-et-${date}">${headerHTML}${tableHTML}</div>`;
-            });
-            salesListContainerET.innerHTML = fullHTML;
-        }
-        window.changeSaleStatus = async function(id, newStatus, productName, isMainSales) {
-            const table = isMainSales ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
-            const localArray = isMainSales ? allSales : allSalesElTransito;
+        
+        window.changeSaleStatus = async function(id, newStatus, productName) {
+            const table = SALES_TABLE;
+            const localArray = allSales;
             const sale = localArray.find(s => s.id === id);
             if (!sale || !supabase) return alert("❌ Error: Supabase no está cargado.");
 
@@ -1840,7 +1584,7 @@
             sale.status = newStatus; // Optimistic update (for status select color)
 
             // Update status select color immediately
-            const selectEl = document.getElementById(`select-status${isMainSales ? '' : '-et'}-${id}`);
+            const selectEl = document.getElementById(`select-status-${id}`);
             if (selectEl) {
                 selectEl.className = `p-1 border rounded text-xs font-medium ${STATUS_COLORS[newStatus] || STATUS_COLORS['Pendiente']} cursor-pointer`;
             }
@@ -1850,23 +1594,30 @@
                 if (error) throw error;
 
                 // Handle stock update: Adjust stock ONLY if status changes from/to 'Pagado'
-                // Esta lógica no puede saber en qué tabla descontar el stock si el producto fue vendido desde el Principal
-                // y su stock estaba en Bodega. Mantenemos el descuento en la tabla principal por simplicidad,
-                // ya que el stock vendido se rastrea en el inventario desde donde se registró la venta.
-                const stockTable = isMainSales ? PRODUCTS_TABLE : PRODUCTS_EL_TRANSITO_TABLE;
-                const stockLocalArray = isMainSales ? allProducts : allProductsElTransito;
                 const cleanName = getCleanProductName(productName);
                 
-                // NOTA: Para el Inventario Bodega, este es un registro de venta separado y,
-                // por lo tanto, no se está rastreando la venta desde Bodega, solo la existencia.
-                // Si la venta se hizo desde Principal, se descuenta de Principal.
+                let updateTable = null;
+                let updateArray = null;
 
-                if (oldStatus !== 'Pagado' && newStatus === 'Pagado') {
-                    // Went from Pending/Returned to Paid: Decrease stock
-                    await updateProductStock(cleanName, stockTable, stockLocalArray, -1);
-                } else if (oldStatus === 'Pagado' && newStatus !== 'Pagado') {
-                    // Went from Paid to Pending/Returned: Increase stock
-                    await updateProductStock(cleanName, stockTable, stockLocalArray, 1);
+                // Buscar en ambos inventarios para descontar
+                if (allProducts.some(p => getCleanProductName(p.name).trim() === cleanName)) {
+                    updateTable = PRODUCTS_TABLE;
+                    updateArray = allProducts;
+                } else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === cleanName)) {
+                    updateTable = PRODUCTS_BODEGA_TABLE;
+                    updateArray = allProductsBodega;
+                }
+                
+                if (updateTable && updateArray) {
+                    if (oldStatus !== 'Pagado' && newStatus === 'Pagado') {
+                        // Went from Pending/Returned to Paid: Decrease stock
+                        await updateProductStock(cleanName, updateTable, updateArray, -1);
+                    } else if (oldStatus === 'Pagado' && newStatus !== 'Pagado') {
+                        // Went from Paid to Pending/Returned: Increase stock
+                        await updateProductStock(cleanName, updateTable, updateArray, 1);
+                    }
+                } else {
+                    console.warn(`Producto vendido "${cleanName}" no encontrado en ningún inventario para ajuste de stock.`);
                 }
 
             } catch (error) {
@@ -1880,15 +1631,12 @@
                     selectEl.className = `p-1 border rounded text-xs font-medium ${STATUS_COLORS[oldStatus] || STATUS_COLORS['Pendiente']} cursor-pointer`;
                 }
             } finally {
-                // Force a full sales list refresh to update totals (Realtime should handle this, but for robustness)
-                isMainSales ? filterAndRenderSales() : filterAndRenderSalesET();
+                // Force a full sales list refresh to update totals
+                filterAndRenderSales();
             }
         }
-        window.changeSaleStatusET = function(id, newStatus, productName) {
-            return changeSaleStatus(id, newStatus, productName, false);
-        }
-        window.editSalePrice = function(id, currentPrice, isMainSales) {
-            const idSuffix = isMainSales ? '' : '-et';
+        
+        window.editSalePrice = function(id, currentPrice) {
             const newPriceStr = prompt(`Ingresa el nuevo precio para la venta ${id}:`, currentPrice.toFixed(2));
             if (newPriceStr === null) return; 
 
@@ -1898,17 +1646,17 @@
                 return;
             }
 
-            const table = isMainSales ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
-            const localArray = isMainSales ? allSales : allSalesElTransito;
+            const table = SALES_TABLE;
+            const localArray = allSales;
             const sale = localArray.find(s => s.id === id);
             if (!sale || !supabase) return alert("❌ Error: Supabase no está cargado.");
 
             const oldPrice = sale.price;
             sale.price = newPrice; // Optimistic update
 
-            const priceCell = document.getElementById(`sale-price-cell${idSuffix}-${id}`);
+            const priceCell = document.getElementById(`sale-price-cell-${id}`);
             if (priceCell) {
-                priceCell.innerHTML = `$${newPrice.toFixed(2)} <button onclick="editSalePrice('${id}', ${newPrice}, ${isMainSales})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button>`;
+                priceCell.innerHTML = `$${newPrice.toFixed(2)} <button onclick="editSalePrice('${id}', ${newPrice})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button>`;
             }
 
             supabase.from(table).update({ price: newPrice }).eq("id", id).then(({ error }) => {
@@ -1917,46 +1665,41 @@
                     alert("❌ Error al actualizar precio: " + error.message);
                     sale.price = oldPrice; // Rollback
                     if (priceCell) {
-                         priceCell.innerHTML = `$${oldPrice.toFixed(2)} <button onclick="editSalePrice('${id}', ${oldPrice}, ${isMainSales})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button>`;
+                         priceCell.innerHTML = `$${oldPrice.toFixed(2)} <button onclick="editSalePrice('${id}', ${oldPrice})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button>`;
                     }
                 } else {
-                    isMainSales ? filterAndRenderSales() : filterAndRenderSalesET(); // Refresh totals
+                    filterAndRenderSales(); // Refresh totals
                 }
             });
         }
-        window.editSalePriceET = function(id, currentPrice) {
-            return editSalePrice(id, currentPrice, false);
-        }
-        window.deleteSale = async function(id, isMainSales) {
+        
+        window.deleteSale = async function(id) {
             if (!confirm("¿Eliminar este registro de venta?")) return;
             if (!supabase) return alert("❌ Error: Supabase no está cargado.");
             
-            const table = isMainSales ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
-            const localArray = isMainSales ? allSales : allSalesElTransito;
+            const table = SALES_TABLE;
+            const localArray = allSales;
             const sale = localArray.find(s => s.id === id);
 
             if (!sale) return;
 
             // Rollback stock if status was 'Pagado'
             if (sale.status === 'Pagado') {
-                // Lógica de búsqueda de producto para descontar stock.
                 let updateTable = null, updateArray = null;
                 const soldProductName = getCleanProductName(sale.product_name_sold);
                 
+                // Buscar en ambos arrays y aumentar stock al que corresponda
                 if (allProducts.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
                     updateTable = PRODUCTS_TABLE;
                     updateArray = allProducts;
-                } else if (allProductsElTransito.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
-                    updateTable = PRODUCTS_EL_TRANSITO_TABLE;
-                    updateArray = allProductsElTransito;
                 } else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
                     updateTable = PRODUCTS_BODEGA_TABLE;
                     updateArray = allProductsBodega;
                 }
 
                 if (updateTable && updateArray) {
-                     // Increase stock by 1
-                     await updateProductStock(soldProductName, updateTable, updateArray, 1);
+                    // Increase stock by 1
+                    await updateProductStock(soldProductName, updateTable, updateArray, 1);
                 }
             }
 
@@ -1968,19 +1711,17 @@
                 alert("❌ Error al eliminar: " + error.message);
             }
         }
-        window.deleteSaleET = function(id) {
-            return deleteSale(id, false);
-        }
 
         // --- ADICIÓN: Lógica para Descargar PDF de Ventas ---
         window.downloadSalesPDF = async function(isMainSales) {
+            // isMainSales es siempre true en la nueva versión, pero mantenemos el parámetro por seguridad.
             if (typeof window.jspdf.jsPDF === 'undefined' || typeof html2canvas === 'undefined') {
                 return alert("❌ Error: Las librerías jsPDF y html2canvas no están cargadas.");
             }
             
-            const listContainer = isMainSales ? salesListContainer : salesListContainerET;
-            const title = isMainSales ? 'Registro de Ventas Principal' : 'Registro de Ventas El Transito';
-            const fileName = isMainSales ? 'Ventas_Principal_' : 'Ventas_El_Transito_';
+            const listContainer = salesListContainer;
+            const title = 'Registro de Ventas Principal';
+            const fileName = 'Ventas_Principal_';
 
             if (!listContainer.children.length) {
                 return alert("No hay datos de ventas para descargar.");
@@ -1998,16 +1739,15 @@
             y += 8;
 
             // Totales Generales
-            const totalSoldEl = document.getElementById(isMainSales ? 'total-sold-amount' : 'total-sold-amount-et');
-            const totalPaidEl = document.getElementById(isMainSales ? 'total-paid-amount' : 'total-paid-amount-et');
-            const paidPercentageEl = document.getElementById(isMainSales ? 'paid-percentage' : 'paid-percentage-et');
+            const totalSoldEl = document.getElementById('total-sold-amount');
+            const totalPaidEl = document.getElementById('total-paid-amount');
+            const paidPercentageEl = document.getElementById('paid-percentage');
             
             doc.setFontSize(10);
             doc.text(`Total Vendido: ${totalSoldEl.textContent}`, 10, y);
             doc.text(`Total Pagado: ${totalPaidEl.textContent}`, 70, y);
             doc.text(`Progreso: ${paidPercentageEl.textContent}`, 130, y);
-            y += 8;
-            
+            y += 5;
             doc.setLineWidth(0.1);
             doc.line(10, y, pageWidth - 10, y);
             y += 5;
@@ -2159,20 +1899,15 @@
         }
 
         // --- Lógica de Realtime ---
-        function handleRealtimePayload(payload, localArray, renderFunction, idKey = 'id') {
+        function handleRealtimePayload(payload, localArray, renderFunction, isMainProducts = false, isBodegaProducts = false, isSales = false, idKey = 'id') {
             if (!supabase) return;
             console.log('📡 Payload Realtime Recibido:', payload);
             const { eventType, new: newRecord, old: oldRecord } = payload;
             const recordId = (eventType === 'DELETE') ? oldRecord[idKey] : newRecord[idKey];
             if (!recordId) { console.error("Payload de Realtime sin ID.", payload); return; }
             let index = localArray.findIndex(item => item[idKey] === recordId);
-            const isMainSales = (localArray === allSales);
-            const isElTransitoSales = (localArray === allSalesElTransito);
-            const isMainProducts = (localArray === allProducts);
-            const isElTransitoProducts = (localArray === allProductsElTransito);
-            const isBodegaProducts = (localArray === allProductsBodega); // NUEVO
             
-            if (isMainSales || isElTransitoSales) {
+            if (isSales) { 
                 let needsFullRender = false; 
                 switch (eventType) {
                     case 'INSERT':
@@ -2184,11 +1919,9 @@
                         break;
                     case 'UPDATE':
                         if (index !== -1) {
-                            // Update locally but rely on full render for UI refresh
                             Object.assign(localArray[index], newRecord);
                             needsFullRender = true; 
                         } else {
-                            // If the record was not loaded before, insert it and re-render
                             localArray.unshift(newRecord); 
                             localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at)); 
                             needsFullRender = true;
@@ -2205,15 +1938,12 @@
                         return;
                 }
                 if (needsFullRender) {
-                    if (isMainSales) {
-                        filterAndRenderSales();
-                    } else {
-                        filterAndRenderSalesET();
-                    }
+                    filterAndRenderSales();
                 }
                 return; 
             }
-            if (isMainProducts || isElTransitoProducts || isBodegaProducts) { // MODIFICADO
+            
+            if (isMainProducts || isBodegaProducts) { 
                 let needsFullRender = false;
                 switch (eventType) {
                     case 'INSERT':
@@ -2233,7 +1963,7 @@
                             if (oldCategory !== newCategory || oldQuantity !== newQuantity) { 
                                 needsFullRender = true;
                             } else {
-                                updateProductCardInDOM(newRecord, isMainProducts, isElTransitoProducts, isBodegaProducts); 
+                                updateProductCardInDOM(newRecord, isMainProducts, false, isBodegaProducts); 
                             }
                         } else {
                             localArray.unshift(newRecord); 
@@ -2250,21 +1980,19 @@
                 }
                 
                 // --- ADICIÓN: Recalcular totales ANTES de renderizar ---
-                calculateCategoryTotals(localArray, isMainProducts, isElTransitoProducts, isBodegaProducts);
+                calculateCategoryTotals(localArray, isMainProducts, false, isBodegaProducts);
                 
                 if (needsFullRender) {
                     if (isMainProducts) filterAndRenderProducts(); 
-                    else if (isElTransitoProducts) filterAndRenderProductsET();
-                    else filterAndRenderProductsBodega(); // NUEVO
+                    else filterAndRenderProductsBodega(); 
                 }
                 
-                if (isMainProducts) updateAutocompleteList(allProducts, inventorySuggestions);
-                if (isElTransitoProducts) updateAutocompleteList(allProductsElTransito, inventorySuggestionsET);
-                // No hay autocompletado para Bodega ya que no se vende desde ella directamente.
+                updateAutocompleteList(allProducts, inventorySuggestions); // Siempre actualizar la lista combinada
                 return; 
             }
+            
+            // Para Tools y Missing
             if (eventType === 'UPDATE' && index !== -1) {
-                 // Para herramientas y faltantes, solo actualizamos si el registro ya existe.
                  Object.assign(localArray[index], newRecord);
             } else {
                 switch (eventType) {
@@ -2288,37 +2016,39 @@
             if (!supabase) return;
             console.log("📡 Inicializando suscripciones en tiempo real...");
             const channelOptions = { config: { broadcast: { ack: true } } };
+            
+            // Inventario Principal
             supabase.channel('public:' + PRODUCTS_TABLE, channelOptions)
                 .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_TABLE },
-                    (payload) => handleRealtimePayload(payload, allProducts, filterAndRenderProducts, 'id')
+                    (payload) => handleRealtimePayload(payload, allProducts, filterAndRenderProducts, true, false, false, 'id')
                 ).subscribe((status, err) => console.log(`Canal ${PRODUCTS_TABLE}: ${status}`, err || ''));
-            supabase.channel('public:' + PRODUCTS_EL_TRANSITO_TABLE, channelOptions)
-                .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_EL_TRANSITO_TABLE },
-                    (payload) => handleRealtimePayload(payload, allProductsElTransito, filterAndRenderProductsET, 'id')
-                ).subscribe((status, err) => console.log(`Canal ${PRODUCTS_EL_TRANSITO_TABLE}: ${status}`, err || ''));
-            supabase.channel('public:' + PRODUCTS_BODEGA_TABLE, channelOptions) // CORREGIDO AQUÍ
+            
+            // Nuevo Inventario (products_nuevo)
+            supabase.channel('public:' + PRODUCTS_BODEGA_TABLE, channelOptions) 
                 .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_BODEGA_TABLE },
-                    (payload) => handleRealtimePayload(payload, allProductsBodega, filterAndRenderProductsBodega, 'id')
+                    (payload) => handleRealtimePayload(payload, allProductsBodega, filterAndRenderProductsBodega, false, true, false, 'id')
                 ).subscribe((status, err) => console.log(`Canal ${PRODUCTS_BODEGA_TABLE}: ${status}`, err || ''));
+            
+            // Ventas
             supabase.channel('public:' + SALES_TABLE, channelOptions)
                 .on('postgres_changes', { event: '*', schema: 'public', table: SALES_TABLE },
-                    (payload) => handleRealtimePayload(payload, allSales, filterAndRenderSales, 'id') 
+                    (payload) => handleRealtimePayload(payload, allSales, filterAndRenderSales, false, false, true, 'id') 
                 ).subscribe((status, err) => console.log(`Canal ${SALES_TABLE}: ${status}`, err || ''));
-            supabase.channel('public:' + SALES_EL_TRANSITO_TABLE, channelOptions)
-                .on('postgres_changes', { event: '*', schema: 'public', table: SALES_EL_TRANSITO_TABLE },
-                    (payload) => handleRealtimePayload(payload, allSalesElTransito, filterAndRenderSalesET, 'id')
-                ).subscribe((status, err) => console.log(`Canal ${SALES_EL_TRANSITO_TABLE}: ${status}`, err || ''));
+            
+            // Faltantes
             supabase.channel('public:' + MISSING_PRODUCTS_TABLE, channelOptions)
                 .on('postgres_changes', { event: '*', schema: 'public', table: MISSING_PRODUCTS_TABLE },
-                    (payload) => handleRealtimePayload(payload, allMissingProducts, renderMissingProducts, 'id')
+                    (payload) => handleRealtimePayload(payload, allMissingProducts, renderMissingProducts, false, false, false, 'id')
                 ).subscribe((status, err) => console.log(`Canal ${MISSING_PRODUCTS_TABLE}: ${status}`, err || ''));
+            
+            // Herramientas
             supabase.channel('public:' + TOOLS_TABLE, channelOptions)
                 .on('postgres_changes', { event: '*', schema: 'public', table: TOOLS_TABLE },
-                    (payload) => handleRealtimePayload(payload, allTools, renderTools, 'id')
+                    (payload) => handleRealtimePayload(payload, allTools, renderTools, false, false, false, 'id')
                 ).subscribe((status, err) => console.log(`Canal ${TOOLS_TABLE}: ${status}`, err || ''));
         }
 
-        // --- Lógica de Carga Inicial de Datos (Faltantes y Ventas) ---
+        // --- Lógica de Carga Inicial de Datos ---
         async function fetchSales() {
             if (!supabase) return;
             const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
@@ -2326,13 +2056,8 @@
             allSales = data;
             filterAndRenderSales();
         }
-        async function fetchSalesElTransito() {
-            if (!supabase) return;
-            const { data, error } = await supabase.from(SALES_EL_TRANSITO_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando ventas (ET):", error); return; }
-            allSalesElTransito = data;
-            filterAndRenderSalesET();
-        }
+        
+        // Se elimina fetchSalesElTransito
 
         // ============================================================================
         // == VI. LÓGICA DE MODALES (QR, Scanner y EDITOR)                             ==
@@ -2340,7 +2065,7 @@
 
         // --- Lógica del Editor de Producto (Modal) ---
         
-        window.openProductEditorModal = function(productId, locationKey) { // MODIFICADO: locationKey es 'main', 'et', o 'bodega'
+        window.openProductEditorModal = function(productId, locationKey) { 
             currentEditingProduct = null;
             selectedProductImageFile = null;
             modalStatus.textContent = '';
@@ -2352,31 +2077,26 @@
             if (locationKey === 'main') {
                 productArray = allProducts;
                 displayName = 'Inventario Principal';
-            } else if (locationKey === 'et') {
-                productArray = allProductsElTransito;
-                displayName = 'Inventario El Transito';
-            } else if (locationKey === 'bodega') { // NUEVO
+            } else if (locationKey === 'bodega') { 
                 productArray = allProductsBodega;
-                displayName = 'Inventario Bodega';
+                displayName = 'Nuevo Inventario';
             } else {
                 alert("Error: Ubicación de inventario no válida.");
                 return;
             }
 
-            // CORRECCIÓN APLICADA: Usar String() y .trim() para asegurar la comparación entre tipos de datos de string
             let product = productArray.find(p => String(p.id).trim() === String(productId).trim());
 
             if (!product) {
-                // Si no se encuentra en el array esperado, buscar en todos como fallback
-                const all = [...allProducts, ...allProductsElTransito, ...allProductsBodega];
+                // Fallback: Buscar en todos por si la clave de ubicación fue incorrecta
+                const all = [...allProducts, ...allProductsBodega];
                 product = all.find(p => String(p.id).trim() === String(productId).trim());
                 if (product) {
                     // Actualizar la clave de ubicación si se encontró en otro lugar
                     if (allProducts.some(p => p.id === product.id)) locationKey = 'main';
-                    else if (allProductsElTransito.some(p => p.id === product.id)) locationKey = 'et';
                     else if (allProductsBodega.some(p => p.id === product.id)) locationKey = 'bodega';
                     
-                    displayName = (locationKey === 'main' ? 'Inventario Principal' : (locationKey === 'et' ? 'Inventario El Transito' : 'Inventario Bodega'));
+                    displayName = (locationKey === 'main' ? 'Inventario Principal' : 'Nuevo Inventario');
                     console.warn("⚠️ Producto encontrado en el inventario opuesto. Se ajustó la vista a:", displayName);
                 } else {
                     alert("Error: Producto no encontrado en el inventario local. Intente recargar la página. ID Buscado: " + productId);
@@ -2385,11 +2105,9 @@
             }
             
             currentEditingProduct = product;
-            isMainInventory = (locationKey === 'main'); // isMainInventory ya no es suficiente, pero la mantenemos para compatibilidad con código antiguo.
 
             // 2. Llenar campos del modal
             modalName.value = product.name;
-            // Se usa el valor de la propiedad 'category' si existe, si no, se deja vacío.
             modalCategory.value = product.category || ''; 
             modalPrice.value = Number(product.price).toFixed(2);
             modalQuantity.value = product.quantity;
@@ -2397,7 +2115,6 @@
             modalLocation.textContent = displayName;
 
             // 3. Cargar imagen de previsualización
-            // Añadimos un timestamp para forzar la recarga de la imagen si se ha actualizado
             const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
             modalImagePreview.src = imageUrl;
             
@@ -2439,20 +2156,16 @@
             // 1. Determinar la tabla correcta
             let table = PRODUCTS_TABLE;
             let localArray = allProducts;
-            let isMain = true, isET = false, isBodega = false;
+            let isMain = true, isBodega = false;
 
             if (allProducts.some(p => p.id === currentEditingProduct.id)) {
                 table = PRODUCTS_TABLE;
                 localArray = allProducts;
-                isMain = true; isET = false; isBodega = false;
-            } else if (allProductsElTransito.some(p => p.id === currentEditingProduct.id)) {
-                table = PRODUCTS_EL_TRANSITO_TABLE;
-                localArray = allProductsElTransito;
-                isMain = false; isET = true; isBodega = false;
+                isMain = true; isBodega = false;
             } else if (allProductsBodega.some(p => p.id === currentEditingProduct.id)) {
                 table = PRODUCTS_BODEGA_TABLE;
                 localArray = allProductsBodega;
-                isMain = false; isET = false; isBodega = true;
+                isMain = false; isBodega = true;
             } else {
                  modalStatus.textContent = 'Error: No se puede determinar la ubicación del producto.';
                  saveButton.disabled = false;
@@ -2479,19 +2192,6 @@
                     image_url: newImageUrl
                 };
                 
-                // Si la tabla de Bodega (products_nuevo) no tiene columna 'category',
-                // debemos eliminar esa propiedad del payload para esa tabla específica.
-                // Esta es una solución temporal si la estructura de 'products_nuevo' no es estándar.
-                // Si la columna existe y solo estaba vacía, esta lógica no es necesaria.
-                if (table === PRODUCTS_BODEGA_TABLE && !currentEditingProduct.category) {
-                     // Solo para seguridad si la columna 'category' realmente no existe en products_nuevo
-                     // Esto puede causar problemas si la tabla SÍ tiene la columna, pero no está en la respuesta de Supabase.
-                     // Lo dejaremos por ahora asumiendo que products_nuevo es una tabla simple sin "category".
-                     // Si descomentas esto, se asumirá que la columna 'category' NO existe en products_nuevo
-                     // delete updatePayload.category; 
-                }
-
-
                 // 4. Actualizar en Supabase
                 modalStatus.textContent = 'Actualizando registro en la base de datos...';
                 const { error } = await supabase
@@ -2501,14 +2201,13 @@
                 
                 if (error) throw error;
 
-                // 5. Actualizar localmente y en el DOM (Realtime debería hacer esto, pero por robustez)
+                // 5. Actualizar localmente y en el DOM 
                 Object.assign(currentEditingProduct, updatePayload);
-                updateProductCardInDOM(currentEditingProduct, isMain, isET, isBodega);
+                updateProductCardInDOM(currentEditingProduct, isMain, false, isBodega);
                 
                 // ADICIÓN: Recalcular totales después de la actualización exitosa
-                calculateCategoryTotals(localArray, isMain, isET, isBodega);
+                calculateCategoryTotals(localArray, isMain, false, isBodega);
                 if(isMain) filterAndRenderProducts();
-                else if(isET) filterAndRenderProductsET();
                 else filterAndRenderProductsBodega();
                 
                 modalStatus.textContent = 'Producto actualizado con éxito. ✅';
@@ -2590,19 +2289,16 @@
 
 
         // ============================================================================
-        // == VIII. LÓGICA DEL ESCÁNER Y REGISTRO DE VENTA AUTOMÁTICA                 ==
+        // == VIII. LÓGICA DEL ESCÁNER Y REGISTRO DE VENTA AUTOMÁTICA                   ==
         // ============================================================================
         
-        async function registerScannedSale(product, isMainInventory) {
+        async function registerScannedSale(product) {
             if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const salesTable = isMainInventory ? SALES_TABLE : SALES_EL_TRANSITO_TABLE;
-            const stockTable = isMainInventory ? PRODUCTS_TABLE : PRODUCTS_EL_TRANSITO_TABLE;
-            // Solo para ventas, no se contempla Bodega ya que no tiene vista de venta asociada
-            const stockLocalArray = isMainInventory ? allProducts : allProductsElTransito; 
-            const statusEl = isMainInventory ? saleStatus : saleStatusET;
+            const salesTable = SALES_TABLE;
+            const statusEl = saleStatus;
             
-            // Obtener el destinatario, usando el valor actual del input (que fue enfocado)
-            const recipientNameEl = isMainInventory ? recipientNameIn : recipientNameInET;
+            // Obtener el destinatario, usando el valor actual del input 
+            const recipientNameEl = recipientNameIn;
             const recipientName = recipientNameEl.value.trim() || 'Cliente Rápido QR'; 
             
             const productNameSold = product.name + (product.category ? ` (${product.category})` : '');
@@ -2627,39 +2323,29 @@
                 // DESCUENTO DE STOCK OBLIGATORIO si es Pagado
                 if (newSale.status === 'Pagado') {
                     // Determinar qué tabla de inventario actualizar:
-                    let updateTable = PRODUCTS_TABLE;
-                    let updateArray = allProducts;
-                    let isMain = true, isET = false, isBodega = false;
+                    let updateTable = null;
+                    let updateArray = null;
 
                     if (allProducts.some(p => p.id === product.id)) {
                         updateTable = PRODUCTS_TABLE;
                         updateArray = allProducts;
-                        isMain = true;
-                    } else if (allProductsElTransito.some(p => p.id === product.id)) {
-                        updateTable = PRODUCTS_EL_TRANSITO_TABLE;
-                        updateArray = allProductsElTransito;
-                        isET = true;
                     } else if (allProductsBodega.some(p => p.id === product.id)) {
                         updateTable = PRODUCTS_BODEGA_TABLE;
                         updateArray = allProductsBodega;
-                        isBodega = true;
                     }
 
-                    await updateProductStock(product.name, updateTable, updateArray, -1);
+                    if (updateTable && updateArray) {
+                        await updateProductStock(product.name, updateTable, updateArray, -1);
+                    } else {
+                         throw new Error(`Producto escaneado (${product.name}) no encontrado en el inventario para descontar stock.`);
+                    }
                 }
                 
                 // Limpiar inputs
-                if (isMainInventory) {
-                    productNameSoldIn.value = ''; // Limpiar solo el producto
-                    salePriceIn.value = ''; 
-                    saleDateIn.value = new Date().toISOString().split('T')[0]; 
-                    saleStatusInput.value = 'Pagado';
-                } else {
-                    productNameSoldInET.value = ''; 
-                    salePriceInET.value = ''; 
-                    saleDateInET.value = new Date().toISOString().split('T')[0]; 
-                    saleStatusInputET.value = 'Pagado';
-                }
+                productNameSoldIn.value = ''; 
+                salePriceIn.value = ''; 
+                saleDateIn.value = new Date().toISOString().split('T')[0]; 
+                saleStatusInput.value = 'Pagado';
                 
                 alert(`✅ Venta de "${product.name}" registrada con éxito para ${recipientName}. Stock descontado.`);
                 setStatusMessage(statusEl, `Venta de ${product.name} registrada con éxito y stock descontado ✅`, true); 
@@ -2717,10 +2403,9 @@
                     scanSuccessHandled = true; 
                     await closeScannerModal(true); 
 
-                    // Búsqueda del producto en TODOS los inventarios, asegurando la comparación de strings
+                    // Búsqueda del producto en TODOS los inventarios
                     const product = allProducts.find(p => String(p.id).trim() === scannedId) || 
-                                    allProductsElTransito.find(p => String(p.id).trim() === scannedId) ||
-                                    allProductsBodega.find(p => String(p.id).trim() === scannedId); // NUEVO
+                                     allProductsBodega.find(p => String(p.id).trim() === scannedId); 
                     
                     if (!product) {
                         throw new Error(`El producto con ID "${scannedId}" no existe en ningún inventario.`);
@@ -2730,36 +2415,17 @@
                         throw new Error(`Stock insuficiente: El producto "${product.name}" tiene 0 unidades disponibles. (Ubicación: ${product.box_number || 'N/A'})`);
                     }
                     
-                    // Determinar el inventario principal para saber a qué vista de Venta ir
-                    const isMainInventorySale = allProducts.some(p => String(p.id).trim() === scannedId);
-                    
-                    console.log(`[SCANNER LOG] Producto encontrado: ${product.name} (Inventario: ${isMainInventorySale ? 'Principal' : 'El Transito/Bodega'})`);
-                    
                     // 1. Cargar datos en el formulario y cambiar a la vista de ventas
-                    if (isMainInventorySale) {
-                        toggleView('sales');
-                        const productNameWithCategory = product.name + (product.category ? ` (${product.category})` : '');
-                        productNameSoldIn.value = productNameWithCategory;
-                        salePriceIn.value = Number(product.price).toFixed(2);
-                        saleDateIn.value = new Date().toISOString().split('T')[0];
-                        saleStatusInput.value = 'Pendiente'; 
-                        // ENFOCAR AL DESTINATARIO
-                        recipientNameIn.focus();
-                    } else {
-                        // Por simplicidad, si no es Principal, se asume que la venta es de El Transito
-                        // (o se decide que Bodega no tiene vista de ventas y se usa ET como desborde)
-                        toggleView('sales_el_transito');
-                        const productNameWithCategoryET = product.name + (product.category ? ` (${product.category})` : '');
-                        productNameSoldInET.value = productNameWithCategoryET;
-                        salePriceInET.value = Number(product.price).toFixed(2);
-                        saleDateInET.value = new Date().toISOString().split('T')[0];
-                        saleStatusInputET.value = 'Pendiente';
-                        // ENFOCAR AL DESTINATARIO
-                        recipientNameInET.focus();
-                    }
+                    toggleView('sales');
+                    const productNameWithCategory = product.name + (product.category ? ` (${product.category})` : '');
+                    productNameSoldIn.value = productNameWithCategory;
+                    salePriceIn.value = Number(product.price).toFixed(2);
+                    saleDateIn.value = new Date().toISOString().split('T')[0];
+                    saleStatusInput.value = 'Pagado'; // Venta rápida se asume pagada
                     
-                    // Nota: La venta se registra manualmente al presionar "Registrar Venta" en el formulario.
-
+                    // Ejecutar el registro de venta inmediatamente al escanear
+                    await registerScannedSale(product);
+                    
                 } catch (error) {
                     console.error("Error al procesar escaneo:", error);
                     // Restablecer la bandera antes de la alerta para permitir reintentar
@@ -2820,19 +2486,18 @@
 
 
         // ============================================================================
-        // == IX. EVENT LISTENERS Y CARGA INICIAL                                   ==
+        // == IX. EVENT LISTENERS Y CARGA INICIAL                                      ==
         // ============================================================================
         
         // --- Event Listeners ---
         searchInput.addEventListener("input", filterAndRenderProducts);
-        searchInputET.addEventListener("input", filterAndRenderProductsET);
-        searchInputBodega.addEventListener("input", filterAndRenderProductsBodega); // NUEVO
+        // Se elimina searchInputET
+        searchInputBodega.addEventListener("input", filterAndRenderProductsBodega); 
         searchSalesInput.addEventListener("input", filterAndRenderSales);
         pendingOnlyCheckbox.addEventListener("change", filterAndRenderSales);
-        searchSalesInputET.addEventListener("input", filterAndRenderSalesET);
-        pendingOnlyCheckboxET.addEventListener("change", filterAndRenderSalesET);
+        // Se eliminan searchSalesInputET y pendingOnlyCheckboxET
         
-        // --- Forms Submit Logic (Implementados anteriormente) ---
+        // --- Forms Submit Logic (Inventario Principal) ---
         form.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("submit"); 
@@ -2853,27 +2518,8 @@
                 submitBtn.disabled = false; 
             } 
         });
-        formET.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("submit-et"); 
-            submitBtn.disabled = true; 
-            setStatusMessage(statusET, "Guardando...", true); 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            try { 
-                const imageUrl = imageInET.files[0] ? await uploadImage(imageInET.files[0]) : null; 
-                const newProductET = { name: nameInET.value, category: categoryInET.value, price: parseFloat(priceInET.value), quantity: parseInt(qtyInET.value), image_url: imageUrl, box_number: boxNumberInET.value.trim() || null };
-                const { data: insertedProduct, error } = await supabase.from(PRODUCTS_EL_TRANSITO_TABLE).insert(newProductET).select().single();
-                if (error) throw error; 
-                formET.reset(); qtyInET.value = 1; 
-                setStatusMessage(statusET, "Producto agregado con éxito (El Transito) ✅", true); 
-            } catch (err) { 
-                console.error("Error al agregar producto ET:", err);
-                setStatusMessage(statusET, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-        // Lógica de submit para Bodega (NUEVO)
+        
+        // --- Forms Submit Logic (Nuevo Inventario) ---
         formBodega.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("submit-bodega"); 
@@ -2884,27 +2530,69 @@
                 const imageUrl = imageInBodega.files[0] ? await uploadImage(imageInBodega.files[0]) : null; 
                 const newProductBodega = { name: nameInBodega.value, category: categoryInBodega.value, price: parseFloat(priceInBodega.value), quantity: parseInt(qtyInBodega.value), image_url: imageUrl, box_number: boxNumberInBodega.value.trim() || null };
                 
-                // Si la tabla products_nuevo no tiene la columna 'category',
-                // debemos eliminarla del payload antes de insertar
-                const insertPayload = {...newProductBodega};
-                // Si la tabla no tiene 'category', la eliminamos antes de enviar.
-                if (insertPayload.category) {
-                     // Solo eliminamos la categoría si no queremos forzar la inserción en products_nuevo
-                     // En este caso, la mantenemos, pero si falla aquí, hay que comentar esta línea y eliminar la categoría del payload.
-                }
-
-                const { data: insertedProduct, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).insert(insertPayload).select().single();
+                // Se asume que products_nuevo usa las mismas columnas
+                const { data: insertedProduct, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).insert(newProductBodega).select().single();
                 if (error) throw error; 
                 formBodega.reset(); qtyInBodega.value = 1; 
-                setStatusMessage(statusBodega, "Producto agregado con éxito (Bodega) ✅", true); 
+                setStatusMessage(statusBodega, "Producto agregado con éxito (Nuevo Inventario) ✅", true); 
             } catch (err) { 
-                console.error("Error al agregar producto Bodega:", err);
+                console.error("Error al agregar producto Nuevo Inventario:", err);
                 setStatusMessage(statusBodega, "Error: " + err.message, false); 
             } finally { 
                 submitBtn.disabled = false; 
             } 
         });
 
+        // --- Forms Submit Logic (Ventas) ---
+        salesForm.addEventListener("submit", async (ev) => { 
+            ev.preventDefault(); 
+            const submitBtn = document.getElementById("sale-submit"); 
+            submitBtn.disabled = true; 
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
+            const soldProductWithCategory = productNameSoldIn.value.trim();
+            const soldProductName = getCleanProductName(soldProductWithCategory); 
+            try { 
+                const newSale = {
+                    recipient_name: recipientNameIn.value,
+                    product_name_sold: soldProductWithCategory,
+                    price: parseFloat(salePriceIn.value),
+                    sale_date: saleDateIn.value,
+                    status: saleStatusInput.value
+                };
+                const { data: insertedSale, error: saleError } = await supabase.from(SALES_TABLE).insert(newSale).select().single();
+                if (saleError) throw error;
+                
+                // Descontar stock del producto vendido, buscándolo en ambos inventarios
+                if (newSale.status === 'Pagado') {
+                    let updateTable = null, updateArray = null;
+                    if (allProducts.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
+                        updateTable = PRODUCTS_TABLE;
+                        updateArray = allProducts;
+                    } else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
+                        updateTable = PRODUCTS_BODEGA_TABLE;
+                        updateArray = allProductsBodega;
+                    }
+
+                    if (updateTable && updateArray) {
+                         await updateProductStock(soldProductName, updateTable, updateArray, -1);
+                    } else {
+                        console.warn(`Producto vendido (${soldProductName}) no encontrado en el inventario para descontar stock.`);
+                    }
+                }
+
+                salesForm.reset(); 
+                saleDateIn.value = new Date().toISOString().split('T')[0]; 
+                setStatusMessage(saleStatus, "Venta registrada con éxito ✅", true); 
+            } catch (err) { 
+                console.error("Error al registrar venta:", err);
+                setStatusMessage(saleStatus, "Error: " + err.message, false); 
+            } finally { 
+                submitBtn.disabled = false; 
+            } 
+        });
+        
+        // Se elimina salesFormET
+        
         missingProductForm.addEventListener("submit", async (ev) => { 
             ev.preventDefault(); 
             const submitBtn = document.getElementById("missing-product-submit"); 
@@ -2943,101 +2631,7 @@
                 submitBtn.disabled = false; 
             } 
         });
-        salesForm.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("sale-submit"); 
-            submitBtn.disabled = true; 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const soldProductWithCategory = productNameSoldIn.value.trim();
-            const soldProductName = getCleanProductName(soldProductWithCategory); 
-            try { 
-                const newSale = {
-                    recipient_name: recipientNameIn.value,
-                    product_name_sold: soldProductWithCategory,
-                    price: parseFloat(salePriceIn.value),
-                    sale_date: saleDateIn.value,
-                    status: saleStatusInput.value
-                };
-                const { data: insertedSale, error: saleError } = await supabase.from(SALES_TABLE).insert(newSale).select().single();
-                if (saleError) throw error;
-                
-                // Descontar stock del producto vendido, buscándolo en el inventario principal
-                if (newSale.status === 'Pagado') {
-                    // Buscar en todos los arrays y descontar del que corresponda.
-                    let updateTable = null, updateArray = null;
-                    if (allProducts.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
-                        updateTable = PRODUCTS_TABLE;
-                        updateArray = allProducts;
-                    } else if (allProductsElTransito.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
-                        updateTable = PRODUCTS_EL_TRANSITO_TABLE;
-                        updateArray = allProductsElTransito;
-                    } else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
-                        updateTable = PRODUCTS_BODEGA_TABLE;
-                        updateArray = allProductsBodega;
-                    }
-
-                    if (updateTable && updateArray) {
-                         await updateProductStock(soldProductName, updateTable, updateArray, -1);
-                    }
-                }
-
-                salesForm.reset(); 
-                saleDateIn.value = new Date().toISOString().split('T')[0]; 
-                setStatusMessage(saleStatus, "Venta registrada con éxito ✅", true); 
-            } catch (err) { 
-                console.error("Error al registrar venta:", err);
-                setStatusMessage(saleStatus, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-        salesFormET.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("sale-submit-et"); 
-            submitBtn.disabled = true; 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const soldProductWithCategoryET = productNameSoldInET.value.trim();
-            const soldProductNameET = getCleanProductName(soldProductWithCategoryET); 
-            try { 
-                const newSaleET = {
-                    recipient_name: recipientNameInET.value,
-                    product_name_sold: soldProductWithCategoryET,
-                    price: parseFloat(salePriceInET.value),
-                    sale_date: saleDateInET.value,
-                    status: saleStatusInputET.value
-                };
-                const { data: insertedSale, error: saleErrorET } = await supabase.from(SALES_EL_TRANSITO_TABLE).insert(newSaleET).select().single();
-                if (error) throw error;
-                
-                // Descontar stock del producto vendido, buscándolo en el inventario de El Transito
-                if (newSaleET.status === 'Pagado') {
-                    let updateTable = null, updateArray = null;
-                    if (allProducts.some(p => getCleanProductName(p.name).trim() === soldProductNameET)) {
-                        updateTable = PRODUCTS_TABLE;
-                        updateArray = allProducts;
-                    } else if (allProductsElTransito.some(p => getCleanProductName(p.name).trim() === soldProductNameET)) {
-                        updateTable = PRODUCTS_EL_TRANSITO_TABLE;
-                        updateArray = allProductsElTransito;
-                    } else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === soldProductNameET)) {
-                        updateTable = PRODUCTS_BODEGA_TABLE;
-                        updateArray = allProductsBodega;
-                    }
-
-                    if (updateTable && updateArray) {
-                         await updateProductStock(soldProductNameET, updateTable, updateArray, -1);
-                    }
-                }
-
-                salesFormET.reset(); 
-                saleDateInET.value = new Date().toISOString().split('T')[0]; 
-                setStatusMessage(saleStatusET, "Venta (El Transito) registrada con éxito ✅", true); 
-            } catch (err) { 
-                console.error("Error al registrar venta ET:", err);
-                setStatusMessage(statusET, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
+        
         toolImageEditorInput.addEventListener('change', async (event) => {
             if (!editingToolId) return; 
             const file = event.target.files[0];
@@ -3057,7 +2651,7 @@
             } finally {
                 editingToolId = null; 
                 toolImageEditorInput.value = ''; 
-                if(editButton) editButton.textContent = originalText; 
+                if(editButton) editButton.textContent = originalButtonText; 
             }
         });
         // Modificación para que el menú móvil use toggleView (y se auto-cierre)
@@ -3071,7 +2665,6 @@
         function populateLabelCategories(products) {
             const categories = new Set();
             products.forEach(p => {
-                // Solo si la columna existe, la agregamos (esto ayuda a productos_nuevo si le falta 'category')
                 if (p.category) categories.add(p.category); 
             });
             const sortedCategories = Array.from(categories).sort();
@@ -3092,9 +2685,7 @@
             let selectedProducts = [];
             if (location === 'main') {
                 selectedProducts = allProducts;
-            } else if (location === 'et') {
-                selectedProducts = allProductsElTransito;
-            } else if (location === 'bodega') { // NUEVO
+            } else if (location === 'bodega') { 
                 selectedProducts = allProductsBodega;
             } else {
                 labelsCountSpan.textContent = `0 Productos seleccionados (Error de ubicación)`;
@@ -3120,9 +2711,7 @@
             let selectedProducts = [];
             if (location === 'main') {
                 selectedProducts = allProducts;
-            } else if (location === 'et') {
-                selectedProducts = allProductsElTransito;
-            } else if (location === 'bodega') { // NUEVO
+            } else if (location === 'bodega') { 
                 selectedProducts = allProductsBodega;
             } else {
                 return alert("Error de ubicación de inventario.");
@@ -3207,9 +2796,7 @@
             let selectedProducts = [];
             if (location === 'main') {
                 selectedProducts = allProducts;
-            } else if (location === 'et') {
-                selectedProducts = allProductsElTransito;
-            } else if (location === 'bodega') { // NUEVO
+            } else if (location === 'bodega') { 
                 selectedProducts = allProductsBodega;
             } else {
                 return alert("Error de ubicación de inventario.");
@@ -3282,7 +2869,6 @@
             applyTheme(initialTheme); 
             
             saleDateIn.value = new Date().toISOString().split('T')[0];
-            saleDateInET.value = new Date().toISOString().split('T')[0];
             
             showSkeletonLoaders(); 
             
@@ -3298,14 +2884,11 @@
 
             if (supabase) {
                 try {
-                    // Carga de datos inicial
-                    // Se agrega fetchProductsBodega()
+                    // Carga de datos inicial (se eliminó fetchProductsET y fetchSalesElTransito)
                     await Promise.all([
                         fetchProducts(), 
-                        fetchProductsET(),
                         fetchProductsBodega(), 
                         fetchSales(), 
-                        fetchSalesElTransito(), 
                         fetchMissingProducts(),
                         fetchTools() 
                     ]);
@@ -3313,7 +2896,6 @@
                     initializeRealtimeSubscriptions();
                 } catch (error) {
                     console.error("Error crítico durante la carga de datos inicial:", error);
-                    // No alert() aquí, ya que el Promise.all contiene sus propios manejadores de error.
                 }
             } else {
                 alert("Error Crítico: No se pudo cargar Supabase. La aplicación no funcionará correctamente.");
