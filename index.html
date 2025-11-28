@@ -467,6 +467,45 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 <body class="" onclick=""> 
+    
+    <div id="auth-modal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="auth-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-90 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-indigo-500">
+                <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start flex-col">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-2xl leading-6 font-bold text-white mb-4 border-b border-indigo-500 pb-2" id="auth-modal-title">
+                                🔒 Iniciar Sesión en Cell Smar
+                            </h3>
+                            <form id="auth-form" class="mt-4 space-y-4">
+                                <div>
+                                    <label for="email-input" class="block text-sm font-medium text-gray-300">Correo Electrónico</label>
+                                    <input id="email-input" type="email" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="tu@correo.com" />
+                                </div>
+                                <div>
+                                    <label for="password-input" class="block text-sm font-medium text-gray-300">Contraseña</label>
+                                    <input id="password-input" type="password" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="********" />
+                                </div>
+                                <p id="auth-status" class="text-sm text-center text-gray-400 mt-3"></p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-700">
+                    <button type="submit" form="auth-form" id="login-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 sm:ml-3 sm:w-auto sm:text-sm transition">
+                        Entrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="app-content-wrapper" class="hidden">
+    
     <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
         <div class="flex items-center space-x-4">
             <img 
@@ -531,11 +570,11 @@
                         <input type="file" id="logo-upload" title="Sube una nueva imagen para tu logo" accept="image/*" />
                     </div>
                     <button id="logo-save-button" class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed text-sm w-full shadow-md" disabled>Guardar Logo</button>
+                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white font-medium py-1.5 px-3 rounded-lg transition duration-300 text-sm w-full shadow-md">Cerrar Sesión 🚪</button>
                 </div>
             </div>
         </div>
-    </header>
-    <div class="container mx-auto px-4 py-6">
+    </header><div class="container mx-auto px-4 py-6">
         <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario Principal</p>
         <div id="labels-view" class="view-section hidden">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
@@ -573,7 +612,6 @@
             </div>
         </div>
         
-        <!-- INICIO: Inventario Principal (products) -->
         <div id="inventory-view" class="view-section hidden">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
                 <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (Inventario Principal)</h2>
@@ -609,9 +647,6 @@
                 <div id="products"></div>
             </section>
         </div>
-        <!-- FIN: Inventario Principal (products) -->
-
-        <!-- INICIO: Nuevo Inventario (products_nuevo) -->
         <div id="inventory-bodega-view" class="view-section hidden">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
                 <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (Nuevo Inventario)</h2>
@@ -647,9 +682,6 @@
                 <div id="products-bodega"></div>
             </section>
         </div>
-        <!-- FIN: Nuevo Inventario (products_nuevo) -->
-        
-        <!-- INICIO: Ventas (sales) -->
         <div id="sales-view" class="view-section hidden">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
                 <div class="flex justify-between items-center mb-4">
@@ -711,8 +743,6 @@
                 <div id="sales-list-container"></div>
             </section>
         </div>
-        <!-- FIN: Ventas (sales) -->
-        
         <div id="missing-view" class="view-section hidden">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 max-w-4xl mx-auto">
                 <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Registrar Producto Faltante</h2>
@@ -898,6 +928,9 @@
         </div>
     </div>
     <input type="file" id="tool-image-editor-input" class="hidden" accept="image/*" />
+    
+    </div>
+
     <script>
         // =================================================================================
         // == Configuración de Supabase y Edge Function para R2                       ==
@@ -961,6 +994,14 @@
         const currentViewTitle = document.getElementById("current-view-title");
         const toolImageEditorInput = document.getElementById('tool-image-editor-input'); 
 
+        // --- ADICIÓN: Elementos de Autenticación ---
+        const authModal = document.getElementById('auth-modal');
+        const appContentWrapper = document.getElementById('app-content-wrapper');
+        const authForm = document.getElementById('auth-form');
+        const emailInput = document.getElementById('email-input');
+        const passwordInput = document.getElementById('password-input');
+        const authStatus = document.getElementById('auth-status');
+
         // --- Elementos de Inventario Principal ---
         const form = document.getElementById("product-form"), nameIn = document.getElementById("name"), categoryIn = document.getElementById("category-select"), priceIn = document.getElementById("price"), qtyIn = document.getElementById("quantity"), imageIn = document.getElementById("image"), status = document.getElementById("status"), productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader"), boxNumberIn = document.getElementById("box-number");
 
@@ -1014,7 +1055,93 @@
 
 
         // ============================================================================
-        // == III. LÓGICA DE TEMAS Y DROPDOWN                                      ==
+        // == III. LÓGICA DE AUTENTICACIÓN (LOGIN)                                   ==
+        // ============================================================================
+        function setAuthStatus(msg, success = true) {
+             authStatus.textContent = msg;
+             authStatus.className = `text-sm mt-3 text-center ${success ? 'text-green-400' : 'text-red-400'}`;
+             setTimeout(() => (authStatus.textContent = ""), 5000);
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const loginButton = document.getElementById('login-button');
+            loginButton.disabled = true;
+            setAuthStatus('Iniciando sesión...');
+
+            if (!supabase) {
+                setAuthStatus('Error: Supabase no está cargado.', false);
+                loginButton.disabled = false;
+                return;
+            }
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+
+            try {
+                // Usamos signInWithPassword para autenticación por email y contraseña
+                const { error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
+
+                if (error) throw error;
+                
+                setAuthStatus('Inicio de sesión exitoso. Cargando aplicación...', true);
+                // El onAuthStateChange se encarga de la UI
+
+            } catch (error) {
+                console.error("Error de autenticación:", error);
+                setAuthStatus('Error: Correo o contraseña inválida.', false); 
+            } finally {
+                loginButton.disabled = false;
+            }
+        }
+
+        window.logout = async function() {
+            if (!supabase) return;
+            if (!confirm("¿Estás seguro de que quieres cerrar tu sesión?")) return;
+            
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+            } catch (error) {
+                 alert("❌ Error al cerrar sesión: " + error.message);
+            }
+        }
+
+        function setupAuthListener() {
+            if (!supabase) {
+                authModal.classList.remove('hidden');
+                appContentWrapper.classList.add('hidden');
+                return;
+            }
+
+            supabase.auth.onAuthStateChange((event, session) => {
+                console.log('Evento de Autenticación:', event);
+
+                if (session) {
+                    authModal.classList.add('hidden');
+                    appContentWrapper.classList.remove('hidden');
+                    
+                    if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
+                        loadAppDataAndInitialize(); 
+                    }
+
+                } else {
+                    authModal.classList.remove('hidden');
+                    appContentWrapper.classList.add('hidden');
+                    emailInput.value = '';
+                    passwordInput.value = '';
+                    authStatus.textContent = '';
+                }
+            });
+        }
+        
+        authForm.addEventListener('submit', handleLogin);
+
+        // ============================================================================
+        // == IV. LÓGICA DE TEMAS Y DROPDOWN                                      ==
         // ============================================================================
 
         function applyTheme(theme) {
@@ -1068,7 +1195,7 @@
 
 
         // ============================================================================
-        // == IV. UTILIDADES Y LÓGICA COMPARTIDA                                     ==
+        // == V. UTILIDADES Y LÓGICA COMPARTIDA                                     ==
         // ============================================================================
 
         function setStatusMessage(el, msg, success = true) { 
@@ -1197,7 +1324,7 @@
         }
         
         // ============================================================================
-        // == V. LÓGICA DE VISTAS Y RENDERS (Producto, Venta, Faltantes, Herramienta) ==
+        // == VI. LÓGICA DE VISTAS Y RENDERS (Producto, Venta, Faltantes, Herramienta) ==
         // ============================================================================
 
         // --- ADICIÓN: Función para calcular los totales de categoría ---
@@ -2060,7 +2187,7 @@
         // Se elimina fetchSalesElTransito
 
         // ============================================================================
-        // == VI. LÓGICA DE MODALES (QR, Scanner y EDITOR)                             ==
+        // == VII. LÓGICA DE MODALES (QR, Scanner y EDITOR)                             ==
         // ============================================================================
 
         // --- Lógica del Editor de Producto (Modal) ---
@@ -2863,10 +2990,7 @@
         };
         
         // --- Evento de Carga Principal (MODIFICADO para incluir Bodega) ---
-        window.addEventListener("load", async () => {
-            // Aplicar el tema guardado o predeterminado al cargar
-            const initialTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
-            applyTheme(initialTheme); 
+        async function loadAppDataAndInitialize() {
             
             saleDateIn.value = new Date().toISOString().split('T')[0];
             
@@ -2900,6 +3024,17 @@
             } else {
                 alert("Error Crítico: No se pudo cargar Supabase. La aplicación no funcionará correctamente.");
             }
+        }
+        
+        window.addEventListener("load", async () => {
+            // Aplicar el tema guardado o predeterminado al cargar
+            const initialTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
+            applyTheme(initialTheme); 
+            
+            // 1. Iniciar el escuchador de autenticación
+            setupAuthListener();
+            
+            // Nota: loadAppDataAndInitialize() es llamado desde setupAuthListener() cuando el usuario está autenticado.
         });
     </script>
 </body>
