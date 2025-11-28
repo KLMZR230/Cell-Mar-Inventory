@@ -723,21 +723,7 @@
                 </div>
                 <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
                     <h2 class="text-xl font-semibold text-indigo-300">📊 Historial de Ventas</h2>
-                    <div class="flex items-center space-x-4 text-sm bg-gray-900/50 p-2 rounded-lg">
-                        <span id="total-sales-count" class="text-gray-400 pr-2 border-r border-gray-600"></span>
-                        <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Total General Vendido:</span>
-                            <span id="total-sold-amount" class="font-bold text-green-400">$0.00</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Total General Pagado:</span>
-                            <span id="total-paid-amount" class="font-bold text-green-500">$0.00</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="font-medium text-gray-300">Progreso:</span>
-                            <span id="paid-percentage" class="font-bold text-indigo-400">0%</span>
-                        </div>
-                    </div>
+                    <span id="total-sales-count" class="text-gray-400 text-sm"></span>
                 </div>
                 <div id="sales-list-loader" class="space-y-2"></div>
                 <div id="sales-list-container"></div>
@@ -965,7 +951,6 @@
         // ============================================================================
 
         // --- Variables de Estado ---
-        // Se eliminan las variables de El Transito
         let allProducts = [], allProductsBodega = [], allSales = [], allMissingProducts = [], allTools = [], selectedLogoFile = null;
         let editingToolId = null; 
         let currentEditingProduct = null;
@@ -1541,7 +1526,7 @@
             categoryTotalsElBodega.innerHTML = `
                 <span class="font-bold text-indigo-300">Total por Categoría (Nuevo Inventario):</span>
                 ${Object.keys(categoryTotalsBodega).sort().map(cat => 
-                    `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotalsBodega[cat]}</span> u.</span>`
+                    `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotals[cat]}</span> u.</span>`
                 ).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
             `;
             productsElBodega.appendChild(categoryTotalsElBodega);
@@ -1626,21 +1611,13 @@
             renderSales(filtered);
         }
         
+        // Función eliminada: updateGeneralTotals (se mantiene para compatibilidad con la llamada de renderSales)
         function updateGeneralTotals(filteredArray) {
-            // Se elimina la lógica de isMainSales ya que solo existe una tabla de ventas.
-            const totalSoldEl = document.getElementById(`total-sold-amount`);
-            const totalPaidEl = document.getElementById(`total-paid-amount`);
-            const percentageEl = document.getElementById(`paid-percentage`);
+            // Lógica eliminada, solo actualiza el contador de ventas visibles.
             const countEl = document.getElementById(`total-sales-count`);
-            
-            const totalSold = allSales.reduce((sum, s) => sum + Number(s.price), 0);
-            const totalPaid = allSales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
-            const percentagePaid = totalSold > 0 ? (totalPaid / totalSold) * 100 : 0;
-            if(totalSoldEl) totalSoldEl.textContent = `$${totalSold.toFixed(2)}`;
-            if(totalPaidEl) totalPaidEl.textContent = `$${totalPaid.toFixed(2)}`;
-            if(percentageEl) percentageEl.textContent = `${percentagePaid.toFixed(1)}%`;
             if(countEl) countEl.textContent = `${filteredArray.length} de ${allSales.length} ventas`;
         }
+        
         function createSaleRowHTML(sale) {
             // Se elimina idSuffix ya que solo hay una tabla de ventas
             const currentStatus = sale.status || 'Pendiente';
@@ -1864,17 +1841,7 @@
             doc.setFontSize(16);
             doc.text(title, 10, y);
             y += 8;
-
-            // Totales Generales
-            const totalSoldEl = document.getElementById('total-sold-amount');
-            const totalPaidEl = document.getElementById('total-paid-amount');
-            const paidPercentageEl = document.getElementById('paid-percentage');
             
-            doc.setFontSize(10);
-            doc.text(`Total Vendido: ${totalSoldEl.textContent}`, 10, y);
-            doc.text(`Total Pagado: ${totalPaidEl.textContent}`, 70, y);
-            doc.text(`Progreso: ${paidPercentageEl.textContent}`, 130, y);
-            y += 5;
             doc.setLineWidth(0.1);
             doc.line(10, y, pageWidth - 10, y);
             y += 5;
