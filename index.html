@@ -1037,7 +1037,9 @@
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenuDropdown = document.getElementById('mobile-menu-dropdown');
         const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
-
+        
+        // --- ADICIÓN: Variable global para rastrear la vista actual antes de la recarga
+        let currentView = 'inventory'; // Valor predeterminado
 
         // ============================================================================
         // == III. LÓGICA DE AUTENTICACIÓN (LOGIN)                                   ==
@@ -1338,6 +1340,8 @@
             missing: { el: document.getElementById('missing-view'), title: 'Vista: Productos Faltantes' },
             tools: { el: document.getElementById('tools-view'), title: 'Vista: Herramientas y Tutoriales' } 
         };
+        
+        // MODIFICACIÓN CRÍTICA: Guarda la vista en localStorage para restaurarla
         function toggleView(viewName) { 
             Object.keys(views).forEach(key => { 
                 const isCurrent = key === viewName; 
@@ -1360,6 +1364,15 @@
                    }
             }); 
             currentViewTitle.textContent = views[viewName].title; 
+            
+            // --- ADICIÓN CLAVE: Guardar la vista actual ---
+            currentView = viewName;
+            try {
+                localStorage.setItem('lastView', viewName);
+            } catch (e) {
+                console.warn("No se pudo guardar la última vista en localStorage.", e);
+            }
+            // --- FIN ADICIÓN CLAVE ---
             
             if (viewName === 'labels') {
                 updateLabelView();
@@ -1427,7 +1440,7 @@
                 section.className = "mb-10"; 
                 section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; 
                 const grid = document.createElement("div"); 
-                // Ajuste de columnas: 2 en móvil, 3 en sm, 4 en lg, 4 en xl (Tailwind)
+                // Ajuste de columnas: 2 en móvil, 2 en sm, 3 en lg, 4 en xl (Tailwind)
                 grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
                 grouped[category].forEach(p => { 
                     const card = document.createElement("div");
@@ -2966,12 +2979,17 @@
             // Cargar Logo (independiente de Supabase)
             await loadLogo(); 
             
-            // LÓGICA DE CARGA MÓVIL/ESCRITORIO
-            if (isMobile()) {
-                toggleView('inventory'); // Carga inicial en Inventario Principal en móvil
-            } else {
-                toggleView('inventory'); // Carga inicial en Inventario Principal (Desktop)
+            // NUEVA LÓGICA DE VISTA: Recuperar la última vista al cargar
+            let viewToLoad = 'inventory';
+            try {
+                const lastView = localStorage.getItem('lastView');
+                if (lastView && views[lastView]) {
+                    viewToLoad = lastView;
+                }
+            } catch (e) {
+                console.warn("No se pudo leer la última vista de localStorage.", e);
             }
+            toggleView(viewToLoad);
 
             if (supabase) {
                 try {
@@ -2992,6 +3010,42 @@
                 alert("Error Crítico: No se pudo cargar Supabase. La aplicación no funcionará correctamente.");
             }
         }
+        
+        // --- ADICIÓN CRÍTICA: Lógica de Restauración en Dispositivos Móviles ---
+        document.addEventListener('visibilitychange', async () => {
+            // Esta función detecta cuando el usuario regresa a la pestaña (página)
+            if (document.visibilityState === 'visible') {
+                console.log('👀 Página visible: Comprobando sesión de Supabase...');
+                
+                if (!supabase) return;
+
+                // Forzar la obtención del estado de la sesión más reciente
+                const { data: { session }, error } = await supabase.auth.getSession();
+
+                if (error) {
+                    console.error('Error al obtener la sesión en el regreso:', error);
+                    return;
+                }
+
+                if (session) {
+                    // Si hay sesión, el usuario está autenticado. 
+                    // Aseguramos que el DOM de la app esté visible y se reinicialicen los datos.
+                    if (appContentWrapper.classList.contains('hidden')) {
+                        authModal.classList.add('hidden');
+                        appContentWrapper.classList.remove('hidden');
+                        console.log('🔄 Reinicializando datos de la aplicación...');
+                        await loadAppDataAndInitialize(); 
+                    }
+                } else {
+                    // Si no hay sesión, aseguramos que se muestre el modal de autenticación
+                    if (appContentWrapper && !appContentWrapper.classList.contains('hidden')) {
+                        authModal.classList.remove('hidden');
+                        appContentWrapper.classList.add('hidden');
+                        console.log('🚪 Sesión expirada. Mostrando modal de autenticación.');
+                    }
+                }
+            }
+        });
         
         window.addEventListener("load", async () => {
             // Aplicar el tema guardado o predeterminado al cargar
