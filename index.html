@@ -177,7 +177,9 @@
                     </button>
                 </div>
             </div>
-            <div id="app-content-wrapper" class="hidden">
+        </div>
+    </div>
+    <div id="app-content-wrapper" class="hidden">
     
     <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
         <div class="flex items-center space-x-4">
@@ -665,7 +667,8 @@
              const el = document.getElementById('auth-status');
              el.textContent = msg;
              el.className = `text-sm mt-3 text-center ${success ? 'text-green-400' : 'text-red-400'}`;
-             setTimeout(() => (el.textContent = ""), 5000);
+             // Mantener visible el mensaje un poco más, especialmente en éxito/error.
+             setTimeout(() => (el.textContent = ""), 5000); 
         }
 
         async function handleLogin(event) {
@@ -679,10 +682,11 @@
             // Desactivar botón y limpiar mensajes previos
             loginButton.disabled = true;
             loginButton.textContent = "Verificando...";
-            setAuthStatus("Verificando credenciales..."); 
+            document.getElementById('auth-status').textContent = "Verificando credenciales..."; 
 
             if (!supabase) { 
-                setAuthStatus('Error: Librerías no cargadas.', false); 
+                document.getElementById('auth-status').textContent = 'Error: Librerías no cargadas.';
+                document.getElementById('auth-status').className = 'text-sm mt-3 text-center text-red-400';
                 loginButton.disabled = false; 
                 loginButton.textContent = "Entrar";
                 return; 
@@ -703,7 +707,7 @@
                 // MENSAJE PEDIDO: Éxito
                 setAuthStatus('Inicio exitoso, cargando aplicación...', true);
                 
-                // Pausa ligera para mostrar el mensaje de éxito antes de que el listener cambie la vista
+                // La función setupAuthListener se encargará del cambio de vista.
                 setTimeout(() => {
                     loginButton.textContent = "Entrar";
                     loginButton.disabled = false;
@@ -732,14 +736,21 @@
             const checkInterval = setInterval(() => {
                 if (window.supabase) {
                     clearInterval(checkInterval);
-                    initSupabase();
+                    initSupabase(); // Asegura la inicialización
+
+                    if (!supabase) {
+                        console.error("Supabase no inicializado.");
+                        return;
+                    }
                     
                     supabase.auth.onAuthStateChange((event, session) => {
                         const authModal = document.getElementById('auth-modal');
                         const appContent = document.getElementById('app-content-wrapper');
-                        
+
                         if (session) {
-                            // Si hay sesión, ocultamos login y mostramos la app
+                            // HAY SESIÓN: Mostrar aplicación y cargar datos
+                            console.log(`Estado de autenticación: ${event}. Sesión activa.`);
+                            
                             if (!authModal.classList.contains('hidden')) {
                                 authModal.classList.add('hidden');
                             }
@@ -749,7 +760,9 @@
                                 loadAppDataAndInitialize(); 
                             }
                         } else {
-                            // Si no hay sesión (o se cerró), mostramos el login
+                            // NO HAY SESIÓN: Mostrar modal de inicio de sesión
+                            console.log(`Estado de autenticación: ${event}. Sesión inactiva.`);
+
                             authModal.classList.remove('hidden');
                             appContent.classList.add('hidden');
                             
@@ -759,6 +772,24 @@
                             document.getElementById('auth-status').textContent = '';
                         }
                     });
+                    
+                    // Verificación inicial para usuarios ya autenticados (corrige el "quedarse en blanco")
+                    supabase.auth.getSession().then(({ data: { session } }) => {
+                        const authModal = document.getElementById('auth-modal');
+                        const appContent = document.getElementById('app-content-wrapper');
+
+                        if (session) {
+                            // Si ya hay sesión, cargamos la aplicación inmediatamente
+                            authModal.classList.add('hidden');
+                            appContent.classList.remove('hidden');
+                            loadAppDataAndInitialize();
+                        } else {
+                            // Si no hay sesión, mostramos el modal de login
+                            authModal.classList.remove('hidden');
+                            appContent.classList.add('hidden');
+                        }
+                    });
+
                 }
             }, 100);
         }
@@ -1561,10 +1592,3 @@
                 e.target.reset();
                 fetchTools(); // Refresh list via fetch/realtime
             } catch (err) {
-                statusEl.textContent = `Error: ${err.message}`;
-                statusEl.className = 'text-sm text-red-400 mt-3';
-            }
-        });
-    </script>
-</body>
-</html>
