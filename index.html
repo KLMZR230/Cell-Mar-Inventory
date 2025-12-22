@@ -26,7 +26,7 @@
             transition: background-color 0.5s ease;
             position: relative;
             overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent; /* Elimina flash azul en toques móviles */
+            -webkit-tap-highlight-color: transparent; /* Fix móvil */
         }
         .container.mx-auto {
             flex-grow: 1;
@@ -35,7 +35,7 @@
         .product-card:hover, .tool-card:hover { transform: translateY(-5px); }
         /* El input file del logo debe ser invisible pero accesible */
         #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
-        .hidden { display: none !important; } /* Forzar hidden */
+        .hidden { display: none !important; }
         .skeleton-card { background-color: transparent; border-radius: 0.5rem; padding: 1rem; display: flex; flex-direction: column; }
         .skeleton-line {
             background-color: var(--bg-secondary);
@@ -62,8 +62,8 @@
                 background-color: white !important;
             }
             .labels-container > div {
-                width: 100mm;
-                height: 35mm;
+                width: 100mm; 
+                height: 35mm; 
                 box-sizing: border-box;
                 border: 1px solid #ccc;
                 margin: 2mm;
@@ -74,11 +74,12 @@
                 justify-content: flex-start;
                 page-break-after: avoid;
                 background-color: white !important;
-                color: black !important;
+                color: black !important; 
             }
             .labels-container .qr-box { margin-right: 10px; width: 35mm; height: 35mm; display: flex; justify-content: center; align-items: center; }
             .labels-container canvas, .labels-container img { width: 30mm !important; height: 30mm !important; }
             
+            /* Modal de QR individual (para asegurar fondo blanco en impresión) */
             #qr-modal {
                 display: flex !important;
                 position: fixed;
@@ -108,7 +109,7 @@
             --accent-color-dark: #6366f1;
             --font-main: 'Poppins', sans-serif;
             --font-headings: 'Poppins', sans-serif;
-            --pastel-bg: #e0f2f1;
+            --pastel-bg: #e0f2f1; /* Verde pastel claro para móvil */
             --pastel-text: #1f2937;
         }
         
@@ -138,7 +139,7 @@
             --accent-color-dark: #e63e00;
             --font-main: 'Roboto', sans-serif;
             --font-headings: 'Roboto', sans-serif;
-            --pastel-bg: #ffccbc;
+            --pastel-bg: #ffccbc; /* Naranja/Melocotón pastel */
             --pastel-text: #2d1a1a;
         }
         .theme-infernal { background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
@@ -159,7 +160,7 @@
             --accent-color-dark: #B8860B;
             --font-main: 'Poppins', sans-serif;
             --font-headings: 'Playfair Display', serif;
-            --pastel-bg: #faf3e0;
+            --pastel-bg: #faf3e0; /* Crema pastel */
             --pastel-text: #121212;
         }
         .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
@@ -167,26 +168,28 @@
         .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
         .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
         
+        /* TEMA NAVIDAD ELIMINADO COMPLETAMENTE */
+
         /********************************/
         /* TEMA 5: Blue Neon */
         /********************************/
         .theme-blue-neon {
-            --bg-primary: #080a1c;
-            --bg-secondary: #12183b;
+            --bg-primary: #080a1c; /* Azul muy oscuro/negro */
+            --bg-secondary: #12183b; /* Azul oscuro */
             --bg-header: rgba(8, 10, 28, 0.9);
-            --text-primary: #e0f7fa;
+            --text-primary: #e0f7fa; /* Cyan claro */
             --text-secondary: #99eeff;
             --text-muted: #4dd0e1;
-            --border-color: #00bcd4;
-            --accent-color: #00e5ff;
+            --border-color: #00bcd4; /* Azul Neón */
+            --accent-color: #00e5ff; /* Neón brillante */
             --accent-color-dark: #00aacd;
             --font-main: 'Roboto', sans-serif;
-            --font-headings: 'Roboto Mono', monospace;
-            --pastel-bg: #e1f5fe;
+            --font-headings: 'Roboto Mono', monospace; /* Fuente de código */
+            --pastel-bg: #e1f5fe; /* Azul pastel */
             --pastel-text: #080a1c;
         }
         .theme-blue-neon {
-            background-image: url('data:image/svg+xml,%3Csvg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%231a1a3a" fill-opacity="0.4"%3E%3Cpath d="M0 0h80v80H0zM20 20v40h40V20H20zM30 30h20v20H30V30z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+            background-image: url('data:image/svg+xml,%3Csvg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%231a1a3a" fill-opacity="0.4"%3E%3Cpath d="M0 0h80v80H0zM20 20v40h40V20H20zM30 30h20v20H30V30z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); /* Fondo de circuito/malla */
         }
         .theme-blue-neon .product-card:hover, .theme-blue-neon .tool-card:hover {
             box-shadow: 0 0 20px var(--accent-color);
@@ -194,7 +197,7 @@
         }
         .theme-blue-neon .text-indigo-400, .theme-blue-neon .text-indigo-300 {
             color: var(--accent-color);
-            text-shadow: 0 0 8px var(--accent-color);
+            text-shadow: 0 0 8px var(--accent-color); /* Efecto neón */
         }
         .theme-blue-neon .bg-indigo-500, .theme-blue-neon .hover\:bg-indigo-600:hover, 
         .theme-blue-neon .bg-blue-600, .theme-blue-neon .hover\:bg-blue-700:hover,
@@ -216,13 +219,15 @@
         }
         h1, h2, h3, h4, h5, h6 { font-family: var(--font-headings); }
         
+        /* Aplicación de colores para fondo de headers y cards */
         .bg-gray-800, .bg-gray-900\/50 {
             background-color: var(--bg-header);
             border: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
             backdrop-filter: blur(10px);
-            color: var(--text-primary);
+            color: var(--text-primary); /* Restaurar color de texto */
         }
         
+        /* Asegurar que el fondo secundario de inputs y selectores es visible */
         .bg-gray-600 { background-color: var(--bg-secondary) !important; }
         .bg-gray-700\/50 { background-color: var(--bg-secondary); }
 
@@ -277,6 +282,7 @@
                 display: none !important;
             }
             .sales-list-table {
+                /* Asegura que la tabla se comporte como tabla en escritorio */
                 display: table;
             }
         }
@@ -288,6 +294,7 @@
             #mobile-menu-button {
                 display: block; 
             }
+            /* Inventario en 2 columnas en móvil */
             #products .grid, #products-bodega .grid, #products-loader, #products-loader-bodega, #tools-list {
                 grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             }
@@ -315,6 +322,7 @@
             #mobile-menu-dropdown button:hover {
                 background-color: rgba(0, 0, 0, 0.05);
             }
+             /* Estilo para el botón activo en el menú móvil */
             #mobile-menu-dropdown .bg-indigo-500 {
                 background-color: var(--accent-color) !important;
                 color: var(--text-primary) !important;
@@ -328,11 +336,12 @@
                 border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             }
 
+            /* Estilos para transformar la tabla de ventas en tarjetas */
             .sales-list-table, .sales-list-table thead, .sales-list-table tbody, .sales-list-table th, .sales-list-table td, .sales-list-table tr { 
                 display: block; 
             }
             .sales-list-table thead {
-                display: none;
+                display: none; /* Oculta la cabecera en móvil */
             }
             .sales-list-table tr {
                 margin-bottom: 0.75rem;
@@ -341,13 +350,15 @@
                 overflow: hidden;
             }
             .sales-list-table td {
+                /* Hace que cada celda ocupe el ancho completo */
                 border-bottom: 1px solid var(--border-color);
                 position: relative;
                 padding-left: 50%;
                 text-align: right;
-                word-wrap: break-word;
+                word-wrap: break-word; /* Para prevenir desbordamiento de palabras largas */
             }
             .sales-list-table td:before {
+                /* Usa el atributo data-label para mostrar el nombre de la columna */
                 content: attr(data-label);
                 position: absolute;
                 left: 0;
@@ -358,6 +369,7 @@
                 font-weight: 600;
                 color: var(--text-muted);
             }
+            /* La última celda (Eliminar) y el select de estado no necesitan padding extra */
             .sales-list-table td:last-child {
                 border-bottom: none;
                 text-align: center;
@@ -366,6 +378,7 @@
             .sales-list-table td:last-child:before {
                 content: none;
             }
+            /* Ajustar el select de estado para que se vea correctamente */
             .sales-list-table select {
                 display: inline-block;
                 max-width: 100%;
@@ -375,6 +388,7 @@
     <script>
         (function() {
             try {
+                // Se agregan los nuevos temas a la lista de temas válidos
                 const theme = localStorage.getItem('selectedTheme');
                 if (theme && ['theme-dark', 'theme-infernal', 'theme-gold', 'theme-blue-neon'].includes(theme)) {
                     document.documentElement.className = theme;
@@ -392,9 +406,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
-<body class=""> 
+<body class="" onclick=""> 
     
-    <div id="auth-modal" class="fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="auth-modal-title" role="dialog" aria-modal="true">
+    <div id="auth-modal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="auth-modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-900 bg-opacity-90 transition-opacity" aria-hidden="true"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
@@ -411,19 +425,19 @@
                             <form id="auth-form" class="mt-4 space-y-4">
                                 <div>
                                     <label for="email-input" class="block text-sm font-medium text-gray-300">Correo Electrónico</label>
-                                    <input id="email-input" type="email" required enterkeyhint="next" class="mt-1 block w-full border rounded-md p-3 bg-gray-600 border-gray-500 text-white focus:ring-indigo-500 focus:border-indigo-500 text-base" placeholder="tu@correo.com" />
+                                    <input id="email-input" type="email" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="tu@correo.com" />
                                 </div>
                                 <div>
                                     <label for="password-input" class="block text-sm font-medium text-gray-300">Contraseña</label>
-                                    <input id="password-input" type="password" required enterkeyhint="go" class="mt-1 block w-full border rounded-md p-3 bg-gray-600 border-gray-500 text-white focus:ring-indigo-500 focus:border-indigo-500 text-base" placeholder="********" />
+                                    <input id="password-input" type="password" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="********" />
                                 </div>
-                                <p id="auth-status" class="text-sm text-center text-gray-400 mt-3 min-h-[20px]"></p>
+                                <p id="auth-status" class="text-sm text-center text-gray-400 mt-3"></p>
                             </form>
                         </div>
                     </div>
                 </div>
                 <div class="bg-gray-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-700">
-                    <button type="submit" form="auth-form" id="login-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-3 bg-indigo-600 text-lg font-medium text-white hover:bg-indigo-700 sm:ml-3 sm:w-auto sm:text-sm transition">
+                    <button type="submit" form="auth-form" id="login-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 sm:ml-3 sm:w-auto sm:text-sm transition">
                         Entrar
                     </button>
                 </div>
@@ -723,7 +737,7 @@
         </footer>
     </div>
 
-    <div id="product-editor-modal" class="fixed inset-0 z-[60] overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div id="product-editor-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeProductEditorModal()"></div>
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
@@ -805,7 +819,7 @@
       </div>
     </div>
 
-    <div id="qr-modal" class="fixed inset-0 z-[70] overflow-y-auto hidden" aria-labelledby="qr-modal-title" role="dialog" aria-modal="true">
+    <div id="qr-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="qr-modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-white bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeQrModal()"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
@@ -827,7 +841,7 @@
         </div>
     </div>
 
-    <div id="scanner-modal" class="fixed inset-0 z-[70] overflow-y-auto hidden" aria-labelledby="scanner-modal-title" role="dialog" aria-modal="true">
+    <div id="scanner-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="scanner-modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeScannerModal(true)"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
@@ -852,10 +866,15 @@
         // =================================================================================
         // == Configuración de Supabase y Edge Function para R2                        ==
         // =================================================================================
-        
-        let supabase = null;
+        const createClient = window.supabase ? window.supabase.createClient : null;
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
+        let supabase = null;
+        if (createClient) {
+            supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } else {
+            console.error("Error Crítico: La librería Supabase no se ha cargado.");
+        }
         const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
         
         // --- INICIO: Definición de Constantes de Tablas y Estilos ---
@@ -882,9 +901,11 @@
         let isMainInventory = true;
         let selectedProductImageFile = null; 
         
+        // --- ADICIÓN: Variables para almacenar totales por categoría ---
         let categoryTotals = {};
         let categoryTotalsBodega = {}; 
         
+        // --- ADICIÓN: Elementos para mostrar los totales ---
         const categoryTotalsEl = document.createElement("div"); 
         categoryTotalsEl.id = "category-totals";
         categoryTotalsEl.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
@@ -956,15 +977,16 @@
         const modalImageUpload = document.getElementById('modal-image-upload');
         const modalStatus = document.getElementById('modal-status');
         
-        // --- Elementos de Menú Móvil ---
+        // --- ADICIÓN: Elementos de Menú Móvil ---
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenuDropdown = document.getElementById('mobile-menu-dropdown');
         const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
         
+        // --- ADICIÓN: Variable global para rastrear la vista actual antes de la recarga
         let currentView = 'inventory'; 
 
         // ============================================================================
-        // == III. LÓGICA DE AUTENTICACIÓN (LOGIN) - CORREGIDA PARA MÓVILES          ==
+        // == III. LÓGICA DE AUTENTICACIÓN (LOGIN) - ARREGLADA PARA MÓVILES          ==
         // ============================================================================
         function setAuthStatus(msg, success = true) {
              authStatus.textContent = msg;
@@ -976,10 +998,10 @@
             event.preventDefault();
             const loginButton = document.getElementById('login-button');
             loginButton.disabled = true;
-            setAuthStatus('Conectando con el servidor...', true);
+            setAuthStatus('Verificando credenciales...', true);
 
             if (!supabase) {
-                setAuthStatus('Error crítico: El sistema no cargó correctamente. Recarga la página.', false);
+                setAuthStatus('Error crítico: Supabase no cargó. Recarga la página.', false);
                 loginButton.disabled = false;
                 return;
             }
@@ -988,7 +1010,7 @@
             const password = passwordInput.value;
 
             try {
-                // CORRECCIÓN MÓVIL: No confiamos solo en el retorno, forzamos un chequeo de sesión después
+                // Intentamos el login
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email: email,
                     password: password,
@@ -996,58 +1018,201 @@
 
                 if (error) throw error;
                 
-                // Si llegamos aquí, la petición fue exitosa. 
-                // Verificamos si la sesión se guardó
-                const { data: sessionData } = await supabase.auth.getSession();
+                // SI EL LOGIN ES EXITOSO EN LA API:
+                setAuthStatus('¡Bienvenido! Entrando...', true);
                 
-                if (sessionData && sessionData.session) {
-                    setAuthStatus('¡Acceso concedido! Entrando...', true);
-                    // Forzar cierre del modal si el onAuthStateChange tarda
-                    authModal.classList.add('hidden');
-                    appContentWrapper.classList.remove('hidden');
-                    loadAppDataAndInitialize();
-                } else {
-                    throw new Error("La sesión no pudo persistirse. Revisa cookies.");
-                }
+                // FORZAMOS LA ENTRADA MANUALMENTE (No esperamos al evento onAuthStateChange)
+                // Esto soluciona el bug en móviles donde el evento no se dispara a tiempo
+                authModal.classList.add('hidden');
+                appContentWrapper.classList.remove('hidden');
+                loadAppDataAndInitialize();
 
             } catch (error) {
                 console.error("Error de autenticación:", error);
-                let msg = 'Error desconocido.';
-                if(error.message.includes("Invalid login")) msg = 'Correo o contraseña incorrectos.';
-                else if(error.message.includes("network")) msg = 'Error de conexión. Verifica tu internet.';
-                setAuthStatus(msg, false); 
-            } finally {
+                setAuthStatus('Correo o contraseña incorrectos.', false); 
                 loginButton.disabled = false;
             }
         }
 
         window.logout = async function() {
             if (!supabase) return;
-            if (!confirm("¿Cerrar sesión actual?")) return;
+            if (!confirm("¿Estás seguro de que quieres cerrar tu sesión?")) return;
+            
             try {
-                await supabase.auth.signOut();
-                window.location.reload(); // Recarga limpia para limpiar estados
+                const { error } = await supabase.auth.signOut();
+                // Forzamos recarga para limpiar memoria
+                window.location.reload(); 
             } catch (error) {
-                 alert("Error al cerrar: " + error.message);
+                 alert("❌ Error al cerrar sesión: " + error.message);
+                 window.location.reload();
             }
         }
 
+        // Se mantiene el listener como respaldo, pero el login manual tiene prioridad
         function setupAuthListener() {
             if (!supabase) {
-                console.error("Supabase no definido en setupAuthListener");
+                authModal.classList.remove('hidden');
+                appContentWrapper.classList.add('hidden');
                 return;
             }
 
-            // Escuchar cambios de estado
             supabase.auth.onAuthStateChange((event, session) => {
-                console.log('Evento Auth:', event);
                 if (session) {
+                    // Solo si aún no hemos entrado (para no recargar datos doble)
+                    if(authModal.classList.contains('hidden') === false) {
+                        authModal.classList.add('hidden');
+                        appContentWrapper.classList.remove('hidden');
+                        loadAppDataAndInitialize(); 
+                    }
+                } else {
+                    // Si no hay sesión, mostramos login
+                    authModal.classList.remove('hidden');
+                    appContentWrapper.classList.add('hidden');
+                }
+            });
+        }
+        
+        authForm.addEventListener('submit', handleLogin);<script>
+        // =================================================================================
+        // == 1. CONFIGURACIÓN SUPABASE                                                   ==
+        // =================================================================================
+        
+        let supabase = null;
+        const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
+        const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
+        
+        // Tablas
+        const PRODUCTS_TABLE = "products";
+        const PRODUCTS_BODEGA_TABLE = "products_nuevo"; 
+        const SALES_TABLE = "sales";
+        const MISSING_PRODUCTS_TABLE = "missing_products";
+        const TOOLS_TABLE = "tools"; 
+        const CONFIG_TABLE = "config"; 
+        
+        const STATUS_COLORS = { 
+            'Pagado': 'status-paid', 
+            'Pendiente': 'status-pending', 
+            'Devuelto': 'status-returned' 
+        };
+
+        // ============================================================================
+        // == 2. VARIABLES GLOBALES                                                  ==
+        // ============================================================================
+
+        let allProducts = [], allProductsBodega = [], allSales = [], allMissingProducts = [], allTools = [];
+        let editingToolId = null; 
+        let currentEditingProduct = null;
+        let selectedProductImageFile = null; 
+        
+        // Totales
+        let categoryTotals = {};
+        let categoryTotalsBodega = {}; 
+        
+        // Elementos UI Totales
+        const categoryTotalsEl = document.createElement("div"); 
+        categoryTotalsEl.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 text-sm";
+        const categoryTotalsElBodega = document.createElement("div"); 
+        categoryTotalsElBodega.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 text-sm";
+
+        // Elementos DOM
+        const authModal = document.getElementById('auth-modal');
+        const appContentWrapper = document.getElementById('app-content-wrapper');
+        const authForm = document.getElementById('auth-form');
+        const emailInput = document.getElementById('email-input');
+        const passwordInput = document.getElementById('password-input');
+        const authStatus = document.getElementById('auth-status');
+        const mobileMenuDropdown = document.getElementById('mobile-menu-dropdown');
+        const settingsDropdown = document.getElementById('settings-dropdown');
+        
+        // Formularios
+        const form = document.getElementById("product-form");
+        const formBodega = document.getElementById("product-form-bodega");
+        const salesForm = document.getElementById("sale-form");
+        const missingProductForm = document.getElementById("missing-product-form");
+        const toolForm = document.getElementById("tool-form");
+        
+        // Modales
+        const modal = document.getElementById('product-editor-modal');
+        const modalProductForm = document.getElementById('modal-product-form');
+        const qrModal = document.getElementById('qr-modal');
+        const scannerModal = document.getElementById('scanner-modal');
+        let html5QrcodeScanner = null;
+        let isScannerRunning = false;
+
+        // ============================================================================
+        // == 3. AUTENTICACIÓN (LOGIN FIX MÓVIL)                                     ==
+        // ============================================================================
+
+        function setAuthStatus(msg, success = true) {
+             authStatus.textContent = msg;
+             authStatus.className = `text-sm mt-3 text-center ${success ? 'text-green-400' : 'text-red-400'}`;
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const loginButton = document.getElementById('login-button');
+            loginButton.disabled = true;
+            loginButton.textContent = "Verificando...";
+            setAuthStatus('Conectando...', true);
+
+            if (!supabase) {
+                setAuthStatus('Error: Supabase no cargó. Refresca la página.', false);
+                loginButton.disabled = false;
+                return;
+            }
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+
+            try {
+                // Intento de login
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
+
+                if (error) throw error;
+                
+                // ÉXITO: Forzamos la entrada inmediatamente
+                // No esperamos al evento onAuthStateChange que falla en móviles
+                setAuthStatus('¡Correcto! Entrando...', true);
+                
+                authModal.classList.add('hidden');
+                appContentWrapper.classList.remove('hidden');
+                
+                // Cargar datos
+                loadAppDataAndInitialize();
+
+            } catch (error) {
+                console.error("Login error:", error);
+                setAuthStatus('Correo o contraseña incorrectos.', false); 
+                loginButton.disabled = false;
+                loginButton.textContent = "Entrar";
+            }
+        }
+
+        window.logout = async function() {
+            if (!supabase) return;
+            if (confirm("¿Cerrar sesión?")) {
+                try {
+                    await supabase.auth.signOut();
+                    window.location.reload(); 
+                } catch (error) {
+                     window.location.reload();
+                }
+            }
+        }
+
+        // Listener de respaldo (por si la sesión ya existe al recargar)
+        function setupAuthListener() {
+            if (!supabase) return;
+            supabase.auth.onAuthStateChange((event, session) => {
+                if (session) {
+                    if(!appContentWrapper.classList.contains('hidden')) return; // Ya estamos dentro
                     authModal.classList.add('hidden');
                     appContentWrapper.classList.remove('hidden');
-                    if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
-                        // Solo cargamos si no se ha cargado ya (evitar doble carga)
-                        if(allProducts.length === 0) loadAppDataAndInitialize(); 
-                    }
+                    loadAppDataAndInitialize(); 
                 } else {
                     authModal.classList.remove('hidden');
                     appContentWrapper.classList.add('hidden');
@@ -1055,47 +1220,30 @@
             });
         }
         
-        authForm.addEventListener('submit', handleLogin);// ============================================================================
-        // == IV. CONFIGURACIÓN Y ESTILOS                                           ==
+        authForm.addEventListener('submit', handleLogin);
+
+        // ============================================================================
+        // == 4. LÓGICA DE APLICACIÓN Y UI                                           ==
         // ============================================================================
 
         function applyTheme(theme) {
-            root.className = theme;
+            document.documentElement.className = theme;
             localStorage.setItem('selectedTheme', theme);
-            themeSelector.value = theme;
+            document.getElementById('theme-selector').value = theme;
         }
-        themeSelector.addEventListener('change', (e) => applyTheme(e.target.value));
         
-        window.toggleSettingsDropdown = function(event) {
-            event.stopPropagation(); 
-            settingsDropdown.classList.toggle('hidden');
-            mobileMenuDropdown.classList.add('hidden');
-        };
+        // Menús
+        window.toggleSettingsDropdown = (e) => { e.stopPropagation(); settingsDropdown.classList.toggle('hidden'); mobileMenuDropdown.classList.add('hidden'); };
+        window.toggleMobileMenu = (e) => { e.stopPropagation(); mobileMenuDropdown.classList.toggle('hidden'); settingsDropdown.classList.add('hidden'); };
         
-        window.toggleMobileMenu = function(event) {
-            event.stopPropagation(); 
-            mobileMenuDropdown.classList.toggle('hidden');
+        document.body.addEventListener('click', () => {
             settingsDropdown.classList.add('hidden');
-        };
-        
-        document.body.addEventListener('click', (event) => {
-            if (settingsDropdown && !settingsDropdown.classList.contains('hidden')) {
-                if (!settingsDropdown.contains(event.target) && !settingsButton.contains(event.target)) {
-                    settingsDropdown.classList.add('hidden');
-                }
-            }
-             if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden')) {
-                if (!mobileMenuDropdown.contains(event.target) && !mobileMenuButton.contains(event.target)) {
-                   mobileMenuDropdown.classList.add('hidden');
-                }
-             }
+            mobileMenuDropdown.classList.add('hidden');
         });
 
-        // ============================================================================
-        // == V. UTILIDADES Y CARGA DE DATOS                                        ==
-        // ============================================================================
-
+        // Utilidades
         function setStatusMessage(el, msg, success = true) { 
+            if(!el) return;
             el.textContent = msg; 
             el.className = `text-sm mt-3 ${success ? 'text-green-400' : 'text-red-400'}`; 
             setTimeout(() => (el.textContent = ""), 3000); 
@@ -1112,75 +1260,12 @@
             formData.append('file', file);
             const response = await fetch(SUPABASE_FUNCTION_URL, { method: 'POST', body: formData });
             const data = await response.json();
-            if (!response.ok || !data.success) throw new Error(data.error || 'Fallo subida imagen');
+            if (!response.ok || !data.success) throw new Error('Fallo subida imagen');
             return data.url; 
         }
 
-        function updateAutocompleteList(productsArray, datalistElement) {
-            datalistElement.innerHTML = '';
-            const combinedProducts = [...allProducts, ...allProductsBodega];
-            const sortedProducts = [...combinedProducts].sort((a, b) => a.name.localeCompare(b.name));
-            const uniqueNames = new Set();
-            sortedProducts.filter(p => p.quantity > 0).forEach(product => {
-                const nameWithCategory = product.name + (product.category ? ` (${product.category})` : '');
-                if (!uniqueNames.has(nameWithCategory)) {
-                    const option = document.createElement('option');
-                    option.value = nameWithCategory;
-                    datalistElement.appendChild(option);
-                    uniqueNames.add(nameWithCategory);
-                }
-            });
-        }
-
-        async function updateProductStock(productName, table, localArray, delta) {
-            const cleanProductName = getCleanProductName(productName);
-            const productToUpdate = localArray.find(p => getCleanProductName(p.name).trim() === cleanProductName);
-
-            if (productToUpdate) {
-                const currentQty = parseInt(productToUpdate.quantity) || 0;
-                const newQty = Math.max(0, currentQty + delta);
-                const isMain = (table === PRODUCTS_TABLE); 
-                const isBodega = (table === PRODUCTS_BODEGA_TABLE);
-
-                if (delta < 0 && currentQty <= 0) return;
-                
-                productToUpdate.quantity = newQty;
-                updateProductCardInDOM(productToUpdate, isMain, false, isBodega); 
-                updateAutocompleteList(localArray, inventorySuggestions);
-                calculateCategoryTotals(localArray, isMain, false, isBodega);
-
-                if(isMain) renderProducts(allProducts.filter(p => true)); 
-                else renderProductsBodega(allProductsBodega.filter(p => true)); 
-                
-                if (!supabase) return;
-
-                const { error: updateError } = await supabase
-                    .from(table)
-                    .update({ quantity: newQty })
-                    .eq("id", productToUpdate.id);
-                
-                if (updateError) {
-                    productToUpdate.quantity = currentQty;
-                    updateProductCardInDOM(productToUpdate, isMain, false, isBodega);
-                    alert(`❌ Error al actualizar stock. Revertido.`);
-                }
-            }
-        }
-        
-        const LOGO_CONFIG_KEY = "current_logo_url";
-        async function loadLogo() {
-            if (!supabase) return;
-            try {
-                const { data } = await supabase.from(CONFIG_TABLE).select("value").eq("key", LOGO_CONFIG_KEY).single();
-                if (data && data.value) businessLogo.src = `${data.value}?t=${new Date().getTime()}`; 
-            } catch (err) {}
-        }
-        
-        // ============================================================================
-        // == VI. VISTAS Y RENDERIZADO                                              ==
-        // ============================================================================
-
-        function calculateCategoryTotals(productsArray, isMain, isET, isBodega) {
+        // Totales y Autocomplete
+        function calculateCategoryTotals(productsArray, isMain, isBodega) {
             const totals = productsArray.reduce((acc, p) => {
                 const cat = p.category || 'Otros';
                 acc[cat] = (acc[cat] || 0) + parseInt(p.quantity || 0);
@@ -1191,493 +1276,335 @@
             return totals;
         }
 
-        const views = { 
-            inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario Principal' }, 
-            inventory_bodega: { el: document.getElementById('inventory-bodega-view'), title: 'Vista: Nuevo Inventario' }, 
-            labels: { el: document.getElementById('labels-view'), title: 'Vista: Generación de Etiquetas QR' },
-            sales: { el: document.getElementById('sales-view'), title: 'Vista: Ventas Registradas' },
-            missing: { el: document.getElementById('missing-view'), title: 'Vista: Productos Faltantes' },
-            tools: { el: document.getElementById('tools-view'), title: 'Vista: Herramientas y Tutoriales' } 
-        };
-        
-        function toggleView(viewName) { 
-            Object.keys(views).forEach(key => { 
-                const isCurrent = key === viewName; 
-                views[key].el.classList.toggle('hidden', !isCurrent); 
-                
-                const btn = document.querySelector(`#view-buttons .view-btn[data-view="${key}"]`); 
-                if (btn) {
-                    btn.classList.toggle('bg-indigo-500', isCurrent); 
-                    btn.classList.toggle('text-white', isCurrent); 
-                    btn.classList.toggle('bg-transparent', !isCurrent); 
-                    btn.classList.toggle('text-gray-300', !isCurrent); 
+        function updateAutocompleteList() {
+            const list = document.getElementById('inventory-suggestions');
+            list.innerHTML = '';
+            const combined = [...allProducts, ...allProductsBodega];
+            const unique = new Set();
+            combined.forEach(p => {
+                const name = p.name + (p.category ? ` (${p.category})` : '');
+                if (!unique.has(name) && p.quantity > 0) {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    list.appendChild(opt);
+                    unique.add(name);
                 }
-                 const mobileBtn = document.querySelector(`#mobile-menu-dropdown .view-btn[data-view="${key}"]`);
-                 if (mobileBtn) {
-                      mobileBtn.classList.toggle('bg-indigo-500', isCurrent); 
-                      mobileBtn.classList.toggle('font-bold', isCurrent);
-                    }
-            }); 
-            currentViewTitle.textContent = views[viewName].title; 
-            currentView = viewName;
-            try { localStorage.setItem('lastView', viewName); } catch (e) {}
+            });
+        }
+
+        // Control de Vistas
+        function toggleView(viewName) { 
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(viewName + (viewName.includes('view') ? '' : '-view'));
+            if(target) target.classList.remove('hidden');
+            
+            // Títulos y Botones
+            const titleMap = { 'inventory': 'Inventario Principal', 'inventory_bodega': 'Nuevo Inventario', 'sales': 'Ventas', 'labels': 'Etiquetas QR', 'missing': 'Faltantes', 'tools': 'Herramientas' };
+            document.getElementById("current-view-title").textContent = "Vista: " + (titleMap[viewName] || viewName);
+            
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                const active = btn.dataset.view === viewName;
+                if(btn.closest('#mobile-menu-dropdown')) {
+                    btn.className = `view-btn text-sm w-full text-left p-3 border-b border-gray-200 ${active ? 'bg-indigo-500 text-white font-bold' : 'text-gray-800'}`;
+                } else {
+                    btn.className = `view-btn py-1.5 px-3 rounded-lg text-sm transition duration-300 ${active ? 'bg-indigo-500 text-white font-medium shadow-md' : 'bg-transparent text-gray-300 hover:bg-gray-700'}`;
+                }
+            });
+
             if (viewName === 'labels') updateLabelView();
-            if (isMobile() && !mobileMenuDropdown.classList.contains('hidden')) mobileMenuDropdown.classList.add('hidden');
-            if (['sales','inventory','inventory_bodega'].includes(viewName)) window.scrollTo({ top: 0, behavior: 'smooth' });
+            mobileMenuDropdown.classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function showSkeletonLoaders() { 
-            const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div><div class="h-4 w-1/2 skeleton-line"></div><div class="h-8 w-1/4 skeleton-line"></div></div>`).join('');
-            productsLoader.innerHTML = cardSkeleton;
-            productsLoaderBodega.innerHTML = cardSkeleton; 
-            toolsLoader.innerHTML = cardSkeleton;
-            const tableSkeleton = Array(3).fill('').map(() => `<div class="h-12 skeleton-line"></div>`).join(''); 
-            salesListLoader.innerHTML = tableSkeleton; 
-            missingListLoader.innerHTML = tableSkeleton; 
-        }
+        // ============================================================================
+        // == 5. CRUD (DATOS)                                                        ==
+        // ============================================================================
 
+        // --- Productos Principal ---
         async function fetchProducts() { 
             if (!supabase) return;
-            const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
-            if (error) { totalCount.textContent = "Error"; return; } 
-            allProducts = data; 
-            calculateCategoryTotals(allProducts, true, false, false); 
-            filterAndRenderProducts(); 
-            updateAutocompleteList(allProducts, inventorySuggestions);
+            const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("created_at", { ascending: false }); 
+            if (!error) {
+                allProducts = data; 
+                calculateCategoryTotals(allProducts, true, false); 
+                filterAndRenderProducts(); 
+                updateAutocompleteList();
+            }
         }
         function filterAndRenderProducts() { 
-            const term = (searchInput.value || "").toLowerCase().trim(); 
+            const term = document.getElementById("search-input").value.toLowerCase().trim(); 
             const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); 
             renderProducts(filtered); 
         }
         function renderProducts(items) { 
-            productsLoader.innerHTML = ""; 
-            productsEl.innerHTML = ""; 
-            totalCount.textContent = `${items.length} productos`; 
-            categoryTotalsEl.innerHTML = `
-                <span class="font-bold text-indigo-300">Total por Categoría:</span>
-                ${Object.keys(categoryTotals).sort().map(cat => `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotals[cat]}</span> u.</span>`).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
-            `;
-            productsEl.appendChild(categoryTotalsEl);
-            if (items.length === 0) { productsEl.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos.</p>`; return; } 
-            const grouped = items.reduce((acc, p) => { 
-                const cat = p.category || 'Sin Categoría'; 
-                if (!acc[cat]) acc[cat] = []; 
-                acc[cat].push(p); 
-                return acc; 
-            }, {}); 
-            Object.keys(grouped).sort().forEach(category => { 
-                const section = document.createElement("div"); 
-                section.className = "mb-10"; 
-                section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; 
-                const grid = document.createElement("div"); 
-                grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
-                grouped[category].forEach(p => { 
+            const container = document.getElementById("products");
+            const loader = document.getElementById("products-loader");
+            loader.innerHTML = ""; 
+            container.innerHTML = ""; 
+            document.getElementById("total-count").textContent = `${items.length} productos`; 
+
+            // Totales
+            categoryTotalsEl.innerHTML = `<span class="font-bold text-indigo-300">Total:</span> ` + Object.keys(categoryTotals).map(cat => `<span class="text-gray-300 ml-2">${cat}: <b class="text-white">${categoryTotals[cat]}</b></span>`).join(' | ');
+            container.appendChild(categoryTotalsEl);
+
+            if (items.length === 0) { container.innerHTML += `<p class="p-4 text-gray-400">Sin resultados.</p>`; return; } 
+            
+            const grouped = items.reduce((acc, p) => { (acc[p.category || 'Otros'] = acc[p.category || 'Otros'] || []).push(p); return acc; }, {}); 
+            Object.keys(grouped).sort().forEach(cat => { 
+                const section = document.createElement("div"); section.className = "mb-8"; 
+                section.innerHTML = `<h2 class="text-xl font-bold text-gray-200 border-b border-gray-600 pb-2 mb-4">${cat}</h2>`; 
+                const grid = document.createElement("div"); grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"; 
+                grouped[cat].forEach(p => { 
                     const card = document.createElement("div");
-                    card.id = `product-card-${p.id}`; 
-                    card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
-                    const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
+                    card.className = "bg-gray-800 rounded-lg shadow p-3 relative border border-gray-700 product-card"; 
                     card.innerHTML = `
-                        <button onclick="openProductEditorModal('${p.id}', 'main')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                        </button>
-                        <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" id="product-img-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div>
-                        <h3 id="product-name-${p.id}" class="font-semibold text-white">${p.name}</h3>
-                        <p id="product-category-${p.id}" class="text-xs text-gray-400 -mt-1">${p.category || 'Otros'}</p>
-                        <p id="product-price-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
-                        <p id="product-stock-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
-                        <p id="product-box-number-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
-                        <div class="flex-grow"></div>
-                        <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
-                            <button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
-                        </div>`; 
+                        <button onclick="openProductEditorModal('${p.id}', 'main')" class="absolute top-2 right-2 text-gray-400 bg-gray-900 rounded-full p-1">✏️</button>
+                        <div class="h-32 bg-gray-700 rounded mb-2 overflow-hidden flex justify-center"><img src="${p.image_url || 'https://via.placeholder.com/150'}" class="h-full object-contain"></div>
+                        <h3 class="font-bold text-white text-sm">${p.name}</h3>
+                        <p class="text-green-400 font-bold">$${p.price}</p>
+                        <div class="flex justify-between text-xs text-gray-400 mt-1"><span>Stock: ${p.quantity}</span><span>Caja: ${p.box_number || '-'}</span></div>
+                        <button onclick="deleteProduct('${p.id}', '${PRODUCTS_TABLE}')" class="mt-2 w-full bg-red-900 text-red-200 text-xs py-1 rounded">Eliminar</button>`; 
                     grid.appendChild(card); 
                 }); 
-                section.appendChild(grid); 
-                productsEl.appendChild(section); 
+                section.appendChild(grid); container.appendChild(section); 
             }); 
         }
 
-        function updateProductCardInDOM(product, isMain, isET, isBodega) {
-            let idSuffix = isBodega ? '-bodega' : ''; 
-            const elementPrefix = 'product-';
-            const els = ['stock','name','price','category','box-number'];
-            els.forEach(key => {
-                const el = document.getElementById(`${elementPrefix}${key}${idSuffix}-${product.id}`);
-                if(el) {
-                    if(key==='stock') el.textContent = `Stock: ${product.quantity}`;
-                    if(key==='name') el.textContent = product.name;
-                    if(key==='price') el.textContent = `$${Number(product.price).toFixed(2)}`;
-                    if(key==='category') el.textContent = product.category;
-                    if(key==='box-number') el.querySelector('span').textContent = product.box_number || 'N/A';
-                }
-            });
-            const imgEl = document.getElementById(`${elementPrefix}img${idSuffix}-${product.id}`);
-            if(imgEl) {
-                imgEl.src = (product.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`) + `?t=${new Date().getTime()}`;
-            }
-        }
-        
-        window.deleteProduct = async function(id) { 
-            if (!confirm("¿Eliminar?")) return; 
-            const { error } = await supabase.from(PRODUCTS_TABLE).delete().eq("id", id); 
-            if (!error) {
-                allProducts = allProducts.filter(p => p.id !== id);
-                calculateCategoryTotals(allProducts, true, false, false); 
-                filterAndRenderProducts(); 
-                updateAutocompleteList(allProducts, inventorySuggestions);
-            }
-        }
-
+        // --- Productos Bodega ---
         async function fetchProductsBodega() { 
             if (!supabase) return;
             const { data, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).select("*").order("created_at", { ascending: false }); 
-            if (error) { totalCountBodega.textContent = "Error"; return; } 
-            allProductsBodega = data; 
-            calculateCategoryTotals(allProductsBodega, false, false, true); 
-            filterAndRenderProductsBodega(); 
-            if (labelsLocationSelect.value === 'bodega') populateLabelCategories(allProductsBodega);
-            updateAutocompleteList(allProducts, inventorySuggestions);
+            if (!error) {
+                allProductsBodega = data; 
+                calculateCategoryTotals(allProductsBodega, false, true); 
+                filterAndRenderProductsBodega(); 
+                updateAutocompleteList();
+            }
         }
         function filterAndRenderProductsBodega() { 
-            const term = (searchInputBodega.value || "").toLowerCase().trim(); 
-            const filtered = allProductsBodega.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); 
+            const term = document.getElementById("search-input-bodega").value.toLowerCase().trim(); 
+            const filtered = allProductsBodega.filter(p => p.name.toLowerCase().includes(term)); 
             renderProductsBodega(filtered); 
         }
         function renderProductsBodega(items) { 
-            productsLoaderBodega.innerHTML = ""; 
-            productsElBodega.innerHTML = ""; 
-            totalCountBodega.textContent = `${items.length} productos`; 
-            categoryTotalsElBodega.innerHTML = `
-                <span class="font-bold text-indigo-300">Total por Categoría (Nuevo):</span>
-                ${Object.keys(categoryTotalsBodega).sort().map(cat => `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotals[cat]}</span> u.</span>`).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
-            `;
-            productsElBodega.appendChild(categoryTotalsElBodega);
-            if (items.length === 0) { productsElBodega.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos.</p>`; return; } 
-            const grouped = items.reduce((acc, p) => { 
-                const cat = p.category || 'Sin Categoría'; 
-                if (!acc[cat]) acc[cat] = []; 
-                acc[cat].push(p); 
-                return acc; 
-            }, {}); 
-            Object.keys(grouped).sort().forEach(category => { 
-                const section = document.createElement("div"); 
-                section.className = "mb-10"; 
-                section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; 
-                const grid = document.createElement("div"); 
-                grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
-                grouped[category].forEach(p => { 
-                    const card = document.createElement("div"); 
-                    card.id = `product-card-bodega-${p.id}`;
-                    card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
-                    const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
+            const container = document.getElementById("products-bodega");
+            const loader = document.getElementById("products-loader-bodega");
+            loader.innerHTML = ""; container.innerHTML = ""; 
+            document.getElementById("total-count-bodega").textContent = `${items.length} productos`; 
+            
+            categoryTotalsElBodega.innerHTML = `<span class="font-bold text-indigo-300">Total Bodega:</span> ` + Object.keys(categoryTotalsBodega).map(cat => `<span class="text-gray-300 ml-2">${cat}: <b class="text-white">${categoryTotalsBodega[cat]}</b></span>`).join(' | ');
+            container.appendChild(categoryTotalsElBodega);
+
+            if (items.length === 0) { container.innerHTML += `<p class="p-4 text-gray-400">Sin resultados.</p>`; return; } 
+            
+            const grouped = items.reduce((acc, p) => { (acc[p.category || 'Otros'] = acc[p.category || 'Otros'] || []).push(p); return acc; }, {}); 
+            Object.keys(grouped).sort().forEach(cat => { 
+                const section = document.createElement("div"); section.className = "mb-8"; 
+                section.innerHTML = `<h2 class="text-xl font-bold text-gray-200 border-b border-gray-600 pb-2 mb-4">${cat}</h2>`; 
+                const grid = document.createElement("div"); grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"; 
+                grouped[cat].forEach(p => { 
+                    const card = document.createElement("div");
+                    card.className = "bg-gray-800 rounded-lg shadow p-3 relative border border-gray-700 product-card"; 
                     card.innerHTML = `
-                        <button onclick="openProductEditorModal('${p.id}', 'bodega')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                        </button>
-                        <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" id="product-img-bodega-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div>
-                        <h3 id="product-name-bodega-${p.id}" class="font-semibold text-white">${p.name}</h3>
-                        <p id="product-category-bodega-${p.id}" class="text-xs text-gray-400 -mt-1">${p.category || 'N/A'}</p>
-                        <p id="product-price-bodega-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
-                        <p id="product-stock-bodega-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
-                        <p id="product-box-number-bodega-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
-                        <div class="flex-grow"></div>
-                        <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
-                            <button onclick="deleteProductBodega('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
-                        </div>`; 
+                        <button onclick="openProductEditorModal('${p.id}', 'bodega')" class="absolute top-2 right-2 text-gray-400 bg-gray-900 rounded-full p-1">✏️</button>
+                        <div class="h-32 bg-gray-700 rounded mb-2 overflow-hidden flex justify-center"><img src="${p.image_url || 'https://via.placeholder.com/150'}" class="h-full object-contain"></div>
+                        <h3 class="font-bold text-white text-sm">${p.name}</h3>
+                        <p class="text-green-400 font-bold">$${p.price}</p>
+                        <div class="flex justify-between text-xs text-gray-400 mt-1"><span>Stock: ${p.quantity}</span><span>Caja: ${p.box_number || '-'}</span></div>
+                        <button onclick="deleteProduct('${p.id}', '${PRODUCTS_BODEGA_TABLE}')" class="mt-2 w-full bg-red-900 text-red-200 text-xs py-1 rounded">Eliminar</button>`; 
                     grid.appendChild(card); 
                 }); 
-                section.appendChild(grid); 
-                productsElBodega.appendChild(section); 
+                section.appendChild(grid); container.appendChild(section); 
             }); 
         }
-        window.deleteProductBodega = async function(id) { 
-            if (!confirm("¿Eliminar?")) return; 
-            const { error } = await supabase.from(PRODUCTS_BODEGA_TABLE).delete().eq("id", id); 
-            if (!error) {
-                allProductsBodega = allProductsBodega.filter(p => p.id !== id);
-                calculateCategoryTotals(allProductsBodega, false, false, true); 
-                filterAndRenderProductsBodega(); 
-                updateAutocompleteList(allProducts, inventorySuggestions);
-            }
+
+        window.deleteProduct = async function(id, table) { 
+            if (!confirm("¿Eliminar producto?")) return; 
+            await supabase.from(table).delete().eq("id", id); 
+            if(table === PRODUCTS_TABLE) fetchProducts();
+            else fetchProductsBodega();
         }
 
+        // --- Ventas ---
         async function fetchSales() {
             if (!supabase) return;
-            const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
-            if (!error) {
-                allSales = data;
-                filterAndRenderSales();
-            }
+            const { data } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false });
+            if (data) { allSales = data; filterAndRenderSales(); }
         }
         function filterAndRenderSales() {
-            const term = (searchSalesInput.value || "").toLowerCase().trim();
-            const pendingOnly = pendingOnlyCheckbox.checked;
-            let filtered = [...allSales]; 
-            if (term) filtered = filtered.filter(s => (s.recipient_name || '').toLowerCase().includes(term) || (s.product_name_sold || '').toLowerCase().includes(term));
-            if (pendingOnly) filtered = filtered.filter(s => s.status === 'Pendiente');
+            const term = document.getElementById("search-sales-input").value.toLowerCase();
+            const pending = document.getElementById("pending-only-checkbox").checked;
+            let filtered = allSales.filter(s => (s.recipient_name + s.product_name_sold).toLowerCase().includes(term));
+            if(pending) filtered = filtered.filter(s => s.status === 'Pendiente');
             renderSales(filtered);
         }
         function renderSales(items) {
-            salesListLoader.innerHTML = "";
-            salesListContainer.innerHTML = ""; 
-            const countEl = document.getElementById(`total-sales-count`);
-            if(countEl) countEl.textContent = `${items.length} de ${allSales.length} ventas`;
-            if (items.length === 0) {
-                salesListContainer.innerHTML = `<p class="p-4 text-gray-400">No hay ventas registradas.</p>`;
-                return;
-            } 
-            const groupedByDate = items.reduce((acc, sale) => {
-                const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
-                if (!acc[saleDate]) acc[saleDate] = [];
-                acc[saleDate].push(sale);
-                return acc;
-            }, {});
-            const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
-            let fullHTML = '';
-            sortedDates.forEach(date => {
-                const dailySales = groupedByDate[date];
-                const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
-                const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
-                const displayDate = new Date(date + 'T00:00:00Z').toLocaleDateString('es-SV', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
-                const headerHTML = `<div class="bg-gray-900/70 p-3 rounded-t-lg mt-6 flex justify-between items-center border-t border-x border-gray-700"><h3 class="font-bold text-lg text-white">${displayDate}</h3><div class="text-sm font-semibold"><span class="mr-4 text-gray-400">Vendido: <span class="text-green-400">$${dailyTotalSold.toFixed(2)}</span></span><span class="text-gray-400">Pagado: <span class="text-green-500">$${dailyTotalPaid.toFixed(2)}</span></span></div></div>`;
-                const rowsHTML = dailySales.map(sale => {
-                    const statusClass = STATUS_COLORS[sale.status] || STATUS_COLORS['Pendiente'];
-                    return `<tr id="sale-row-${sale.id}" class="hover:bg-gray-700/50 transition duration-150"><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Destinatario">${sale.recipient_name}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Producto">${sale.product_name_sold || 'N/A'}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500" data-label="Precio">$${Number(sale.price).toFixed(2)} <button onclick="editSalePrice('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button></td><td class="px-6 py-4 whitespace-nowrap text-sm" data-label="Estado"><select onchange="changeSaleStatus('${sale.id}', this.value, '${sale.product_name_sold}')" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${sale.status==='Pagado'?'selected':''}>Pagado</option><option value="Pendiente" ${sale.status==='Pendiente'?'selected':''}>Pendiente</option><option value="Devuelto" ${sale.status==='Devuelto'?'selected':''}>Devuelto</option></select></td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteSale('${sale.id}')" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td></tr>`;
-                }).join('');
-                fullHTML += `<div id="date-block-${date}">${headerHTML}<table class="min-w-full divide-y divide-gray-700 shadow-md sales-list-table"><thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6" data-label="Destinatario">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Producto Vendido">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Precio">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Estado">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead><tbody class="bg-gray-800 divide-y divide-gray-700">${rowsHTML}</tbody></table></div>`;
-            });
-            salesListContainer.innerHTML = fullHTML;
-        }
-
-        window.changeSaleStatus = async function(id, newStatus, productName) {
-            const sale = allSales.find(s => s.id === id);
-            if (!sale) return;
-            const oldStatus = sale.status;
-            try {
-                const { error } = await supabase.from(SALES_TABLE).update({ status: newStatus }).eq("id", id);
-                if (error) throw error;
-                const cleanName = getCleanProductName(productName);
-                let updateTable = null, updateArray = null;
-                if (allProducts.some(p => getCleanProductName(p.name).trim() === cleanName)) { updateTable = PRODUCTS_TABLE; updateArray = allProducts; }
-                else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === cleanName)) { updateTable = PRODUCTS_BODEGA_TABLE; updateArray = allProductsBodega; }
-                
-                if (updateTable && updateArray) {
-                    if (oldStatus !== 'Pagado' && newStatus === 'Pagado') await updateProductStock(cleanName, updateTable, updateArray, -1);
-                    else if (oldStatus === 'Pagado' && newStatus !== 'Pagado') await updateProductStock(cleanName, updateTable, updateArray, 1);
-                } 
-                fetchSales(); 
-            } catch (error) { alert("Error: " + error.message); }
-        }
-        
-        window.editSalePrice = function(id, currentPrice) {
-            const newPriceStr = prompt(`Nuevo precio:`, currentPrice.toFixed(2));
-            if (!newPriceStr) return;
-            const newPrice = parseFloat(newPriceStr.replace('$', '').trim());
-            if (isNaN(newPrice)) return;
-            supabase.from(SALES_TABLE).update({ price: newPrice }).eq("id", id).then(({ error }) => {
-                if (!error) fetchSales();
-            });
-        }
-        
-        window.deleteSale = async function(id) {
-            if (!confirm("¿Eliminar venta?")) return;
-            const sale = allSales.find(s => s.id === id);
-            if (!sale) return;
-            if (sale.status === 'Pagado') {
-                const cleanName = getCleanProductName(sale.product_name_sold);
-                let updateTable = null, updateArray = null;
-                if (allProducts.some(p => getCleanProductName(p.name).trim() === cleanName)) { updateTable = PRODUCTS_TABLE; updateArray = allProducts; }
-                else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === cleanName)) { updateTable = PRODUCTS_BODEGA_TABLE; updateArray = allProductsBodega; }
-                if (updateTable) await updateProductStock(cleanName, updateTable, updateArray, 1);
-            }
-            await supabase.from(SALES_TABLE).delete().eq("id", id);
-            fetchSales();
-        }
-
-        window.downloadSalesPDF = async function(isMainSales) {
-            if (typeof window.jspdf.jsPDF === 'undefined') return alert("Faltan librerías PDF.");
-            if (!salesListContainer.children.length) return alert("Sin datos.");
-            const Doc = window.jspdf.jsPDF;
-            const doc = new Doc('p', 'mm', 'a4');
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-            doc.text('Registro de Ventas', 10, 10);
+            const container = document.getElementById("sales-list-container");
+            document.getElementById("sales-list-loader").innerHTML = "";
+            container.innerHTML = "";
+            document.getElementById("total-sales-count").textContent = `${items.length} ventas`;
             
-            const tempExportDiv = document.createElement('div');
-            tempExportDiv.style.width = '1000px'; 
-            tempExportDiv.style.backgroundColor = '#ffffff';
-            tempExportDiv.style.color = '#000000';
-            const clone = salesListContainer.cloneNode(true);
-            clone.querySelectorAll('button').forEach(b=>b.style.display='none');
-            clone.querySelectorAll('select').forEach(s=>{ const sp=document.createElement('span'); sp.textContent=s.value; s.parentNode.insertBefore(sp,s); s.style.display='none'; });
-            tempExportDiv.appendChild(clone);
-            document.body.appendChild(tempExportDiv);
-            
-            html2canvas(tempExportDiv, { scale: 2 }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const imgHeight = canvas.height * 190 / canvas.width;
-                let heightLeft = imgHeight;
-                let position = 0;
-                doc.addImage(imgData, 'PNG', 10, 20, 190, imgHeight);
-                doc.save(`Ventas_${new Date().toISOString().split('T')[0]}.pdf`);
-                document.body.removeChild(tempExportDiv);
+            if(items.length === 0) { container.innerHTML = "<p class='text-gray-400'>No hay ventas.</p>"; return; }
+
+            const grouped = items.reduce((acc, s) => { (acc[s.sale_date] = acc[s.sale_date] || []).push(s); return acc; }, {});
+            Object.keys(grouped).sort().reverse().forEach(date => {
+                const totalDia = grouped[date].reduce((sum, s) => sum + (s.status==='Pagado'?s.price:0), 0);
+                let html = `<div class="mt-6"><h3 class="text-white font-bold border-b border-gray-600 mb-2 flex justify-between"><span>${date}</span> <span class="text-green-400">$${totalDia.toFixed(2)}</span></h3>`;
+                grouped[date].forEach(s => {
+                    const color = s.status==='Pagado'?'text-green-400':'text-yellow-400';
+                    html += `<div class="bg-gray-800 p-3 mb-2 rounded border border-gray-700 flex justify-between items-center">
+                        <div><p class="text-white font-bold text-sm">${s.product_name_sold}</p><p class="text-xs text-gray-400">${s.recipient_name}</p></div>
+                        <div class="text-right"><p class="${color} font-bold">$${s.price}</p><button onclick="deleteSale('${s.id}')" class="text-red-500 text-xs">Borrar</button></div>
+                    </div>`;
+                });
+                html += "</div>";
+                container.innerHTML += html;
             });
+        }
+        window.deleteSale = async (id) => { if(confirm("¿Borrar venta?")) { await supabase.from(SALES_TABLE).delete().eq("id", id); fetchSales(); } }
+
+        // --- Modales Logic ---
+        window.openProductEditorModal = (id, type) => {
+            const list = type === 'main' ? allProducts : allProductsBodega;
+            const p = list.find(x => x.id == id);
+            if(!p) return;
+            currentEditingProduct = p;
+            document.getElementById('modal-name').value = p.name;
+            document.getElementById('modal-price').value = p.price;
+            document.getElementById('modal-quantity').value = p.quantity;
+            document.getElementById('modal-box-number').value = p.box_number || '';
+            document.getElementById('modal-location').innerText = type === 'main' ? 'Principal' : 'Bodega';
+            document.getElementById('modal-image-preview').src = p.image_url || '';
+            modal.classList.remove('hidden');
         };
-
-        async function fetchMissingProducts() {
-            if (!supabase) return;
-            const { data } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false });
-            if (data) renderMissingProducts(data);
-        }
-        function renderMissingProducts(items) {
-            missingListEl.innerHTML = items.map(p => `<div class="flex justify-between p-4 border-b border-gray-700 hover:bg-gray-700/50"><div><p class="font-medium text-white">${p.product_name}</p><p class="text-xs text-gray-400">${p.notes || ''}</p></div><button onclick="deleteMissingProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 text-white text-sm">Comprado</button></div>`).join('');
-            totalMissingCount.textContent = `${items.length} pendientes`;
-        }
-        window.deleteMissingProduct = async function(id) {
-            if (confirm("¿Marcar como comprado?")) {
-                await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq("id", id);
-                fetchMissingProducts();
-            }
-        }
-
-        async function fetchTools() {
-            if (!supabase) return;
-            const { data } = await supabase.from(TOOLS_TABLE).select("*").order("created_at", { ascending: false });
-            if (data) renderTools(data);
-        }
-        function renderTools(items) {
-            toolsListEl.innerHTML = "";
-            totalToolsCount.textContent = `${items.length} herramientas`;
-            items.forEach(tool => {
-                const card = document.createElement("div");
-                card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col tool-card border border-gray-700";
-                card.innerHTML = `<div class="h-48 bg-gray-700 rounded mb-3 overflow-hidden"><img src="${tool.image_url || 'https://via.placeholder.com/150'}" class="object-contain h-full w-full"></div><h3 class="font-bold text-lg text-white">${tool.title}</h3><p class="text-gray-400 text-sm mt-2 flex-grow">${(tool.description||'').substring(0,100)}</p><div class="flex justify-end mt-4 pt-3 border-t border-gray-700"><button onclick="editToolImage('${tool.id}')" class="px-3 py-1 rounded bg-indigo-500 text-white text-sm mr-2">Foto</button><button onclick="deleteTool('${tool.id}')" class="px-3 py-1 rounded bg-red-600 text-white text-sm">Eliminar</button></div>`;
-                toolsListEl.appendChild(card);
-            });
-        }
-        window.editToolImage = (id) => { editingToolId = id; toolImageEditorInput.click(); }
-        window.deleteTool = async (id) => { if(confirm("¿Eliminar?")) { await supabase.from(TOOLS_TABLE).delete().eq("id", id); fetchTools(); } }
-        toolImageEditorInput.addEventListener('change', async (e) => {
-            if(e.target.files[0] && editingToolId) {
-                const url = await uploadImage(e.target.files[0]);
-                await supabase.from(TOOLS_TABLE).update({ image_url: url }).eq('id', editingToolId);
-                fetchTools();
-            }
+        window.closeProductEditorModal = () => modal.classList.add('hidden');
+        
+        modalProductForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('modal-save-button'); btn.disabled = true;
+            try {
+                let url = currentEditingProduct.image_url;
+                const file = document.getElementById('modal-image-upload').files[0];
+                if(file) url = await uploadImage(file);
+                
+                const updates = {
+                    name: document.getElementById('modal-name').value,
+                    price: document.getElementById('modal-price').value,
+                    quantity: document.getElementById('modal-quantity').value,
+                    box_number: document.getElementById('modal-box-number').value,
+                    image_url: url
+                };
+                
+                const table = allProducts.some(p=>p.id===currentEditingProduct.id) ? PRODUCTS_TABLE : PRODUCTS_BODEGA_TABLE;
+                await supabase.from(table).update(updates).eq('id', currentEditingProduct.id);
+                
+                if(table === PRODUCTS_TABLE) fetchProducts(); else fetchProductsBodega();
+                closeProductEditorModal();
+            } catch(err) { alert(err.message); }
+            btn.disabled = false;
         });
 
-        // Eventos Forms
-        searchInput.addEventListener("input", filterAndRenderProducts);
-        searchInputBodega.addEventListener("input", filterAndRenderProductsBodega); 
-        searchSalesInput.addEventListener("input", filterAndRenderSales);
-        pendingOnlyCheckbox.addEventListener("change", filterAndRenderSales);
-        
-        async function genericFormSubmit(e, table, fields, successMsg, refreshFn, extraFields={}) {
+        // --- Scanner ---
+        window.openScannerModal = () => {
+            scannerModal.classList.remove('hidden');
+            if(html5QrcodeScanner) html5QrcodeScanner.clear();
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+            html5QrcodeScanner.render((decodedText) => {
+                const id = decodedText.trim();
+                const p = allProducts.find(x=>x.id==id) || allProductsBodega.find(x=>x.id==id);
+                if(p) {
+                    toggleView('sales');
+                    document.getElementById('product-name-sold').value = p.name;
+                    document.getElementById('sale-price').value = p.price;
+                    document.getElementById('sale-status-input').value = 'Pagado';
+                    closeScannerModal();
+                    // Auto venta
+                    document.getElementById('sale-submit').click();
+                } else {
+                    alert("Producto no encontrado");
+                }
+            });
+        };
+        window.closeScannerModal = () => { scannerModal.classList.add('hidden'); if(html5QrcodeScanner) html5QrcodeScanner.clear(); };
+
+        // --- Envíos de Formulario ---
+        async function handleFormSubmit(e, table, fields, reloadFn) {
             e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            const status = e.target.querySelector('p[id*="status"]');
-            btn.disabled = true;
-            setStatusMessage(status, "Guardando...", true);
+            const btn = e.target.querySelector('button'); btn.disabled = true;
             try {
                 let url = null;
                 const fileIn = e.target.querySelector('input[type="file"]');
                 if(fileIn && fileIn.files[0]) url = await uploadImage(fileIn.files[0]);
                 
-                const payload = { ...extraFields };
-                fields.forEach(f => {
-                    const el = e.target.querySelector(`[id*="${f}"]`);
-                    if(el) {
-                        if(el.type==='number') payload[f] = parseFloat(el.value);
-                        else payload[f] = el.value;
-                    }
+                const payload = {};
+                fields.forEach(id => {
+                    const el = e.target.querySelector(`[id*="${id}"]`); 
+                    if(el) payload[id.replace('-bodega','')] = el.value;
                 });
                 if(url) payload.image_url = url;
                 
                 await supabase.from(table).insert(payload);
                 e.target.reset();
-                if(refreshFn) refreshFn();
-                setStatusMessage(status, successMsg, true);
-            } catch(err) { setStatusMessage(status, "Error: " + err.message, false); }
-            finally { btn.disabled = false; }
+                reloadFn();
+                alert("Guardado");
+            } catch(err) { alert("Error: " + err.message); }
+            btn.disabled = false;
         }
 
-        form.addEventListener("submit", (e) => genericFormSubmit(e, PRODUCTS_TABLE, ['name','category','price','quantity','box-number'], "Agregado", fetchProducts));
-        formBodega.addEventListener("submit", (e) => genericFormSubmit(e, PRODUCTS_BODEGA_TABLE, ['name','category','price','quantity','box-number'], "Agregado", fetchProductsBodega));
-        missingProductForm.addEventListener("submit", (e) => genericFormSubmit(e, MISSING_PRODUCTS_TABLE, ['product_name','notes'], "Agregado", fetchMissingProducts));
-        toolForm.addEventListener("submit", (e) => genericFormSubmit(e, TOOLS_TABLE, ['title','description'], "Agregado", fetchTools));
+        form.addEventListener('submit', (e) => handleFormSubmit(e, PRODUCTS_TABLE, ['name','category','price','quantity','box-number'], fetchProducts));
+        formBodega.addEventListener('submit', (e) => handleFormSubmit(e, PRODUCTS_BODEGA_TABLE, ['name-bodega','category-bodega','price-bodega','quantity-bodega','box-number-bodega'], fetchProductsBodega));
         
-        salesForm.addEventListener("submit", async (e) => {
+        salesForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById("sale-submit");
-            btn.disabled=true;
-            const name = productNameSoldIn.value.trim();
+            const btn = document.getElementById('sale-submit'); btn.disabled = true;
             try {
                 const sale = {
-                    recipient_name: recipientNameIn.value,
-                    product_name_sold: name,
-                    price: parseFloat(salePriceIn.value),
-                    sale_date: saleDateIn.value,
-                    status: saleStatusInput.value
+                    recipient_name: document.getElementById('recipient-name').value,
+                    product_name_sold: document.getElementById('product-name-sold').value,
+                    price: document.getElementById('sale-price').value,
+                    sale_date: document.getElementById('sale-date').value,
+                    status: document.getElementById('sale-status-input').value
                 };
                 await supabase.from(SALES_TABLE).insert(sale);
-                if (sale.status === 'Pagado') {
-                    const clean = getCleanProductName(name);
-                    if (allProducts.some(p => getCleanProductName(p.name).trim() === clean)) await updateProductStock(clean, PRODUCTS_TABLE, allProducts, -1);
-                    else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === clean)) await updateProductStock(clean, PRODUCTS_BODEGA_TABLE, allProductsBodega, -1);
+                
+                // Descuento stock simple
+                const name = sale.product_name_sold.split(' (')[0];
+                const pMain = allProducts.find(p=>p.name===name);
+                const pBodega = allProductsBodega.find(p=>p.name===name);
+                if(sale.status==='Pagado') {
+                    if(pMain) await supabase.from(PRODUCTS_TABLE).update({quantity: pMain.quantity-1}).eq('id', pMain.id);
+                    else if(pBodega) await supabase.from(PRODUCTS_BODEGA_TABLE).update({quantity: pBodega.quantity-1}).eq('id', pBodega.id);
                 }
-                salesForm.reset();
-                saleDateIn.value = new Date().toISOString().split('T')[0];
-                fetchSales();
-                setStatusMessage(saleStatus, "Venta OK", true);
-            } catch(err) { setStatusMessage(saleStatus, err.message, false); }
-            finally { btn.disabled=false; }
+                
+                salesForm.reset(); document.getElementById('sale-date').value = new Date().toISOString().split('T')[0];
+                fetchSales(); fetchProducts(); fetchProductsBodega();
+                alert("Venta registrada");
+            } catch(err) { alert(err.message); }
+            btn.disabled = false;
         });
 
-        // Inicialización
-        document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', (e) => {
-            if (!isMobile() && e.target.closest('#mobile-menu-dropdown')) return; 
-            toggleView(btn.dataset.view);
-        }));
-
+        // --- Inicialización ---
         async function loadAppDataAndInitialize() {
-            saleDateIn.value = new Date().toISOString().split('T')[0];
-            showSkeletonLoaders(); 
-            await loadLogo(); 
-            
-            // CORRECCIÓN MÓVIL: Forzar un pequeño retardo para asegurar que la UI se pinte antes de la carga pesada
-            setTimeout(async () => {
-                try {
-                    await Promise.all([
-                        fetchProducts(), 
-                        fetchProductsBodega(), 
-                        fetchSales(), 
-                        fetchMissingProducts(),
-                        fetchTools() 
-                    ]);
-                    // Solo activar realtime después de la carga inicial
-                    initializeRealtimeSubscriptions();
-                } catch (error) {
-                    console.error("Error carga datos:", error);
-                }
-            }, 100);
+            document.getElementById('sale-date').value = new Date().toISOString().split('T')[0];
+            await Promise.all([ fetchProducts(), fetchProductsBodega(), fetchSales() ]);
         }
-        
-        // CORRECCIÓN MÓVIL: Aseguramos la inicialización de supabase-js en window.onload
+
+        // INIT SEGURO
         window.onload = function() {
-            // Re-instanciar cliente si no existe
-            if (!supabase && window.supabase) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-                    auth: {
-                        persistSession: true, // Forzar persistencia
-                        storage: window.localStorage, // Forzar uso de localStorage
-                        detectSessionInUrl: false // Evitar redirecciones raras en móviles
-                    }
-                });
-            }
+            // Asegurar cliente
+            if(!supabase && window.supabase) supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             
-            const initialTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
-            applyTheme(initialTheme); 
+            // Tema
+            const theme = localStorage.getItem('selectedTheme') || 'theme-dark';
+            applyTheme(theme);
+            
+            // Listener sesion
             setupAuthListener();
+            
+            // Listeners inputs
+            document.getElementById("search-input").addEventListener("input", filterAndRenderProducts);
+            document.getElementById("search-input-bodega").addEventListener("input", filterAndRenderProductsBodega);
+            document.getElementById("search-sales-input").addEventListener("input", filterAndRenderSales);
         };
     </script>
 </body>
