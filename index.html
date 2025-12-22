@@ -26,8 +26,7 @@
             transition: background-color 0.5s ease;
             position: relative;
             overflow-x: hidden;
-            /* Mejora para móviles */
-            -webkit-tap-highlight-color: transparent;
+            -webkit-tap-highlight-color: transparent; /* Elimina flash azul en toques móviles */
         }
         .container.mx-auto {
             flex-grow: 1;
@@ -36,7 +35,7 @@
         .product-card:hover, .tool-card:hover { transform: translateY(-5px); }
         /* El input file del logo debe ser invisible pero accesible */
         #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
-        .hidden { display: none; }
+        .hidden { display: none !important; } /* Forzar hidden */
         .skeleton-card { background-color: transparent; border-radius: 0.5rem; padding: 1rem; display: flex; flex-direction: column; }
         .skeleton-line {
             background-color: var(--bg-secondary);
@@ -63,8 +62,8 @@
                 background-color: white !important;
             }
             .labels-container > div {
-                width: 100mm; /* Ancho deseado de la etiqueta */
-                height: 35mm; /* Alto deseado de la etiqueta */
+                width: 100mm;
+                height: 35mm;
                 box-sizing: border-box;
                 border: 1px solid #ccc;
                 margin: 2mm;
@@ -74,14 +73,12 @@
                 align-items: center;
                 justify-content: flex-start;
                 page-break-after: avoid;
-                /* Asegurar que el fondo de cada etiqueta es blanco */
                 background-color: white !important;
-                color: black !important; /* Texto de etiqueta en negro */
+                color: black !important;
             }
             .labels-container .qr-box { margin-right: 10px; width: 35mm; height: 35mm; display: flex; justify-content: center; align-items: center; }
             .labels-container canvas, .labels-container img { width: 30mm !important; height: 30mm !important; }
             
-            /* Modal de QR individual (para asegurar fondo blanco en impresión) */
             #qr-modal {
                 display: flex !important;
                 position: fixed;
@@ -111,7 +108,7 @@
             --accent-color-dark: #6366f1;
             --font-main: 'Poppins', sans-serif;
             --font-headings: 'Poppins', sans-serif;
-            --pastel-bg: #e0f2f1; /* Verde pastel claro para móvil */
+            --pastel-bg: #e0f2f1;
             --pastel-text: #1f2937;
         }
         
@@ -141,7 +138,7 @@
             --accent-color-dark: #e63e00;
             --font-main: 'Roboto', sans-serif;
             --font-headings: 'Roboto', sans-serif;
-            --pastel-bg: #ffccbc; /* Naranja/Melocotón pastel */
+            --pastel-bg: #ffccbc;
             --pastel-text: #2d1a1a;
         }
         .theme-infernal { background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
@@ -162,7 +159,7 @@
             --accent-color-dark: #B8860B;
             --font-main: 'Poppins', sans-serif;
             --font-headings: 'Playfair Display', serif;
-            --pastel-bg: #faf3e0; /* Crema pastel */
+            --pastel-bg: #faf3e0;
             --pastel-text: #121212;
         }
         .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
@@ -170,28 +167,26 @@
         .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
         .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
         
-        /* TEMA DE NAVIDAD ELIMINADO PARA OPTIMIZACIÓN MÓVIL */
-
         /********************************/
         /* TEMA 5: Blue Neon */
         /********************************/
         .theme-blue-neon {
-            --bg-primary: #080a1c; /* Azul muy oscuro/negro */
-            --bg-secondary: #12183b; /* Azul oscuro */
+            --bg-primary: #080a1c;
+            --bg-secondary: #12183b;
             --bg-header: rgba(8, 10, 28, 0.9);
-            --text-primary: #e0f7fa; /* Cyan claro */
+            --text-primary: #e0f7fa;
             --text-secondary: #99eeff;
             --text-muted: #4dd0e1;
-            --border-color: #00bcd4; /* Azul Neón */
-            --accent-color: #00e5ff; /* Neón brillante */
+            --border-color: #00bcd4;
+            --accent-color: #00e5ff;
             --accent-color-dark: #00aacd;
             --font-main: 'Roboto', sans-serif;
-            --font-headings: 'Roboto Mono', monospace; /* Fuente de código */
-            --pastel-bg: #e1f5fe; /* Azul pastel */
+            --font-headings: 'Roboto Mono', monospace;
+            --pastel-bg: #e1f5fe;
             --pastel-text: #080a1c;
         }
         .theme-blue-neon {
-            background-image: url('data:image/svg+xml,%3Csvg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%231a1a3a" fill-opacity="0.4"%3E%3Cpath d="M0 0h80v80H0zM20 20v40h40V20H20zM30 30h20v20H30V30z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); /* Fondo de circuito/malla */
+            background-image: url('data:image/svg+xml,%3Csvg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%231a1a3a" fill-opacity="0.4"%3E%3Cpath d="M0 0h80v80H0zM20 20v40h40V20H20zM30 30h20v20H30V30z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
         }
         .theme-blue-neon .product-card:hover, .theme-blue-neon .tool-card:hover {
             box-shadow: 0 0 20px var(--accent-color);
@@ -199,7 +194,7 @@
         }
         .theme-blue-neon .text-indigo-400, .theme-blue-neon .text-indigo-300 {
             color: var(--accent-color);
-            text-shadow: 0 0 8px var(--accent-color); /* Efecto neón */
+            text-shadow: 0 0 8px var(--accent-color);
         }
         .theme-blue-neon .bg-indigo-500, .theme-blue-neon .hover\:bg-indigo-600:hover, 
         .theme-blue-neon .bg-blue-600, .theme-blue-neon .hover\:bg-blue-700:hover,
@@ -221,15 +216,13 @@
         }
         h1, h2, h3, h4, h5, h6 { font-family: var(--font-headings); }
         
-        /* Aplicación de colores para fondo de headers y cards */
         .bg-gray-800, .bg-gray-900\/50 {
             background-color: var(--bg-header);
             border: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
             backdrop-filter: blur(10px);
-            color: var(--text-primary); /* Restaurar color de texto */
+            color: var(--text-primary);
         }
         
-        /* Asegurar que el fondo secundario de inputs y selectores es visible */
         .bg-gray-600 { background-color: var(--bg-secondary) !important; }
         .bg-gray-700\/50 { background-color: var(--bg-secondary); }
 
@@ -284,7 +277,6 @@
                 display: none !important;
             }
             .sales-list-table {
-                /* Asegura que la tabla se comporte como tabla en escritorio */
                 display: table;
             }
         }
@@ -296,7 +288,6 @@
             #mobile-menu-button {
                 display: block; 
             }
-            /* Inventario en 2 columnas en móvil */
             #products .grid, #products-bodega .grid, #products-loader, #products-loader-bodega, #tools-list {
                 grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             }
@@ -324,7 +315,6 @@
             #mobile-menu-dropdown button:hover {
                 background-color: rgba(0, 0, 0, 0.05);
             }
-             /* Estilo para el botón activo en el menú móvil */
             #mobile-menu-dropdown .bg-indigo-500 {
                 background-color: var(--accent-color) !important;
                 color: var(--text-primary) !important;
@@ -338,12 +328,11 @@
                 border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             }
 
-            /* Estilos para transformar la tabla de ventas en tarjetas */
             .sales-list-table, .sales-list-table thead, .sales-list-table tbody, .sales-list-table th, .sales-list-table td, .sales-list-table tr { 
                 display: block; 
             }
             .sales-list-table thead {
-                display: none; /* Oculta la cabecera en móvil */
+                display: none;
             }
             .sales-list-table tr {
                 margin-bottom: 0.75rem;
@@ -352,15 +341,13 @@
                 overflow: hidden;
             }
             .sales-list-table td {
-                /* Hace que cada celda ocupe el ancho completo */
                 border-bottom: 1px solid var(--border-color);
                 position: relative;
                 padding-left: 50%;
                 text-align: right;
-                word-wrap: break-word; /* Para prevenir desbordamiento de palabras largas */
+                word-wrap: break-word;
             }
             .sales-list-table td:before {
-                /* Usa el atributo data-label para mostrar el nombre de la columna */
                 content: attr(data-label);
                 position: absolute;
                 left: 0;
@@ -371,7 +358,6 @@
                 font-weight: 600;
                 color: var(--text-muted);
             }
-            /* La última celda (Eliminar) y el select de estado no necesitan padding extra */
             .sales-list-table td:last-child {
                 border-bottom: none;
                 text-align: center;
@@ -380,7 +366,6 @@
             .sales-list-table td:last-child:before {
                 content: none;
             }
-            /* Ajustar el select de estado para que se vea correctamente */
             .sales-list-table select {
                 display: inline-block;
                 max-width: 100%;
@@ -390,7 +375,6 @@
     <script>
         (function() {
             try {
-                // Se agregan los nuevos temas a la lista de temas válidos (Eliminado Navidad)
                 const theme = localStorage.getItem('selectedTheme');
                 if (theme && ['theme-dark', 'theme-infernal', 'theme-gold', 'theme-blue-neon'].includes(theme)) {
                     document.documentElement.className = theme;
@@ -410,7 +394,7 @@
 </head>
 <body class=""> 
     
-    <div id="auth-modal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="auth-modal-title" role="dialog" aria-modal="true">
+    <div id="auth-modal" class="fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="auth-modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-900 bg-opacity-90 transition-opacity" aria-hidden="true"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
@@ -427,19 +411,19 @@
                             <form id="auth-form" class="mt-4 space-y-4">
                                 <div>
                                     <label for="email-input" class="block text-sm font-medium text-gray-300">Correo Electrónico</label>
-                                    <input id="email-input" type="email" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="tu@correo.com" />
+                                    <input id="email-input" type="email" required enterkeyhint="next" class="mt-1 block w-full border rounded-md p-3 bg-gray-600 border-gray-500 text-white focus:ring-indigo-500 focus:border-indigo-500 text-base" placeholder="tu@correo.com" />
                                 </div>
                                 <div>
                                     <label for="password-input" class="block text-sm font-medium text-gray-300">Contraseña</label>
-                                    <input id="password-input" type="password" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="********" />
+                                    <input id="password-input" type="password" required enterkeyhint="go" class="mt-1 block w-full border rounded-md p-3 bg-gray-600 border-gray-500 text-white focus:ring-indigo-500 focus:border-indigo-500 text-base" placeholder="********" />
                                 </div>
-                                <p id="auth-status" class="text-sm text-center text-gray-400 mt-3"></p>
+                                <p id="auth-status" class="text-sm text-center text-gray-400 mt-3 min-h-[20px]"></p>
                             </form>
                         </div>
                     </div>
                 </div>
                 <div class="bg-gray-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-700">
-                    <button type="submit" form="auth-form" id="login-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 sm:ml-3 sm:w-auto sm:text-sm transition">
+                    <button type="submit" form="auth-form" id="login-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-3 bg-indigo-600 text-lg font-medium text-white hover:bg-indigo-700 sm:ml-3 sm:w-auto sm:text-sm transition">
                         Entrar
                     </button>
                 </div>
@@ -739,7 +723,7 @@
         </footer>
     </div>
 
-    <div id="product-editor-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div id="product-editor-modal" class="fixed inset-0 z-[60] overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeProductEditorModal()"></div>
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
@@ -821,7 +805,7 @@
       </div>
     </div>
 
-    <div id="qr-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="qr-modal-title" role="dialog" aria-modal="true">
+    <div id="qr-modal" class="fixed inset-0 z-[70] overflow-y-auto hidden" aria-labelledby="qr-modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-white bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeQrModal()"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
@@ -843,7 +827,7 @@
         </div>
     </div>
 
-    <div id="scanner-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="scanner-modal-title" role="dialog" aria-modal="true">
+    <div id="scanner-modal" class="fixed inset-0 z-[70] overflow-y-auto hidden" aria-labelledby="scanner-modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeScannerModal(true)"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
@@ -868,15 +852,10 @@
         // =================================================================================
         // == Configuración de Supabase y Edge Function para R2                        ==
         // =================================================================================
-        const createClient = window.supabase ? window.supabase.createClient : null;
+        
+        let supabase = null;
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
-        let supabase = null;
-        if (createClient) {
-            supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } else {
-            console.error("Error Crítico: La librería Supabase no se ha cargado.");
-        }
         const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
         
         // --- INICIO: Definición de Constantes de Tablas y Estilos ---
@@ -903,11 +882,9 @@
         let isMainInventory = true;
         let selectedProductImageFile = null; 
         
-        // --- ADICIÓN: Variables para almacenar totales por categoría ---
         let categoryTotals = {};
         let categoryTotalsBodega = {}; 
         
-        // --- ADICIÓN: Elementos para mostrar los totales ---
         const categoryTotalsEl = document.createElement("div"); 
         categoryTotalsEl.id = "category-totals";
         categoryTotalsEl.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
@@ -979,31 +956,30 @@
         const modalImageUpload = document.getElementById('modal-image-upload');
         const modalStatus = document.getElementById('modal-status');
         
-        // --- ADICIÓN: Elementos de Menú Móvil ---
+        // --- Elementos de Menú Móvil ---
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenuDropdown = document.getElementById('mobile-menu-dropdown');
         const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
         
-        // --- ADICIÓN: Variable global para rastrear la vista actual antes de la recarga
         let currentView = 'inventory'; 
 
         // ============================================================================
-        // == III. LÓGICA DE AUTENTICACIÓN (LOGIN)                                  ==
+        // == III. LÓGICA DE AUTENTICACIÓN (LOGIN) - CORREGIDA PARA MÓVILES          ==
         // ============================================================================
         function setAuthStatus(msg, success = true) {
              authStatus.textContent = msg;
              authStatus.className = `text-sm mt-3 text-center ${success ? 'text-green-400' : 'text-red-400'}`;
-             setTimeout(() => (authStatus.textContent = ""), 5000);
+             if(success) setTimeout(() => (authStatus.textContent = ""), 5000);
         }
 
         async function handleLogin(event) {
             event.preventDefault();
             const loginButton = document.getElementById('login-button');
             loginButton.disabled = true;
-            setAuthStatus('Iniciando sesión...');
+            setAuthStatus('Conectando con el servidor...', true);
 
             if (!supabase) {
-                setAuthStatus('Error: Supabase no está cargado.', false);
+                setAuthStatus('Error crítico: El sistema no cargó correctamente. Recarga la página.', false);
                 loginButton.disabled = false;
                 return;
             }
@@ -1012,19 +988,34 @@
             const password = passwordInput.value;
 
             try {
-                const { error } = await supabase.auth.signInWithPassword({
+                // CORRECCIÓN MÓVIL: No confiamos solo en el retorno, forzamos un chequeo de sesión después
+                const { data, error } = await supabase.auth.signInWithPassword({
                     email: email,
                     password: password,
                 });
 
                 if (error) throw error;
                 
-                setAuthStatus('Inicio de sesión exitoso. Cargando aplicación...', true);
-                // El onAuthStateChange se encarga de la UI
+                // Si llegamos aquí, la petición fue exitosa. 
+                // Verificamos si la sesión se guardó
+                const { data: sessionData } = await supabase.auth.getSession();
+                
+                if (sessionData && sessionData.session) {
+                    setAuthStatus('¡Acceso concedido! Entrando...', true);
+                    // Forzar cierre del modal si el onAuthStateChange tarda
+                    authModal.classList.add('hidden');
+                    appContentWrapper.classList.remove('hidden');
+                    loadAppDataAndInitialize();
+                } else {
+                    throw new Error("La sesión no pudo persistirse. Revisa cookies.");
+                }
 
             } catch (error) {
                 console.error("Error de autenticación:", error);
-                setAuthStatus('Error: Correo o contraseña inválida.', false); 
+                let msg = 'Error desconocido.';
+                if(error.message.includes("Invalid login")) msg = 'Correo o contraseña incorrectos.';
+                else if(error.message.includes("network")) msg = 'Error de conexión. Verifica tu internet.';
+                setAuthStatus(msg, false); 
             } finally {
                 loginButton.disabled = false;
             }
@@ -1032,46 +1023,40 @@
 
         window.logout = async function() {
             if (!supabase) return;
-            if (!confirm("¿Estás seguro de que quieres cerrar tu sesión?")) return;
-            
+            if (!confirm("¿Cerrar sesión actual?")) return;
             try {
-                const { error } = await supabase.auth.signOut();
-                if (error) throw error;
+                await supabase.auth.signOut();
+                window.location.reload(); // Recarga limpia para limpiar estados
             } catch (error) {
-                 alert("❌ Error al cerrar sesión: " + error.message);
+                 alert("Error al cerrar: " + error.message);
             }
         }
 
         function setupAuthListener() {
             if (!supabase) {
-                authModal.classList.remove('hidden');
-                appContentWrapper.classList.add('hidden');
+                console.error("Supabase no definido en setupAuthListener");
                 return;
             }
 
+            // Escuchar cambios de estado
             supabase.auth.onAuthStateChange((event, session) => {
-                console.log('Evento de Autenticación:', event);
-
+                console.log('Evento Auth:', event);
                 if (session) {
                     authModal.classList.add('hidden');
                     appContentWrapper.classList.remove('hidden');
-                    
                     if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
-                        loadAppDataAndInitialize(); 
+                        // Solo cargamos si no se ha cargado ya (evitar doble carga)
+                        if(allProducts.length === 0) loadAppDataAndInitialize(); 
                     }
-
                 } else {
                     authModal.classList.remove('hidden');
                     appContentWrapper.classList.add('hidden');
-                    emailInput.value = '';
-                    passwordInput.value = '';
-                    authStatus.textContent = '';
                 }
             });
         }
         
         authForm.addEventListener('submit', handleLogin);// ============================================================================
-        // == IV. LÓGICA DE TEMAS Y DROPDOWN                                      ==
+        // == IV. CONFIGURACIÓN Y ESTILOS                                           ==
         // ============================================================================
 
         function applyTheme(theme) {
@@ -1079,33 +1064,26 @@
             localStorage.setItem('selectedTheme', theme);
             themeSelector.value = theme;
         }
-        themeSelector.addEventListener('change', (e) => {
-            applyTheme(e.target.value);
-        });
+        themeSelector.addEventListener('change', (e) => applyTheme(e.target.value));
+        
         window.toggleSettingsDropdown = function(event) {
             event.stopPropagation(); 
             settingsDropdown.classList.toggle('hidden');
-            // Cierra el menú móvil si está abierto
             mobileMenuDropdown.classList.add('hidden');
         };
         
-        // --- ADICIÓN: Lógica del Menú Móvil ---
         window.toggleMobileMenu = function(event) {
             event.stopPropagation(); 
             mobileMenuDropdown.classList.toggle('hidden');
-            // Cierra el menú de configuración si está abierto
             settingsDropdown.classList.add('hidden');
         };
         
-        // Cierre para ambos menús
         document.body.addEventListener('click', (event) => {
-            // 1. Cierra el menú de Configuración
             if (settingsDropdown && !settingsDropdown.classList.contains('hidden')) {
                 if (!settingsDropdown.contains(event.target) && !settingsButton.contains(event.target)) {
                     settingsDropdown.classList.add('hidden');
                 }
             }
-            // 2. Cierra el menú Móvil
              if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden')) {
                 if (!mobileMenuDropdown.contains(event.target) && !mobileMenuButton.contains(event.target)) {
                    mobileMenuDropdown.classList.add('hidden');
@@ -1114,7 +1092,7 @@
         });
 
         // ============================================================================
-        // == V. UTILIDADES Y LÓGICA COMPARTIDA                                     ==
+        // == V. UTILIDADES Y CARGA DE DATOS                                        ==
         // ============================================================================
 
         function setStatusMessage(el, msg, success = true) { 
@@ -1125,34 +1103,23 @@
         
         function getCleanProductName(inputName) {
             const match = inputName.match(/^(.*?)\s+\((.*?)$/);
-            if (match) {
-                return match[1].trim();
-            }
-            return inputName.trim();
+            return match ? match[1].trim() : inputName.trim();
         }
 
         async function uploadImage(file) {
             if (!file || !supabase) return null;
             const formData = new FormData();
             formData.append('file', file);
-            // Usamos la Edge Function configurada en Supabase para subir a R2/Storage
-            const response = await fetch(SUPABASE_FUNCTION_URL, {
-                method: 'POST',
-                body: formData
-            });
+            const response = await fetch(SUPABASE_FUNCTION_URL, { method: 'POST', body: formData });
             const data = await response.json();
-            if (!response.ok || !data.success) {
-                throw new Error(data.error || 'La subida del archivo falló.');
-            }
+            if (!response.ok || !data.success) throw new Error(data.error || 'Fallo subida imagen');
             return data.url; 
         }
 
         function updateAutocompleteList(productsArray, datalistElement) {
             datalistElement.innerHTML = '';
-            // Combinar todos los productos disponibles (Principal y Nuevo Inventario) en la lista de sugerencias de venta
             const combinedProducts = [...allProducts, ...allProductsBodega];
             const sortedProducts = [...combinedProducts].sort((a, b) => a.name.localeCompare(b.name));
-            
             const uniqueNames = new Set();
             sortedProducts.filter(p => p.quantity > 0).forEach(product => {
                 const nameWithCategory = product.name + (product.category ? ` (${product.category})` : '');
@@ -1172,75 +1139,45 @@
             if (productToUpdate) {
                 const currentQty = parseInt(productToUpdate.quantity) || 0;
                 const newQty = Math.max(0, currentQty + delta);
-                
                 const isMain = (table === PRODUCTS_TABLE); 
                 const isBodega = (table === PRODUCTS_BODEGA_TABLE);
 
-                if (delta < 0 && currentQty <= 0) {
-                    console.warn(`⚠️ Advertencia: Stock de ${productName} ya es 0. No se puede descontar.`);
-                    return;
-                }
+                if (delta < 0 && currentQty <= 0) return;
                 
-                // Optimistic Update (Local)
                 productToUpdate.quantity = newQty;
                 updateProductCardInDOM(productToUpdate, isMain, false, isBodega); 
-
                 updateAutocompleteList(localArray, inventorySuggestions);
-                
-                // Recalcular totales después de la actualización local
                 calculateCategoryTotals(localArray, isMain, false, isBodega);
 
                 if(isMain) renderProducts(allProducts.filter(p => true)); 
                 else renderProductsBodega(allProductsBodega.filter(p => true)); 
                 
-                if (!supabase) return console.error("❌ Error: Supabase no está cargado para actualizar stock.");
+                if (!supabase) return;
 
-                // Database Update
                 const { error: updateError } = await supabase
                     .from(table)
                     .update({ quantity: newQty })
                     .eq("id", productToUpdate.id);
                 
                 if (updateError) {
-                    console.error("❌ Error al actualizar stock:", updateError.message);
-                    // Rollback optimistic update on failure
                     productToUpdate.quantity = currentQty;
                     updateProductCardInDOM(productToUpdate, isMain, false, isBodega);
-                    updateAutocompleteList(localArray, inventorySuggestions);
-                    calculateCategoryTotals(localArray, isMain, false, isBodega);
-                    if(isMain) renderProducts(allProducts.filter(p => true)); 
-                    else renderProductsBodega(allProductsBodega.filter(p => true));
-
-                    alert(`❌ Error al actualizar stock de ${productName}. El stock local ha sido revertido.`);
-                } else {
-                    console.log(`✅ Stock actualizado para: ${productName}. Nuevo stock: ${newQty}`);
+                    alert(`❌ Error al actualizar stock. Revertido.`);
                 }
-            } else {
-                console.warn(`ℹ️ Producto no encontrado en inventario por nombre exacto: ${cleanProductName}. No se modificó stock.`);
             }
         }
         
-        // --- Carga de Logo ---
         const LOGO_CONFIG_KEY = "current_logo_url";
         async function loadLogo() {
             if (!supabase) return;
             try {
-                const { data, error } = await supabase
-                    .from(CONFIG_TABLE)
-                    .select("value")
-                    .eq("key", LOGO_CONFIG_KEY)
-                    .single();
-                if (error || !data || !data.value) {
-                    return; 
-                }
-                businessLogo.src = `${data.value}?t=${new Date().getTime()}`; 
-            } catch (err) {
-                console.error("Error en loadLogo:", err);
-            }
+                const { data } = await supabase.from(CONFIG_TABLE).select("value").eq("key", LOGO_CONFIG_KEY).single();
+                if (data && data.value) businessLogo.src = `${data.value}?t=${new Date().getTime()}`; 
+            } catch (err) {}
         }
         
         // ============================================================================
-        // == VI. LÓGICA DE VISTAS Y RENDERS                                        ==
+        // == VI. VISTAS Y RENDERIZADO                                              ==
         // ============================================================================
 
         function calculateCategoryTotals(productsArray, isMain, isET, isBodega) {
@@ -1249,15 +1186,11 @@
                 acc[cat] = (acc[cat] || 0) + parseInt(p.quantity || 0);
                 return acc;
             }, {});
-            if (isMain) {
-                categoryTotals = totals;
-            } else if (isBodega) { 
-                categoryTotalsBodega = totals;
-            }
+            if (isMain) categoryTotals = totals;
+            else if (isBodega) categoryTotalsBodega = totals;
             return totals;
         }
 
-        // --- Funciones de Vistas ---
         const views = { 
             inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario Principal' }, 
             inventory_bodega: { el: document.getElementById('inventory-bodega-view'), title: 'Vista: Nuevo Inventario' }, 
@@ -1272,7 +1205,6 @@
                 const isCurrent = key === viewName; 
                 views[key].el.classList.toggle('hidden', !isCurrent); 
                 
-                // Botones de escritorio
                 const btn = document.querySelector(`#view-buttons .view-btn[data-view="${key}"]`); 
                 if (btn) {
                     btn.classList.toggle('bg-indigo-500', isCurrent); 
@@ -1280,8 +1212,6 @@
                     btn.classList.toggle('bg-transparent', !isCurrent); 
                     btn.classList.toggle('text-gray-300', !isCurrent); 
                 }
-
-                // Botones de menú móvil
                  const mobileBtn = document.querySelector(`#mobile-menu-dropdown .view-btn[data-view="${key}"]`);
                  if (mobileBtn) {
                       mobileBtn.classList.toggle('bg-indigo-500', isCurrent); 
@@ -1289,27 +1219,11 @@
                     }
             }); 
             currentViewTitle.textContent = views[viewName].title; 
-            
             currentView = viewName;
-            try {
-                localStorage.setItem('lastView', viewName);
-            } catch (e) {
-                console.warn("No se pudo guardar la última vista en localStorage.", e);
-            }
-            
-            if (viewName === 'labels') {
-                updateLabelView();
-            }
-            
-            // Cierra el menú móvil si se selecciona una vista
-            if (isMobile() && !mobileMenuDropdown.classList.contains('hidden')) {
-                mobileMenuDropdown.classList.add('hidden');
-            }
-            
-            // Desplazar la vista al inicio
-            if (viewName === 'sales' || viewName === 'inventory' || viewName === 'inventory_bodega') {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
+            try { localStorage.setItem('lastView', viewName); } catch (e) {}
+            if (viewName === 'labels') updateLabelView();
+            if (isMobile() && !mobileMenuDropdown.classList.contains('hidden')) mobileMenuDropdown.classList.add('hidden');
+            if (['sales','inventory','inventory_bodega'].includes(viewName)) window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function showSkeletonLoaders() { 
@@ -1322,11 +1236,10 @@
             missingListLoader.innerHTML = tableSkeleton; 
         }
 
-        // --- Lógica de Inventario Principal ---
         async function fetchProducts() { 
             if (!supabase) return;
             const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
-            if (error) { console.error("Error cargando productos:", error); totalCount.textContent = "Error al cargar"; productsEl.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
+            if (error) { totalCount.textContent = "Error"; return; } 
             allProducts = data; 
             calculateCategoryTotals(allProducts, true, false, false); 
             filterAndRenderProducts(); 
@@ -1341,17 +1254,12 @@
             productsLoader.innerHTML = ""; 
             productsEl.innerHTML = ""; 
             totalCount.textContent = `${items.length} productos`; 
-
-            // Renderizar Totales de Categoría
             categoryTotalsEl.innerHTML = `
                 <span class="font-bold text-indigo-300">Total por Categoría:</span>
-                ${Object.keys(categoryTotals).sort().map(cat => 
-                    `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotals[cat]}</span> u.</span>`
-                ).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
+                ${Object.keys(categoryTotals).sort().map(cat => `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotals[cat]}</span> u.</span>`).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
             `;
             productsEl.appendChild(categoryTotalsEl);
-
-            if (items.length === 0) { productsEl.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos${searchInput.value ? ' para "' + searchInput.value + '"' : ''}.</p>`; return; } 
+            if (items.length === 0) { productsEl.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos.</p>`; return; } 
             const grouped = items.reduce((acc, p) => { 
                 const cat = p.category || 'Sin Categoría'; 
                 if (!acc[cat]) acc[cat] = []; 
@@ -1363,7 +1271,6 @@
                 section.className = "mb-10"; 
                 section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; 
                 const grid = document.createElement("div"); 
-                // Ajuste de columnas
                 grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
                 grouped[category].forEach(p => { 
                     const card = document.createElement("div");
@@ -1371,12 +1278,10 @@
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
                     card.innerHTML = `
-                        <button onclick="openProductEditorModal('${p.id}', 'main')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
+                        <button onclick="openProductEditorModal('${p.id}', 'main')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </button>
-                        <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden">
-                            <img src="${imageUrl}" id="product-img-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}">
-                        </div>
+                        <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" id="product-img-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div>
                         <h3 id="product-name-${p.id}" class="font-semibold text-white">${p.name}</h3>
                         <p id="product-category-${p.id}" class="text-xs text-gray-400 -mt-1">${p.category || 'Otros'}</p>
                         <p id="product-price-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
@@ -1393,55 +1298,41 @@
             }); 
         }
 
-        // Función auxiliar para actualizar tarjeta sin recargar todo
         function updateProductCardInDOM(product, isMain, isET, isBodega) {
-            let idSuffix = '';
-            if (isBodega) idSuffix = '-bodega'; 
-            
+            let idSuffix = isBodega ? '-bodega' : ''; 
             const elementPrefix = 'product-';
-            const stockEl = document.getElementById(`${elementPrefix}stock${idSuffix}-${product.id}`);
-            const nameEl = document.getElementById(`${elementPrefix}name${idSuffix}-${product.id}`);
-            const priceEl = document.getElementById(`${elementPrefix}price${idSuffix}-${product.id}`);
-            const categoryEl = document.getElementById(`${elementPrefix}category${idSuffix}-${product.id}`);
+            const els = ['stock','name','price','category','box-number'];
+            els.forEach(key => {
+                const el = document.getElementById(`${elementPrefix}${key}${idSuffix}-${product.id}`);
+                if(el) {
+                    if(key==='stock') el.textContent = `Stock: ${product.quantity}`;
+                    if(key==='name') el.textContent = product.name;
+                    if(key==='price') el.textContent = `$${Number(product.price).toFixed(2)}`;
+                    if(key==='category') el.textContent = product.category;
+                    if(key==='box-number') el.querySelector('span').textContent = product.box_number || 'N/A';
+                }
+            });
             const imgEl = document.getElementById(`${elementPrefix}img${idSuffix}-${product.id}`);
-            const boxNumberEl = document.getElementById(`${elementPrefix}box-number${idSuffix}-${product.id}`);
-            
-            if (boxNumberEl) {
-                boxNumberEl.querySelector('span').textContent = product.box_number || 'N/A';
-            }
-            
-            if (stockEl) stockEl.textContent = `Stock: ${product.quantity}`;
-            if (nameEl) nameEl.textContent = product.name;
-            if (priceEl) priceEl.textContent = `$${Number(product.price).toFixed(2)}`; 
-            if (categoryEl) categoryEl.textContent = product.category;
-            
-            if (imgEl) {
-                const newSrc = product.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
-                imgEl.src = `${newSrc}?t=${new Date().getTime()}`;
-                imgEl.alt = product.name; 
+            if(imgEl) {
+                imgEl.src = (product.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`) + `?t=${new Date().getTime()}`;
             }
         }
         
         window.deleteProduct = async function(id) { 
-            if (!confirm("¿Eliminar este producto?")) return; 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
+            if (!confirm("¿Eliminar?")) return; 
             const { error } = await supabase.from(PRODUCTS_TABLE).delete().eq("id", id); 
-            if (error) {
-                alert("❌ Error al eliminar: " + error.message);
-            } else {
+            if (!error) {
                 allProducts = allProducts.filter(p => p.id !== id);
                 calculateCategoryTotals(allProducts, true, false, false); 
                 filterAndRenderProducts(); 
                 updateAutocompleteList(allProducts, inventorySuggestions);
-                updateLabelView();
             }
         }
 
-        // --- Lógica de Nuevo Inventario (products_nuevo) ---
         async function fetchProductsBodega() { 
             if (!supabase) return;
             const { data, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).select("*").order("created_at", { ascending: false }); 
-            if (error) { console.error("Error cargando productos (Nuevo Inventario):", error); totalCountBodega.textContent = "Error al cargar"; productsElBodega.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
+            if (error) { totalCountBodega.textContent = "Error"; return; } 
             allProductsBodega = data; 
             calculateCategoryTotals(allProductsBodega, false, false, true); 
             filterAndRenderProductsBodega(); 
@@ -1457,16 +1348,12 @@
             productsLoaderBodega.innerHTML = ""; 
             productsElBodega.innerHTML = ""; 
             totalCountBodega.textContent = `${items.length} productos`; 
-            
             categoryTotalsElBodega.innerHTML = `
-                <span class="font-bold text-indigo-300">Total por Categoría (Nuevo Inventario):</span>
-                ${Object.keys(categoryTotalsBodega).sort().map(cat => 
-                    `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotals[cat]}</span> u.</span>`
-                ).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
+                <span class="font-bold text-indigo-300">Total por Categoría (Nuevo):</span>
+                ${Object.keys(categoryTotalsBodega).sort().map(cat => `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotals[cat]}</span> u.</span>`).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
             `;
             productsElBodega.appendChild(categoryTotalsElBodega);
-
-            if (items.length === 0) { productsElBodega.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos${searchInputBodega.value ? ' para "' + searchInputBodega.value + '"' : ''}.</p>`; return; } 
+            if (items.length === 0) { productsElBodega.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos.</p>`; return; } 
             const grouped = items.reduce((acc, p) => { 
                 const cat = p.category || 'Sin Categoría'; 
                 if (!acc[cat]) acc[cat] = []; 
@@ -1484,21 +1371,15 @@
                     card.id = `product-card-bodega-${p.id}`;
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
-                    const displayCategory = p.category || 'N/A'; 
-                    const displayPrice = p.price ? `$${Number(p.price).toFixed(2)}` : '$N/A';
-                    const displayQuantity = p.quantity !== undefined ? p.quantity : 'N/A';
-                    
                     card.innerHTML = `
-                        <button onclick="openProductEditorModal('${p.id}', 'bodega')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
+                        <button onclick="openProductEditorModal('${p.id}', 'bodega')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </button>
-                        <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden">
-                            <img src="${imageUrl}" id="product-img-bodega-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}">
-                        </div>
+                        <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" id="product-img-bodega-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}"></div>
                         <h3 id="product-name-bodega-${p.id}" class="font-semibold text-white">${p.name}</h3>
-                        <p id="product-category-bodega-${p.id}" class="text-xs text-gray-400 -mt-1">${displayCategory}</p>
-                        <p id="product-price-bodega-${p.id}" class="text-green-400 font-bold text-lg mt-2">${displayPrice}</p>
-                        <p id="product-stock-bodega-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${displayQuantity}</p>
+                        <p id="product-category-bodega-${p.id}" class="text-xs text-gray-400 -mt-1">${p.category || 'N/A'}</p>
+                        <p id="product-price-bodega-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
+                        <p id="product-stock-bodega-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
                         <p id="product-box-number-bodega-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
                         <div class="flex-grow"></div>
                         <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
@@ -1511,70 +1392,39 @@
             }); 
         }
         window.deleteProductBodega = async function(id) { 
-            if (!confirm("¿Eliminar este producto de Nuevo Inventario?")) return; 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
+            if (!confirm("¿Eliminar?")) return; 
             const { error } = await supabase.from(PRODUCTS_BODEGA_TABLE).delete().eq("id", id); 
-            if (error) {
-                alert("❌ Error al eliminar: " + error.message);
-            } else {
+            if (!error) {
                 allProductsBodega = allProductsBodega.filter(p => p.id !== id);
                 calculateCategoryTotals(allProductsBodega, false, false, true); 
                 filterAndRenderProductsBodega(); 
                 updateAutocompleteList(allProducts, inventorySuggestions);
-                updateLabelView();
             }
         }
 
-        // --- Lógica de Ventas ---
         async function fetchSales() {
             if (!supabase) return;
             const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando ventas:", error); return; }
-            allSales = data;
-            filterAndRenderSales();
+            if (!error) {
+                allSales = data;
+                filterAndRenderSales();
+            }
         }
         function filterAndRenderSales() {
             const term = (searchSalesInput.value || "").toLowerCase().trim();
             const pendingOnly = pendingOnlyCheckbox.checked;
             let filtered = [...allSales]; 
-            if (term) {
-                filtered = filtered.filter(s => 
-                    (s.recipient_name || '').toLowerCase().includes(term) ||
-                    (s.product_name_sold || '').toLowerCase().includes(term)
-                );
-            }
-            if (pendingOnly) {
-                filtered = filtered.filter(s => s.status === 'Pendiente');
-            }
+            if (term) filtered = filtered.filter(s => (s.recipient_name || '').toLowerCase().includes(term) || (s.product_name_sold || '').toLowerCase().includes(term));
+            if (pendingOnly) filtered = filtered.filter(s => s.status === 'Pendiente');
             renderSales(filtered);
-        }
-        function updateGeneralTotals(filteredArray) {
-            const countEl = document.getElementById(`total-sales-count`);
-            if(countEl) countEl.textContent = `${filteredArray.length} de ${allSales.length} ventas`;
-        }
-        function createSaleRowHTML(sale) {
-            const currentStatus = sale.status || 'Pendiente';
-            const statusClass = STATUS_COLORS[currentStatus] || STATUS_COLORS['Pendiente'];
-            const changeFn = 'changeSaleStatus';
-            const editFn = 'editSalePrice';
-            const deleteFn = 'deleteSale';
-            const statusSelectHtml = `<select id="select-status-${sale.id}" onchange="${changeFn}('${sale.id}', this.value, '${sale.product_name_sold}')" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option><option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option><option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option></select>`;
-            return `
-                <tr id="sale-row-${sale.id}" class="hover:bg-gray-700/50 transition duration-150">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Destinatario">${sale.recipient_name}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Producto Vendido">${sale.product_name_sold || 'N/A'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500" id="sale-price-cell-${sale.id}" data-label="Precio (USD)">$${Number(sale.price).toFixed(2)} <button onclick="${editFn}('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm" data-label="Estado">${statusSelectHtml}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="${deleteFn}('${sale.id}')" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td>
-                </tr>`;
         }
         function renderSales(items) {
             salesListLoader.innerHTML = "";
             salesListContainer.innerHTML = ""; 
-            updateGeneralTotals(items); 
+            const countEl = document.getElementById(`total-sales-count`);
+            if(countEl) countEl.textContent = `${items.length} de ${allSales.length} ventas`;
             if (items.length === 0) {
-                const isSearching = searchSalesInput.value || pendingOnlyCheckbox.checked;
-                salesListContainer.innerHTML = `<p class="p-4 text-gray-400">${isSearching ? 'No se encontraron ventas que coincidan con el filtro.' : 'No hay ventas registradas.'}</p>`;
+                salesListContainer.innerHTML = `<p class="p-4 text-gray-400">No hay ventas registradas.</p>`;
                 return;
             } 
             const groupedByDate = items.reduce((acc, sale) => {
@@ -1590,891 +1440,200 @@
                 const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
                 const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
                 const displayDate = new Date(date + 'T00:00:00Z').toLocaleDateString('es-SV', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
-                const headerHTML = `
-                    <div class="bg-gray-900/70 p-3 rounded-t-lg mt-6 flex justify-between items-center border-t border-x border-gray-700">
-                        <h3 class="font-bold text-lg text-white">${displayDate}</h3>
-                        <div class="text-sm font-semibold">
-                            <span class="mr-4 text-gray-400">Vendido (día): <span class="text-green-400" id="daily-sold-${date}">$${dailyTotalSold.toFixed(2)}</span></span>
-                            <span class="text-gray-400">Pagado (día): <span class="text-green-500" id="daily-paid-${date}">$${dailyTotalPaid.toFixed(2)}</span></span>
-                        </div>
-                    </div>`;
-                const rowsHTML = dailySales.map(sale => createSaleRowHTML(sale)).join('');
-                const tableHTML = `
-                    <table class="min-w-full divide-y divide-gray-700 shadow-md sales-list-table">
-                        <thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6" data-label="Destinatario">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Producto Vendido">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Precio">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Estado">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead>
-                        <tbody id="sales-tbody-${date}" class="bg-gray-800 divide-y divide-gray-700">
-                            ${rowsHTML}
-                        </tbody>
-                    </table>`;
-                fullHTML += `<div id="date-block-${date}">${headerHTML}${tableHTML}</div>`;
+                const headerHTML = `<div class="bg-gray-900/70 p-3 rounded-t-lg mt-6 flex justify-between items-center border-t border-x border-gray-700"><h3 class="font-bold text-lg text-white">${displayDate}</h3><div class="text-sm font-semibold"><span class="mr-4 text-gray-400">Vendido: <span class="text-green-400">$${dailyTotalSold.toFixed(2)}</span></span><span class="text-gray-400">Pagado: <span class="text-green-500">$${dailyTotalPaid.toFixed(2)}</span></span></div></div>`;
+                const rowsHTML = dailySales.map(sale => {
+                    const statusClass = STATUS_COLORS[sale.status] || STATUS_COLORS['Pendiente'];
+                    return `<tr id="sale-row-${sale.id}" class="hover:bg-gray-700/50 transition duration-150"><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Destinatario">${sale.recipient_name}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Producto">${sale.product_name_sold || 'N/A'}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500" data-label="Precio">$${Number(sale.price).toFixed(2)} <button onclick="editSalePrice('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button></td><td class="px-6 py-4 whitespace-nowrap text-sm" data-label="Estado"><select onchange="changeSaleStatus('${sale.id}', this.value, '${sale.product_name_sold}')" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${sale.status==='Pagado'?'selected':''}>Pagado</option><option value="Pendiente" ${sale.status==='Pendiente'?'selected':''}>Pendiente</option><option value="Devuelto" ${sale.status==='Devuelto'?'selected':''}>Devuelto</option></select></td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteSale('${sale.id}')" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td></tr>`;
+                }).join('');
+                fullHTML += `<div id="date-block-${date}">${headerHTML}<table class="min-w-full divide-y divide-gray-700 shadow-md sales-list-table"><thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6" data-label="Destinatario">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Producto Vendido">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Precio">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Estado">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead><tbody class="bg-gray-800 divide-y divide-gray-700">${rowsHTML}</tbody></table></div>`;
             });
             salesListContainer.innerHTML = fullHTML;
         }
 
         window.changeSaleStatus = async function(id, newStatus, productName) {
-            const table = SALES_TABLE;
-            const localArray = allSales;
-            const sale = localArray.find(s => s.id === id);
-            if (!sale || !supabase) return alert("❌ Error: Supabase no está cargado.");
+            const sale = allSales.find(s => s.id === id);
+            if (!sale) return;
             const oldStatus = sale.status;
-            sale.status = newStatus; 
-            const selectEl = document.getElementById(`select-status-${id}`);
-            if (selectEl) {
-                selectEl.className = `p-1 border rounded text-xs font-medium ${STATUS_COLORS[newStatus] || STATUS_COLORS['Pendiente']} cursor-pointer`;
-            }
             try {
-                const { error } = await supabase.from(table).update({ status: newStatus }).eq("id", id);
+                const { error } = await supabase.from(SALES_TABLE).update({ status: newStatus }).eq("id", id);
                 if (error) throw error;
                 const cleanName = getCleanProductName(productName);
-                let updateTable = null;
-                let updateArray = null;
-                if (allProducts.some(p => getCleanProductName(p.name).trim() === cleanName)) {
-                    updateTable = PRODUCTS_TABLE;
-                    updateArray = allProducts;
-                } else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === cleanName)) {
-                    updateTable = PRODUCTS_BODEGA_TABLE;
-                    updateArray = allProductsBodega;
-                }
+                let updateTable = null, updateArray = null;
+                if (allProducts.some(p => getCleanProductName(p.name).trim() === cleanName)) { updateTable = PRODUCTS_TABLE; updateArray = allProducts; }
+                else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === cleanName)) { updateTable = PRODUCTS_BODEGA_TABLE; updateArray = allProductsBodega; }
+                
                 if (updateTable && updateArray) {
-                    if (oldStatus !== 'Pagado' && newStatus === 'Pagado') {
-                        await updateProductStock(cleanName, updateTable, updateArray, -1);
-                    } else if (oldStatus === 'Pagado' && newStatus !== 'Pagado') {
-                        await updateProductStock(cleanName, updateTable, updateArray, 1);
-                    }
+                    if (oldStatus !== 'Pagado' && newStatus === 'Pagado') await updateProductStock(cleanName, updateTable, updateArray, -1);
+                    else if (oldStatus === 'Pagado' && newStatus !== 'Pagado') await updateProductStock(cleanName, updateTable, updateArray, 1);
                 } 
-            } catch (error) {
-                console.error("Error al actualizar estado:", error);
-                alert("❌ Error al actualizar estado: " + error.message);
-                sale.status = oldStatus;
-                if (selectEl) {
-                    selectEl.value = oldStatus;
-                    selectEl.className = `p-1 border rounded text-xs font-medium ${STATUS_COLORS[oldStatus] || STATUS_COLORS['Pendiente']} cursor-pointer`;
-                }
-            } finally {
-                filterAndRenderSales();
-            }
+                fetchSales(); 
+            } catch (error) { alert("Error: " + error.message); }
         }
         
         window.editSalePrice = function(id, currentPrice) {
-            const newPriceStr = prompt(`Ingresa el nuevo precio para la venta ${id}:`, currentPrice.toFixed(2));
-            if (newPriceStr === null) return; 
+            const newPriceStr = prompt(`Nuevo precio:`, currentPrice.toFixed(2));
+            if (!newPriceStr) return;
             const newPrice = parseFloat(newPriceStr.replace('$', '').trim());
-            if (isNaN(newPrice) || newPrice <= 0) {
-                alert("❌ Precio inválido.");
-                return;
-            }
-            const table = SALES_TABLE;
-            const localArray = allSales;
-            const sale = localArray.find(s => s.id === id);
-            if (!sale || !supabase) return alert("❌ Error: Supabase no está cargado.");
-            const oldPrice = sale.price;
-            sale.price = newPrice; 
-            const priceCell = document.getElementById(`sale-price-cell-${id}`);
-            if (priceCell) {
-                priceCell.innerHTML = `$${newPrice.toFixed(2)} <button onclick="editSalePrice('${id}', ${newPrice})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button>`;
-            }
-            supabase.from(table).update({ price: newPrice }).eq("id", id).then(({ error }) => {
-                if (error) {
-                    console.error("Error al actualizar precio:", error);
-                    alert("❌ Error al actualizar precio: " + error.message);
-                    sale.price = oldPrice; 
-                    if (priceCell) {
-                         priceCell.innerHTML = `$${oldPrice.toFixed(2)} <button onclick="editSalePrice('${id}', ${oldPrice})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button>`;
-                    }
-                } else {
-                    filterAndRenderSales(); 
-                }
+            if (isNaN(newPrice)) return;
+            supabase.from(SALES_TABLE).update({ price: newPrice }).eq("id", id).then(({ error }) => {
+                if (!error) fetchSales();
             });
         }
         
         window.deleteSale = async function(id) {
-            if (!confirm("¿Eliminar este registro de venta?")) return;
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const table = SALES_TABLE;
-            const localArray = allSales;
-            const sale = localArray.find(s => s.id === id);
+            if (!confirm("¿Eliminar venta?")) return;
+            const sale = allSales.find(s => s.id === id);
             if (!sale) return;
             if (sale.status === 'Pagado') {
+                const cleanName = getCleanProductName(sale.product_name_sold);
                 let updateTable = null, updateArray = null;
-                const soldProductName = getCleanProductName(sale.product_name_sold);
-                if (allProducts.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
-                    updateTable = PRODUCTS_TABLE;
-                    updateArray = allProducts;
-                } else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
-                    updateTable = PRODUCTS_BODEGA_TABLE;
-                    updateArray = allProductsBodega;
-                }
-                if (updateTable && updateArray) {
-                    await updateProductStock(soldProductName, updateTable, updateArray, 1);
-                }
+                if (allProducts.some(p => getCleanProductName(p.name).trim() === cleanName)) { updateTable = PRODUCTS_TABLE; updateArray = allProducts; }
+                else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === cleanName)) { updateTable = PRODUCTS_BODEGA_TABLE; updateArray = allProductsBodega; }
+                if (updateTable) await updateProductStock(cleanName, updateTable, updateArray, 1);
             }
-            try {
-                const { error } = await supabase.from(table).delete().eq("id", id);
-                if (error) throw error;
-            } catch (error) {
-                console.error("Error al eliminar venta:", error);
-                alert("❌ Error al eliminar: " + error.message);
-            }
+            await supabase.from(SALES_TABLE).delete().eq("id", id);
+            fetchSales();
         }
 
         window.downloadSalesPDF = async function(isMainSales) {
-            if (typeof window.jspdf.jsPDF === 'undefined' || typeof html2canvas === 'undefined') {
-                return alert("❌ Error: Las librerías jsPDF y html2canvas no están cargadas.");
-            }
-            const listContainer = salesListContainer;
-            const title = 'Registro de Ventas Principal';
-            const fileName = 'Ventas_Principal_';
-            if (!listContainer.children.length) {
-                return alert("No hay datos de ventas para descargar.");
-            }
+            if (typeof window.jspdf.jsPDF === 'undefined') return alert("Faltan librerías PDF.");
+            if (!salesListContainer.children.length) return alert("Sin datos.");
             const Doc = window.jspdf.jsPDF;
-            const doc = new Doc('p', 'mm', 'a4'); 
+            const doc = new Doc('p', 'mm', 'a4');
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
-            let y = 10;
-            doc.setFontSize(16);
-            doc.text(title, 10, y);
-            y += 8;
-            doc.setLineWidth(0.1);
-            doc.line(10, y, pageWidth - 10, y);
-            y += 5;
-            const salesListClone = listContainer.cloneNode(true);
-            salesListClone.classList.add('export-pdf-style');
-            salesListClone.querySelectorAll('button').forEach(btn => btn.style.display = 'none');
-            salesListClone.querySelectorAll('select').forEach(select => {
-                const span = document.createElement('span');
-                span.textContent = select.value;
-                select.parentNode.insertBefore(span, select);
-                select.style.display = 'none';
-            });
+            doc.text('Registro de Ventas', 10, 10);
+            
             const tempExportDiv = document.createElement('div');
             tempExportDiv.style.width = '1000px'; 
             tempExportDiv.style.backgroundColor = '#ffffff';
             tempExportDiv.style.color = '#000000';
-            tempExportDiv.appendChild(salesListClone);
+            const clone = salesListContainer.cloneNode(true);
+            clone.querySelectorAll('button').forEach(b=>b.style.display='none');
+            clone.querySelectorAll('select').forEach(s=>{ const sp=document.createElement('span'); sp.textContent=s.value; s.parentNode.insertBefore(sp,s); s.style.display='none'; });
+            tempExportDiv.appendChild(clone);
             document.body.appendChild(tempExportDiv);
+            
             html2canvas(tempExportDiv, { scale: 2 }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
-                const imgWidth = 190; 
-                const imgHeight = canvas.height * imgWidth / canvas.width;
+                const imgHeight = canvas.height * 190 / canvas.width;
                 let heightLeft = imgHeight;
                 let position = 0;
-                while (heightLeft >= pageHeight) {
-                    doc.addPage();
-                    doc.addImage(imgData, 'PNG', 10, -heightLeft + 10, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                }
-                doc.addImage(imgData, 'PNG', 10, y, imgWidth, imgHeight);
-                doc.save(`${fileName}${new Date().toISOString().split('T')[0]}.pdf`);
+                doc.addImage(imgData, 'PNG', 10, 20, 190, imgHeight);
+                doc.save(`Ventas_${new Date().toISOString().split('T')[0]}.pdf`);
                 document.body.removeChild(tempExportDiv);
-                alert(`✅ PDF de ${title} descargado con éxito.`);
-            }).catch(error => {
-                console.error("Error al generar PDF:", error);
-                if(document.body.contains(tempExportDiv)) document.body.removeChild(tempExportDiv);
-                alert("❌ Error: No se pudo generar el PDF. Asegúrate de que todos los datos se hayan cargado.");
             });
         };
 
-        // --- Lógica de Faltantes ---
         async function fetchMissingProducts() {
             if (!supabase) return;
-            const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando faltantes:", error); return; }
-            allMissingProducts = data;
-            renderMissingProducts(allMissingProducts);
+            const { data } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false });
+            if (data) renderMissingProducts(data);
         }
         function renderMissingProducts(items) {
-            missingListLoader.innerHTML = "";
-            missingListEl.innerHTML = "";
-            totalMissingCount.textContent = `${items.length} productos pendientes`;
-            if (items.length === 0) {
-                missingListEl.innerHTML = `<p class="p-4 text-gray-400">¡Genial! No hay productos faltantes en la lista.</p>`;
-                return;
-            }
-            const listItems = items.map(p => {
-                const date = new Date(p.created_at).toLocaleDateString('es-SV', { day: 'numeric', month: 'short' });
-                return `
-                    <div id="missing-row-${p.id}" class="flex items-center justify-between p-4 border-b border-gray-700 hover:bg-gray-700/50 transition">
-                        <div>
-                            <p class="font-medium text-white">${p.product_name}</p>
-                            <p class="text-xs text-gray-400">${p.notes || 'Sin notas'}</p>
-                            <p class="text-xs text-indigo-400 mt-1">Registrado el ${date}</p>
-                        </div>
-                        <button onclick="deleteMissingProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Comprado</button>
-                    </div>
-                `;
-            }).join('');
-            missingListEl.innerHTML = listItems;
+            missingListEl.innerHTML = items.map(p => `<div class="flex justify-between p-4 border-b border-gray-700 hover:bg-gray-700/50"><div><p class="font-medium text-white">${p.product_name}</p><p class="text-xs text-gray-400">${p.notes || ''}</p></div><button onclick="deleteMissingProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 text-white text-sm">Comprado</button></div>`).join('');
+            totalMissingCount.textContent = `${items.length} pendientes`;
         }
         window.deleteMissingProduct = async function(id) {
-            if (!confirm("¿Marcar este producto como 'Comprado' y eliminarlo de la lista?")) return;
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            try {
-                const { error } = await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq("id", id);
-                if (error) throw error;
-            } catch (error) {
-                console.error("Error al eliminar faltante:", error);
-                alert("❌ Error al eliminar: " + error.message);
+            if (confirm("¿Marcar como comprado?")) {
+                await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq("id", id);
+                fetchMissingProducts();
             }
         }
 
-        // --- Lógica de Herramientas ---
         async function fetchTools() {
             if (!supabase) return;
-            const { data, error } = await supabase.from(TOOLS_TABLE).select("*").order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando herramientas:", error); totalToolsCount.textContent = "Error al cargar"; return; }
-            allTools = data;
-            renderTools(allTools);
+            const { data } = await supabase.from(TOOLS_TABLE).select("*").order("created_at", { ascending: false });
+            if (data) renderTools(data);
         }
         function renderTools(items) {
-            toolsLoader.innerHTML = "";
             toolsListEl.innerHTML = "";
             totalToolsCount.textContent = `${items.length} herramientas`;
-            if (items.length === 0) {
-                toolsListEl.innerHTML = `<p class="text-gray-400 md:col-span-3">No hay herramientas o tutoriales guardados.</p>`;
-                return;
-            }
             items.forEach(tool => {
                 const card = document.createElement("div");
-                card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col tool-card border border-gray-700 relative";
-                const imageUrl = tool.image_url ? `${tool.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/6366f1/ffffff?text=Tutorial`;
-                const descriptionHtml = tool.description ? `<p class="text-gray-400 text-sm mt-2 flex-grow">${tool.description.replace(/\n/g, '<br>')}</p>` : '<div class="flex-grow"></div>';
-                card.innerHTML = `
-                    <div class="h-48 bg-gray-700 rounded flex items-center justify-center mb-3 overflow-hidden">
-                        <img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${tool.title}">
-                    </div>
-                    <h3 class="font-bold text-lg text-white">${tool.title}</h3>
-                    ${descriptionHtml}
-                    <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
-                        <button onclick="editToolImage('${tool.id}')" class="px-3 py-1 rounded bg-indigo-500 hover:bg-indigo-600 text-white shadow-md text-sm transition mr-2">Editar Foto</button>
-                        <button onclick="deleteTool('${tool.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
-                    </div>`;
+                card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col tool-card border border-gray-700";
+                card.innerHTML = `<div class="h-48 bg-gray-700 rounded mb-3 overflow-hidden"><img src="${tool.image_url || 'https://via.placeholder.com/150'}" class="object-contain h-full w-full"></div><h3 class="font-bold text-lg text-white">${tool.title}</h3><p class="text-gray-400 text-sm mt-2 flex-grow">${(tool.description||'').substring(0,100)}</p><div class="flex justify-end mt-4 pt-3 border-t border-gray-700"><button onclick="editToolImage('${tool.id}')" class="px-3 py-1 rounded bg-indigo-500 text-white text-sm mr-2">Foto</button><button onclick="deleteTool('${tool.id}')" class="px-3 py-1 rounded bg-red-600 text-white text-sm">Eliminar</button></div>`;
                 toolsListEl.appendChild(card);
             });
         }
-        window.editToolImage = async function(id) {
-            editingToolId = id;
-            toolImageEditorInput.click();
-        }
-        window.deleteTool = async function(id) {
-            if (!confirm("¿Estás seguro de que quieres eliminar esta herramienta?")) return;
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const { error } = await supabase.from(TOOLS_TABLE).delete().eq("id", id);
-            if (error) {
-                alert("❌ Error al eliminar: " + error.message);
-            } else {
-                allTools = allTools.filter(t => t.id !== id);
-                renderTools(allTools);
-            }
-        }
-        
-        // ============================================================================
-        // == VII. LÓGICA DE MODALES (QR, Scanner y EDITOR)                         ==
-        // ============================================================================
-
-        window.openProductEditorModal = function(productId, locationKey) { 
-            currentEditingProduct = null;
-            selectedProductImageFile = null;
-            modalStatus.textContent = '';
-            
-            let productArray;
-            let displayName;
-            
-            if (locationKey === 'main') {
-                productArray = allProducts;
-                displayName = 'Inventario Principal';
-            } else if (locationKey === 'bodega') { 
-                productArray = allProductsBodega;
-                displayName = 'Nuevo Inventario';
-            } else {
-                alert("Error: Ubicación de inventario no válida.");
-                return;
-            }
-
-            let product = productArray.find(p => String(p.id).trim() === String(productId).trim());
-
-            if (!product) {
-                const all = [...allProducts, ...allProductsBodega];
-                product = all.find(p => String(p.id).trim() === String(productId).trim());
-                if (product) {
-                    if (allProducts.some(p => p.id === product.id)) locationKey = 'main';
-                    else if (allProductsBodega.some(p => p.id === product.id)) locationKey = 'bodega';
-                    displayName = (locationKey === 'main' ? 'Inventario Principal' : 'Nuevo Inventario');
-                } else {
-                    alert("Error: Producto no encontrado. ID: " + productId);
-                    return;
-                }
-            }
-            
-            currentEditingProduct = product;
-            modalName.value = product.name;
-            modalCategory.value = product.category || ''; 
-            modalPrice.value = Number(product.price).toFixed(2);
-            modalQuantity.value = product.quantity;
-            modalBoxNumber.value = product.box_number || '';
-            modalLocation.textContent = displayName;
-            const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
-            modalImagePreview.src = imageUrl;
-            modalImageUpload.value = '';
-            modal.classList.remove('hidden');
-        }
-
-        window.closeProductEditorModal = function() {
-            modal.classList.add('hidden');
-            modalProductForm.reset();
-            selectedProductImageFile = null;
-        }
-
-        modalImageUpload.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                selectedProductImageFile = file;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    modalImagePreview.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
+        window.editToolImage = (id) => { editingToolId = id; toolImageEditorInput.click(); }
+        window.deleteTool = async (id) => { if(confirm("¿Eliminar?")) { await supabase.from(TOOLS_TABLE).delete().eq("id", id); fetchTools(); } }
+        toolImageEditorInput.addEventListener('change', async (e) => {
+            if(e.target.files[0] && editingToolId) {
+                const url = await uploadImage(e.target.files[0]);
+                await supabase.from(TOOLS_TABLE).update({ image_url: url }).eq('id', editingToolId);
+                fetchTools();
             }
         });
 
-        modalProductForm.addEventListener('submit', async (ev) => {
-            ev.preventDefault();
-            const saveButton = document.getElementById('modal-save-button');
-            saveButton.disabled = true;
-            modalStatus.textContent = 'Guardando cambios...';
-
-            if (!supabase || !currentEditingProduct) {
-                modalStatus.textContent = 'Error: Supabase o producto no cargado.';
-                saveButton.disabled = false;
-                return;
-            }
-            
-            let table = PRODUCTS_TABLE;
-            let localArray = allProducts;
-            let isMain = true, isBodega = false;
-
-            if (allProducts.some(p => p.id === currentEditingProduct.id)) {
-                table = PRODUCTS_TABLE;
-                localArray = allProducts;
-                isMain = true; isBodega = false;
-            } else if (allProductsBodega.some(p => p.id === currentEditingProduct.id)) {
-                table = PRODUCTS_BODEGA_TABLE;
-                localArray = allProductsBodega;
-                isMain = false; isBodega = true;
-            } 
-
-            let newImageUrl = currentEditingProduct.image_url;
-            let updatePayload = {};
-
-            try {
-                if (selectedProductImageFile) {
-                    modalStatus.textContent = 'Subiendo nueva imagen...';
-                    newImageUrl = await uploadImage(selectedProductImageFile);
-                }
-                updatePayload = {
-                    name: modalName.value,
-                    category: modalCategory.value,
-                    price: parseFloat(modalPrice.value),
-                    quantity: parseInt(modalQuantity.value),
-                    box_number: modalBoxNumber.value.trim() || null,
-                    image_url: newImageUrl
-                };
-                
-                modalStatus.textContent = 'Actualizando registro...';
-                const { error } = await supabase
-                    .from(table)
-                    .update(updatePayload)
-                    .eq('id', currentEditingProduct.id);
-                
-                if (error) throw error;
-
-                Object.assign(currentEditingProduct, updatePayload);
-                updateProductCardInDOM(currentEditingProduct, isMain, false, isBodega);
-                
-                calculateCategoryTotals(localArray, isMain, false, isBodega);
-                if(isMain) filterAndRenderProducts();
-                else filterAndRenderProductsBodega();
-                
-                modalStatus.textContent = 'Producto actualizado ✅';
-                setTimeout(closeProductEditorModal, 1000);
-
-            } catch (err) {
-                console.error("Error al guardar cambios:", err);
-                modalStatus.textContent = 'Error: ' + err.message;
-            } finally {
-                saveButton.disabled = false;
-            }
-        });
-
-        window.openQrModal = function() {
-            if (!currentEditingProduct || !currentEditingProduct.id) {
-                alert("Error: No hay producto seleccionado.");
-                return;
-            }
-            const productId = String(currentEditingProduct.id).trim(); 
-            const productName = currentEditingProduct.name;
-            qrCodeContainer.innerHTML = ''; 
-            currentQrCanvas = null;
-            qrProductInfo.textContent = `Producto: ${productName} (ID: ${productId})`;
-            
-            if (typeof QRCode !== 'undefined') {
-                const tempDiv = document.createElement('div');
-                new QRCode(tempDiv, {
-                    text: productId,
-                    width: 256,
-                    height: 256,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff", 
-                    correctLevel : QRCode.CorrectLevel.H
-                });
-                setTimeout(() => {
-                    const canvas = tempDiv.querySelector('canvas');
-                    if (canvas) {
-                        currentQrCanvas = canvas;
-                        const imgUrl = canvas.toDataURL("image/png");
-                        const img = document.createElement('img');
-                        img.src = imgUrl;
-                        img.style.width = '256px';
-                        img.style.height = '256px';
-                        qrCodeContainer.innerHTML = '';
-                        qrCodeContainer.appendChild(img);
-                    }
-                }, 50);
-            } 
-            qrModal.classList.remove('hidden');
-        };
-        window.closeQrModal = function() {
-            qrModal.classList.add('hidden');
-        };
-        window.downloadQrCode = function() {
-            if (!currentQrCanvas || !currentEditingProduct) {
-                return alert("Error: No se ha generado el QR.");
-            }
-            try {
-                const dataURL = currentQrCanvas.toDataURL("image/png");
-                const link = document.createElement('a');
-                link.href = dataURL;
-                link.download = `QR_${currentEditingProduct.name.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } catch (error) {
-                console.error("Error al descargar el QR:", error);
-            }
-        };
-
-        // --- Lógica de Impresión y Descarga Masiva de Etiquetas ---
-        function populateLabelCategories(products) {
-            const categories = new Set();
-            products.forEach(p => { if (p.category) categories.add(p.category); });
-            const sortedCategories = Array.from(categories).sort();
-            const currentCategory = labelsCategorySelect.value;
-            labelsCategorySelect.innerHTML = '<option value="all">Todas las Categorías</option>';
-            sortedCategories.forEach(cat => {
-                const option = document.createElement('option');
-                option.value = cat;
-                option.textContent = cat;
-                labelsCategorySelect.appendChild(option);
-            });
-            labelsCategorySelect.value = sortedCategories.includes(currentCategory) ? currentCategory : 'all';
-        }
-        labelsLocationSelect.addEventListener('change', updateLabelView);
-        labelsCategorySelect.addEventListener('change', updateLabelView);
-        function updateLabelView() {
-            const location = labelsLocationSelect.value;
-            let selectedProducts = (location === 'main') ? allProducts : allProductsBodega;
-            populateLabelCategories(selectedProducts);
-            const categoryFilter = labelsCategorySelect.value;
-            const filtered = selectedProducts.filter(p => categoryFilter === 'all' || p.category === categoryFilter);
-            labelsCountSpan.textContent = `${filtered.length} Productos seleccionados`;
-            if (labelsOutputDiv.children.length === 0 || labelsOutputDiv.children[0].tagName === 'P') {
-                labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Selecciona el inventario y presiona "Generar e Imprimir Etiquetas".</p>`;
-            }
-        }
-        
-        window.generateAndPrintLabels = function() {
-            if (typeof QRCode === 'undefined') return alert("❌ Error: Librería QRCode faltante.");
-            const location = labelsLocationSelect.value;
-            const categoryFilter = labelsCategorySelect.value;
-            const selectedProducts = (location === 'main') ? allProducts : allProductsBodega;
-            const productsToPrint = selectedProducts.filter(p => categoryFilter === 'all' || p.category === categoryFilter);
-            if (productsToPrint.length === 0) return alert("No hay productos seleccionados.");
-            
-            labelsOutputDiv.innerHTML = '';
-            labelsOutputDiv.classList.add('labels-container');
-            const qrPromises = [];
-            productsToPrint.forEach((product) => {
-                const label = document.createElement('div');
-                label.className = 'label-tag border border-gray-400 p-1 flex items-center justify-start'; 
-                label.style.backgroundColor = 'white'; 
-                const tempDiv = document.createElement('div');
-                const infoBox = document.createElement('div');
-                infoBox.className = 'flex-grow text-xs text-black';
-                infoBox.style.color = '#000';
-                infoBox.style.fontFamily = 'sans-serif';
-                const productName = product.name.length > 30 ? product.name.substring(0, 27) + '...' : product.name;
-                infoBox.innerHTML = `
-                    <p style="font-weight: bold; font-size: 11px; margin: 0;">${productName}</p>
-                    <p style="font-size: 10px; margin: 0;">Cat: ${product.category || 'N/A'}</p>
-                    <p style="font-weight: bold; color: #10b981; font-size: 11px; margin: 0;">$${Number(product.price).toFixed(2)}</p>
-                    <p style="font-size: 9px; margin: 0;">Caja: ${product.box_number || 'N/A'}</p>
-                `;
-                const qrPromise = new Promise(resolve => {
-                    const cleanProductId = String(product.id).trim(); 
-                    new QRCode(tempDiv, {
-                        text: cleanProductId,
-                        width: 100, height: 100,
-                        colorDark : "#000000", colorLight : "#ffffff",
-                        correctLevel : QRCode.CorrectLevel.L
-                    });
-                    setTimeout(() => {
-                        const canvas = tempDiv.querySelector('canvas');
-                        if (canvas) {
-                            const imgUrl = canvas.toDataURL("image/png");
-                            const imgBox = document.createElement('div');
-                            imgBox.className = 'qr-box mr-2';
-                            const img = document.createElement('img');
-                            img.src = imgUrl;
-                            img.style.width = '30mm'; img.style.height = '30mm';
-                            imgBox.appendChild(img);
-                            label.appendChild(infoBox); 
-                            label.appendChild(imgBox);
-                            labelsOutputDiv.appendChild(label);
-                        }
-                        resolve();
-                    }, 100); 
-                });
-                qrPromises.push(qrPromise);
-            });
-            Promise.all(qrPromises).then(() => {
-                window.print();
-                labelsOutputDiv.classList.remove('labels-container'); 
-            });
-        };
-
-        window.downloadAllLabelsAsZip = async function() {
-            if (typeof QRCode === 'undefined' || typeof JSZip === 'undefined' || typeof saveAs === 'undefined') {
-                 return alert("❌ Error: Faltan librerías JSZip/FileSaver.");
-            }
-            const location = labelsLocationSelect.value;
-            const categoryFilter = labelsCategorySelect.value;
-            const selectedProducts = (location === 'main') ? allProducts : allProductsBodega;
-            const productsToPrint = selectedProducts.filter(p => categoryFilter === 'all' || p.category === categoryFilter);
-
-            if (productsToPrint.length === 0) return alert("No hay productos para descargar.");
-
-            const zip = new JSZip();
-            const loadingButton = document.querySelector('button[onclick="downloadAllLabelsAsZip()"]');
-            loadingButton.disabled = true;
-            loadingButton.textContent = 'Generando ZIP...';
-
-            try {
-                for (const product of productsToPrint) {
-                    const tempDiv = document.createElement('div');
-                    const cleanProductId = String(product.id).trim();
-                    new QRCode(tempDiv, {
-                        text: cleanProductId,
-                        width: 256, height: 256,
-                        colorDark: "#000000", colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-                    await new Promise(resolve => setTimeout(resolve, 50)); 
-                    const canvas = tempDiv.querySelector('canvas');
-                    if (canvas) {
-                        const dataURL = canvas.toDataURL("image/png");
-                        const base64Data = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-                        const filename = `${product.name.replace(/[^a-zA-Z0-9]/g, '_')}_${cleanProductId.substring(0, 8)}.png`;
-                        zip.file(filename, base64Data, { base64: true });
-                    }
-                }
-                const zipContent = await zip.generateAsync({ type: "blob" });
-                saveAs(zipContent, `CellSmar_QR_Etiquetas_${new Date().toISOString().split('T')[0]}.zip`);
-                alert(`✅ ${productsToPrint.length} QRs descargados.`);
-            } catch (error) {
-                console.error("Error ZIP:", error);
-                alert("❌ Error generando ZIP.");
-            } finally {
-                loadingButton.disabled = false;
-                loadingButton.textContent = 'Descargar todos los QRs (.zip) 💾';
-            }
-        };
-
-        // ============================================================================
-        // == VIII. LÓGICA DEL ESCÁNER Y REGISTRO DE VENTA AUTOMÁTICA               ==
-        // ============================================================================
-        
-        async function registerScannedSale(product) {
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const salesTable = SALES_TABLE;
-            const statusEl = saleStatus;
-            
-            const recipientName = recipientNameIn.value.trim() || 'Cliente Rápido QR'; 
-            const productNameSold = product.name + (product.category ? ` (${product.category})` : '');
-            const salePrice = Number(product.price);
-            const saleDate = new Date().toISOString().split('T')[0];
-            const saleStatusValue = 'Pagado'; 
-
-            const newSale = {
-                recipient_name: recipientName,
-                product_name_sold: productNameSold,
-                price: salePrice,
-                sale_date: saleDate,
-                status: saleStatusValue
-            };
-            
-            setStatusMessage(statusEl, `Registrando venta de ${product.name}...`, true);
-            
-            try { 
-                const { data: insertedSale, error: saleError } = await supabase.from(salesTable).insert(newSale).select().single();
-                if (saleError) throw saleError;
-                
-                // DESCUENTO DE STOCK OBLIGATORIO si es Pagado
-                let updateTable = null, updateArray = null;
-                if (allProducts.some(p => p.id === product.id)) {
-                    updateTable = PRODUCTS_TABLE;
-                    updateArray = allProducts;
-                } else if (allProductsBodega.some(p => p.id === product.id)) {
-                    updateTable = PRODUCTS_BODEGA_TABLE;
-                    updateArray = allProductsBodega;
-                }
-
-                if (updateTable && updateArray) {
-                    await updateProductStock(product.name, updateTable, updateArray, -1);
-                }
-                
-                // Limpiar inputs
-                productNameSoldIn.value = ''; 
-                salePriceIn.value = ''; 
-                saleDateIn.value = new Date().toISOString().split('T')[0]; 
-                saleStatusInput.value = 'Pagado';
-                
-                alert(`✅ Venta de "${product.name}" registrada con éxito para ${recipientName}. Stock descontado.`);
-                setStatusMessage(statusEl, `Venta de ${product.name} registrada con éxito y stock descontado ✅`, true); 
-                
-            } catch (err) { 
-                console.error("Error al registrar venta escaneada:", err);
-                setStatusMessage(statusEl, "Error al registrar venta: " + err.message, false); 
-            }
-        }
-
-        window.openScannerModal = async function() {
-            if (isScannerRunning) return;
-            if (typeof Html5QrcodeScanner === 'undefined') return alert("Error: Librería de escaneo faltante.");
-
-            scannerModal.classList.remove('hidden');
-            scannerStatusEl.textContent = 'Iniciando cámara...';
-            scanSuccessHandled = false;
-            isScannerRunning = true;
-
-            if (html5QrcodeScanner) {
-                try { await html5QrcodeScanner.clear(); } catch (e) {}
-                html5QrcodeScanner = null;
-            }
-
-            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250}, rememberLastUsedCamera: true }, false);
-
-            const onScanSuccess = async (decodedText, decodedResult) => {
-                if (scanSuccessHandled) return;
-                try {
-                    const scannedId = String(decodedText).trim();
-                    if (!scannedId) throw new Error(`Código QR inválido.`);
-
-                    scanSuccessHandled = true; 
-                    await closeScannerModal(true); 
-
-                    // Búsqueda del producto en TODOS los inventarios
-                    const product = allProducts.find(p => String(p.id).trim() === scannedId) || 
-                                     allProductsBodega.find(p => String(p.id).trim() === scannedId); 
-                    
-                    if (!product) throw new Error(`El producto con ID "${scannedId}" no existe.`);
-                    if (parseInt(product.quantity) <= 0) throw new Error(`Stock insuficiente: "${product.name}" tiene 0 unidades.`);
-                    
-                    toggleView('sales');
-                    const productNameWithCategory = product.name + (product.category ? ` (${product.category})` : '');
-                    productNameSoldIn.value = productNameWithCategory;
-                    salePriceIn.value = Number(product.price).toFixed(2);
-                    saleDateIn.value = new Date().toISOString().split('T')[0];
-                    saleStatusInput.value = 'Pagado'; 
-                    
-                    await registerScannedSale(product);
-                    
-                } catch (error) {
-                    console.error("Error al procesar escaneo:", error);
-                    scanSuccessHandled = false; 
-                    alert(`❌ Error en Escaneo: ${error.message}`);
-                    if (!error.message.includes("cámara")) openScannerModal();
-                    else closeScannerModal(true);
-                }
-            };
-
-            const onScanError = (errorMessage) => {
-                if (!scanSuccessHandled && !errorMessage.includes("code parse error")) {
-                     scannerStatusEl.textContent = 'Escaneando... Apunta el código QR al centro.';
-                }
-            };
-            
-            html5QrcodeScanner.render(onScanSuccess, onScanError);
-        };
-
-        window.closeScannerModal = async function(hideModal = true) {
-            if (hideModal) scannerModal.classList.add('hidden');
-            scannerStatusEl.textContent = 'Esperando código...';
-            if (html5QrcodeScanner && isScannerRunning) {
-                try { await html5QrcodeScanner.stop(); } catch (e) {}
-                try { await html5QrcodeScanner.clear(); } catch (e) {}
-                html5QrcodeScanner = null;
-            } 
-            isScannerRunning = false;
-            scanSuccessHandled = false; 
-        };
-
-
-        // ============================================================================
-        // == IX. EVENT LISTENERS Y CARGA INICIAL                                   ==
-        // ============================================================================
-        
+        // Eventos Forms
         searchInput.addEventListener("input", filterAndRenderProducts);
         searchInputBodega.addEventListener("input", filterAndRenderProductsBodega); 
         searchSalesInput.addEventListener("input", filterAndRenderSales);
         pendingOnlyCheckbox.addEventListener("change", filterAndRenderSales);
         
-        form.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("submit"); 
-            submitBtn.disabled = true; 
-            setStatusMessage(status, "Guardando...", true); 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            try { 
-                const imageUrl = imageIn.files[0] ? await uploadImage(imageIn.files[0]) : null; 
-                const newProduct = { name: nameIn.value, category: categoryIn.value, price: parseFloat(priceIn.value), quantity: parseInt(qtyIn.value), image_url: imageUrl, box_number: boxNumberIn.value.trim() || null };
-                const { error } = await supabase.from(PRODUCTS_TABLE).insert(newProduct); 
-                if (error) throw error; 
-                form.reset(); qtyIn.value = 1; 
-                setStatusMessage(status, "Producto agregado con éxito ✅", true); 
-                fetchProducts();
-            } catch (err) { 
-                setStatusMessage(status, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-        
-        formBodega.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("submit-bodega"); 
-            submitBtn.disabled = true; 
-            setStatusMessage(statusBodega, "Guardando...", true); 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            try { 
-                const imageUrl = imageInBodega.files[0] ? await uploadImage(imageInBodega.files[0]) : null; 
-                const newProductBodega = { name: nameInBodega.value, category: categoryInBodega.value, price: parseFloat(priceInBodega.value), quantity: parseInt(qtyInBodega.value), image_url: imageUrl, box_number: boxNumberInBodega.value.trim() || null };
-                const { error } = await supabase.from(PRODUCTS_BODEGA_TABLE).insert(newProductBodega);
-                if (error) throw error; 
-                formBodega.reset(); qtyInBodega.value = 1; 
-                setStatusMessage(statusBodega, "Producto agregado con éxito ✅", true); 
-                fetchProductsBodega();
-            } catch (err) { 
-                setStatusMessage(statusBodega, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
+        async function genericFormSubmit(e, table, fields, successMsg, refreshFn, extraFields={}) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const status = e.target.querySelector('p[id*="status"]');
+            btn.disabled = true;
+            setStatusMessage(status, "Guardando...", true);
+            try {
+                let url = null;
+                const fileIn = e.target.querySelector('input[type="file"]');
+                if(fileIn && fileIn.files[0]) url = await uploadImage(fileIn.files[0]);
+                
+                const payload = { ...extraFields };
+                fields.forEach(f => {
+                    const el = e.target.querySelector(`[id*="${f}"]`);
+                    if(el) {
+                        if(el.type==='number') payload[f] = parseFloat(el.value);
+                        else payload[f] = el.value;
+                    }
+                });
+                if(url) payload.image_url = url;
+                
+                await supabase.from(table).insert(payload);
+                e.target.reset();
+                if(refreshFn) refreshFn();
+                setStatusMessage(status, successMsg, true);
+            } catch(err) { setStatusMessage(status, "Error: " + err.message, false); }
+            finally { btn.disabled = false; }
+        }
 
-        salesForm.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("sale-submit"); 
-            submitBtn.disabled = true; 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const soldProductWithCategory = productNameSoldIn.value.trim();
-            const soldProductName = getCleanProductName(soldProductWithCategory); 
-            try { 
-                const newSale = {
+        form.addEventListener("submit", (e) => genericFormSubmit(e, PRODUCTS_TABLE, ['name','category','price','quantity','box-number'], "Agregado", fetchProducts));
+        formBodega.addEventListener("submit", (e) => genericFormSubmit(e, PRODUCTS_BODEGA_TABLE, ['name','category','price','quantity','box-number'], "Agregado", fetchProductsBodega));
+        missingProductForm.addEventListener("submit", (e) => genericFormSubmit(e, MISSING_PRODUCTS_TABLE, ['product_name','notes'], "Agregado", fetchMissingProducts));
+        toolForm.addEventListener("submit", (e) => genericFormSubmit(e, TOOLS_TABLE, ['title','description'], "Agregado", fetchTools));
+        
+        salesForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("sale-submit");
+            btn.disabled=true;
+            const name = productNameSoldIn.value.trim();
+            try {
+                const sale = {
                     recipient_name: recipientNameIn.value,
-                    product_name_sold: soldProductWithCategory,
+                    product_name_sold: name,
                     price: parseFloat(salePriceIn.value),
                     sale_date: saleDateIn.value,
                     status: saleStatusInput.value
                 };
-                const { error } = await supabase.from(SALES_TABLE).insert(newSale);
-                if (error) throw error;
-                
-                if (newSale.status === 'Pagado') {
-                    let updateTable = null, updateArray = null;
-                    if (allProducts.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
-                        updateTable = PRODUCTS_TABLE; updateArray = allProducts;
-                    } else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
-                        updateTable = PRODUCTS_BODEGA_TABLE; updateArray = allProductsBodega;
-                    }
-                    if (updateTable && updateArray) {
-                         await updateProductStock(soldProductName, updateTable, updateArray, -1);
-                    }
+                await supabase.from(SALES_TABLE).insert(sale);
+                if (sale.status === 'Pagado') {
+                    const clean = getCleanProductName(name);
+                    if (allProducts.some(p => getCleanProductName(p.name).trim() === clean)) await updateProductStock(clean, PRODUCTS_TABLE, allProducts, -1);
+                    else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === clean)) await updateProductStock(clean, PRODUCTS_BODEGA_TABLE, allProductsBodega, -1);
                 }
-                salesForm.reset(); 
-                saleDateIn.value = new Date().toISOString().split('T')[0]; 
-                setStatusMessage(saleStatus, "Venta registrada con éxito ✅", true); 
+                salesForm.reset();
+                saleDateIn.value = new Date().toISOString().split('T')[0];
                 fetchSales();
-            } catch (err) { 
-                setStatusMessage(saleStatus, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-        
-        missingProductForm.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("missing-product-submit"); 
-            submitBtn.disabled = true; 
-            try { 
-                const newMissing = { product_name: missingProductNameIn.value, notes: missingProductNotesIn.value || null };
-                const { error } = await supabase.from(MISSING_PRODUCTS_TABLE).insert(newMissing);
-                if (error) throw error;
-                missingProductForm.reset(); 
-                setStatusMessage(missingProductStatus, "Agregado ✅", true); 
-                fetchMissingProducts();
-            } catch (err) { 
-                setStatusMessage(missingProductStatus, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
+                setStatusMessage(saleStatus, "Venta OK", true);
+            } catch(err) { setStatusMessage(saleStatus, err.message, false); }
+            finally { btn.disabled=false; }
         });
 
-        toolForm.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("tool-submit"); 
-            submitBtn.disabled = true; 
-            setStatusMessage(toolStatus, "Guardando...", true); 
-            try { 
-                const imageUrl = toolImageIn.files[0] ? await uploadImage(toolImageIn.files[0]) : null; 
-                const newTool = { title: toolTitleIn.value, description: toolDescriptionIn.value || null, image_url: imageUrl };
-                const { error } = await supabase.from(TOOLS_TABLE).insert(newTool);
-                if (error) throw error; 
-                toolForm.reset(); 
-                setStatusMessage(toolStatus, "Guardado ✅", true); 
-                fetchTools();
-            } catch (err) { 
-                setStatusMessage(toolStatus, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-        
-        toolImageEditorInput.addEventListener('change', async (event) => {
-            if (!editingToolId) return; 
-            const file = event.target.files[0];
-            if (!file) return; 
-            try {
-                const newImageUrl = await uploadImage(file);
-                await supabase.from(TOOLS_TABLE).update({ image_url: newImageUrl }).eq('id', editingToolId);
-                alert('✅ Imagen actualizada.');
-                fetchTools();
-            } catch (error) {
-                alert('❌ Error: ' + error.message);
-            } finally {
-                editingToolId = null; 
-                toolImageEditorInput.value = ''; 
-            }
-        });
-
+        // Inicialización
         document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', (e) => {
             if (!isMobile() && e.target.closest('#mobile-menu-dropdown')) return; 
             toggleView(btn.dataset.view);
@@ -2485,14 +1644,8 @@
             showSkeletonLoaders(); 
             await loadLogo(); 
             
-            let viewToLoad = 'inventory';
-            try {
-                const lastView = localStorage.getItem('lastView');
-                if (lastView && views[lastView]) viewToLoad = lastView;
-            } catch (e) {}
-            toggleView(viewToLoad);
-
-            if (supabase) {
+            // CORRECCIÓN MÓVIL: Forzar un pequeño retardo para asegurar que la UI se pinte antes de la carga pesada
+            setTimeout(async () => {
                 try {
                     await Promise.all([
                         fetchProducts(), 
@@ -2501,37 +1654,31 @@
                         fetchMissingProducts(),
                         fetchTools() 
                     ]);
-                    updateLabelView(); 
+                    // Solo activar realtime después de la carga inicial
+                    initializeRealtimeSubscriptions();
                 } catch (error) {
-                    console.error("Error crítico carga inicial:", error);
+                    console.error("Error carga datos:", error);
                 }
-            }
+            }, 100);
         }
         
-        document.addEventListener('visibilitychange', async () => {
-            if (document.visibilityState === 'visible') {
-                if (!supabase) return;
-                const { data: { session }, error } = await supabase.auth.getSession();
-                if (session) {
-                    if (appContentWrapper.classList.contains('hidden')) {
-                        authModal.classList.add('hidden');
-                        appContentWrapper.classList.remove('hidden');
-                        await loadAppDataAndInitialize(); 
+        // CORRECCIÓN MÓVIL: Aseguramos la inicialización de supabase-js en window.onload
+        window.onload = function() {
+            // Re-instanciar cliente si no existe
+            if (!supabase && window.supabase) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                    auth: {
+                        persistSession: true, // Forzar persistencia
+                        storage: window.localStorage, // Forzar uso de localStorage
+                        detectSessionInUrl: false // Evitar redirecciones raras en móviles
                     }
-                } else {
-                    if (appContentWrapper && !appContentWrapper.classList.contains('hidden')) {
-                        authModal.classList.remove('hidden');
-                        appContentWrapper.classList.add('hidden');
-                    }
-                }
+                });
             }
-        });
-        
-        window.addEventListener("load", async () => {
+            
             const initialTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
             applyTheme(initialTheme); 
             setupAuthListener();
-        });
+        };
     </script>
 </body>
 </html>
