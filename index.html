@@ -4,95 +4,444 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
     <title>Cell Smar</title>
-    
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700;900&family=Lora:wght@700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /********************************/
+        /* Estilos Base (Comunes a todos los temas) */
+        /********************************/
+        html {
+            height: 100%;
+        }
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.5s ease;
+            position: relative; 
+            overflow-x: hidden; 
+        }
+        .container.mx-auto {
+            flex-grow: 1;
+        }
+        .product-card, .tool-card { transition: transform 0.2s, box-shadow 0.3s; }
+        .product-card:hover, .tool-card:hover { transform: translateY(-5px); }
+        /* El input file del logo debe ser invisible pero accesible */
+        #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
+        .hidden { display: none; }
+        .skeleton-card { background-color: transparent; border-radius: 0.5rem; padding: 1rem; display: flex; flex-direction: column; }
+        .skeleton-line {
+            background-color: var(--bg-secondary);
+            opacity: 0.7;
+            border-radius: 0.25rem;
+            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse { 50% { opacity: .4; } }
+        
+        /********************************/
+        /* Estilos para impresión de QR */
+        /********************************/
+        @media print {
+            body > *:not(.labels-container):not(#qr-modal) { display: none !important; }
+            
+            /* Contenedor principal de etiquetas: Forzar blanco */
+            .labels-container { 
+                display: flex !important;
+                flex-wrap: wrap;
+                width: 100%;
+                min-height: 100vh;
+                margin: 0;
+                padding: 0;
+                background-color: white !important;
+            }
+            .labels-container > div {
+                width: 100mm; /* Ancho deseado de la etiqueta */
+                height: 35mm; /* Alto deseado de la etiqueta */
+                box-sizing: border-box;
+                border: 1px solid #ccc;
+                margin: 2mm;
+                padding: 5px;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+                page-break-after: avoid;
+                /* Asegurar que el fondo de cada etiqueta es blanco */
+                background-color: white !important;
+                color: black !important; /* Texto de etiqueta en negro */
+            }
+            .labels-container .qr-box { margin-right: 10px; width: 35mm; height: 35mm; display: flex; justify-content: center; align-items: center; }
+            .labels-container canvas, .labels-container img { width: 30mm !important; height: 30mm !important; }
+            
+            /* Modal de QR individual (para asegurar fondo blanco en impresión) */
+            #qr-modal {
+                display: flex !important;
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: white;
+                align-items: center;
+                justify-content: center;
+            }
+            #qr-modal .bg-gray-800, #qr-modal .bg-gray-900 { background-color: white !important; }
+            #qr-modal .text-white, #qr-modal .text-gray-300 { color: black !important; }
+            #qr-modal .border-purple-500 { border-color: black !important; }
+            #qr-modal .print\:hidden { display: none !important; }
+        }
+        
+        /********************************/
+        /* TEMA 1: Dark (Predeterminado) */
+        /********************************/
+        .theme-dark {
+            --bg-primary: #1f2937;
+            --bg-secondary: #374151;
+            --bg-header: rgba(31, 41, 55, 0.8);
+            --text-primary: #e5e7eb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --border-color: #4b5563;
+            --accent-color: #818cf8;
+            --accent-color-dark: #6366f1;
+            --font-main: 'Poppins', sans-serif;
+            --font-headings: 'Poppins', sans-serif;
+            --pastel-bg: #e0f2f1; /* Verde pastel claro para móvil */
+            --pastel-text: #1f2937;
+        }
+        
+        /********************************/
+        /* Fondo del Escáner siempre blanco */
+        /********************************/
+        #scanner-modal .modal-content {
+            background-color: white !important;
+            color: black !important;
+        }
+        #scanner-modal .modal-content h3, #scanner-modal .modal-content p {
+            color: black !important;
+        }
+        
+        /********************************/
+        /* TEMA 2: Fuego Infernal */
+        /********************************/
+        .theme-infernal {
+            --bg-primary: #000000;
+            --bg-secondary: #2d1a1a;
+            --bg-header: rgba(17, 7, 0, 0.6);
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --border-color: #571e1e;
+            --accent-color: #ff4500;
+            --accent-color-dark: #e63e00;
+            --font-main: 'Roboto', sans-serif;
+            --font-headings: 'Roboto', sans-serif;
+            --pastel-bg: #ffccbc; /* Naranja/Melocotón pastel */
+            --pastel-text: #2d1a1a;
+        }
+        .theme-infernal { background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
+        .theme-infernal .product-card:hover, .theme-infernal .tool-card:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.5); border-color: rgba(255, 69, 0, 0.7); }
+        
+        /********************************/
+        /* TEMA 3: Luxury Gold */
+        /********************************/
+        .theme-gold {
+            --bg-primary: #121212;
+            --bg-secondary: #2b2b2b;
+            --bg-header: rgba(18, 18, 18, 0.85);
+            --text-primary: #f1f1f1;
+            --text-secondary: #cccccc;
+            --text-muted: #a0a0a0;
+            --border-color: #444444;
+            --accent-color: #D4AF37;
+            --accent-color-dark: #B8860B;
+            --font-main: 'Poppins', sans-serif;
+            --font-headings: 'Playfair Display', serif;
+            --pastel-bg: #faf3e0; /* Crema pastel */
+            --pastel-text: #121212;
+        }
+        .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
+        .theme-gold .product-card:hover, .theme-gold .tool-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
+        .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
+        .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
+        
+        /* TEMA NAVIDAD ELIMINADO COMPLETAMENTE */
+
+        /********************************/
+        /* TEMA 5: Blue Neon */
+        /********************************/
+        .theme-blue-neon {
+            --bg-primary: #080a1c; /* Azul muy oscuro/negro */
+            --bg-secondary: #12183b; /* Azul oscuro */
+            --bg-header: rgba(8, 10, 28, 0.9);
+            --text-primary: #e0f7fa; /* Cyan claro */
+            --text-secondary: #99eeff;
+            --text-muted: #4dd0e1;
+            --border-color: #00bcd4; /* Azul Neón */
+            --accent-color: #00e5ff; /* Neón brillante */
+            --accent-color-dark: #00aacd;
+            --font-main: 'Roboto', sans-serif;
+            --font-headings: 'Roboto Mono', monospace; /* Fuente de código */
+            --pastel-bg: #e1f5fe; /* Azul pastel */
+            --pastel-text: #080a1c;
+        }
+        .theme-blue-neon {
+            background-image: url('data:image/svg+xml,%3Csvg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%231a1a3a" fill-opacity="0.4"%3E%3Cpath d="M0 0h80v80H0zM20 20v40h40V20H20zM30 30h20v20H30V30z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); /* Fondo de circuito/malla */
+        }
+        .theme-blue-neon .product-card:hover, .theme-blue-neon .tool-card:hover {
+            box-shadow: 0 0 20px var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        .theme-blue-neon .text-indigo-400, .theme-blue-neon .text-indigo-300 {
+            color: var(--accent-color);
+            text-shadow: 0 0 8px var(--accent-color); /* Efecto neón */
+        }
+        .theme-blue-neon .bg-indigo-500, .theme-blue-neon .hover\:bg-indigo-600:hover, 
+        .theme-blue-neon .bg-blue-600, .theme-blue-neon .hover\:bg-blue-700:hover,
+        .theme-blue-neon .bg-green-600, .theme-blue-neon .hover\:bg-green-700:hover {
+            background-color: var(--accent-color-dark);
+            box-shadow: 0 0 10px var(--border-color);
+        }
+        .theme-blue-neon .bg-indigo-500:hover, .theme-blue-neon .hover\:bg-indigo-600 {
+            background-color: var(--accent-color);
+        }
+        
+        /********************************/
+        /* Aplicación de Variables CSS */
+        /********************************/
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+        }
+        h1, h2, h3, h4, h5, h6 { font-family: var(--font-headings); }
+        
+        /* Aplicación de colores para fondo de headers y cards */
+        .bg-gray-800, .bg-gray-900\/50 {
+            background-color: var(--bg-header);
+            border: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+            backdrop-filter: blur(10px);
+            color: var(--text-primary); /* Restaurar color de texto */
+        }
+        
+        /* Asegurar que el fondo secundario de inputs y selectores es visible */
+        .bg-gray-600 { background-color: var(--bg-secondary) !important; }
+        .bg-gray-700\/50 { background-color: var(--bg-secondary); }
+
+        .text-gray-300 { color: var(--text-secondary); }
+        .text-gray-400 { color: var(--text-muted); }
+        
+        .border-gray-500, .border-gray-600, .border-gray-700 { border-color: var(--border-color); }
+        
+        /* Acentos */
+        .text-indigo-400, .text-indigo-300 { color: var(--accent-color); }
+        .border-indigo-500 { border-color: var(--accent-color); }
+        .bg-indigo-500 { background-color: var(--accent-color-dark); color: var(--text-primary); }
+        .hover\:bg-indigo-600:hover { background-color: var(--accent-color); }
+        .focus\:ring-indigo-500:focus { --tw-ring-color: var(--accent-color); }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent-color) !important;
+            box-shadow: 0 0 0 1px var(--accent-color);
+            outline: none;
+        }
+        .bg-blue-600, .bg-green-600 { background-color: var(--accent-color-dark); }
+        .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover { background-color: var(--accent-color); }
+        
+        /********************************/
+        /* ESTILOS FIJOS PARA ESTADOS DE VENTA */
+        /********************************/
+        .status-paid {
+            background-color: #16a34a !important; /* Verde */
+            color: #ffffff !important;
+            border-color: #15803d !important;
+        }
+        .status-pending {
+            background-color: #f59e0b !important; /* Naranja/Amarillo */
+            color: #1f2937 !important;
+            border-color: #d97706 !important;
+        }
+        .status-returned {
+            background-color: #dc2626 !important; /* Rojo */
+            color: #ffffff !important;
+            border-color: #b91c1c !important;
+        }
+
+        /********************************/
+        /* ESTILOS MÓVIL (Menú de Hamburguesa y Columnas) */
+        /********************************/
+        #mobile-menu-button {
+            display: none; 
+        }
+        
+        @media (min-width: 769px) {
+            #mobile-scan-button {
+                display: none !important;
+            }
+            .sales-list-table {
+                /* Asegura que la tabla se comporte como tabla en escritorio */
+                display: table;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            #view-buttons {
+                display: none !important; 
+            }
+            #mobile-menu-button {
+                display: block; 
+            }
+            /* Inventario en 2 columnas en móvil */
+            #products .grid, #products-bodega .grid, #products-loader, #products-loader-bodega, #tools-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            }
+
+            #mobile-menu-dropdown {
+                position: absolute;
+                right: 0;
+                top: 100%; 
+                width: 250px;
+                background-color: var(--pastel-bg); 
+                color: var(--pastel-text);
+                border: 1px solid var(--border-color);
+                border-top: none;
+                z-index: 40;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+            #mobile-menu-dropdown button {
+                width: 100%;
+                text-align: left;
+                padding: 0.75rem 1rem;
+                font-weight: 500;
+                color: var(--pastel-text);
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            }
+            #mobile-menu-dropdown button:hover {
+                background-color: rgba(0, 0, 0, 0.05);
+            }
+             /* Estilo para el botón activo en el menú móvil */
+            #mobile-menu-dropdown .bg-indigo-500 {
+                background-color: var(--accent-color) !important;
+                color: var(--text-primary) !important;
+                font-weight: bold;
+            }
+            #mobile-menu-dropdown #mobile-scan-button {
+                background-color: var(--pastel-bg); 
+                color: var(--pastel-text);
+                font-weight: bold;
+                padding: 0.75rem 1rem;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            }
+
+            /* Estilos para transformar la tabla de ventas en tarjetas */
+            .sales-list-table, .sales-list-table thead, .sales-list-table tbody, .sales-list-table th, .sales-list-table td, .sales-list-table tr { 
+                display: block; 
+            }
+            .sales-list-table thead {
+                display: none; /* Oculta la cabecera en móvil */
+            }
+            .sales-list-table tr {
+                margin-bottom: 0.75rem;
+                border: 1px solid var(--border-color);
+                border-radius: 0.5rem;
+                overflow: hidden;
+            }
+            .sales-list-table td {
+                /* Hace que cada celda ocupe el ancho completo */
+                border-bottom: 1px solid var(--border-color);
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+                word-wrap: break-word; /* Para prevenir desbordamiento de palabras largas */
+            }
+            .sales-list-table td:before {
+                /* Usa el atributo data-label para mostrar el nombre de la columna */
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 45%;
+                padding-left: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: 600;
+                color: var(--text-muted);
+            }
+            /* La última celda (Eliminar) y el select de estado no necesitan padding extra */
+            .sales-list-table td:last-child {
+                border-bottom: none;
+                text-align: center;
+                padding-left: 0;
+            }
+            .sales-list-table td:last-child:before {
+                content: none;
+            }
+            /* Ajustar el select de estado para que se vea correctamente */
+            .sales-list-table select {
+                display: inline-block;
+                max-width: 100%;
+            }
+        }
+    </style>
+    <script>
+        (function() {
+            try {
+                // Se agregan los nuevos temas a la lista de temas válidos
+                const theme = localStorage.getItem('selectedTheme');
+                if (theme && ['theme-dark', 'theme-infernal', 'theme-gold', 'theme-blue-neon'].includes(theme)) {
+                    document.documentElement.className = theme;
+                } else {
+                    document.documentElement.className = 'theme-dark';
+                }
+            } catch (e) {
+                document.documentElement.className = 'theme-dark';
+            }
+        })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
-    <style>
-        body {
-            background-color: #1f2937;
-            color: #e5e7eb;
-            font-family: 'Poppins', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        /* Utilidades */
-        .hidden { display: none !important; }
-        input, select, textarea { font-size: 16px !important; /* Evita zoom en iOS */ }
-        
-        /* Temas */
-        .theme-dark { --bg-p: #1f2937; --bg-s: #374151; --txt: #e5e7eb; }
-        .theme-infernal { --bg-p: #000000; --bg-s: #2d1a1a; --txt: #f9fafb; background: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
-        .theme-gold { --bg-p: #121212; --bg-s: #2b2b2b; --txt: #f1f1f1; }
-        .theme-blue-neon { --bg-p: #080a1c; --bg-s: #12183b; --txt: #e0f7fa; }
-
-        /* Estilos Tarjetas y Tablas */
-        .product-card { transition: transform 0.2s; background: var(--bg-s, #374151); border: 1px solid #4b5563; }
-        .product-card:active { transform: scale(0.98); }
-        
-        /* Móvil Específico */
-        @media (max-width: 768px) {
-            #mobile-menu-btn { display: block; }
-            #desktop-menu { display: none; }
-            .grid-cols-mobile { grid-template-columns: repeat(2, 1fr) !important; gap: 0.5rem; }
-            
-            /* Tabla responsiva tipo tarjeta */
-            .sales-table, .sales-table thead, .sales-table tbody, .sales-table th, .sales-table td, .sales-table tr { display: block; }
-            .sales-table thead { display: none; }
-            .sales-table tr { margin-bottom: 1rem; border: 1px solid #4b5563; border-radius: 0.5rem; padding: 0.5rem; }
-            .sales-table td { border-bottom: 1px solid #4b5563; position: relative; padding-left: 50%; text-align: right; font-size: 0.9rem; }
-            .sales-table td:before { content: attr(data-label); position: absolute; left: 0; width: 45%; padding-left: 10px; text-align: left; font-weight: bold; color: #9ca3af; }
-            .sales-table td:last-child { border-bottom: 0; }
-        }
-        
-        /* Impresión */
-        @media print {
-            body > *:not(.labels-area):not(#qr-modal) { display: none !important; }
-            .labels-area { display: flex !important; flex-wrap: wrap; background: white; width: 100%; position: absolute; top:0; left:0; }
-            .label-item { width: 100mm; height: 35mm; border: 1px solid black; margin: 2mm; display: flex; align-items: center; page-break-inside: avoid; color: black; background: white; }
-            #qr-modal { display: flex !important; background: white; color: black; position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-            .no-print { display: none !important; }
-        }
-    </style>
 </head>
-<body class="theme-dark">
-
-    <div id="auth-modal" class="fixed inset-0 z-[100] bg-gray-900 bg-opacity-95 flex items-center justify-center p-4">
-        <div class="bg-gray-800 rounded-lg shadow-2xl w-full max-w-md border border-indigo-600 p-6">
-            <div class="text-center mb-6">
-                <div class="mx-auto h-12 w-12 bg-indigo-900 rounded-full flex items-center justify-center mb-4">
-                    <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+<body class="" onclick=""> 
+    
+    <div id="auth-modal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="auth-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-90 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-indigo-500">
+                <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start flex-col">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-2xl leading-6 font-bold text-white mb-4 border-b border-indigo-500 pb-2" id="auth-modal-title">
+                                🔒 Iniciar Sesión en Cell Smar
+                            </h3>
+                            <form id="auth-form" class="mt-4 space-y-4">
+                                <div>
+                                    <label for="email-input" class="block text-sm font-medium text-gray-300">Correo Electrónico</label>
+                                    <input id="email-input" type="email" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="tu@correo.com" />
+                                </div>
+                                <div>
+                                    <label for="password-input" class="block text-sm font-medium text-gray-300">Contraseña</label>
+                                    <input id="password-input" type="password" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="********" />
+                                </div>
+                                <p id="auth-status" class="text-sm text-center text-gray-400 mt-3"></p>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <h2 class="text-2xl font-bold text-white">Cell Smar</h2>
-                <p class="text-gray-400 text-sm">Sistema de Inventario</p>
+                <div class="bg-gray-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-700">
+                    <button type="submit" form="auth-form" id="login-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 sm:ml-3 sm:w-auto sm:text-sm transition">
+                        Entrar
+                    </button>
+                </div>
             </div>
-            
-            <form id="auth-form" class="space-y-4">
-                <div>
-                    <label class="block text-gray-300 text-sm font-medium mb-1">Correo</label>
-                    <input id="email-input" type="email" class="w-full p-3 bg-gray-700 border border-gray-600 rounded text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="admin@cellsmar.com" required>
-                </div>
-                <div>
-                    <label class="block text-gray-300 text-sm font-medium mb-1">Contraseña</label>
-                    <input id="password-input" type="password" class="w-full p-3 bg-gray-700 border border-gray-600 rounded text-white focus:border-indigo-500 outline-none" placeholder="••••••••" required>
-                </div>
-                <p id="auth-status" class="text-center text-sm font-medium min-h-[20px]"></p>
-                <button type="submit" id="login-button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded transition duration-200">
-                    INGRESAR
-                </button>
-            </form>
         </div>
     </div><div id="app-content-wrapper" class="hidden">
     
@@ -513,22 +862,22 @@
     
     <input type="file" id="tool-image-editor-input" class="hidden" accept="image/*" /><script>
         // =================================================================================
-        // == 1. CONFIGURACIÓN SUPABASE E INICIALIZACIÓN INMEDIATA                        ==
+        // == 1. CONFIGURACIÓN SUPABASE                                                   ==
         // =================================================================================
         
+        // Inicialización inmediata para evitar errores en PC o Móvil
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
         const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
         
-        // Inicializar Supabase inmediatamente si la librería cargó
         let supabase = null;
         if (window.supabase) {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } else {
-            alert("⚠️ Error crítico: La librería de Supabase no cargó. Revisa tu conexión a internet.");
+            alert("Error Crítico: No se pudo cargar Supabase. Revise su conexión.");
         }
         
-        // Tablas
+        // Constantes de Tablas
         const PRODUCTS_TABLE = "products";
         const PRODUCTS_BODEGA_TABLE = "products_nuevo"; 
         const SALES_TABLE = "sales";
@@ -551,7 +900,7 @@
         let currentEditingProduct = null;
         let selectedProductImageFile = null; 
         
-        // Totales
+        // Variables para totales
         let categoryTotals = {};
         let categoryTotalsBodega = {}; 
         
@@ -563,14 +912,17 @@
         const passwordInput = document.getElementById('password-input');
         const authStatus = document.getElementById('auth-status');
         
-        // Elementos de Totales UI
+        // Elementos para mostrar totales
         const categoryTotalsEl = document.createElement("div"); 
-        categoryTotalsEl.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 text-sm";
+        categoryTotalsEl.id = "category-totals";
+        categoryTotalsEl.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
+        
         const categoryTotalsElBodega = document.createElement("div"); 
-        categoryTotalsElBodega.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 text-sm";
+        categoryTotalsElBodega.id = "category-totals-bodega";
+        categoryTotalsElBodega.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
 
         // ============================================================================
-        // == 3. AUTENTICACIÓN (LOGIN CORREGIDO)                                     ==
+        // == 3. LÓGICA DE AUTENTICACIÓN (LOGIN ARREGLADO)                           ==
         // ============================================================================
 
         function setAuthStatus(msg, success = true) {
@@ -579,14 +931,13 @@
         }
 
         async function handleLogin(event) {
-            event.preventDefault(); // Prevenir recarga del formulario
+            event.preventDefault();
             const loginButton = document.getElementById('login-button');
             loginButton.disabled = true;
-            loginButton.textContent = "Verificando...";
-            setAuthStatus('Conectando...', true);
+            setAuthStatus('Iniciando sesión...', true);
 
             if (!supabase) {
-                setAuthStatus('Error: Supabase no está disponible.', false);
+                setAuthStatus('Error: Supabase no cargó.', false);
                 loginButton.disabled = false;
                 return;
             }
@@ -595,7 +946,7 @@
             const password = passwordInput.value;
 
             try {
-                // 1. Intentar iniciar sesión
+                // 1. Intentar Login en la API
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email: email,
                     password: password,
@@ -603,50 +954,49 @@
 
                 if (error) throw error;
                 
-                // 2. ÉXITO: Forzamos la entrada INMEDIATAMENTE
-                // Esto arregla el problema en móviles donde el evento no se dispara
-                setAuthStatus('¡Correcto! Entrando...', true);
+                // 2. ÉXITO: FORZAR ENTRADA INMEDIATAMENTE
+                // No esperamos al evento onAuthStateChange que suele fallar en móviles.
+                setAuthStatus('¡Éxito! Entrando...', true);
                 
                 authModal.classList.add('hidden');
                 appContentWrapper.classList.remove('hidden');
                 
-                // 3. Cargar datos
+                // Cargar datos
                 loadAppDataAndInitialize();
 
             } catch (error) {
-                console.error("Login error:", error);
+                console.error("Error Login:", error);
                 setAuthStatus('Correo o contraseña incorrectos.', false); 
                 loginButton.disabled = false;
-                loginButton.textContent = "Entrar";
             }
         }
 
         window.logout = async function() {
             if (!supabase) return;
-            if (confirm("¿Deseas cerrar sesión?")) {
-                try {
-                    await supabase.auth.signOut();
-                    window.location.reload(); 
-                } catch (error) {
-                     window.location.reload();
-                }
+            if (!confirm("¿Cerrar sesión?")) return;
+            try {
+                await supabase.auth.signOut();
+                window.location.reload(); 
+            } catch (error) {
+                 window.location.reload();
             }
         }
 
-        // Listener de respaldo para persistencia de sesión al recargar
+        // Listener de respaldo (útil si recargas la página ya logueado)
         function setupAuthListener() {
             if (!supabase) return;
             supabase.auth.onAuthStateChange((event, session) => {
                 if (session) {
-                    if(!appContentWrapper.classList.contains('hidden')) return; // Ya estamos dentro
-                    authModal.classList.add('hidden');
-                    appContentWrapper.classList.remove('hidden');
-                    loadAppDataAndInitialize(); 
+                    // Si ya estamos dentro, no hacemos nada. Si estamos fuera, entramos.
+                    if (authModal.classList.contains('hidden') === false) {
+                        authModal.classList.add('hidden');
+                        appContentWrapper.classList.remove('hidden');
+                        loadAppDataAndInitialize(); 
+                    }
                 } else {
                     // Si no hay sesión, asegurar que se vea el login
-                    if(appContentWrapper.classList.contains('hidden')){
-                        authModal.classList.remove('hidden');
-                    }
+                    authModal.classList.remove('hidden');
+                    appContentWrapper.classList.add('hidden');
                 }
             });
         }
@@ -654,36 +1004,41 @@
         authForm.addEventListener('submit', handleLogin);
 
         // ============================================================================
-        // == 4. LÓGICA UI Y UTILIDADES                                              ==
+        // == 4. LÓGICA DE UI Y UTILIDADES                                           ==
         // ============================================================================
 
+        // Temas
         function applyTheme(theme) {
             document.documentElement.className = theme;
             localStorage.setItem('selectedTheme', theme);
             const selector = document.getElementById('theme-selector');
             if(selector) selector.value = theme;
         }
-        
-        // Control de Menús
+        const themeSelector = document.getElementById('theme-selector');
+        if(themeSelector) themeSelector.addEventListener('change', (e) => applyTheme(e.target.value));
+
+        // Menús
         const settingsDropdown = document.getElementById('settings-dropdown');
         const mobileMenuDropdown = document.getElementById('mobile-menu-dropdown');
         
-        window.toggleSettingsDropdown = (e) => { e.stopPropagation(); settingsDropdown.classList.toggle('hidden'); mobileMenuDropdown.classList.add('hidden'); };
-        window.toggleMobileMenu = (e) => { e.stopPropagation(); mobileMenuDropdown.classList.toggle('hidden'); settingsDropdown.classList.add('hidden'); };
+        window.toggleSettingsDropdown = function(event) {
+            event.stopPropagation(); 
+            settingsDropdown.classList.toggle('hidden');
+            mobileMenuDropdown.classList.add('hidden');
+        };
         
-        document.body.addEventListener('click', () => {
-            if(settingsDropdown) settingsDropdown.classList.add('hidden');
-            if(mobileMenuDropdown) mobileMenuDropdown.classList.add('hidden');
+        window.toggleMobileMenu = function(event) {
+            event.stopPropagation(); 
+            mobileMenuDropdown.classList.toggle('hidden');
+            settingsDropdown.classList.add('hidden');
+        };
+        
+        document.body.addEventListener('click', (event) => {
+            if (settingsDropdown && !settingsDropdown.classList.contains('hidden')) settingsDropdown.classList.add('hidden');
+            if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden')) mobileMenuDropdown.classList.add('hidden');
         });
 
-        // Utilidades Varias
-        function setStatusMessage(el, msg, success = true) { 
-            if(!el) return;
-            el.textContent = msg; 
-            el.className = `text-sm mt-3 ${success ? 'text-green-400' : 'text-red-400'}`; 
-            setTimeout(() => (el.textContent = ""), 3000); 
-        }
-        
+        // Utilidades
         function getCleanProductName(inputName) {
             const match = inputName.match(/^(.*?)\s+\((.*?)$/);
             return match ? match[1].trim() : inputName.trim();
@@ -695,7 +1050,7 @@
             formData.append('file', file);
             const response = await fetch(SUPABASE_FUNCTION_URL, { method: 'POST', body: formData });
             const data = await response.json();
-            if (!response.ok || !data.success) throw new Error('Fallo subida imagen');
+            if (!response.ok || !data.success) throw new Error(data.error || 'La subida del archivo falló.');
             return data.url; 
         }
 
@@ -728,29 +1083,40 @@
             });
         }
 
-        // Control de Vistas (Tabs)
+        // Control de Vistas
+        const views = { 
+            inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario Principal' }, 
+            inventory_bodega: { el: document.getElementById('inventory-bodega-view'), title: 'Vista: Nuevo Inventario' }, 
+            labels: { el: document.getElementById('labels-view'), title: 'Vista: Generación de Etiquetas QR' },
+            sales: { el: document.getElementById('sales-view'), title: 'Vista: Ventas Registradas' },
+            missing: { el: document.getElementById('missing-view'), title: 'Vista: Productos Faltantes' },
+            tools: { el: document.getElementById('tools-view'), title: 'Vista: Herramientas y Tutoriales' } 
+        };
+        
         function toggleView(viewName) { 
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            const target = document.getElementById(viewName + (viewName.includes('view') ? '' : '-view'));
-            if(target) target.classList.remove('hidden');
-            
-            // Títulos y Botones
-            const titleMap = { 'inventory': 'Inventario Principal', 'inventory_bodega': 'Nuevo Inventario', 'sales': 'Ventas', 'labels': 'Etiquetas QR', 'missing': 'Faltantes', 'tools': 'Herramientas' };
-            const titleEl = document.getElementById("current-view-title");
-            if(titleEl) titleEl.textContent = "Vista: " + (titleMap[viewName] || viewName);
-            
-            // Actualizar estado de botones
-            document.querySelectorAll('.view-btn').forEach(btn => {
-                const active = btn.dataset.view === viewName;
-                if(btn.closest('#mobile-menu-dropdown')) {
-                    btn.className = `view-btn text-sm w-full text-left p-3 border-b border-gray-200 ${active ? 'bg-indigo-500 text-white font-bold' : 'text-gray-800'}`;
-                } else {
-                    btn.className = `view-btn py-1.5 px-3 rounded-lg text-sm transition duration-300 ${active ? 'bg-indigo-500 text-white font-medium shadow-md' : 'bg-transparent text-gray-300 hover:bg-gray-700'}`;
+            Object.keys(views).forEach(key => { 
+                const isCurrent = key === viewName; 
+                views[key].el.classList.toggle('hidden', !isCurrent); 
+                
+                // Botones Desktop
+                const btn = document.querySelector(`#view-buttons .view-btn[data-view="${key}"]`); 
+                if (btn) {
+                    btn.classList.toggle('bg-indigo-500', isCurrent); 
+                    btn.classList.toggle('text-white', isCurrent); 
+                    btn.classList.toggle('bg-transparent', !isCurrent); 
+                    btn.classList.toggle('text-gray-300', !isCurrent); 
                 }
-            });
-
+                // Botones Móvil
+                 const mobileBtn = document.querySelector(`#mobile-menu-dropdown .view-btn[data-view="${key}"]`);
+                 if (mobileBtn) {
+                      mobileBtn.classList.toggle('bg-indigo-500', isCurrent); 
+                      mobileBtn.classList.toggle('font-bold', isCurrent);
+                    }
+            }); 
+            document.getElementById("current-view-title").textContent = views[viewName].title; 
+            
             if (viewName === 'labels') updateLabelView();
-            if(mobileMenuDropdown) mobileMenuDropdown.classList.add('hidden');
+            mobileMenuDropdown.classList.add('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -762,12 +1128,11 @@
         async function fetchProducts() { 
             if (!supabase) return;
             const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("created_at", { ascending: false }); 
-            if (!error) {
-                allProducts = data; 
-                calculateCategoryTotals(allProducts, true, false); 
-                filterAndRenderProducts(); 
-                updateAutocompleteList();
-            }
+            if (error) { console.error(error); return; } 
+            allProducts = data; 
+            calculateCategoryTotals(allProducts, true, false); 
+            filterAndRenderProducts(); 
+            updateAutocompleteList();
         }
         function filterAndRenderProducts() { 
             const term = document.getElementById("search-input").value.toLowerCase().trim(); 
@@ -776,33 +1141,31 @@
         }
         function renderProducts(items) { 
             const container = document.getElementById("products");
-            const loader = document.getElementById("products-loader");
-            loader.innerHTML = ""; 
+            document.getElementById("products-loader").innerHTML = ""; 
             container.innerHTML = ""; 
             document.getElementById("total-count").textContent = `${items.length} productos`; 
 
-            // Totales
-            categoryTotalsEl.innerHTML = `<span class="font-bold text-indigo-300">Total:</span> ` + Object.keys(categoryTotals).map(cat => `<span class="text-gray-300 ml-2">${cat}: <b class="text-white">${categoryTotals[cat]}</b></span>`).join(' | ');
+            categoryTotalsEl.innerHTML = `<span class="font-bold text-indigo-300">Total:</span> ` + Object.keys(categoryTotals).sort().map(cat => `<span class="text-gray-300 ml-2">${cat}: <b class="text-white">${categoryTotals[cat]}</b></span>`).join(' | ');
             container.appendChild(categoryTotalsEl);
 
             if (items.length === 0) { container.innerHTML += `<p class="p-4 text-gray-400">Sin resultados.</p>`; return; } 
             
             const grouped = items.reduce((acc, p) => { (acc[p.category || 'Otros'] = acc[p.category || 'Otros'] || []).push(p); return acc; }, {}); 
             Object.keys(grouped).sort().forEach(cat => { 
-                const section = document.createElement("div"); section.className = "mb-8"; 
-                section.innerHTML = `<h2 class="text-xl font-bold text-gray-200 border-b border-gray-600 pb-2 mb-4">${cat}</h2>`; 
-                const grid = document.createElement("div"); grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"; 
+                const section = document.createElement("div"); section.className = "mb-10"; 
+                section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${cat}</h2>`; 
+                const grid = document.createElement("div"); grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
                 grouped[cat].forEach(p => { 
                     const card = document.createElement("div");
-                    card.className = "bg-gray-800 rounded-lg shadow p-3 relative border border-gray-700 product-card"; 
+                    card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imgUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
                     card.innerHTML = `
-                        <button onclick="openProductEditorModal('${p.id}', 'main')" class="absolute top-2 right-2 text-gray-400 bg-gray-900 rounded-full p-1 shadow">✏️</button>
-                        <div class="h-32 bg-gray-700 rounded mb-2 overflow-hidden flex justify-center"><img src="${imgUrl}" class="h-full object-contain"></div>
-                        <h3 class="font-bold text-white text-sm">${p.name}</h3>
+                        <button onclick="openProductEditorModal('${p.id}', 'main')" class="absolute top-2 right-2 text-gray-400 bg-gray-700 rounded-full p-1 shadow">✏️</button>
+                        <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imgUrl}" class="object-contain h-full w-full"></div>
+                        <h3 class="font-semibold text-white">${p.name}</h3>
                         <p class="text-green-400 font-bold">$${Number(p.price).toFixed(2)}</p>
-                        <div class="flex justify-between text-xs text-gray-400 mt-1"><span>Stock: ${p.quantity}</span><span>Caja: ${p.box_number || '-'}</span></div>
-                        <button onclick="deleteProduct('${p.id}', '${PRODUCTS_TABLE}')" class="mt-2 w-full bg-red-900 text-red-200 text-xs py-1 rounded hover:bg-red-800">Eliminar</button>`; 
+                        <div class="flex justify-between text-sm text-gray-400 mt-1"><span>Stock: ${p.quantity}</span><span>Caja: ${p.box_number || '-'}</span></div>
+                        <button onclick="deleteProduct('${p.id}', '${PRODUCTS_TABLE}')" class="mt-4 w-full bg-red-600 text-white px-3 py-1 rounded shadow text-sm">Eliminar</button>`; 
                     grid.appendChild(card); 
                 }); 
                 section.appendChild(grid); container.appendChild(section); 
@@ -813,12 +1176,11 @@
         async function fetchProductsBodega() { 
             if (!supabase) return;
             const { data, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).select("*").order("created_at", { ascending: false }); 
-            if (!error) {
-                allProductsBodega = data; 
-                calculateCategoryTotals(allProductsBodega, false, true); 
-                filterAndRenderProductsBodega(); 
-                updateAutocompleteList();
-            }
+            if (error) { console.error(error); return; } 
+            allProductsBodega = data; 
+            calculateCategoryTotals(allProductsBodega, false, true); 
+            filterAndRenderProductsBodega(); 
+            updateAutocompleteList();
         }
         function filterAndRenderProductsBodega() { 
             const term = document.getElementById("search-input-bodega").value.toLowerCase().trim(); 
@@ -827,31 +1189,31 @@
         }
         function renderProductsBodega(items) { 
             const container = document.getElementById("products-bodega");
-            const loader = document.getElementById("products-loader-bodega");
-            loader.innerHTML = ""; container.innerHTML = ""; 
+            document.getElementById("products-loader-bodega").innerHTML = ""; 
+            container.innerHTML = ""; 
             document.getElementById("total-count-bodega").textContent = `${items.length} productos`; 
             
-            categoryTotalsElBodega.innerHTML = `<span class="font-bold text-indigo-300">Total Bodega:</span> ` + Object.keys(categoryTotalsBodega).map(cat => `<span class="text-gray-300 ml-2">${cat}: <b class="text-white">${categoryTotalsBodega[cat]}</b></span>`).join(' | ');
+            categoryTotalsElBodega.innerHTML = `<span class="font-bold text-indigo-300">Total Bodega:</span> ` + Object.keys(categoryTotalsBodega).sort().map(cat => `<span class="text-gray-300 ml-2">${cat}: <b class="text-white">${categoryTotalsBodega[cat]}</b></span>`).join(' | ');
             container.appendChild(categoryTotalsElBodega);
 
             if (items.length === 0) { container.innerHTML += `<p class="p-4 text-gray-400">Sin resultados.</p>`; return; } 
             
             const grouped = items.reduce((acc, p) => { (acc[p.category || 'Otros'] = acc[p.category || 'Otros'] || []).push(p); return acc; }, {}); 
             Object.keys(grouped).sort().forEach(cat => { 
-                const section = document.createElement("div"); section.className = "mb-8"; 
-                section.innerHTML = `<h2 class="text-xl font-bold text-gray-200 border-b border-gray-600 pb-2 mb-4">${cat}</h2>`; 
-                const grid = document.createElement("div"); grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"; 
+                const section = document.createElement("div"); section.className = "mb-10"; 
+                section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${cat}</h2>`; 
+                const grid = document.createElement("div"); grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
                 grouped[cat].forEach(p => { 
                     const card = document.createElement("div");
-                    card.className = "bg-gray-800 rounded-lg shadow p-3 relative border border-gray-700 product-card"; 
+                    card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
                     const imgUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
                     card.innerHTML = `
-                        <button onclick="openProductEditorModal('${p.id}', 'bodega')" class="absolute top-2 right-2 text-gray-400 bg-gray-900 rounded-full p-1 shadow">✏️</button>
-                        <div class="h-32 bg-gray-700 rounded mb-2 overflow-hidden flex justify-center"><img src="${imgUrl}" class="h-full object-contain"></div>
-                        <h3 class="font-bold text-white text-sm">${p.name}</h3>
+                        <button onclick="openProductEditorModal('${p.id}', 'bodega')" class="absolute top-2 right-2 text-gray-400 bg-gray-700 rounded-full p-1 shadow">✏️</button>
+                        <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imgUrl}" class="object-contain h-full w-full"></div>
+                        <h3 class="font-semibold text-white">${p.name}</h3>
                         <p class="text-green-400 font-bold">$${Number(p.price).toFixed(2)}</p>
-                        <div class="flex justify-between text-xs text-gray-400 mt-1"><span>Stock: ${p.quantity}</span><span>Caja: ${p.box_number || '-'}</span></div>
-                        <button onclick="deleteProduct('${p.id}', '${PRODUCTS_BODEGA_TABLE}')" class="mt-2 w-full bg-red-900 text-red-200 text-xs py-1 rounded hover:bg-red-800">Eliminar</button>`; 
+                        <div class="flex justify-between text-sm text-gray-400 mt-1"><span>Stock: ${p.quantity}</span><span>Caja: ${p.box_number || '-'}</span></div>
+                        <button onclick="deleteProduct('${p.id}', '${PRODUCTS_BODEGA_TABLE}')" class="mt-4 w-full bg-red-600 text-white px-3 py-1 rounded shadow text-sm">Eliminar</button>`; 
                     grid.appendChild(card); 
                 }); 
                 section.appendChild(grid); container.appendChild(section); 
@@ -890,19 +1252,34 @@
             Object.keys(grouped).sort().reverse().forEach(date => {
                 const totalDia = grouped[date].reduce((sum, s) => sum + (s.status==='Pagado'?s.price:0), 0);
                 let html = `<div class="mt-6"><h3 class="text-white font-bold border-b border-gray-600 mb-2 flex justify-between"><span>${date}</span> <span class="text-green-400">$${totalDia.toFixed(2)}</span></h3>`;
+                html += `<table class="min-w-full divide-y divide-gray-700 shadow-md sales-list-table"><thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase">Cliente</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase">Producto</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase">Estado</th><th></th></tr></thead><tbody class="bg-gray-800 divide-y divide-gray-700">`;
                 grouped[date].forEach(s => {
-                    const color = s.status==='Pagado'?'text-green-400':'text-yellow-400';
-                    const bgStatus = s.status==='Pagado'?'border-green-600':'border-yellow-600';
-                    html += `<div class="bg-gray-800 p-3 mb-2 rounded border-l-4 ${bgStatus} flex justify-between items-center">
-                        <div><p class="text-white font-bold text-sm">${s.product_name_sold}</p><p class="text-xs text-gray-400">${s.recipient_name}</p></div>
-                        <div class="text-right"><p class="${color} font-bold">$${Number(s.price).toFixed(2)}</p><button onclick="deleteSale('${s.id}')" class="text-red-500 text-xs mt-1">Borrar</button></div>
-                    </div>`;
+                    const statusClass = STATUS_COLORS[s.status] || STATUS_COLORS['Pendiente'];
+                    html += `<tr class="hover:bg-gray-700/50"><td class="px-6 py-4 text-sm text-gray-300" data-label="Cliente">${s.recipient_name}</td><td class="px-6 py-4 text-sm text-gray-300" data-label="Producto">${s.product_name_sold}</td><td class="px-6 py-4 text-sm font-bold text-green-500" data-label="Precio">$${Number(s.price).toFixed(2)}</td><td class="px-6 py-4 text-sm" data-label="Estado"><select onchange="changeSaleStatus('${s.id}', this.value, '${s.product_name_sold}')" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${s.status==='Pagado'?'selected':''}>Pagado</option><option value="Pendiente" ${s.status==='Pendiente'?'selected':''}>Pendiente</option><option value="Devuelto" ${s.status==='Devuelto'?'selected':''}>Devuelto</option></select></td><td class="px-6 py-4 text-right"><button onclick="deleteSale('${s.id}')" class="text-red-500 text-sm">Eliminar</button></td></tr>`;
                 });
-                html += "</div>";
+                html += "</tbody></table></div>";
                 container.innerHTML += html;
             });
         }
         window.deleteSale = async (id) => { if(confirm("¿Borrar venta?")) { await supabase.from(SALES_TABLE).delete().eq("id", id); fetchSales(); } }
+        window.changeSaleStatus = async (id, status, prod) => {
+            const sale = allSales.find(s=>s.id===id);
+            const oldStatus = sale.status;
+            try {
+                await supabase.from(SALES_TABLE).update({status}).eq("id", id);
+                // Stock logic simplified
+                const name = prod.split(' (')[0];
+                const pMain = allProducts.find(p=>p.name===name);
+                const pBodega = allProductsBodega.find(p=>p.name===name);
+                let table = pMain ? PRODUCTS_TABLE : (pBodega ? PRODUCTS_BODEGA_TABLE : null);
+                let p = pMain || pBodega;
+                if(table) {
+                    if(oldStatus!=='Pagado' && status==='Pagado') await supabase.from(table).update({quantity: Math.max(0, p.quantity-1)}).eq('id', p.id);
+                    if(oldStatus==='Pagado' && status!=='Pagado') await supabase.from(table).update({quantity: p.quantity+1}).eq('id', p.id);
+                }
+                fetchSales(); fetchProducts(); fetchProductsBodega();
+            } catch(e) { alert(e.message); }
+        };
 
         // --- Modales Logic ---
         window.openProductEditorModal = (id, type) => {
@@ -914,13 +1291,14 @@
             document.getElementById('modal-price').value = p.price;
             document.getElementById('modal-quantity').value = p.quantity;
             document.getElementById('modal-box-number').value = p.box_number || '';
-            document.getElementById('modal-location').innerText = type === 'main' ? 'Inventario Principal' : 'Nuevo Inventario';
+            document.getElementById('modal-location').innerText = type === 'main' ? 'Principal' : 'Bodega';
             document.getElementById('modal-image-preview').src = p.image_url || '';
             modal.classList.remove('hidden');
         };
         window.closeProductEditorModal = () => modal.classList.add('hidden');
         
-        modalProductForm.addEventListener('submit', async (e) => {
+        const modalProductForm = document.getElementById('modal-product-form');
+        if(modalProductForm) modalProductForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('modal-save-button'); btn.disabled = true;
             try {
@@ -945,6 +1323,28 @@
             btn.disabled = false;
         });
 
+        // --- Scanner ---
+        window.openScannerModal = () => {
+            scannerModal.classList.remove('hidden');
+            if(html5QrcodeScanner) html5QrcodeScanner.clear();
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+            html5QrcodeScanner.render((decodedText) => {
+                const id = decodedText.trim();
+                const p = allProducts.find(x=>x.id==id) || allProductsBodega.find(x=>x.id==id);
+                if(p) {
+                    toggleView('sales');
+                    document.getElementById('product-name-sold').value = `${p.name} (${p.category})`;
+                    document.getElementById('sale-price').value = p.price;
+                    document.getElementById('sale-status-input').value = 'Pagado';
+                    closeScannerModal();
+                    document.getElementById('sale-submit').click();
+                } else {
+                    alert("Producto no encontrado");
+                }
+            });
+        };
+        window.closeScannerModal = () => { scannerModal.classList.add('hidden'); if(html5QrcodeScanner) html5QrcodeScanner.clear(); };
+
         // --- Envíos de Formulario ---
         async function handleFormSubmit(e, table, fields, reloadFn) {
             e.preventDefault();
@@ -964,7 +1364,7 @@
                 await supabase.from(table).insert(payload);
                 e.target.reset();
                 reloadFn();
-                alert("Guardado exitosamente");
+                alert("Guardado");
             } catch(err) { alert("Error: " + err.message); }
             btn.disabled = false;
         }
@@ -1005,10 +1405,19 @@
             btn.disabled = false;
         });
 
-        // --- Carga Inicial ---
+        // --- Inicialización ---
         async function loadAppDataAndInitialize() {
             document.getElementById('sale-date').value = new Date().toISOString().split('T')[0];
+            await loadLogo();
             await Promise.all([ fetchProducts(), fetchProductsBodega(), fetchSales() ]);
+        }
+        
+        // Carga Logo
+        async function loadLogo() {
+            try {
+                const { data } = await supabase.from(CONFIG_TABLE).select("value").eq("key", "current_logo_url").single();
+                if(data && data.value) document.getElementById('business-logo').src = data.value + '?t=' + Date.now();
+            } catch(e) {}
         }
 
         // --- Evento de Carga de Ventana ---
