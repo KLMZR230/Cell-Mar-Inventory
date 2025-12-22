@@ -4,444 +4,95 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
     <title>Cell Smar</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700;900&family=Lora:wght@700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-    <style>
-        /********************************/
-        /* Estilos Base (Comunes a todos los temas) */
-        /********************************/
-        html {
-            height: 100%;
-        }
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            transition: background-color 0.5s ease;
-            position: relative;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent; /* Fix móvil */
-        }
-        .container.mx-auto {
-            flex-grow: 1;
-        }
-        .product-card, .tool-card { transition: transform 0.2s, box-shadow 0.3s; }
-        .product-card:hover, .tool-card:hover { transform: translateY(-5px); }
-        /* El input file del logo debe ser invisible pero accesible */
-        #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
-        .hidden { display: none !important; }
-        .skeleton-card { background-color: transparent; border-radius: 0.5rem; padding: 1rem; display: flex; flex-direction: column; }
-        .skeleton-line {
-            background-color: var(--bg-secondary);
-            opacity: 0.7;
-            border-radius: 0.25rem;
-            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes pulse { 50% { opacity: .4; } }
-        
-        /********************************/
-        /* Estilos para impresión de QR */
-        /********************************/
-        @media print {
-            body > *:not(.labels-container):not(#qr-modal) { display: none !important; }
-            
-            /* Contenedor principal de etiquetas: Forzar blanco */
-            .labels-container { 
-                display: flex !important;
-                flex-wrap: wrap;
-                width: 100%;
-                min-height: 100vh;
-                margin: 0;
-                padding: 0;
-                background-color: white !important;
-            }
-            .labels-container > div {
-                width: 100mm; 
-                height: 35mm; 
-                box-sizing: border-box;
-                border: 1px solid #ccc;
-                margin: 2mm;
-                padding: 5px;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: flex-start;
-                page-break-after: avoid;
-                background-color: white !important;
-                color: black !important; 
-            }
-            .labels-container .qr-box { margin-right: 10px; width: 35mm; height: 35mm; display: flex; justify-content: center; align-items: center; }
-            .labels-container canvas, .labels-container img { width: 30mm !important; height: 30mm !important; }
-            
-            /* Modal de QR individual (para asegurar fondo blanco en impresión) */
-            #qr-modal {
-                display: flex !important;
-                position: fixed;
-                top: 0; left: 0; right: 0; bottom: 0;
-                background: white;
-                align-items: center;
-                justify-content: center;
-            }
-            #qr-modal .bg-gray-800, #qr-modal .bg-gray-900 { background-color: white !important; }
-            #qr-modal .text-white, #qr-modal .text-gray-300 { color: black !important; }
-            #qr-modal .border-purple-500 { border-color: black !important; }
-            #qr-modal .print\:hidden { display: none !important; }
-        }
-        
-        /********************************/
-        /* TEMA 1: Dark (Predeterminado) */
-        /********************************/
-        .theme-dark {
-            --bg-primary: #1f2937;
-            --bg-secondary: #374151;
-            --bg-header: rgba(31, 41, 55, 0.8);
-            --text-primary: #e5e7eb;
-            --text-secondary: #d1d5db;
-            --text-muted: #9ca3af;
-            --border-color: #4b5563;
-            --accent-color: #818cf8;
-            --accent-color-dark: #6366f1;
-            --font-main: 'Poppins', sans-serif;
-            --font-headings: 'Poppins', sans-serif;
-            --pastel-bg: #e0f2f1; /* Verde pastel claro para móvil */
-            --pastel-text: #1f2937;
-        }
-        
-        /********************************/
-        /* Fondo del Escáner siempre blanco */
-        /********************************/
-        #scanner-modal .modal-content {
-            background-color: white !important;
-            color: black !important;
-        }
-        #scanner-modal .modal-content h3, #scanner-modal .modal-content p {
-            color: black !important;
-        }
-        
-        /********************************/
-        /* TEMA 2: Fuego Infernal */
-        /********************************/
-        .theme-infernal {
-            --bg-primary: #000000;
-            --bg-secondary: #2d1a1a;
-            --bg-header: rgba(17, 7, 0, 0.6);
-            --text-primary: #f9fafb;
-            --text-secondary: #d1d5db;
-            --text-muted: #9ca3af;
-            --border-color: #571e1e;
-            --accent-color: #ff4500;
-            --accent-color-dark: #e63e00;
-            --font-main: 'Roboto', sans-serif;
-            --font-headings: 'Roboto', sans-serif;
-            --pastel-bg: #ffccbc; /* Naranja/Melocotón pastel */
-            --pastel-text: #2d1a1a;
-        }
-        .theme-infernal { background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
-        .theme-infernal .product-card:hover, .theme-infernal .tool-card:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.5); border-color: rgba(255, 69, 0, 0.7); }
-        
-        /********************************/
-        /* TEMA 3: Luxury Gold */
-        /********************************/
-        .theme-gold {
-            --bg-primary: #121212;
-            --bg-secondary: #2b2b2b;
-            --bg-header: rgba(18, 18, 18, 0.85);
-            --text-primary: #f1f1f1;
-            --text-secondary: #cccccc;
-            --text-muted: #a0a0a0;
-            --border-color: #444444;
-            --accent-color: #D4AF37;
-            --accent-color-dark: #B8860B;
-            --font-main: 'Poppins', sans-serif;
-            --font-headings: 'Playfair Display', serif;
-            --pastel-bg: #faf3e0; /* Crema pastel */
-            --pastel-text: #121212;
-        }
-        .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
-        .theme-gold .product-card:hover, .theme-gold .tool-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
-        .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
-        .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
-        
-        /* TEMA NAVIDAD ELIMINADO COMPLETAMENTE */
-
-        /********************************/
-        /* TEMA 5: Blue Neon */
-        /********************************/
-        .theme-blue-neon {
-            --bg-primary: #080a1c; /* Azul muy oscuro/negro */
-            --bg-secondary: #12183b; /* Azul oscuro */
-            --bg-header: rgba(8, 10, 28, 0.9);
-            --text-primary: #e0f7fa; /* Cyan claro */
-            --text-secondary: #99eeff;
-            --text-muted: #4dd0e1;
-            --border-color: #00bcd4; /* Azul Neón */
-            --accent-color: #00e5ff; /* Neón brillante */
-            --accent-color-dark: #00aacd;
-            --font-main: 'Roboto', sans-serif;
-            --font-headings: 'Roboto Mono', monospace; /* Fuente de código */
-            --pastel-bg: #e1f5fe; /* Azul pastel */
-            --pastel-text: #080a1c;
-        }
-        .theme-blue-neon {
-            background-image: url('data:image/svg+xml,%3Csvg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%231a1a3a" fill-opacity="0.4"%3E%3Cpath d="M0 0h80v80H0zM20 20v40h40V20H20zM30 30h20v20H30V30z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); /* Fondo de circuito/malla */
-        }
-        .theme-blue-neon .product-card:hover, .theme-blue-neon .tool-card:hover {
-            box-shadow: 0 0 20px var(--accent-color);
-            border-color: var(--accent-color);
-        }
-        .theme-blue-neon .text-indigo-400, .theme-blue-neon .text-indigo-300 {
-            color: var(--accent-color);
-            text-shadow: 0 0 8px var(--accent-color); /* Efecto neón */
-        }
-        .theme-blue-neon .bg-indigo-500, .theme-blue-neon .hover\:bg-indigo-600:hover, 
-        .theme-blue-neon .bg-blue-600, .theme-blue-neon .hover\:bg-blue-700:hover,
-        .theme-blue-neon .bg-green-600, .theme-blue-neon .hover\:bg-green-700:hover {
-            background-color: var(--accent-color-dark);
-            box-shadow: 0 0 10px var(--border-color);
-        }
-        .theme-blue-neon .bg-indigo-500:hover, .theme-blue-neon .hover\:bg-indigo-600 {
-            background-color: var(--accent-color);
-        }
-        
-        /********************************/
-        /* Aplicación de Variables CSS */
-        /********************************/
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            font-family: var(--font-main);
-        }
-        h1, h2, h3, h4, h5, h6 { font-family: var(--font-headings); }
-        
-        /* Aplicación de colores para fondo de headers y cards */
-        .bg-gray-800, .bg-gray-900\/50 {
-            background-color: var(--bg-header);
-            border: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
-            backdrop-filter: blur(10px);
-            color: var(--text-primary); /* Restaurar color de texto */
-        }
-        
-        /* Asegurar que el fondo secundario de inputs y selectores es visible */
-        .bg-gray-600 { background-color: var(--bg-secondary) !important; }
-        .bg-gray-700\/50 { background-color: var(--bg-secondary); }
-
-        .text-gray-300 { color: var(--text-secondary); }
-        .text-gray-400 { color: var(--text-muted); }
-        
-        .border-gray-500, .border-gray-600, .border-gray-700 { border-color: var(--border-color); }
-        
-        /* Acentos */
-        .text-indigo-400, .text-indigo-300 { color: var(--accent-color); }
-        .border-indigo-500 { border-color: var(--accent-color); }
-        .bg-indigo-500 { background-color: var(--accent-color-dark); color: var(--text-primary); }
-        .hover\:bg-indigo-600:hover { background-color: var(--accent-color); }
-        .focus\:ring-indigo-500:focus { --tw-ring-color: var(--accent-color); }
-        
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--accent-color) !important;
-            box-shadow: 0 0 0 1px var(--accent-color);
-            outline: none;
-        }
-        .bg-blue-600, .bg-green-600 { background-color: var(--accent-color-dark); }
-        .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover { background-color: var(--accent-color); }
-        
-        /********************************/
-        /* ESTILOS FIJOS PARA ESTADOS DE VENTA */
-        /********************************/
-        .status-paid {
-            background-color: #16a34a !important; /* Verde */
-            color: #ffffff !important;
-            border-color: #15803d !important;
-        }
-        .status-pending {
-            background-color: #f59e0b !important; /* Naranja/Amarillo */
-            color: #1f2937 !important;
-            border-color: #d97706 !important;
-        }
-        .status-returned {
-            background-color: #dc2626 !important; /* Rojo */
-            color: #ffffff !important;
-            border-color: #b91c1c !important;
-        }
-
-        /********************************/
-        /* ESTILOS MÓVIL (Menú de Hamburguesa y Columnas) */
-        /********************************/
-        #mobile-menu-button {
-            display: none; 
-        }
-        
-        @media (min-width: 769px) {
-            #mobile-scan-button {
-                display: none !important;
-            }
-            .sales-list-table {
-                /* Asegura que la tabla se comporte como tabla en escritorio */
-                display: table;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            #view-buttons {
-                display: none !important; 
-            }
-            #mobile-menu-button {
-                display: block; 
-            }
-            /* Inventario en 2 columnas en móvil */
-            #products .grid, #products-bodega .grid, #products-loader, #products-loader-bodega, #tools-list {
-                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-            }
-
-            #mobile-menu-dropdown {
-                position: absolute;
-                right: 0;
-                top: 100%; 
-                width: 250px;
-                background-color: var(--pastel-bg); 
-                color: var(--pastel-text);
-                border: 1px solid var(--border-color);
-                border-top: none;
-                z-index: 40;
-                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            }
-            #mobile-menu-dropdown button {
-                width: 100%;
-                text-align: left;
-                padding: 0.75rem 1rem;
-                font-weight: 500;
-                color: var(--pastel-text);
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            }
-            #mobile-menu-dropdown button:hover {
-                background-color: rgba(0, 0, 0, 0.05);
-            }
-             /* Estilo para el botón activo en el menú móvil */
-            #mobile-menu-dropdown .bg-indigo-500 {
-                background-color: var(--accent-color) !important;
-                color: var(--text-primary) !important;
-                font-weight: bold;
-            }
-            #mobile-menu-dropdown #mobile-scan-button {
-                background-color: var(--pastel-bg); 
-                color: var(--pastel-text);
-                font-weight: bold;
-                padding: 0.75rem 1rem;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            }
-
-            /* Estilos para transformar la tabla de ventas en tarjetas */
-            .sales-list-table, .sales-list-table thead, .sales-list-table tbody, .sales-list-table th, .sales-list-table td, .sales-list-table tr { 
-                display: block; 
-            }
-            .sales-list-table thead {
-                display: none; /* Oculta la cabecera en móvil */
-            }
-            .sales-list-table tr {
-                margin-bottom: 0.75rem;
-                border: 1px solid var(--border-color);
-                border-radius: 0.5rem;
-                overflow: hidden;
-            }
-            .sales-list-table td {
-                /* Hace que cada celda ocupe el ancho completo */
-                border-bottom: 1px solid var(--border-color);
-                position: relative;
-                padding-left: 50%;
-                text-align: right;
-                word-wrap: break-word; /* Para prevenir desbordamiento de palabras largas */
-            }
-            .sales-list-table td:before {
-                /* Usa el atributo data-label para mostrar el nombre de la columna */
-                content: attr(data-label);
-                position: absolute;
-                left: 0;
-                width: 45%;
-                padding-left: 10px;
-                white-space: nowrap;
-                text-align: left;
-                font-weight: 600;
-                color: var(--text-muted);
-            }
-            /* La última celda (Eliminar) y el select de estado no necesitan padding extra */
-            .sales-list-table td:last-child {
-                border-bottom: none;
-                text-align: center;
-                padding-left: 0;
-            }
-            .sales-list-table td:last-child:before {
-                content: none;
-            }
-            /* Ajustar el select de estado para que se vea correctamente */
-            .sales-list-table select {
-                display: inline-block;
-                max-width: 100%;
-            }
-        }
-    </style>
-    <script>
-        (function() {
-            try {
-                // Se agregan los nuevos temas a la lista de temas válidos
-                const theme = localStorage.getItem('selectedTheme');
-                if (theme && ['theme-dark', 'theme-infernal', 'theme-gold', 'theme-blue-neon'].includes(theme)) {
-                    document.documentElement.className = theme;
-                } else {
-                    document.documentElement.className = 'theme-dark';
-                }
-            } catch (e) {
-                document.documentElement.className = 'theme-dark';
-            }
-        })();
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        body {
+            background-color: #1f2937;
+            color: #e5e7eb;
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Utilidades */
+        .hidden { display: none !important; }
+        input, select, textarea { font-size: 16px !important; /* Evita zoom en iOS */ }
+        
+        /* Temas */
+        .theme-dark { --bg-p: #1f2937; --bg-s: #374151; --txt: #e5e7eb; }
+        .theme-infernal { --bg-p: #000000; --bg-s: #2d1a1a; --txt: #f9fafb; background: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
+        .theme-gold { --bg-p: #121212; --bg-s: #2b2b2b; --txt: #f1f1f1; }
+        .theme-blue-neon { --bg-p: #080a1c; --bg-s: #12183b; --txt: #e0f7fa; }
+
+        /* Estilos Tarjetas y Tablas */
+        .product-card { transition: transform 0.2s; background: var(--bg-s, #374151); border: 1px solid #4b5563; }
+        .product-card:active { transform: scale(0.98); }
+        
+        /* Móvil Específico */
+        @media (max-width: 768px) {
+            #mobile-menu-btn { display: block; }
+            #desktop-menu { display: none; }
+            .grid-cols-mobile { grid-template-columns: repeat(2, 1fr) !important; gap: 0.5rem; }
+            
+            /* Tabla responsiva tipo tarjeta */
+            .sales-table, .sales-table thead, .sales-table tbody, .sales-table th, .sales-table td, .sales-table tr { display: block; }
+            .sales-table thead { display: none; }
+            .sales-table tr { margin-bottom: 1rem; border: 1px solid #4b5563; border-radius: 0.5rem; padding: 0.5rem; }
+            .sales-table td { border-bottom: 1px solid #4b5563; position: relative; padding-left: 50%; text-align: right; font-size: 0.9rem; }
+            .sales-table td:before { content: attr(data-label); position: absolute; left: 0; width: 45%; padding-left: 10px; text-align: left; font-weight: bold; color: #9ca3af; }
+            .sales-table td:last-child { border-bottom: 0; }
+        }
+        
+        /* Impresión */
+        @media print {
+            body > *:not(.labels-area):not(#qr-modal) { display: none !important; }
+            .labels-area { display: flex !important; flex-wrap: wrap; background: white; width: 100%; position: absolute; top:0; left:0; }
+            .label-item { width: 100mm; height: 35mm; border: 1px solid black; margin: 2mm; display: flex; align-items: center; page-break-inside: avoid; color: black; background: white; }
+            #qr-modal { display: flex !important; background: white; color: black; position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+            .no-print { display: none !important; }
+        }
+    </style>
 </head>
-<body class="" onclick=""> 
-    
-    <div id="auth-modal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="auth-modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-900 bg-opacity-90 transition-opacity" aria-hidden="true"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-indigo-500">
-                <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start flex-col">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
-                        </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-2xl leading-6 font-bold text-white mb-4 border-b border-indigo-500 pb-2" id="auth-modal-title">
-                                🔒 Iniciar Sesión en Cell Smar
-                            </h3>
-                            <form id="auth-form" class="mt-4 space-y-4">
-                                <div>
-                                    <label for="email-input" class="block text-sm font-medium text-gray-300">Correo Electrónico</label>
-                                    <input id="email-input" type="email" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="tu@correo.com" />
-                                </div>
-                                <div>
-                                    <label for="password-input" class="block text-sm font-medium text-gray-300">Contraseña</label>
-                                    <input id="password-input" type="password" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="********" />
-                                </div>
-                                <p id="auth-status" class="text-sm text-center text-gray-400 mt-3"></p>
-                            </form>
-                        </div>
-                    </div>
+<body class="theme-dark">
+
+    <div id="auth-modal" class="fixed inset-0 z-[100] bg-gray-900 bg-opacity-95 flex items-center justify-center p-4">
+        <div class="bg-gray-800 rounded-lg shadow-2xl w-full max-w-md border border-indigo-600 p-6">
+            <div class="text-center mb-6">
+                <div class="mx-auto h-12 w-12 bg-indigo-900 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 </div>
-                <div class="bg-gray-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-700">
-                    <button type="submit" form="auth-form" id="login-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 sm:ml-3 sm:w-auto sm:text-sm transition">
-                        Entrar
-                    </button>
-                </div>
+                <h2 class="text-2xl font-bold text-white">Cell Smar</h2>
+                <p class="text-gray-400 text-sm">Sistema de Inventario</p>
             </div>
+            
+            <form id="auth-form" class="space-y-4">
+                <div>
+                    <label class="block text-gray-300 text-sm font-medium mb-1">Correo</label>
+                    <input id="email-input" type="email" class="w-full p-3 bg-gray-700 border border-gray-600 rounded text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="admin@cellsmar.com" required>
+                </div>
+                <div>
+                    <label class="block text-gray-300 text-sm font-medium mb-1">Contraseña</label>
+                    <input id="password-input" type="password" class="w-full p-3 bg-gray-700 border border-gray-600 rounded text-white focus:border-indigo-500 outline-none" placeholder="••••••••" required>
+                </div>
+                <p id="auth-status" class="text-center text-sm font-medium min-h-[20px]"></p>
+                <button type="submit" id="login-button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded transition duration-200">
+                    INGRESAR
+                </button>
+            </form>
         </div>
     </div><div id="app-content-wrapper" class="hidden">
     
@@ -587,9 +238,7 @@
                 <div id="products-loader" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
                 <div id="products"></div>
             </section>
-        </div>
-
-        <div id="inventory-bodega-view" class="view-section hidden">
+        </div><div id="inventory-bodega-view" class="view-section hidden">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
                 <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (Nuevo Inventario)</h2>
                 <form id="product-form-bodega" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
@@ -671,7 +320,9 @@
                 <div id="sales-list-loader" class="space-y-2"></div>
                 <div id="sales-list-container"></div>
             </section>
-        </div><div id="missing-view" class="view-section hidden">
+        </div>
+
+        <div id="missing-view" class="view-section hidden">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 max-w-4xl mx-auto">
                 <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Registrar Producto Faltante</h2>
                 <form id="missing-product-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
@@ -860,227 +511,22 @@
         </div>
     </div>
     
-    <input type="file" id="tool-image-editor-input" class="hidden" accept="image/*" />
-    
-    <script>
+    <input type="file" id="tool-image-editor-input" class="hidden" accept="image/*" /><script>
         // =================================================================================
-        // == Configuración de Supabase y Edge Function para R2                        ==
+        // == 1. CONFIGURACIÓN SUPABASE E INICIALIZACIÓN INMEDIATA                        ==
         // =================================================================================
-        const createClient = window.supabase ? window.supabase.createClient : null;
+        
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
+        const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
+        
+        // Inicializar Supabase inmediatamente si la librería cargó
         let supabase = null;
-        if (createClient) {
-            supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        if (window.supabase) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } else {
-            console.error("Error Crítico: La librería Supabase no se ha cargado.");
+            alert("⚠️ Error crítico: La librería de Supabase no cargó. Revisa tu conexión a internet.");
         }
-        const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
-        
-        // --- INICIO: Definición de Constantes de Tablas y Estilos ---
-        const PRODUCTS_TABLE = "products";
-        const PRODUCTS_BODEGA_TABLE = "products_nuevo"; 
-        const SALES_TABLE = "sales";
-        const MISSING_PRODUCTS_TABLE = "missing_products";
-        const TOOLS_TABLE = "tools"; 
-        const CONFIG_TABLE = "config"; 
-        const STATUS_COLORS = { 
-            'Pagado': 'status-paid', 
-            'Pendiente': 'status-pending', 
-            'Devuelto': 'status-returned' 
-        };
-
-        // ============================================================================
-        // == II. INICIALIZACIÓN DE VARIABLES GLOBALES Y ELEMENTOS DEL DOM (CRÍTICO) ==
-        // ============================================================================
-
-        // --- Variables de Estado ---
-        let allProducts = [], allProductsBodega = [], allSales = [], allMissingProducts = [], allTools = [], selectedLogoFile = null;
-        let editingToolId = null; 
-        let currentEditingProduct = null;
-        let isMainInventory = true;
-        let selectedProductImageFile = null; 
-        
-        // --- ADICIÓN: Variables para almacenar totales por categoría ---
-        let categoryTotals = {};
-        let categoryTotalsBodega = {}; 
-        
-        // --- ADICIÓN: Elementos para mostrar los totales ---
-        const categoryTotalsEl = document.createElement("div"); 
-        categoryTotalsEl.id = "category-totals";
-        categoryTotalsEl.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
-        
-        const categoryTotalsElBodega = document.createElement("div"); 
-        categoryTotalsElBodega.id = "category-totals-bodega";
-        categoryTotalsElBodega.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
-
-        // --- Elementos de Configuración General ---
-        const themeSelector = document.getElementById('theme-selector');
-        const root = document.documentElement;
-        const settingsDropdown = document.getElementById('settings-dropdown');
-        const settingsButton = document.getElementById('settings-button');
-        const logoUpload = document.getElementById("logo-upload"), businessLogo = document.getElementById("business-logo"), logoSaveButton = document.getElementById("logo-save-button");
-        const currentViewTitle = document.getElementById("current-view-title");
-        const toolImageEditorInput = document.getElementById('tool-image-editor-input'); 
-
-        // --- ADICIÓN: Elementos de Autenticación ---
-        const authModal = document.getElementById('auth-modal');
-        const appContentWrapper = document.getElementById('app-content-wrapper');
-        const authForm = document.getElementById('auth-form');
-        const emailInput = document.getElementById('email-input');
-        const passwordInput = document.getElementById('password-input');
-        const authStatus = document.getElementById('auth-status');
-
-        // --- Elementos de Inventario Principal ---
-        const form = document.getElementById("product-form"), nameIn = document.getElementById("name"), categoryIn = document.getElementById("category-select"), priceIn = document.getElementById("price"), qtyIn = document.getElementById("quantity"), imageIn = document.getElementById("image"), status = document.getElementById("status"), productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader"), boxNumberIn = document.getElementById("box-number");
-
-        // --- Elementos de Nuevo Inventario (Bodega) ---
-        const formBodega = document.getElementById("product-form-bodega"), nameInBodega = document.getElementById("name-bodega"), categoryInBodega = document.getElementById("category-select-bodega"), priceInBodega = document.getElementById("price-bodega"), qtyInBodega = document.getElementById("quantity-bodega"), imageInBodega = document.getElementById("image-bodega"), statusBodega = document.getElementById("status-bodega"), productsElBodega = document.getElementById("products-bodega"), totalCountBodega = document.getElementById("total-count-bodega"), searchInputBodega = document.getElementById("search-input-bodega"), productsLoaderBodega = document.getElementById("products-loader-bodega"), boxNumberInBodega = document.getElementById("box-number-bodega");
-        
-        // --- Elementos de Ventas ---
-        const salesForm = document.getElementById("sale-form"), recipientNameIn = document.getElementById("recipient-name"), productNameSoldIn = document.getElementById("product-name-sold"), salePriceIn = document.getElementById("sale-price"), saleDateIn = document.getElementById("sale-date"), saleStatusInput = document.getElementById("sale-status-input"), salesListContainer = document.getElementById("sales-list-container"), saleStatus = document.getElementById("sale-status"), totalSalesCount = document.getElementById("total-sales-count"), salesListLoader = document.getElementById("sales-list-loader"), searchSalesInput = document.getElementById("search-sales-input"), pendingOnlyCheckbox = document.getElementById("pending-only-checkbox");
-        const inventorySuggestions = document.getElementById('inventory-suggestions');
-
-        // --- Elementos de Etiquetas QR (Labels) ---
-        const labelsLocationSelect = document.getElementById('labels-location');
-        const labelsCategorySelect = document.getElementById('labels-category');
-        const labelsOutputDiv = document.getElementById('labels-output');
-        const labelsCountSpan = document.getElementById('labels-count');
-
-        // --- Elementos de Faltantes ---
-        const missingProductForm = document.getElementById("missing-product-form"), missingProductNameIn = document.getElementById("missing-product-name"), missingProductNotesIn = document.getElementById("missing-product-notes"), missingProductStatus = document.getElementById("missing-product-status"), missingListEl = document.getElementById("missing-list"), totalMissingCount = document.getElementById("total-missing-count"), missingListLoader = document.getElementById("missing-list-loader");
-        
-        // --- Elementos de Herramientas ---
-        const toolForm = document.getElementById("tool-form"), toolTitleIn = document.getElementById("tool-title"), toolDescriptionIn = document.getElementById("tool-description"), toolImageIn = document.getElementById("tool-image"), toolStatus = document.getElementById("tool-status"), toolsListEl = document.getElementById("tools-list"), totalToolsCount = document.getElementById("total-tools-count"), toolsLoader = document.getElementById("tools-loader");
-
-        // --- Elementos de Modales y QR/Scanner ---
-        const modal = document.getElementById('product-editor-modal');
-        const qrModal = document.getElementById('qr-modal');
-        const qrCodeContainer = document.getElementById('qr-code-container');
-        const qrProductInfo = document.getElementById('qr-product-info');
-        let currentQrCanvas = null;
-        const scannerModal = document.getElementById('scanner-modal');
-        const scannerStatusEl = document.getElementById('scanner-status');
-        let html5QrcodeScanner = null;
-        let scanSuccessHandled = false;
-        let isScannerRunning = false;
-        
-        // --- Elementos del Modal de Edición de Producto ---
-        const modalProductForm = document.getElementById('modal-product-form');
-        const modalName = document.getElementById('modal-name');
-        const modalCategory = document.getElementById('modal-category');
-        const modalPrice = document.getElementById('modal-price');
-        const modalQuantity = document.getElementById('modal-quantity');
-        const modalBoxNumber = document.getElementById('modal-box-number');
-        const modalLocation = document.getElementById('modal-location');
-        const modalImagePreview = document.getElementById('modal-image-preview');
-        const modalImageUpload = document.getElementById('modal-image-upload');
-        const modalStatus = document.getElementById('modal-status');
-        
-        // --- ADICIÓN: Elementos de Menú Móvil ---
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenuDropdown = document.getElementById('mobile-menu-dropdown');
-        const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
-        
-        // --- ADICIÓN: Variable global para rastrear la vista actual antes de la recarga
-        let currentView = 'inventory'; 
-
-        // ============================================================================
-        // == III. LÓGICA DE AUTENTICACIÓN (LOGIN) - ARREGLADA PARA MÓVILES          ==
-        // ============================================================================
-        function setAuthStatus(msg, success = true) {
-             authStatus.textContent = msg;
-             authStatus.className = `text-sm mt-3 text-center ${success ? 'text-green-400' : 'text-red-400'}`;
-             if(success) setTimeout(() => (authStatus.textContent = ""), 5000);
-        }
-
-        async function handleLogin(event) {
-            event.preventDefault();
-            const loginButton = document.getElementById('login-button');
-            loginButton.disabled = true;
-            setAuthStatus('Verificando credenciales...', true);
-
-            if (!supabase) {
-                setAuthStatus('Error crítico: Supabase no cargó. Recarga la página.', false);
-                loginButton.disabled = false;
-                return;
-            }
-
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-
-            try {
-                // Intentamos el login
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password,
-                });
-
-                if (error) throw error;
-                
-                // SI EL LOGIN ES EXITOSO EN LA API:
-                setAuthStatus('¡Bienvenido! Entrando...', true);
-                
-                // FORZAMOS LA ENTRADA MANUALMENTE (No esperamos al evento onAuthStateChange)
-                // Esto soluciona el bug en móviles donde el evento no se dispara a tiempo
-                authModal.classList.add('hidden');
-                appContentWrapper.classList.remove('hidden');
-                loadAppDataAndInitialize();
-
-            } catch (error) {
-                console.error("Error de autenticación:", error);
-                setAuthStatus('Correo o contraseña incorrectos.', false); 
-                loginButton.disabled = false;
-            }
-        }
-
-        window.logout = async function() {
-            if (!supabase) return;
-            if (!confirm("¿Estás seguro de que quieres cerrar tu sesión?")) return;
-            
-            try {
-                const { error } = await supabase.auth.signOut();
-                // Forzamos recarga para limpiar memoria
-                window.location.reload(); 
-            } catch (error) {
-                 alert("❌ Error al cerrar sesión: " + error.message);
-                 window.location.reload();
-            }
-        }
-
-        // Se mantiene el listener como respaldo, pero el login manual tiene prioridad
-        function setupAuthListener() {
-            if (!supabase) {
-                authModal.classList.remove('hidden');
-                appContentWrapper.classList.add('hidden');
-                return;
-            }
-
-            supabase.auth.onAuthStateChange((event, session) => {
-                if (session) {
-                    // Solo si aún no hemos entrado (para no recargar datos doble)
-                    if(authModal.classList.contains('hidden') === false) {
-                        authModal.classList.add('hidden');
-                        appContentWrapper.classList.remove('hidden');
-                        loadAppDataAndInitialize(); 
-                    }
-                } else {
-                    // Si no hay sesión, mostramos login
-                    authModal.classList.remove('hidden');
-                    appContentWrapper.classList.add('hidden');
-                }
-            });
-        }
-        
-        authForm.addEventListener('submit', handleLogin);<script>
-        // =================================================================================
-        // == 1. CONFIGURACIÓN SUPABASE                                                   ==
-        // =================================================================================
-        
-        let supabase = null;
-        const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
-        const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
         
         // Tablas
         const PRODUCTS_TABLE = "products";
@@ -1109,39 +555,22 @@
         let categoryTotals = {};
         let categoryTotalsBodega = {}; 
         
-        // Elementos UI Totales
-        const categoryTotalsEl = document.createElement("div"); 
-        categoryTotalsEl.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 text-sm";
-        const categoryTotalsElBodega = document.createElement("div"); 
-        categoryTotalsElBodega.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 text-sm";
-
-        // Elementos DOM
+        // Elementos DOM Globales
         const authModal = document.getElementById('auth-modal');
         const appContentWrapper = document.getElementById('app-content-wrapper');
         const authForm = document.getElementById('auth-form');
         const emailInput = document.getElementById('email-input');
         const passwordInput = document.getElementById('password-input');
         const authStatus = document.getElementById('auth-status');
-        const mobileMenuDropdown = document.getElementById('mobile-menu-dropdown');
-        const settingsDropdown = document.getElementById('settings-dropdown');
         
-        // Formularios
-        const form = document.getElementById("product-form");
-        const formBodega = document.getElementById("product-form-bodega");
-        const salesForm = document.getElementById("sale-form");
-        const missingProductForm = document.getElementById("missing-product-form");
-        const toolForm = document.getElementById("tool-form");
-        
-        // Modales
-        const modal = document.getElementById('product-editor-modal');
-        const modalProductForm = document.getElementById('modal-product-form');
-        const qrModal = document.getElementById('qr-modal');
-        const scannerModal = document.getElementById('scanner-modal');
-        let html5QrcodeScanner = null;
-        let isScannerRunning = false;
+        // Elementos de Totales UI
+        const categoryTotalsEl = document.createElement("div"); 
+        categoryTotalsEl.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 text-sm";
+        const categoryTotalsElBodega = document.createElement("div"); 
+        categoryTotalsElBodega.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 text-sm";
 
         // ============================================================================
-        // == 3. AUTENTICACIÓN (LOGIN FIX MÓVIL)                                     ==
+        // == 3. AUTENTICACIÓN (LOGIN CORREGIDO)                                     ==
         // ============================================================================
 
         function setAuthStatus(msg, success = true) {
@@ -1150,14 +579,14 @@
         }
 
         async function handleLogin(event) {
-            event.preventDefault();
+            event.preventDefault(); // Prevenir recarga del formulario
             const loginButton = document.getElementById('login-button');
             loginButton.disabled = true;
             loginButton.textContent = "Verificando...";
             setAuthStatus('Conectando...', true);
 
             if (!supabase) {
-                setAuthStatus('Error: Supabase no cargó. Refresca la página.', false);
+                setAuthStatus('Error: Supabase no está disponible.', false);
                 loginButton.disabled = false;
                 return;
             }
@@ -1166,7 +595,7 @@
             const password = passwordInput.value;
 
             try {
-                // Intento de login
+                // 1. Intentar iniciar sesión
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email: email,
                     password: password,
@@ -1174,14 +603,14 @@
 
                 if (error) throw error;
                 
-                // ÉXITO: Forzamos la entrada inmediatamente
-                // No esperamos al evento onAuthStateChange que falla en móviles
+                // 2. ÉXITO: Forzamos la entrada INMEDIATAMENTE
+                // Esto arregla el problema en móviles donde el evento no se dispara
                 setAuthStatus('¡Correcto! Entrando...', true);
                 
                 authModal.classList.add('hidden');
                 appContentWrapper.classList.remove('hidden');
                 
-                // Cargar datos
+                // 3. Cargar datos
                 loadAppDataAndInitialize();
 
             } catch (error) {
@@ -1194,7 +623,7 @@
 
         window.logout = async function() {
             if (!supabase) return;
-            if (confirm("¿Cerrar sesión?")) {
+            if (confirm("¿Deseas cerrar sesión?")) {
                 try {
                     await supabase.auth.signOut();
                     window.location.reload(); 
@@ -1204,7 +633,7 @@
             }
         }
 
-        // Listener de respaldo (por si la sesión ya existe al recargar)
+        // Listener de respaldo para persistencia de sesión al recargar
         function setupAuthListener() {
             if (!supabase) return;
             supabase.auth.onAuthStateChange((event, session) => {
@@ -1214,8 +643,10 @@
                     appContentWrapper.classList.remove('hidden');
                     loadAppDataAndInitialize(); 
                 } else {
-                    authModal.classList.remove('hidden');
-                    appContentWrapper.classList.add('hidden');
+                    // Si no hay sesión, asegurar que se vea el login
+                    if(appContentWrapper.classList.contains('hidden')){
+                        authModal.classList.remove('hidden');
+                    }
                 }
             });
         }
@@ -1223,25 +654,29 @@
         authForm.addEventListener('submit', handleLogin);
 
         // ============================================================================
-        // == 4. LÓGICA DE APLICACIÓN Y UI                                           ==
+        // == 4. LÓGICA UI Y UTILIDADES                                              ==
         // ============================================================================
 
         function applyTheme(theme) {
             document.documentElement.className = theme;
             localStorage.setItem('selectedTheme', theme);
-            document.getElementById('theme-selector').value = theme;
+            const selector = document.getElementById('theme-selector');
+            if(selector) selector.value = theme;
         }
         
-        // Menús
+        // Control de Menús
+        const settingsDropdown = document.getElementById('settings-dropdown');
+        const mobileMenuDropdown = document.getElementById('mobile-menu-dropdown');
+        
         window.toggleSettingsDropdown = (e) => { e.stopPropagation(); settingsDropdown.classList.toggle('hidden'); mobileMenuDropdown.classList.add('hidden'); };
         window.toggleMobileMenu = (e) => { e.stopPropagation(); mobileMenuDropdown.classList.toggle('hidden'); settingsDropdown.classList.add('hidden'); };
         
         document.body.addEventListener('click', () => {
-            settingsDropdown.classList.add('hidden');
-            mobileMenuDropdown.classList.add('hidden');
+            if(settingsDropdown) settingsDropdown.classList.add('hidden');
+            if(mobileMenuDropdown) mobileMenuDropdown.classList.add('hidden');
         });
 
-        // Utilidades
+        // Utilidades Varias
         function setStatusMessage(el, msg, success = true) { 
             if(!el) return;
             el.textContent = msg; 
@@ -1278,6 +713,7 @@
 
         function updateAutocompleteList() {
             const list = document.getElementById('inventory-suggestions');
+            if(!list) return;
             list.innerHTML = '';
             const combined = [...allProducts, ...allProductsBodega];
             const unique = new Set();
@@ -1292,7 +728,7 @@
             });
         }
 
-        // Control de Vistas
+        // Control de Vistas (Tabs)
         function toggleView(viewName) { 
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
             const target = document.getElementById(viewName + (viewName.includes('view') ? '' : '-view'));
@@ -1300,8 +736,10 @@
             
             // Títulos y Botones
             const titleMap = { 'inventory': 'Inventario Principal', 'inventory_bodega': 'Nuevo Inventario', 'sales': 'Ventas', 'labels': 'Etiquetas QR', 'missing': 'Faltantes', 'tools': 'Herramientas' };
-            document.getElementById("current-view-title").textContent = "Vista: " + (titleMap[viewName] || viewName);
+            const titleEl = document.getElementById("current-view-title");
+            if(titleEl) titleEl.textContent = "Vista: " + (titleMap[viewName] || viewName);
             
+            // Actualizar estado de botones
             document.querySelectorAll('.view-btn').forEach(btn => {
                 const active = btn.dataset.view === viewName;
                 if(btn.closest('#mobile-menu-dropdown')) {
@@ -1312,15 +750,15 @@
             });
 
             if (viewName === 'labels') updateLabelView();
-            mobileMenuDropdown.classList.add('hidden');
+            if(mobileMenuDropdown) mobileMenuDropdown.classList.add('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // ============================================================================
-        // == 5. CRUD (DATOS)                                                        ==
+        // == 5. GESTIÓN DE DATOS (CRUD)                                            ==
         // ============================================================================
 
-        // --- Productos Principal ---
+        // --- Inventario Principal ---
         async function fetchProducts() { 
             if (!supabase) return;
             const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("created_at", { ascending: false }); 
@@ -1357,20 +795,21 @@
                 grouped[cat].forEach(p => { 
                     const card = document.createElement("div");
                     card.className = "bg-gray-800 rounded-lg shadow p-3 relative border border-gray-700 product-card"; 
+                    const imgUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
                     card.innerHTML = `
-                        <button onclick="openProductEditorModal('${p.id}', 'main')" class="absolute top-2 right-2 text-gray-400 bg-gray-900 rounded-full p-1">✏️</button>
-                        <div class="h-32 bg-gray-700 rounded mb-2 overflow-hidden flex justify-center"><img src="${p.image_url || 'https://via.placeholder.com/150'}" class="h-full object-contain"></div>
+                        <button onclick="openProductEditorModal('${p.id}', 'main')" class="absolute top-2 right-2 text-gray-400 bg-gray-900 rounded-full p-1 shadow">✏️</button>
+                        <div class="h-32 bg-gray-700 rounded mb-2 overflow-hidden flex justify-center"><img src="${imgUrl}" class="h-full object-contain"></div>
                         <h3 class="font-bold text-white text-sm">${p.name}</h3>
-                        <p class="text-green-400 font-bold">$${p.price}</p>
+                        <p class="text-green-400 font-bold">$${Number(p.price).toFixed(2)}</p>
                         <div class="flex justify-between text-xs text-gray-400 mt-1"><span>Stock: ${p.quantity}</span><span>Caja: ${p.box_number || '-'}</span></div>
-                        <button onclick="deleteProduct('${p.id}', '${PRODUCTS_TABLE}')" class="mt-2 w-full bg-red-900 text-red-200 text-xs py-1 rounded">Eliminar</button>`; 
+                        <button onclick="deleteProduct('${p.id}', '${PRODUCTS_TABLE}')" class="mt-2 w-full bg-red-900 text-red-200 text-xs py-1 rounded hover:bg-red-800">Eliminar</button>`; 
                     grid.appendChild(card); 
                 }); 
                 section.appendChild(grid); container.appendChild(section); 
             }); 
         }
 
-        // --- Productos Bodega ---
+        // --- Inventario Bodega ---
         async function fetchProductsBodega() { 
             if (!supabase) return;
             const { data, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).select("*").order("created_at", { ascending: false }); 
@@ -1405,13 +844,14 @@
                 grouped[cat].forEach(p => { 
                     const card = document.createElement("div");
                     card.className = "bg-gray-800 rounded-lg shadow p-3 relative border border-gray-700 product-card"; 
+                    const imgUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
                     card.innerHTML = `
-                        <button onclick="openProductEditorModal('${p.id}', 'bodega')" class="absolute top-2 right-2 text-gray-400 bg-gray-900 rounded-full p-1">✏️</button>
-                        <div class="h-32 bg-gray-700 rounded mb-2 overflow-hidden flex justify-center"><img src="${p.image_url || 'https://via.placeholder.com/150'}" class="h-full object-contain"></div>
+                        <button onclick="openProductEditorModal('${p.id}', 'bodega')" class="absolute top-2 right-2 text-gray-400 bg-gray-900 rounded-full p-1 shadow">✏️</button>
+                        <div class="h-32 bg-gray-700 rounded mb-2 overflow-hidden flex justify-center"><img src="${imgUrl}" class="h-full object-contain"></div>
                         <h3 class="font-bold text-white text-sm">${p.name}</h3>
-                        <p class="text-green-400 font-bold">$${p.price}</p>
+                        <p class="text-green-400 font-bold">$${Number(p.price).toFixed(2)}</p>
                         <div class="flex justify-between text-xs text-gray-400 mt-1"><span>Stock: ${p.quantity}</span><span>Caja: ${p.box_number || '-'}</span></div>
-                        <button onclick="deleteProduct('${p.id}', '${PRODUCTS_BODEGA_TABLE}')" class="mt-2 w-full bg-red-900 text-red-200 text-xs py-1 rounded">Eliminar</button>`; 
+                        <button onclick="deleteProduct('${p.id}', '${PRODUCTS_BODEGA_TABLE}')" class="mt-2 w-full bg-red-900 text-red-200 text-xs py-1 rounded hover:bg-red-800">Eliminar</button>`; 
                     grid.appendChild(card); 
                 }); 
                 section.appendChild(grid); container.appendChild(section); 
@@ -1452,9 +892,10 @@
                 let html = `<div class="mt-6"><h3 class="text-white font-bold border-b border-gray-600 mb-2 flex justify-between"><span>${date}</span> <span class="text-green-400">$${totalDia.toFixed(2)}</span></h3>`;
                 grouped[date].forEach(s => {
                     const color = s.status==='Pagado'?'text-green-400':'text-yellow-400';
-                    html += `<div class="bg-gray-800 p-3 mb-2 rounded border border-gray-700 flex justify-between items-center">
+                    const bgStatus = s.status==='Pagado'?'border-green-600':'border-yellow-600';
+                    html += `<div class="bg-gray-800 p-3 mb-2 rounded border-l-4 ${bgStatus} flex justify-between items-center">
                         <div><p class="text-white font-bold text-sm">${s.product_name_sold}</p><p class="text-xs text-gray-400">${s.recipient_name}</p></div>
-                        <div class="text-right"><p class="${color} font-bold">$${s.price}</p><button onclick="deleteSale('${s.id}')" class="text-red-500 text-xs">Borrar</button></div>
+                        <div class="text-right"><p class="${color} font-bold">$${Number(s.price).toFixed(2)}</p><button onclick="deleteSale('${s.id}')" class="text-red-500 text-xs mt-1">Borrar</button></div>
                     </div>`;
                 });
                 html += "</div>";
@@ -1473,7 +914,7 @@
             document.getElementById('modal-price').value = p.price;
             document.getElementById('modal-quantity').value = p.quantity;
             document.getElementById('modal-box-number').value = p.box_number || '';
-            document.getElementById('modal-location').innerText = type === 'main' ? 'Principal' : 'Bodega';
+            document.getElementById('modal-location').innerText = type === 'main' ? 'Inventario Principal' : 'Nuevo Inventario';
             document.getElementById('modal-image-preview').src = p.image_url || '';
             modal.classList.remove('hidden');
         };
@@ -1504,29 +945,6 @@
             btn.disabled = false;
         });
 
-        // --- Scanner ---
-        window.openScannerModal = () => {
-            scannerModal.classList.remove('hidden');
-            if(html5QrcodeScanner) html5QrcodeScanner.clear();
-            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-            html5QrcodeScanner.render((decodedText) => {
-                const id = decodedText.trim();
-                const p = allProducts.find(x=>x.id==id) || allProductsBodega.find(x=>x.id==id);
-                if(p) {
-                    toggleView('sales');
-                    document.getElementById('product-name-sold').value = p.name;
-                    document.getElementById('sale-price').value = p.price;
-                    document.getElementById('sale-status-input').value = 'Pagado';
-                    closeScannerModal();
-                    // Auto venta
-                    document.getElementById('sale-submit').click();
-                } else {
-                    alert("Producto no encontrado");
-                }
-            });
-        };
-        window.closeScannerModal = () => { scannerModal.classList.add('hidden'); if(html5QrcodeScanner) html5QrcodeScanner.clear(); };
-
         // --- Envíos de Formulario ---
         async function handleFormSubmit(e, table, fields, reloadFn) {
             e.preventDefault();
@@ -1546,15 +964,19 @@
                 await supabase.from(table).insert(payload);
                 e.target.reset();
                 reloadFn();
-                alert("Guardado");
+                alert("Guardado exitosamente");
             } catch(err) { alert("Error: " + err.message); }
             btn.disabled = false;
         }
 
-        form.addEventListener('submit', (e) => handleFormSubmit(e, PRODUCTS_TABLE, ['name','category','price','quantity','box-number'], fetchProducts));
-        formBodega.addEventListener('submit', (e) => handleFormSubmit(e, PRODUCTS_BODEGA_TABLE, ['name-bodega','category-bodega','price-bodega','quantity-bodega','box-number-bodega'], fetchProductsBodega));
+        const formProd = document.getElementById("product-form");
+        if(formProd) formProd.addEventListener('submit', (e) => handleFormSubmit(e, PRODUCTS_TABLE, ['name','category','price','quantity','box-number'], fetchProducts));
         
-        salesForm.addEventListener('submit', async (e) => {
+        const formBod = document.getElementById("product-form-bodega");
+        if(formBod) formBod.addEventListener('submit', (e) => handleFormSubmit(e, PRODUCTS_BODEGA_TABLE, ['name-bodega','category-bodega','price-bodega','quantity-bodega','box-number-bodega'], fetchProductsBodega));
+        
+        const formSales = document.getElementById("sale-form");
+        if(formSales) formSales.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('sale-submit'); btn.disabled = true;
             try {
@@ -1572,39 +994,42 @@
                 const pMain = allProducts.find(p=>p.name===name);
                 const pBodega = allProductsBodega.find(p=>p.name===name);
                 if(sale.status==='Pagado') {
-                    if(pMain) await supabase.from(PRODUCTS_TABLE).update({quantity: pMain.quantity-1}).eq('id', pMain.id);
-                    else if(pBodega) await supabase.from(PRODUCTS_BODEGA_TABLE).update({quantity: pBodega.quantity-1}).eq('id', pBodega.id);
+                    if(pMain) await supabase.from(PRODUCTS_TABLE).update({quantity: Math.max(0, pMain.quantity-1)}).eq('id', pMain.id);
+                    else if(pBodega) await supabase.from(PRODUCTS_BODEGA_TABLE).update({quantity: Math.max(0, pBodega.quantity-1)}).eq('id', pBodega.id);
                 }
                 
-                salesForm.reset(); document.getElementById('sale-date').value = new Date().toISOString().split('T')[0];
+                formSales.reset(); document.getElementById('sale-date').value = new Date().toISOString().split('T')[0];
                 fetchSales(); fetchProducts(); fetchProductsBodega();
                 alert("Venta registrada");
             } catch(err) { alert(err.message); }
             btn.disabled = false;
         });
 
-        // --- Inicialización ---
+        // --- Carga Inicial ---
         async function loadAppDataAndInitialize() {
             document.getElementById('sale-date').value = new Date().toISOString().split('T')[0];
             await Promise.all([ fetchProducts(), fetchProductsBodega(), fetchSales() ]);
         }
 
-        // INIT SEGURO
+        // --- Evento de Carga de Ventana ---
         window.onload = function() {
-            // Asegurar cliente
-            if(!supabase && window.supabase) supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            
-            // Tema
+            // Aplicar tema
             const theme = localStorage.getItem('selectedTheme') || 'theme-dark';
             applyTheme(theme);
             
-            // Listener sesion
+            // Iniciar listener de Auth
             setupAuthListener();
             
-            // Listeners inputs
+            // Listeners de búsqueda
             document.getElementById("search-input").addEventListener("input", filterAndRenderProducts);
             document.getElementById("search-input-bodega").addEventListener("input", filterAndRenderProductsBodega);
             document.getElementById("search-sales-input").addEventListener("input", filterAndRenderSales);
+            
+            // Asignar eventos de botones de vista
+            document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', (e) => {
+                if (!window.matchMedia("(max-width: 768px)").matches && e.target.closest('#mobile-menu-dropdown')) return; 
+                toggleView(btn.dataset.view);
+            }));
         };
     </script>
 </body>
