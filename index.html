@@ -309,9 +309,7 @@
             outline: none;
         }
         .bg-blue-600, .bg-green-600 { background-color: var(--accent-color-dark); }
-        .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover { background-color: var(--accent-color); }
-        
-        /********************************/
+        .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover { background-color: var(--accent-color); }/********************************/
         /* ESTILOS FIJOS PARA ESTADOS DE VENTA */
         /********************************/
         .status-paid {
@@ -468,43 +466,7 @@
 </head>
 <body class="" onclick=""> 
     
-    <div id="auth-modal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="auth-modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-900 bg-opacity-90 transition-opacity" aria-hidden="true"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-indigo-500">
-                <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start flex-col">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
-                        </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-2xl leading-6 font-bold text-white mb-4 border-b border-indigo-500 pb-2" id="auth-modal-title">
-                                🔒 Iniciar Sesión en Cell Smar
-                            </h3>
-                            <form id="auth-form" class="mt-4 space-y-4">
-                                <div>
-                                    <label for="email-input" class="block text-sm font-medium text-gray-300">Correo Electrónico</label>
-                                    <input id="email-input" type="email" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="tu@correo.com" />
-                                </div>
-                                <div>
-                                    <label for="password-input" class="block text-sm font-medium text-gray-300">Contraseña</label>
-                                    <input id="password-input" type="password" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="********" />
-                                </div>
-                                <p id="auth-status" class="text-sm text-center text-gray-400 mt-3"></p>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-700">
-                    <button type="submit" form="auth-form" id="login-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 sm:ml-3 sm:w-auto sm:text-sm transition">
-                        Entrar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="app-content-wrapper" class="hidden">
+    <div id="app-content-wrapper">
     
     <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
         <div class="flex items-center space-x-4">
@@ -570,7 +532,6 @@
                         <input type="file" id="logo-upload" title="Sube una nueva imagen para tu logo" accept="image/*" />
                     </div>
                     <button id="logo-save-button" class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed text-sm w-full shadow-md" disabled>Guardar Logo</button>
-                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white font-medium py-1.5 px-3 rounded-lg transition duration-300 text-sm w-full shadow-md">Cerrar Sesión 🚪</button>
                 </div>
             </div>
         </div>
@@ -979,21 +940,11 @@
         const currentViewTitle = document.getElementById("current-view-title");
         const toolImageEditorInput = document.getElementById('tool-image-editor-input'); 
 
-        // --- ADICIÓN: Elementos de Autenticación ---
-        const authModal = document.getElementById('auth-modal');
-        const appContentWrapper = document.getElementById('app-content-wrapper');
-        const authForm = document.getElementById('auth-form');
-        const emailInput = document.getElementById('email-input');
-        const passwordInput = document.getElementById('password-input');
-        const authStatus = document.getElementById('auth-status');
-
         // --- Elementos de Inventario Principal ---
         const form = document.getElementById("product-form"), nameIn = document.getElementById("name"), categoryIn = document.getElementById("category-select"), priceIn = document.getElementById("price"), qtyIn = document.getElementById("quantity"), imageIn = document.getElementById("image"), status = document.getElementById("status"), productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader"), boxNumberIn = document.getElementById("box-number");
 
         // --- Elementos de Nuevo Inventario (Bodega) ---
-        const formBodega = document.getElementById("product-form-bodega"), nameInBodega = document.getElementById("name-bodega"), categoryInBodega = document.getElementById("category-select-bodega"), priceInBodega = document.getElementById("price-bodega"), qtyInBodega = document.getElementById("quantity-bodega"), imageInBodega = document.getElementById("image-bodega"), statusBodega = document.getElementById("status-bodega"), productsElBodega = document.getElementById("products-bodega"), totalCountBodega = document.getElementById("total-count-bodega"), searchInputBodega = document.getElementById("search-input-bodega"), productsLoaderBodega = document.getElementById("products-loader-bodega"), boxNumberInBodega = document.getElementById("box-number-bodega");
-        
-        // --- Elementos de Ventas ---
+        const formBodega = document.getElementById("product-form-bodega"), nameInBodega = document.getElementById("name-bodega"), categoryInBodega = document.getElementById("category-select-bodega"), priceInBodega = document.getElementById("price-bodega"), qtyInBodega = document.getElementById("quantity-bodega"), imageInBodega = document.getElementById("image-bodega"), statusBodega = document.getElementById("status-bodega"), productsElBodega = document.getElementById("products-bodega"), totalCountBodega = document.getElementById("total-count-bodega"), searchInputBodega = document.getElementById("search-input-bodega"), productsLoaderBodega = document.getElementById("products-loader-bodega"), boxNumberInBodega = document.getElementById("box-number-bodega");// --- Elementos de Ventas ---
         const salesForm = document.getElementById("sale-form"), recipientNameIn = document.getElementById("recipient-name"), productNameSoldIn = document.getElementById("product-name-sold"), salePriceIn = document.getElementById("sale-price"), saleDateIn = document.getElementById("sale-date"), saleStatusInput = document.getElementById("sale-status-input"), salesListContainer = document.getElementById("sales-list-container"), saleStatus = document.getElementById("sale-status"), totalSalesCount = document.getElementById("total-sales-count"), salesListLoader = document.getElementById("sales-list-loader"), searchSalesInput = document.getElementById("search-sales-input"), pendingOnlyCheckbox = document.getElementById("pending-only-checkbox");
         const inventorySuggestions = document.getElementById('inventory-suggestions');
 
@@ -1042,92 +993,6 @@
         let currentView = 'inventory'; // Valor predeterminado
 
         // ============================================================================
-        // == III. LÓGICA DE AUTENTICACIÓN (LOGIN)                                   ==
-        // ============================================================================
-        function setAuthStatus(msg, success = true) {
-             authStatus.textContent = msg;
-             authStatus.className = `text-sm mt-3 text-center ${success ? 'text-green-400' : 'text-red-400'}`;
-             setTimeout(() => (authStatus.textContent = ""), 5000);
-        }
-
-        async function handleLogin(event) {
-            event.preventDefault();
-            const loginButton = document.getElementById('login-button');
-            loginButton.disabled = true;
-            setAuthStatus('Iniciando sesión...');
-
-            if (!supabase) {
-                setAuthStatus('Error: Supabase no está cargado.', false);
-                loginButton.disabled = false;
-                return;
-            }
-
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-
-            try {
-                // Usamos signInWithPassword para autenticación por email y contraseña
-                const { error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password,
-                });
-
-                if (error) throw error;
-                
-                setAuthStatus('Inicio de sesión exitoso. Cargando aplicación...', true);
-                // El onAuthStateChange se encarga de la UI
-
-            } catch (error) {
-                console.error("Error de autenticación:", error);
-                setAuthStatus('Error: Correo o contraseña inválida.', false); 
-            } finally {
-                loginButton.disabled = false;
-            }
-        }
-
-        window.logout = async function() {
-            if (!supabase) return;
-            if (!confirm("¿Estás seguro de que quieres cerrar tu sesión?")) return;
-            
-            try {
-                const { error } = await supabase.auth.signOut();
-                if (error) throw error;
-            } catch (error) {
-                 alert("❌ Error al cerrar sesión: " + error.message);
-            }
-        }
-
-        function setupAuthListener() {
-            if (!supabase) {
-                authModal.classList.remove('hidden');
-                appContentWrapper.classList.add('hidden');
-                return;
-            }
-
-            supabase.auth.onAuthStateChange((event, session) => {
-                console.log('Evento de Autenticación:', event);
-
-                if (session) {
-                    authModal.classList.add('hidden');
-                    appContentWrapper.classList.remove('hidden');
-                    
-                    if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
-                        loadAppDataAndInitialize(); 
-                    }
-
-                } else {
-                    authModal.classList.remove('hidden');
-                    appContentWrapper.classList.add('hidden');
-                    emailInput.value = '';
-                    passwordInput.value = '';
-                    authStatus.textContent = '';
-                }
-            });
-        }
-        
-        authForm.addEventListener('submit', handleLogin);
-
-        // ============================================================================
         // == IV. LÓGICA DE TEMAS Y DROPDOWN                                      ==
         // ============================================================================
 
@@ -1136,7 +1001,6 @@
             localStorage.setItem('selectedTheme', theme);
             themeSelector.value = theme;
             
-            // Lógica para añadir/remover la clase que activa la nieve animada en el body
             if (theme === 'theme-christmas') {
                 document.body.classList.add('theme-christmas');
             } else {
@@ -1149,37 +1013,27 @@
         window.toggleSettingsDropdown = function(event) {
             event.stopPropagation(); 
             settingsDropdown.classList.toggle('hidden');
-            // Cierra el menú móvil si está abierto
             mobileMenuDropdown.classList.add('hidden');
         };
         
-        // --- ADICIÓN: Lógica del Menú Móvil ---
         window.toggleMobileMenu = function(event) {
             event.stopPropagation(); 
             mobileMenuDropdown.classList.toggle('hidden');
-            // Cierra el menú de configuración si está abierto
             settingsDropdown.classList.add('hidden');
         };
         
-        // Cierre para ambos menús
         document.body.addEventListener('click', (event) => {
-            // 1. Cierra el menú de Configuración
             if (settingsDropdown && !settingsDropdown.classList.contains('hidden')) {
-                // Verifica si el clic fue *fuera* del menú de configuración y su botón
                 if (!settingsDropdown.contains(event.target) && !settingsButton.contains(event.target)) {
                     settingsDropdown.classList.add('hidden');
                 }
             }
-            
-            // 2. Cierra el menú Móvil
              if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden')) {
-                // Verifica si el clic fue *fuera* del menú móvil y su botón
                 if (!mobileMenuDropdown.contains(event.target) && !mobileMenuButton.contains(event.target)) {
                    mobileMenuDropdown.classList.add('hidden');
                 }
              }
         });
-
 
         // ============================================================================
         // == V. UTILIDADES Y LÓGICA COMPARTIDA                                     ==
@@ -1216,11 +1070,8 @@
 
         function updateAutocompleteList(productsArray, datalistElement) {
             datalistElement.innerHTML = '';
-            // Combinar todos los productos disponibles (Principal y Nuevo Inventario) en la lista de sugerencias de venta
             const combinedProducts = [...allProducts, ...allProductsBodega];
             const sortedProducts = [...combinedProducts].sort((a, b) => a.name.localeCompare(b.name));
-            
-            // Se usa un Map para manejar duplicados por nombre (aunque deberían tener ID distinto)
             const uniqueNames = new Set();
             sortedProducts.filter(p => p.quantity > 0).forEach(product => {
                 const nameWithCategory = product.name + (product.category ? ` (${product.category})` : '');
@@ -1240,98 +1091,52 @@
             if (productToUpdate) {
                 const currentQty = parseInt(productToUpdate.quantity) || 0;
                 const newQty = Math.max(0, currentQty + delta);
-                
                 const isMain = (table === PRODUCTS_TABLE); 
                 const isBodega = (table === PRODUCTS_BODEGA_TABLE);
 
-                if (delta < 0 && currentQty <= 0) {
-                    console.warn(`⚠️ Advertencia: Stock de ${productName} ya es 0. No se puede descontar.`);
-                    return;
-                }
+                if (delta < 0 && currentQty <= 0) return;
                 
-                // Optimistic Update (Local)
                 productToUpdate.quantity = newQty;
                 updateProductCardInDOM(productToUpdate, isMain, false, isBodega); 
-
                 updateAutocompleteList(localArray, inventorySuggestions);
-                
-                // ADICIÓN: Recalcular totales después de la actualización local optimista
                 calculateCategoryTotals(localArray, isMain, false, isBodega);
 
                 if(isMain) renderProducts(allProducts.filter(p => true)); 
                 else renderProductsBodega(allProductsBodega.filter(p => true)); 
                 
-                if (!supabase) return console.error("❌ Error: Supabase no está cargado para actualizar stock.");
-
-                // Database Update
-                const { error: updateError } = await supabase
-                    .from(table)
-                    .update({ quantity: newQty })
-                    .eq("id", productToUpdate.id);
+                if (!supabase) return;
+                const { error: updateError } = await supabase.from(table).update({ quantity: newQty }).eq("id", productToUpdate.id);
                 
                 if (updateError) {
-                    console.error("❌ Error al actualizar stock:", updateError.message);
-                    // Rollback optimistic update on failure
                     productToUpdate.quantity = currentQty;
                     updateProductCardInDOM(productToUpdate, isMain, false, isBodega);
-                    updateAutocompleteList(localArray, inventorySuggestions);
                     calculateCategoryTotals(localArray, isMain, false, isBodega);
-                    if(isMain) renderProducts(allProducts.filter(p => true)); 
-                    else renderProductsBodega(allProductsBodega.filter(p => true));
-
-                    alert(`❌ Error al actualizar stock de ${productName}. El stock local ha sido revertido.`);
-                } else {
-                    console.log(`✅ Stock actualizado para: ${productName}. Nuevo stock: ${newQty}`);
+                    alert(`❌ Error al actualizar stock.`);
                 }
-            } else {
-                console.warn(`ℹ️ Producto no encontrado en inventario por nombre exacto: ${cleanProductName}. No se modificó stock.`);
             }
         }
         
-        // --- Carga de Logo ---
         const LOGO_CONFIG_KEY = "current_logo_url";
         async function loadLogo() {
             if (!supabase) return;
             try {
-                const { data, error } = await supabase
-                    .from(CONFIG_TABLE)
-                    .select("value")
-                    .eq("key", LOGO_CONFIG_KEY)
-                    .single();
-                if (error || !data || !data.value) {
-                    if (error && error.code !== 'PGRST116') { 
-                       console.warn("No se encontró URL de logo en config:", error?.message);
-                    }
-                    return; 
-                }
+                const { data, error } = await supabase.from(CONFIG_TABLE).select("value").eq("key", LOGO_CONFIG_KEY).single();
+                if (error || !data || !data.value) return; 
                 businessLogo.src = `${data.value}?t=${new Date().getTime()}`; 
-            } catch (err) {
-                console.error("Error en loadLogo:", err);
-            }
+            } catch (err) {}
         }
         
-        // ============================================================================
-        // == VI. LÓGICA DE VISTAS Y RENDERS (Producto, Venta, Faltantes, Herramienta) ==
-        // ============================================================================
-
-        // --- ADICIÓN: Función para calcular los totales de categoría ---
         function calculateCategoryTotals(productsArray, isMain, isET, isBodega) {
             const totals = productsArray.reduce((acc, p) => {
                 const cat = p.category || 'Otros';
                 acc[cat] = (acc[cat] || 0) + parseInt(p.quantity || 0);
                 return acc;
             }, {});
-            if (isMain) {
-                categoryTotals = totals;
-            } else if (isBodega) { 
-                categoryTotalsBodega = totals;
-            }
-            // isET es falso y se ignora
+            if (isMain) categoryTotals = totals;
+            else if (isBodega) categoryTotalsBodega = totals;
             return totals;
         }
 
-
-        // --- Funciones de Vistas ---
         const views = { 
             inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario Principal' }, 
             inventory_bodega: { el: document.getElementById('inventory-bodega-view'), title: 'Vista: Nuevo Inventario' }, 
@@ -1341,55 +1146,28 @@
             tools: { el: document.getElementById('tools-view'), title: 'Vista: Herramientas y Tutoriales' } 
         };
         
-        // MODIFICACIÓN CRÍTICA: Guarda la vista en localStorage para restaurarla
         function toggleView(viewName) { 
             Object.keys(views).forEach(key => { 
                 const isCurrent = key === viewName; 
                 views[key].el.classList.toggle('hidden', !isCurrent); 
-                
-                // Botones de escritorio (Barra ancha)
                 const btn = document.querySelector(`#view-buttons .view-btn[data-view="${key}"]`); 
                 if (btn) {
                     btn.classList.toggle('bg-indigo-500', isCurrent); 
                     btn.classList.toggle('text-white', isCurrent); 
                     btn.classList.toggle('bg-transparent', !isCurrent); 
-                    btn.classList.toggle('text-gray-300', !isCurrent); 
                 }
-
-                // Botones de menú móvil (Dropdown)
                  const mobileBtn = document.querySelector(`#mobile-menu-dropdown .view-btn[data-view="${key}"]`);
-                 if (mobileBtn) {
-                     mobileBtn.classList.toggle('bg-indigo-500', isCurrent); 
-                     mobileBtn.classList.toggle('font-bold', isCurrent);
-                   }
+                 if (mobileBtn) mobileBtn.classList.toggle('bg-indigo-500', isCurrent); 
             }); 
             currentViewTitle.textContent = views[viewName].title; 
-            
-            // --- ADICIÓN CLAVE: Guardar la vista actual ---
             currentView = viewName;
-            try {
-                localStorage.setItem('lastView', viewName);
-            } catch (e) {
-                console.warn("No se pudo guardar la última vista en localStorage.", e);
-            }
-            // --- FIN ADICIÓN CLAVE ---
-            
-            if (viewName === 'labels') {
-                updateLabelView();
-            }
-            
-            // Cierra el menú móvil si se selecciona una vista
-            if (isMobile() && !mobileMenuDropdown.classList.contains('hidden')) {
-                mobileMenuDropdown.classList.add('hidden');
-            }
-            
-            // Desplazar la vista al inicio
-            if (viewName === 'sales' || viewName === 'inventory' || viewName === 'inventory_bodega') {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
+            localStorage.setItem('lastView', viewName);
+            if (viewName === 'labels') updateLabelView();
+            if (isMobile()) mobileMenuDropdown.classList.add('hidden');
         }
+
         function showSkeletonLoaders() { 
-            const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div><div class="h-4 w-1/2 skeleton-line"></div><div class="h-8 w-1/4 skeleton-line"></div></div>`).join('');
+            const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div></div>`).join('');
             productsLoader.innerHTML = cardSkeleton;
             productsLoaderBodega.innerHTML = cardSkeleton; 
             toolsLoader.innerHTML = cardSkeleton;
@@ -1398,37 +1176,28 @@
             missingListLoader.innerHTML = tableSkeleton; 
         }
 
-        // --- Lógica de Inventario Principal ---
         async function fetchProducts() { 
             if (!supabase) return;
-            const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
-            if (error) { console.error("Error cargando productos:", error); totalCount.textContent = "Error al cargar"; productsEl.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
+            const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category", { ascending: true }); 
+            if (error) return; 
             allProducts = data; 
             calculateCategoryTotals(allProducts, true, false, false); 
             filterAndRenderProducts(); 
             updateAutocompleteList(allProducts, inventorySuggestions);
         }
+
         function filterAndRenderProducts() { 
             const term = (searchInput.value || "").toLowerCase().trim(); 
             const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); 
             renderProducts(filtered); 
         }
+
         function renderProducts(items) { 
             productsLoader.innerHTML = ""; 
             productsEl.innerHTML = ""; 
             totalCount.textContent = `${items.length} productos`; 
-
-            // --- ADICIÓN: Renderizar Totales de Categoría ---
-            categoryTotalsEl.innerHTML = `
-                <span class="font-bold text-indigo-300">Total por Categoría:</span>
-                ${Object.keys(categoryTotals).sort().map(cat => 
-                    `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotals[cat]}</span> u.</span>`
-                ).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
-            `;
+            categoryTotalsEl.innerHTML = `<span class="font-bold text-indigo-300">Total por Categoría:</span> ${Object.keys(categoryTotals).sort().map(cat => `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotals[cat]}</span></span>`).join('')}`;
             productsEl.appendChild(categoryTotalsEl);
-            // --- FIN ADICIÓN ---
-
-            if (items.length === 0) { productsEl.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos${searchInput.value ? ' para "' + searchInput.value + '"' : ''}.</p>`; return; } 
             const grouped = items.reduce((acc, p) => { 
                 const cat = p.category || 'Sin Categoría'; 
                 if (!acc[cat]) acc[cat] = []; 
@@ -1438,116 +1207,45 @@
             Object.keys(grouped).sort().forEach(category => { 
                 const section = document.createElement("div"); 
                 section.className = "mb-10"; 
-                section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; 
+                section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase">${category}</h2>`; 
                 const grid = document.createElement("div"); 
-                // Ajuste de columnas: 2 en móvil, 2 en sm, 3 en lg, 4 en xl (Tailwind)
                 grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
                 grouped[category].forEach(p => { 
                     const card = document.createElement("div");
                     card.id = `product-card-${p.id}`; 
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
-                    const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
-                    card.innerHTML = `
-                        <button onclick="openProductEditorModal('${p.id}', 'main')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                        </button>
-                        <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden">
-                            <img src="${imageUrl}" id="product-img-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}">
-                        </div>
-                        <h3 id="product-name-${p.id}" class="font-semibold text-white">${p.name}</h3>
-                        <p id="product-category-${p.id}" class="text-xs text-gray-400 -mt-1">${p.category || 'Otros'}</p>
-                        <p id="product-price-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
-                        <p id="product-stock-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
-                        <p id="product-box-number-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
-                        <div class="flex-grow"></div>
-                        <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
-                            <button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
-                        </div>`; 
+                    const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100?text=Sin+Imagen`; 
+                    card.innerHTML = `<button onclick="openProductEditorModal('${p.id}', 'main')" class="absolute top-2 right-2 text-gray-400 p-1 bg-gray-700/70 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" id="product-img-${p.id}" class="object-contain h-full w-full"></div><h3 id="product-name-${p.id}" class="font-semibold text-white">${p.name}</h3><p id="product-category-${p.id}" class="text-xs text-gray-400">${p.category || 'Otros'}</p><p id="product-price-${p.id}" class="text-green-400 font-bold mt-2">$${Number(p.price).toFixed(2)}</p><p id="product-stock-${p.id}" class="text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex-grow"></div><div class="flex justify-end mt-4 pt-3 border-t border-gray-700"><button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 text-white text-sm">Eliminar</button></div>`; 
                     grid.appendChild(card); 
                 }); 
                 section.appendChild(grid); 
                 productsEl.appendChild(section); 
             }); 
         }
-        function updateProductCardInDOM(product, isMain, isET, isBodega) {
-            let idSuffix = '';
-            // Se asume isET siempre falso
-            if (isBodega) idSuffix = '-bodega'; 
-            
-            const elementPrefix = 'product-';
-            const stockEl = document.getElementById(`${elementPrefix}stock${idSuffix}-${product.id}`);
-            const nameEl = document.getElementById(`${elementPrefix}name${idSuffix}-${product.id}`);
-            const priceEl = document.getElementById(`${elementPrefix}price${idSuffix}-${product.id}`);
-            const categoryEl = document.getElementById(`${elementPrefix}category${idSuffix}-${product.id}`);
-            const imgEl = document.getElementById(`${elementPrefix}img${idSuffix}-${product.id}`);
-            const boxNumberEl = document.getElementById(`${elementPrefix}box-number${idSuffix}-${product.id}`);
-            
-            if (boxNumberEl) {
-                boxNumberEl.querySelector('span').textContent = product.box_number || 'N/A';
-            }
-            
-            if (stockEl) stockEl.textContent = `Stock: ${product.quantity}`;
-            if (nameEl) nameEl.textContent = product.name;
-            // Corregido: Usar 'product.price' en lugar de 'p.price'
-            if (priceEl) priceEl.textContent = `$${Number(product.price).toFixed(2)}`; 
-            if (categoryEl) categoryEl.textContent = product.category;
-            
-            if (imgEl) {
-                const newSrc = product.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
-                imgEl.src = `${newSrc}?t=${new Date().getTime()}`;
-                imgEl.alt = product.name; 
-            }
-        }
-        window.deleteProduct = async function(id) { 
-            if (!confirm("¿Eliminar este producto?")) return; 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const { error } = await supabase.from(PRODUCTS_TABLE).delete().eq("id", id); 
-            if (error) {
-                alert("❌ Error al eliminar: " + error.message);
-            } else {
-                allProducts = allProducts.filter(p => p.id !== id);
-                calculateCategoryTotals(allProducts, true, false, false); 
-                filterAndRenderProducts(); 
-                updateAutocompleteList(allProducts, inventorySuggestions);
-                updateLabelView();
-            }
-        }
 
-        // --- Lógica de Nuevo Inventario (products_nuevo) ---
         async function fetchProductsBodega() { 
             if (!supabase) return;
-            const { data, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).select("*").order("created_at", { ascending: false }); 
-            if (error) { console.error("Error cargando productos (Nuevo Inventario):", error); totalCountBodega.textContent = "Error al cargar"; productsElBodega.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; } 
+            const { data, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).select("*"); 
+            if (error) return; 
             allProductsBodega = data; 
             calculateCategoryTotals(allProductsBodega, false, false, true); 
             filterAndRenderProductsBodega(); 
-            if (labelsLocationSelect.value === 'bodega') populateLabelCategories(allProductsBodega);
-            // Actualizar la lista de sugerencias de venta para incluir los productos de Bodega
             updateAutocompleteList(allProducts, inventorySuggestions);
         }
+
         function filterAndRenderProductsBodega() { 
             const term = (searchInputBodega.value || "").toLowerCase().trim(); 
             const filtered = allProductsBodega.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); 
             renderProductsBodega(filtered); 
         }
+
         function renderProductsBodega(items) { 
             productsLoaderBodega.innerHTML = ""; 
             productsElBodega.innerHTML = ""; 
             totalCountBodega.textContent = `${items.length} productos`; 
-            
-            // --- Renderizar Totales de Categoría (Bodega) ---
-            categoryTotalsElBodega.innerHTML = `
-                <span class="font-bold text-indigo-300">Total por Categoría (Nuevo Inventario):</span>
-                ${Object.keys(categoryTotalsBodega).sort().map(cat => 
-                    `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotals[cat]}</span> u.</span>`
-                ).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
-            `;
+            categoryTotalsElBodega.innerHTML = `<span class="font-bold text-indigo-300">Total (Bodega):</span> ${Object.keys(categoryTotalsBodega).sort().map(cat => `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotalsBodega[cat]}</span></span>`).join('')}`;
             productsElBodega.appendChild(categoryTotalsElBodega);
-            // --- FIN Renderizar Totales ---
-
-            if (items.length === 0) { productsElBodega.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos${searchInputBodega.value ? ' para "' + searchInputBodega.value + '"' : ''}.</p>`; return; } 
             const grouped = items.reduce((acc, p) => { 
-                // Si la columna 'category' no existe, usará 'Sin Categoría'.
                 const cat = p.category || 'Sin Categoría'; 
                 if (!acc[cat]) acc[cat] = []; 
                 acc[cat].push(p); 
@@ -1556,1507 +1254,36 @@
             Object.keys(grouped).sort().forEach(category => { 
                 const section = document.createElement("div"); 
                 section.className = "mb-10"; 
-                section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; 
+                section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase">${category}</h2>`; 
                 const grid = document.createElement("div"); 
                 grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
                 grouped[category].forEach(p => { 
                     const card = document.createElement("div"); 
                     card.id = `product-card-bodega-${p.id}`;
                     card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
-                    const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
-                    const displayCategory = p.category || 'N/A'; 
-                    const displayPrice = p.price ? `$${Number(p.price).toFixed(2)}` : '$N/A';
-                    const displayQuantity = p.quantity !== undefined ? p.quantity : 'N/A';
-                    
-                    card.innerHTML = `
-                        <button onclick="openProductEditorModal('${p.id}', 'bodega')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                        </button>
-                        <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden">
-                            <img src="${imageUrl}" id="product-img-bodega-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}">
-                        </div>
-                        <h3 id="product-name-bodega-${p.id}" class="font-semibold text-white">${p.name}</h3>
-                        <p id="product-category-bodega-${p.id}" class="text-xs text-gray-400 -mt-1">${displayCategory}</p>
-                        <p id="product-price-bodega-${p.id}" class="text-green-400 font-bold text-lg mt-2">${displayPrice}</p>
-                        <p id="product-stock-bodega-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${displayQuantity}</p>
-                        <p id="product-box-number-bodega-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
-                        <div class="flex-grow"></div>
-                        <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
-                            <button onclick="deleteProductBodega('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
-                        </div>`; 
+                    const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100?text=Sin+Imagen`; 
+                    card.innerHTML = `<button onclick="openProductEditorModal('${p.id}', 'bodega')" class="absolute top-2 right-2 text-gray-400 p-1 bg-gray-700/70 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" id="product-img-bodega-${p.id}" class="object-contain h-full w-full"></div><h3 id="product-name-bodega-${p.id}" class="font-semibold text-white">${p.name}</h3><p id="product-category-bodega-${p.id}" class="text-xs text-gray-400">${p.category || 'N/A'}</p><p id="product-price-bodega-${p.id}" class="text-green-400 font-bold mt-2">$${Number(p.price).toFixed(2)}</p><p id="product-stock-bodega-${p.id}" class="text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex-grow"></div><div class="flex justify-end mt-4 pt-3 border-t border-gray-700"><button onclick="deleteProductBodega('${p.id}')" class="px-3 py-1 rounded bg-red-600 text-white text-sm">Eliminar</button></div>`; 
                     grid.appendChild(card); 
                 }); 
                 section.appendChild(grid); 
                 productsElBodega.appendChild(section); 
             }); 
         }
-        window.deleteProductBodega = async function(id) { 
-            if (!confirm("¿Eliminar este producto de Nuevo Inventario?")) return; 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const { error } = await supabase.from(PRODUCTS_BODEGA_TABLE).delete().eq("id", id); 
-            if (error) {
-                alert("❌ Error al eliminar: " + error.message);
-            } else {
-                allProductsBodega = allProductsBodega.filter(p => p.id !== id);
-                calculateCategoryTotals(allProductsBodega, false, false, true); 
-                filterAndRenderProductsBodega(); 
-                updateAutocompleteList(allProducts, inventorySuggestions);
-                updateLabelView();
-            }
-        }
-        // --- FIN: Lógica de Nuevo Inventario ---
 
-
-        // --- Lógica de Ventas ---
-        function filterAndRenderSales() {
-            const term = (searchSalesInput.value || "").toLowerCase().trim();
-            const pendingOnly = pendingOnlyCheckbox.checked;
-            let filtered = [...allSales]; 
-            if (term) {
-                filtered = filtered.filter(s => 
-                    (s.recipient_name || '').toLowerCase().includes(term) ||
-                    (s.product_name_sold || '').toLowerCase().includes(term)
-                );
-            }
-            if (pendingOnly) {
-                filtered = filtered.filter(s => s.status === 'Pendiente');
-            }
-            renderSales(filtered);
-        }
-        
-        // Función eliminada: updateGeneralTotals (se mantiene para compatibilidad con la llamada de renderSales)
-        function updateGeneralTotals(filteredArray) {
-            // Lógica eliminada, solo actualiza el contador de ventas visibles.
-            const countEl = document.getElementById(`total-sales-count`);
-            if(countEl) countEl.textContent = `${filteredArray.length} de ${allSales.length} ventas`;
-        }
-        
-        function createSaleRowHTML(sale) {
-            // Se elimina idSuffix ya que solo hay una tabla de ventas
-            const currentStatus = sale.status || 'Pendiente';
-            const statusClass = STATUS_COLORS[currentStatus] || STATUS_COLORS['Pendiente'];
-            const changeFn = 'changeSaleStatus';
-            const editFn = 'editSalePrice';
-            const deleteFn = 'deleteSale';
-            const statusSelectHtml = `<select id="select-status-${sale.id}" onchange="${changeFn}('${sale.id}', this.value, '${sale.product_name_sold}')" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option><option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option><option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option></select>`;
-            return `
-                <tr id="sale-row-${sale.id}" class="hover:bg-gray-700/50 transition duration-150">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Destinatario">${sale.recipient_name}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Producto Vendido">${sale.product_name_sold || 'N/A'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500" id="sale-price-cell-${sale.id}" data-label="Precio (USD)">$${Number(sale.price).toFixed(2)} <button onclick="${editFn}('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm" data-label="Estado">${statusSelectHtml}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="${deleteFn}('${sale.id}')" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td>
-                </tr>`;
-        }
-        function renderSales(items) {
-            salesListLoader.innerHTML = "";
-            salesListContainer.innerHTML = ""; 
-            updateGeneralTotals(items); 
-            if (items.length === 0) {
-                const isSearching = searchSalesInput.value || pendingOnlyCheckbox.checked;
-                salesListContainer.innerHTML = `<p class="p-4 text-gray-400">${isSearching ? 'No se encontraron ventas que coincidan con el filtro.' : 'No hay ventas registradas.'}</p>`;
-                return;
-            } 
-            const groupedByDate = items.reduce((acc, sale) => {
-                const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
-                if (!acc[saleDate]) acc[saleDate] = [];
-                acc[saleDate].push(sale);
-                return acc;
-            }, {});
-            const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
-            let fullHTML = '';
-            sortedDates.forEach(date => {
-                const dailySales = groupedByDate[date];
-                const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
-                const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
-                const displayDate = new Date(date + 'T00:00:00Z').toLocaleDateString('es-SV', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
-                const headerHTML = `
-                    <div class="bg-gray-900/70 p-3 rounded-t-lg mt-6 flex justify-between items-center border-t border-x border-gray-700">
-                        <h3 class="font-bold text-lg text-white">${displayDate}</h3>
-                        <div class="text-sm font-semibold">
-                            <span class="mr-4 text-gray-400">Vendido (día): <span class="text-green-400" id="daily-sold-${date}">$${dailyTotalSold.toFixed(2)}</span></span>
-                            <span class="text-gray-400">Pagado (día): <span class="text-green-500" id="daily-paid-${date}">$${dailyTotalPaid.toFixed(2)}</span></span>
-                        </div>
-                    </div>`;
-                const rowsHTML = dailySales.map(sale => createSaleRowHTML(sale)).join('');
-                const tableHTML = `
-                    <table class="min-w-full divide-y divide-gray-700 shadow-md sales-list-table">
-                        <thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6" data-label="Destinatario">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Producto Vendido">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Precio">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Estado">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead>
-                        <tbody id="sales-tbody-${date}" class="bg-gray-800 divide-y divide-gray-700">
-                            ${rowsHTML}
-                        </tbody>
-                    </table>`;
-                fullHTML += `<div id="date-block-${date}">${headerHTML}${tableHTML}</div>`;
-            });
-            salesListContainer.innerHTML = fullHTML;
-        }
-        
-        window.changeSaleStatus = async function(id, newStatus, productName) {
-            const table = SALES_TABLE;
-            const localArray = allSales;
-            const sale = localArray.find(s => s.id === id);
-            if (!sale || !supabase) return alert("❌ Error: Supabase no está cargado.");
-
-            const oldStatus = sale.status;
-            sale.status = newStatus; // Optimistic update (for status select color)
-
-            // Update status select color immediately
-            const selectEl = document.getElementById(`select-status-${id}`);
-            if (selectEl) {
-                selectEl.className = `p-1 border rounded text-xs font-medium ${STATUS_COLORS[newStatus] || STATUS_COLORS['Pendiente']} cursor-pointer`;
-            }
-
-            try {
-                const { error } = await supabase.from(table).update({ status: newStatus }).eq("id", id);
-                if (error) throw error;
-
-                // Handle stock update: Adjust stock ONLY if status changes from/to 'Pagado'
-                const cleanName = getCleanProductName(productName);
-                
-                let updateTable = null;
-                let updateArray = null;
-
-                // Buscar en ambos inventarios para descontar
-                if (allProducts.some(p => getCleanProductName(p.name).trim() === cleanName)) {
-                    updateTable = PRODUCTS_TABLE;
-                    updateArray = allProducts;
-                } else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === cleanName)) {
-                    updateTable = PRODUCTS_BODEGA_TABLE;
-                    updateArray = allProductsBodega;
-                }
-                
-                if (updateTable && updateArray) {
-                    if (oldStatus !== 'Pagado' && newStatus === 'Pagado') {
-                        // Went from Pending/Returned to Paid: Decrease stock
-                        await updateProductStock(cleanName, updateTable, updateArray, -1);
-                    } else if (oldStatus === 'Pagado' && newStatus !== 'Pagado') {
-                        // Went from Paid to Pending/Returned: Increase stock
-                        await updateProductStock(cleanName, updateTable, updateArray, 1);
-                    }
-                } else {
-                    console.warn(`Producto vendido "${cleanName}" no encontrado en ningún inventario para ajuste de stock.`);
-                }
-
-            } catch (error) {
-                console.error("Error al actualizar estado:", error);
-                alert("❌ Error al actualizar estado: " + error.message);
-                
-                // Rollback optimistic updates
-                sale.status = oldStatus;
-                if (selectEl) {
-                    selectEl.value = oldStatus;
-                    selectEl.className = `p-1 border rounded text-xs font-medium ${STATUS_COLORS[oldStatus] || STATUS_COLORS['Pendiente']} cursor-pointer`;
-                }
-            } finally {
-                // Force a full sales list refresh to update totals
-                filterAndRenderSales();
-            }
-        }
-        
-        window.editSalePrice = function(id, currentPrice) {
-            const newPriceStr = prompt(`Ingresa el nuevo precio para la venta ${id}:`, currentPrice.toFixed(2));
-            if (newPriceStr === null) return; 
-
-            const newPrice = parseFloat(newPriceStr.replace('$', '').trim());
-            if (isNaN(newPrice) || newPrice <= 0) {
-                alert("❌ Precio inválido.");
-                return;
-            }
-
-            const table = SALES_TABLE;
-            const localArray = allSales;
-            const sale = localArray.find(s => s.id === id);
-            if (!sale || !supabase) return alert("❌ Error: Supabase no está cargado.");
-
-            const oldPrice = sale.price;
-            sale.price = newPrice; // Optimistic update
-
-            const priceCell = document.getElementById(`sale-price-cell-${id}`);
-            if (priceCell) {
-                priceCell.innerHTML = `$${newPrice.toFixed(2)} <button onclick="editSalePrice('${id}', ${newPrice})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button>`;
-            }
-
-            supabase.from(table).update({ price: newPrice }).eq("id", id).then(({ error }) => {
-                if (error) {
-                    console.error("Error al actualizar precio:", error);
-                    alert("❌ Error al actualizar precio: " + error.message);
-                    sale.price = oldPrice; // Rollback
-                    if (priceCell) {
-                         priceCell.innerHTML = `$${oldPrice.toFixed(2)} <button onclick="editSalePrice('${id}', ${oldPrice})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button>`;
-                    }
-                } else {
-                    filterAndRenderSales(); // Refresh totals
-                }
-            });
-        }
-        
-        window.deleteSale = async function(id) {
-            if (!confirm("¿Eliminar este registro de venta?")) return;
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            
-            const table = SALES_TABLE;
-            const localArray = allSales;
-            const sale = localArray.find(s => s.id === id);
-
-            if (!sale) return;
-
-            // Rollback stock if status was 'Pagado'
-            if (sale.status === 'Pagado') {
-                let updateTable = null, updateArray = null;
-                const soldProductName = getCleanProductName(sale.product_name_sold);
-                
-                // Buscar en ambos arrays y aumentar stock al que corresponda
-                if (allProducts.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
-                    updateTable = PRODUCTS_TABLE;
-                    updateArray = allProducts;
-                } else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
-                    updateTable = PRODUCTS_BODEGA_TABLE;
-                    updateArray = allProductsBodega;
-                }
-
-                if (updateTable && updateArray) {
-                    // Increase stock by 1
-                    await updateProductStock(soldProductName, updateTable, updateArray, 1);
-                }
-            }
-
-            try {
-                const { error } = await supabase.from(table).delete().eq("id", id);
-                if (error) throw error;
-            } catch (error) {
-                console.error("Error al eliminar venta:", error);
-                alert("❌ Error al eliminar: " + error.message);
-            }
-        }
-
-        // --- ADICIÓN: Lógica para Descargar PDF de Ventas ---
-        window.downloadSalesPDF = async function(isMainSales) {
-            // isMainSales es siempre true en la nueva versión, pero mantenemos el parámetro por seguridad.
-            if (typeof window.jspdf.jsPDF === 'undefined' || typeof html2canvas === 'undefined') {
-                return alert("❌ Error: Las librerías jsPDF y html2canvas no están cargadas.");
-            }
-            
-            const listContainer = salesListContainer;
-            const title = 'Registro de Ventas Principal';
-            const fileName = 'Ventas_Principal_';
-
-            if (!listContainer.children.length) {
-                return alert("No hay datos de ventas para descargar.");
-            }
-
-            const Doc = window.jspdf.jsPDF;
-            const doc = new Doc('p', 'mm', 'a4'); // 'p' for portrait, 'mm' units, 'a4' size
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-            let y = 10;
-            
-            // Título
-            doc.setFontSize(16);
-            doc.text(title, 10, y);
-            y += 8;
-            
-            doc.setLineWidth(0.1);
-            doc.line(10, y, pageWidth - 10, y);
-            y += 5;
-
-            // Clonar el contenedor de listas para evitar modificar el DOM visible
-            const salesListClone = listContainer.cloneNode(true);
-            salesListClone.classList.add('export-pdf-style');
-            
-            // Ocultar elementos no deseados en la exportación
-            salesListClone.querySelectorAll('button').forEach(btn => btn.style.display = 'none');
-            salesListClone.querySelectorAll('select').forEach(select => {
-                const span = document.createElement('span');
-                span.textContent = select.value;
-                select.parentNode.insertBefore(span, select);
-                select.style.display = 'none';
-            });
-            
-            // Crear un contenedor temporal para la clonación y darle estilos de escritorio
-            const tempExportDiv = document.createElement('div');
-            tempExportDiv.style.width = '1000px'; 
-            tempExportDiv.style.backgroundColor = '#ffffff';
-            tempExportDiv.style.color = '#000000';
-            tempExportDiv.appendChild(salesListClone);
-            document.body.appendChild(tempExportDiv);
-
-
-            html2canvas(tempExportDiv, { scale: 2 }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = 190; // A4 size minus margin (210 - 20)
-                const imgHeight = canvas.height * imgWidth / canvas.width;
-                
-                let heightLeft = imgHeight;
-                let position = 0;
-                
-                while (heightLeft >= pageHeight) {
-                    doc.addPage();
-                    doc.addImage(imgData, 'PNG', 10, -heightLeft + 10, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                }
-                
-                // Añadir imagen al PDF (puede ser de varias páginas)
-                doc.addImage(imgData, 'PNG', 10, y, imgWidth, imgHeight);
-
-                doc.save(`${fileName}${new Date().toISOString().split('T')[0]}.pdf`);
-                
-                // Limpiar DOM temporal
-                document.body.removeChild(tempExportDiv);
-                alert(`✅ PDF de ${title} descargado con éxito.`);
-            }).catch(error => {
-                console.error("Error al generar PDF:", error);
-                // Asegurar la limpieza del DOM temporal en caso de error
-                if(document.body.contains(tempExportDiv)) document.body.removeChild(tempExportDiv);
-                alert("❌ Error: No se pudo generar el PDF. Asegúrate de que todos los datos se hayan cargado.");
-            });
-        };
-
-
-        // --- Lógica de Faltantes ---
-        async function fetchMissingProducts() {
-            if (!supabase) return;
-            const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando faltantes:", error); return; }
-            allMissingProducts = data;
-            renderMissingProducts(allMissingProducts);
-        }
-        function renderMissingProducts(items) {
-            missingListLoader.innerHTML = "";
-            missingListEl.innerHTML = "";
-            totalMissingCount.textContent = `${items.length} productos pendientes`;
-            if (items.length === 0) {
-                missingListEl.innerHTML = `<p class="p-4 text-gray-400">¡Genial! No hay productos faltantes en la lista.</p>`;
-                return;
-            }
-            const listItems = items.map(p => {
-                const date = new Date(p.created_at).toLocaleDateString('es-SV', { day: 'numeric', month: 'short' });
-                return `
-                    <div id="missing-row-${p.id}" class="flex items-center justify-between p-4 border-b border-gray-700 hover:bg-gray-700/50 transition">
-                        <div>
-                            <p class="font-medium text-white">${p.product_name}</p>
-                            <p class="text-xs text-gray-400">${p.notes || 'Sin notas'}</p>
-                            <p class="text-xs text-indigo-400 mt-1">Registrado el ${date}</p>
-                        </div>
-                        <button onclick="deleteMissingProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Comprado</button>
-                    </div>
-                `;
-            }).join('');
-            missingListEl.innerHTML = listItems;
-        }
-        window.deleteMissingProduct = async function(id) {
-            if (!confirm("¿Marcar este producto como 'Comprado' y eliminarlo de la lista?")) return;
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            try {
-                const { error } = await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq("id", id);
-                if (error) throw error;
-            } catch (error) {
-                console.error("Error al eliminar faltante:", error);
-                alert("❌ Error al eliminar: " + error.message);
-            }
-        }
-
-        // --- Lógica de Herramientas ---
-        async function fetchTools() {
-            if (!supabase) return;
-            const { data, error } = await supabase.from(TOOLS_TABLE).select("*").order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando herramientas:", error); totalToolsCount.textContent = "Error al cargar"; return; }
-            allTools = data;
-            renderTools(allTools);
-        }
-        function renderTools(items) {
-            toolsLoader.innerHTML = "";
-            toolsListEl.innerHTML = "";
-            totalToolsCount.textContent = `${items.length} herramientas`;
-            if (items.length === 0) {
-                toolsListEl.innerHTML = `<p class="text-gray-400 md:col-span-3">No hay herramientas o tutoriales guardados.</p>`;
-                return;
-            }
-            items.forEach(tool => {
-                const card = document.createElement("div");
-                card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col tool-card border border-gray-700 relative";
-                const imageUrl = tool.image_url ? `${tool.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/6366f1/ffffff?text=Tutorial`;
-                const descriptionHtml = tool.description ? `<p class="text-gray-400 text-sm mt-2 flex-grow">${tool.description.replace(/\n/g, '<br>')}</p>` : '<div class="flex-grow"></div>';
-                card.innerHTML = `
-                    <div class="h-48 bg-gray-700 rounded flex items-center justify-center mb-3 overflow-hidden">
-                        <img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${tool.title}">
-                    </div>
-                    <h3 class="font-bold text-lg text-white">${tool.title}</h3>
-                    ${descriptionHtml}
-                    <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
-                        <button onclick="editToolImage('${tool.id}')" class="px-3 py-1 rounded bg-indigo-500 hover:bg-indigo-600 text-white shadow-md text-sm transition mr-2">Editar Foto</button>
-                        <button onclick="deleteTool('${tool.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
-                    </div>`;
-                toolsListEl.appendChild(card);
-            });
-        }
-        window.editToolImage = async function(id) {
-            editingToolId = id;
-            toolImageEditorInput.click();
-        }
-        window.deleteTool = async function(id) {
-            if (!confirm("¿Estás seguro de que quieres eliminar esta herramienta?")) return;
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const { error } = await supabase.from(TOOLS_TABLE).delete().eq("id", id);
-            if (error) {
-                alert("❌ Error al eliminar: " + error.message);
-            } else {
-                allTools = allTools.filter(t => t.id !== id);
-                renderTools(allTools);
-            }
-        }
-
-        // --- Lógica de Realtime ---
-        function handleRealtimePayload(payload, localArray, renderFunction, isMainProducts = false, isBodegaProducts = false, isSales = false, idKey = 'id') {
-            if (!supabase) return;
-            console.log('📡 Payload Realtime Recibido:', payload);
-            const { eventType, new: newRecord, old: oldRecord } = payload;
-            const recordId = (eventType === 'DELETE') ? oldRecord[idKey] : newRecord[idKey];
-            if (!recordId) { console.error("Payload de Realtime sin ID.", payload); return; }
-            let index = localArray.findIndex(item => item[idKey] === recordId);
-            
-            if (isSales) { 
-                let needsFullRender = false; 
-                switch (eventType) {
-                    case 'INSERT':
-                        if (index === -1) { 
-                            localArray.unshift(newRecord); 
-                            localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at)); 
-                            needsFullRender = true; 
-                        }
-                        break;
-                    case 'UPDATE':
-                        if (index !== -1) {
-                            Object.assign(localArray[index], newRecord);
-                            needsFullRender = true; 
-                        } else {
-                            localArray.unshift(newRecord); 
-                            localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at)); 
-                            needsFullRender = true;
-                        }
-                        break;
-                    case 'DELETE':
-                        if (index !== -1) {
-                            localArray.splice(index, 1); 
-                            needsFullRender = true;
-                        }
-                        break;
-                    default:
-                        console.warn('Evento Realtime no manejado:', eventType, payload);
-                        return;
-                }
-                if (needsFullRender) {
-                    filterAndRenderSales();
-                }
-                return; 
-            }
-            
-            if (isMainProducts || isBodegaProducts) { 
-                let needsFullRender = false;
-                switch (eventType) {
-                    case 'INSERT':
-                        if (index === -1) {
-                            localArray.unshift(newRecord);
-                            localArray.sort((a, b) => (a.category || '').localeCompare(b.category || '') || new Date(b.created_at) - new Date(a.created_at));
-                        }
-                        needsFullRender = true; 
-                        break;
-                    case 'UPDATE':
-                        if (index !== -1) {
-                            const oldCategory = localArray[index].category;
-                            const newCategory = newRecord.category;
-                            const oldQuantity = localArray[index].quantity; 
-                            const newQuantity = newRecord.quantity; 
-                            Object.assign(localArray[index], newRecord); 
-                            if (oldCategory !== newCategory || oldQuantity !== newQuantity) { 
-                                needsFullRender = true;
-                            } else {
-                                updateProductCardInDOM(newRecord, isMainProducts, false, isBodegaProducts); 
-                            }
-                        } else {
-                            localArray.unshift(newRecord); 
-                            localArray.sort((a, b) => (a.category || '').localeCompare(b.category || '') || new Date(b.created_at) - new Date(a.created_at));
-                            needsFullRender = true;
-                        }
-                        break;
-                    case 'DELETE':
-                        if (index !== -1) {
-                            localArray.splice(index, 1);
-                            needsFullRender = true; 
-                        }
-                        break;
-                }
-                
-                // --- ADICIÓN: Recalcular totales ANTES de renderizar ---
-                calculateCategoryTotals(localArray, isMainProducts, false, isBodegaProducts);
-                
-                if (needsFullRender) {
-                    if (isMainProducts) filterAndRenderProducts(); 
-                    else filterAndRenderProductsBodega(); 
-                }
-                
-                updateAutocompleteList(allProducts, inventorySuggestions); // Siempre actualizar la lista combinada
-                return; 
-            }
-            
-            // Para Tools y Missing
-            if (eventType === 'UPDATE' && index !== -1) {
-                 Object.assign(localArray[index], newRecord);
-            } else {
-                switch (eventType) {
-                    case 'INSERT':
-                        if (index === -1) localArray.unshift(newRecord);
-                        break;
-                    case 'DELETE':
-                        if (index !== -1) localArray.splice(index, 1);
-                        break;
-                    default:
-                        console.warn('Evento Realtime no manejado:', eventType, payload);
-                        return;
-                }
-            }
-            if (renderFunction === renderMissingProducts || renderFunction === renderTools) {
-                localArray.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-            }
-            renderFunction(localArray); 
-        }
-        function initializeRealtimeSubscriptions() {
-            if (!supabase) return;
-            console.log("📡 Inicializando suscripciones en tiempo real...");
-            const channelOptions = { config: { broadcast: { ack: true } } };
-            
-            // Inventario Principal
-            supabase.channel('public:' + PRODUCTS_TABLE, channelOptions)
-                .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_TABLE },
-                    (payload) => handleRealtimePayload(payload, allProducts, filterAndRenderProducts, true, false, false, 'id')
-                ).subscribe((status, err) => console.log(`Canal ${PRODUCTS_TABLE}: ${status}`, err || ''));
-            
-            // Nuevo Inventario (products_nuevo)
-            supabase.channel('public:' + PRODUCTS_BODEGA_TABLE, channelOptions) 
-                .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_BODEGA_TABLE },
-                    (payload) => handleRealtimePayload(payload, allProductsBodega, filterAndRenderProductsBodega, false, true, false, 'id')
-                ).subscribe((status, err) => console.log(`Canal ${PRODUCTS_BODEGA_TABLE}: ${status}`, err || ''));
-            
-            // Ventas
-            supabase.channel('public:' + SALES_TABLE, channelOptions)
-                .on('postgres_changes', { event: '*', schema: 'public', table: SALES_TABLE },
-                    (payload) => handleRealtimePayload(payload, allSales, filterAndRenderSales, false, false, true, 'id') 
-                ).subscribe((status, err) => console.log(`Canal ${SALES_TABLE}: ${status}`, err || ''));
-            
-            // Faltantes
-            supabase.channel('public:' + MISSING_PRODUCTS_TABLE, channelOptions)
-                .on('postgres_changes', { event: '*', schema: 'public', table: MISSING_PRODUCTS_TABLE },
-                    (payload) => handleRealtimePayload(payload, allMissingProducts, renderMissingProducts, false, false, false, 'id')
-                ).subscribe((status, err) => console.log(`Canal ${MISSING_PRODUCTS_TABLE}: ${status}`, err || ''));
-            
-            // Herramientas
-            supabase.channel('public:' + TOOLS_TABLE, channelOptions)
-                .on('postgres_changes', { event: '*', schema: 'public', table: TOOLS_TABLE },
-                    (payload) => handleRealtimePayload(payload, allTools, renderTools, false, false, false, 'id')
-                ).subscribe((status, err) => console.log(`Canal ${TOOLS_TABLE}: ${status}`, err || ''));
-        }
-
-        // --- Lógica de Carga Inicial de Datos ---
-        async function fetchSales() {
-            if (!supabase) return;
-            const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando ventas:", error); return; }
-            allSales = data;
-            filterAndRenderSales();
-        }
-        
-        // Se elimina fetchSalesElTransito
-
-        // ============================================================================
-        // == VII. LÓGICA DE MODALES (QR, Scanner y EDITOR)                             ==
-        // ============================================================================
-
-        // --- Lógica del Editor de Producto (Modal) ---
-        
-        window.openProductEditorModal = function(productId, locationKey) { 
-            currentEditingProduct = null;
-            selectedProductImageFile = null;
-            modalStatus.textContent = '';
-            
-            // 1. Determinar el array de productos y buscar el producto por ID
-            let productArray;
-            let displayName;
-            
-            if (locationKey === 'main') {
-                productArray = allProducts;
-                displayName = 'Inventario Principal';
-            } else if (locationKey === 'bodega') { 
-                productArray = allProductsBodega;
-                displayName = 'Nuevo Inventario';
-            } else {
-                alert("Error: Ubicación de inventario no válida.");
-                return;
-            }
-
-            let product = productArray.find(p => String(p.id).trim() === String(productId).trim());
-
-            if (!product) {
-                // Fallback: Buscar en todos por si la clave de ubicación fue incorrecta
-                const all = [...allProducts, ...allProductsBodega];
-                product = all.find(p => String(p.id).trim() === String(productId).trim());
-                if (product) {
-                    // Actualizar la clave de ubicación si se encontró en otro lugar
-                    if (allProducts.some(p => p.id === product.id)) locationKey = 'main';
-                    else if (allProductsBodega.some(p => p.id === product.id)) locationKey = 'bodega';
-                    
-                    displayName = (locationKey === 'main' ? 'Inventario Principal' : 'Nuevo Inventario');
-                    console.warn("⚠️ Producto encontrado en el inventario opuesto. Se ajustó la vista a:", displayName);
-                } else {
-                    alert("Error: Producto no encontrado en el inventario local. Intente recargar la página. ID Buscado: " + productId);
-                    return;
-                }
-            }
-            
-            currentEditingProduct = product;
-
-            // 2. Llenar campos del modal
-            modalName.value = product.name;
-            modalCategory.value = product.category || ''; 
-            modalPrice.value = Number(product.price).toFixed(2);
-            modalQuantity.value = product.quantity;
-            modalBoxNumber.value = product.box_number || '';
-            modalLocation.textContent = displayName;
-
-            // 3. Cargar imagen de previsualización
-            const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
-            modalImagePreview.src = imageUrl;
-            
-            // 4. Limpiar el input file y mostrar modal
-            modalImageUpload.value = '';
-            modal.classList.remove('hidden');
-        }
-
-        window.closeProductEditorModal = function() {
-            modal.classList.add('hidden');
-            modalProductForm.reset();
-            selectedProductImageFile = null;
-        }
-
-        modalImageUpload.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                selectedProductImageFile = file;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    modalImagePreview.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        modalProductForm.addEventListener('submit', async (ev) => {
-            ev.preventDefault();
-            const saveButton = document.getElementById('modal-save-button');
-            saveButton.disabled = true;
-            modalStatus.textContent = 'Guardando cambios...';
-
-            if (!supabase || !currentEditingProduct) {
-                modalStatus.textContent = 'Error: Supabase o producto no cargado.';
-                saveButton.disabled = false;
-                return;
-            }
-            
-            // 1. Determinar la tabla correcta
-            let table = PRODUCTS_TABLE;
-            let localArray = allProducts;
-            let isMain = true, isBodega = false;
-
-            if (allProducts.some(p => p.id === currentEditingProduct.id)) {
-                table = PRODUCTS_TABLE;
-                localArray = allProducts;
-                isMain = true; isBodega = false;
-            } else if (allProductsBodega.some(p => p.id === currentEditingProduct.id)) {
-                table = PRODUCTS_BODEGA_TABLE;
-                localArray = allProductsBodega;
-                isMain = false; isBodega = true;
-            } else {
-                 modalStatus.textContent = 'Error: No se puede determinar la ubicación del producto.';
-                 saveButton.disabled = false;
-                 return;
-            }
-
-            let newImageUrl = currentEditingProduct.image_url;
-            let updatePayload = {};
-
-            try {
-                // 2. Subir nueva imagen si se seleccionó un archivo
-                if (selectedProductImageFile) {
-                    modalStatus.textContent = 'Subiendo nueva imagen...';
-                    newImageUrl = await uploadImage(selectedProductImageFile);
-                }
-
-                // 3. Preparar payload de actualización
-                updatePayload = {
-                    name: modalName.value,
-                    category: modalCategory.value,
-                    price: parseFloat(modalPrice.value),
-                    quantity: parseInt(modalQuantity.value),
-                    box_number: modalBoxNumber.value.trim() || null,
-                    image_url: newImageUrl
-                };
-                
-                // 4. Actualizar en Supabase
-                modalStatus.textContent = 'Actualizando registro en la base de datos...';
-                const { error } = await supabase
-                    .from(table)
-                    .update(updatePayload)
-                    .eq('id', currentEditingProduct.id);
-                
-                if (error) throw error;
-
-                // 5. Actualizar localmente y en el DOM 
-                Object.assign(currentEditingProduct, updatePayload);
-                updateProductCardInDOM(currentEditingProduct, isMain, false, isBodega);
-                
-                // ADICIÓN: Recalcular totales después de la actualización exitosa
-                calculateCategoryTotals(localArray, isMain, false, isBodega);
-                if(isMain) filterAndRenderProducts();
-                else filterAndRenderProductsBodega();
-                
-                modalStatus.textContent = 'Producto actualizado con éxito. ✅';
-                setTimeout(closeProductEditorModal, 1000);
-
-            } catch (err) {
-                console.error("Error al guardar cambios del producto:", err);
-                modalStatus.textContent = 'Error al actualizar: ' + err.message;
-            } finally {
-                saveButton.disabled = false;
-            }
-        });
-
-        // --- Lógica del QR Modal (Individual) ---
-
-        window.openQrModal = function() {
-            if (!currentEditingProduct || !currentEditingProduct.id) {
-                alert("Error: No hay producto seleccionado para generar el QR.");
-                return;
-            }
-            // Aseguramos que el ID es un String limpio para el QR
-            const productId = String(currentEditingProduct.id).trim(); 
-            const productName = currentEditingProduct.name;
-            qrCodeContainer.innerHTML = ''; 
-            currentQrCanvas = null;
-            qrProductInfo.textContent = `Producto: ${productName} (ID: ${productId})`;
-            
-            if (typeof QRCode !== 'undefined') {
-                const tempDiv = document.createElement('div');
-                // Aseguramos que el QR se genera con fondo blanco (colorLight) para impresión
-                new QRCode(tempDiv, {
-                    text: productId,
-                    width: 256,
-                    height: 256,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff", // Fondo blanco
-                    correctLevel : QRCode.CorrectLevel.H
-                });
-                setTimeout(() => {
-                    const canvas = tempDiv.querySelector('canvas');
-                    if (canvas) {
-                        currentQrCanvas = canvas;
-                        const imgUrl = canvas.toDataURL("image/png");
-                        const img = document.createElement('img');
-                        img.src = imgUrl;
-                        img.style.width = '256px';
-                        img.style.height = '256px';
-                        qrCodeContainer.innerHTML = '';
-                        qrCodeContainer.appendChild(img);
-                    }
-                }, 50);
-            } else {
-                qrProductInfo.textContent = "Error: La librería QRCode no se cargó correctamente.";
-            }
-            qrModal.classList.remove('hidden');
-        };
-        window.closeQrModal = function() {
-            qrModal.classList.add('hidden');
-        };
-        window.downloadQrCode = function() {
-            if (!currentQrCanvas || !currentEditingProduct) {
-                alert("Error: No se ha generado el QR para descargar.");
-                return;
-            }
-            try {
-                const dataURL = currentQrCanvas.toDataURL("image/png");
-                const link = document.createElement('a');
-                link.href = dataURL;
-                link.download = `QR_${currentEditingProduct.name.replace(/[^a-zA-Z0-9]/g, '_')}_${String(currentEditingProduct.id).substring(0, 8)}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                alert(`✅ QR de "${currentEditingProduct.name}" descargado con éxito.`);
-            } catch (error) {
-                console.error("Error al descargar el QR:", error);
-                alert("❌ Error al descargar el QR.");
-            }
-        };
-
-
-        // ============================================================================
-        // == VIII. LÓGICA DEL ESCÁNER Y REGISTRO DE VENTA AUTOMÁTICA                   ==
-        // ============================================================================
-        
-        async function registerScannedSale(product) {
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const salesTable = SALES_TABLE;
-            const statusEl = saleStatus;
-            
-            // Obtener el destinatario, usando el valor actual del input 
-            const recipientNameEl = recipientNameIn;
-            const recipientName = recipientNameEl.value.trim() || 'Cliente Rápido QR'; 
-            
-            const productNameSold = product.name + (product.category ? ` (${product.category})` : '');
-            const salePrice = Number(product.price);
-            const saleDate = new Date().toISOString().split('T')[0];
-            const saleStatusValue = 'Pagado'; 
-
-            const newSale = {
-                recipient_name: recipientName,
-                product_name_sold: productNameSold,
-                price: salePrice,
-                sale_date: saleDate,
-                status: saleStatusValue
-            };
-            
-            setStatusMessage(statusEl, `Registrando venta de ${product.name}...`, true);
-            
-            try { 
-                const { data: insertedSale, error: saleError } = await supabase.from(salesTable).insert(newSale).select().single();
-                if (saleError) throw saleError;
-                
-                // DESCUENTO DE STOCK OBLIGATORIO si es Pagado
-                if (newSale.status === 'Pagado') {
-                    // Determinar qué tabla de inventario actualizar:
-                    let updateTable = null;
-                    let updateArray = null;
-
-                    if (allProducts.some(p => p.id === product.id)) {
-                        updateTable = PRODUCTS_TABLE;
-                        updateArray = allProducts;
-                    } else if (allProductsBodega.some(p => p.id === product.id)) {
-                        updateTable = PRODUCTS_BODEGA_TABLE;
-                        updateArray = allProductsBodega;
-                    }
-
-                    if (updateTable && updateArray) {
-                        await updateProductStock(product.name, updateTable, updateArray, -1);
-                    } else {
-                         throw new Error(`Producto escaneado (${product.name}) no encontrado en el inventario para descontar stock.`);
-                    }
-                }
-                
-                // Limpiar inputs
-                productNameSoldIn.value = ''; 
-                salePriceIn.value = ''; 
-                saleDateIn.value = new Date().toISOString().split('T')[0]; 
-                saleStatusInput.value = 'Pagado';
-                
-                alert(`✅ Venta de "${product.name}" registrada con éxito para ${recipientName}. Stock descontado.`);
-                setStatusMessage(statusEl, `Venta de ${product.name} registrada con éxito y stock descontado ✅`, true); 
-                
-            } catch (err) { 
-                console.error("Error al registrar venta escaneada:", err);
-                setStatusMessage(statusEl, "Error al registrar venta y descontar stock: " + err.message, false); 
-            }
-        }
-
-        window.openScannerModal = async function() {
-            if (isScannerRunning) return;
-            if (typeof Html5QrcodeScanner === 'undefined') {
-                alert("Error: La librería de escaneo no se cargó correctamente.");
-                return;
-            }
-
-            scannerModal.classList.remove('hidden');
-            scannerStatusEl.textContent = 'Iniciando cámara...';
-            scanSuccessHandled = false;
-            isScannerRunning = true;
-
-            if (html5QrcodeScanner) {
-                try {
-                    await html5QrcodeScanner.clear();
-                } catch (e) {
-                    console.warn("Error al intentar limpiar escáner previo:", e);
-                }
-                html5QrcodeScanner = null;
-            }
-
-            html5QrcodeScanner = new Html5QrcodeScanner(
-                "reader", { 
-                    fps: 10, 
-                    qrbox: {width: 250, height: 250},
-                    rememberLastUsedCamera: true
-                },
-                false
-            );
-
-            const onScanSuccess = async (decodedText, decodedResult) => {
-                if (scanSuccessHandled) return;
-                
-                try {
-                    // CORRECCIÓN CRÍTICA: Asegurar que el ID escaneado es una cadena limpia
-                    const scannedId = String(decodedText).trim();
-                    console.log(`[SCANNER LOG] Código escaneado (ID): ${scannedId}`);
-                    
-                    // VALIDACIÓN DE ID: Si el ID está vacío, forzar un error.
-                    if (!scannedId || scannedId === "") {
-                        throw new Error(`El código QR escaneado es inválido o no contiene un ID de producto.`);
-                    }
-
-                    // --- Detener y cerrar el modal ANTES de procesar, para evitar errores visuales ---
-                    scanSuccessHandled = true; 
-                    await closeScannerModal(true); 
-
-                    // Búsqueda del producto en TODOS los inventarios
-                    const product = allProducts.find(p => String(p.id).trim() === scannedId) || 
-                                     allProductsBodega.find(p => String(p.id).trim() === scannedId); 
-                    
-                    if (!product) {
-                        throw new Error(`El producto con ID "${scannedId}" no existe en ningún inventario.`);
-                    }
-
-                    if (parseInt(product.quantity) <= 0) {
-                        throw new Error(`Stock insuficiente: El producto "${product.name}" tiene 0 unidades disponibles. (Ubicación: ${product.box_number || 'N/A'})`);
-                    }
-                    
-                    // 1. Cargar datos en el formulario y cambiar a la vista de ventas
-                    toggleView('sales');
-                    const productNameWithCategory = product.name + (product.category ? ` (${product.category})` : '');
-                    productNameSoldIn.value = productNameWithCategory;
-                    salePriceIn.value = Number(product.price).toFixed(2);
-                    saleDateIn.value = new Date().toISOString().split('T')[0];
-                    saleStatusInput.value = 'Pagado'; // Venta rápida se asume pagada
-                    
-                    // Ejecutar el registro de venta inmediatamente al escanear
-                    await registerScannedSale(product);
-                    
-                } catch (error) {
-                    console.error("Error al procesar escaneo:", error);
-                    // Restablecer la bandera antes de la alerta para permitir reintentar
-                    scanSuccessHandled = false; 
-                    alert(`❌ Error en Escaneo: ${error.message}`);
-                    
-                    // Reabrir el escáner si el modal fue cerrado y el error no es de la cámara
-                    if (!error.message.includes("cámara") && !error.message.includes("Html5QrcodeScanner")) {
-                         openScannerModal();
-                    } else {
-                        closeScannerModal(true);
-                    }
-                }
-            };
-
-            const onScanError = (errorMessage) => {
-                if (!scanSuccessHandled) {
-                    // Solo actualizamos el estado si no es un error de parseo común (QR not found)
-                    if (errorMessage.includes("No camera found")) {
-                        scannerStatusEl.textContent = 'Error: No se detectó ninguna cámara. Asegúrate de dar permiso.';
-                    } else if (!errorMessage.includes("code parse error") && !errorMessage.includes("-D")) {
-                         scannerStatusEl.textContent = 'Escaneando... Apunta el código QR al centro.';
-                    }
-                }
-            };
-            
-            html5QrcodeScanner.render(onScanSuccess, onScanError);
-        };
-
-        window.closeScannerModal = async function(hideModal = true) {
-            if (hideModal) {
-                scannerModal.classList.add('hidden');
-            }
-            scannerStatusEl.textContent = 'Esperando código QR o de barras...';
-            
-            if (html5QrcodeScanner) {
-                if (isScannerRunning) {
-                    try {
-                        await html5QrcodeScanner.stop();
-                        console.log("[SCANNER LOG] Escáner detenido exitosamente.");
-                    } catch (error) {
-                        console.warn("[SCANNER LOG] Error al detener el escáner (puede que ya estuviera detenido):", error); 
-                    }
-                }
-                
-                try {
-                    await html5QrcodeScanner.clear();
-                } catch (e) {
-                    console.warn("[SCANNER LOG] Error al limpiar la instancia:", e);
-                }
-                
-                html5QrcodeScanner = null;
-            } 
-            
-            isScannerRunning = false;
-            scanSuccessHandled = false; 
-        };
-
-
-        // ============================================================================
-        // == IX. EVENT LISTENERS Y CARGA INICIAL                                      ==
-        // ============================================================================
-        
-        // --- Event Listeners ---
-        searchInput.addEventListener("input", filterAndRenderProducts);
-        // Se elimina searchInputET
-        searchInputBodega.addEventListener("input", filterAndRenderProductsBodega); 
-        searchSalesInput.addEventListener("input", filterAndRenderSales);
-        pendingOnlyCheckbox.addEventListener("change", filterAndRenderSales);
-        // Se eliminan searchSalesInputET y pendingOnlyCheckboxET
-        
-        // --- Forms Submit Logic (Inventario Principal) ---
-        form.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("submit"); 
-            submitBtn.disabled = true; 
-            setStatusMessage(status, "Guardando...", true); 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            try { 
-                const imageUrl = imageIn.files[0] ? await uploadImage(imageIn.files[0]) : null; 
-                const newProduct = { name: nameIn.value, category: categoryIn.value, price: parseFloat(priceIn.value), quantity: parseInt(qtyIn.value), image_url: imageUrl, box_number: boxNumberIn.value.trim() || null };
-                const { data: insertedProduct, error: insertError } = await supabase.from(PRODUCTS_TABLE).insert(newProduct).select().single(); 
-                if (insertError) throw insertError; 
-                form.reset(); qtyIn.value = 1; 
-                setStatusMessage(status, "Producto agregado con éxito ✅", true); 
-            } catch (err) { 
-                console.error("Error al agregar producto:", err);
-                setStatusMessage(status, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-        
-        // --- Forms Submit Logic (Nuevo Inventario) ---
-        formBodega.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("submit-bodega"); 
-            submitBtn.disabled = true; 
-            setStatusMessage(statusBodega, "Guardando...", true); 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            try { 
-                const imageUrl = imageInBodega.files[0] ? await uploadImage(imageInBodega.files[0]) : null; 
-                const newProductBodega = { name: nameInBodega.value, category: categoryInBodega.value, price: parseFloat(priceInBodega.value), quantity: parseInt(qtyInBodega.value), image_url: imageUrl, box_number: boxNumberInBodega.value.trim() || null };
-                
-                // Se asume que products_nuevo usa las mismas columnas
-                const { data: insertedProduct, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).insert(newProductBodega).select().single();
-                if (error) throw error; 
-                formBodega.reset(); qtyInBodega.value = 1; 
-                setStatusMessage(statusBodega, "Producto agregado con éxito (Nuevo Inventario) ✅", true); 
-            } catch (err) { 
-                console.error("Error al agregar producto Nuevo Inventario:", err);
-                setStatusMessage(statusBodega, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-
-        // --- Forms Submit Logic (Ventas) ---
-        salesForm.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("sale-submit"); 
-            submitBtn.disabled = true; 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            const soldProductWithCategory = productNameSoldIn.value.trim();
-            const soldProductName = getCleanProductName(soldProductWithCategory); 
-            try { 
-                const newSale = {
-                    recipient_name: recipientNameIn.value,
-                    product_name_sold: soldProductWithCategory,
-                    price: parseFloat(salePriceIn.value),
-                    sale_date: saleDateIn.value,
-                    status: saleStatusInput.value
-                };
-                const { data: insertedSale, error: saleError } = await supabase.from(SALES_TABLE).insert(newSale).select().single();
-                if (saleError) throw error;
-                
-                // Descontar stock del producto vendido, buscándolo en ambos inventarios
-                if (newSale.status === 'Pagado') {
-                    let updateTable = null, updateArray = null;
-                    if (allProducts.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
-                        updateTable = PRODUCTS_TABLE;
-                        updateArray = allProducts;
-                    } else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
-                        updateTable = PRODUCTS_BODEGA_TABLE;
-                        updateArray = allProductsBodega;
-                    }
-
-                    if (updateTable && updateArray) {
-                         await updateProductStock(soldProductName, updateTable, updateArray, -1);
-                    } else {
-                        console.warn(`Producto vendido (${soldProductName}) no encontrado en el inventario para descontar stock.`);
-                    }
-                }
-
-                salesForm.reset(); 
-                saleDateIn.value = new Date().toISOString().split('T')[0]; 
-                setStatusMessage(saleStatus, "Venta registrada con éxito ✅", true); 
-            } catch (err) { 
-                console.error("Error al registrar venta:", err);
-                setStatusMessage(saleStatus, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-        
-        // Se elimina salesFormET
-        
-        missingProductForm.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("missing-product-submit"); 
-            submitBtn.disabled = true; 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            try { 
-                const newMissing = { product_name: missingProductNameIn.value, notes: missingProductNotesIn.value || null };
-                const { data: insertedMissing, error } = await supabase.from(MISSING_PRODUCTS_TABLE).insert(newMissing).select().single();
-                if (error) throw error;
-                missingProductForm.reset(); 
-                setStatusMessage(missingProductStatus, "Producto agregado a la lista ✅", true); 
-            } catch (err) { 
-                console.error("Error al agregar producto faltante:", err);
-                setStatusMessage(missingProductStatus, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-        toolForm.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("tool-submit"); 
-            submitBtn.disabled = true; 
-            setStatusMessage(toolStatus, "Guardando herramienta...", true); 
-            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
-            try { 
-                const imageUrl = toolImageIn.files[0] ? await uploadImage(toolImageIn.files[0]) : null; 
-                const newTool = { title: toolTitleIn.value, description: toolDescriptionIn.value || null, image_url: imageUrl };
-                const { data: insertedTool, error } = await supabase.from(TOOLS_TABLE).insert(newTool).select().single();
-                if (error) throw error; 
-                toolForm.reset(); 
-                setStatusMessage(toolStatus, "Herramienta guardada con éxito ✅", true); 
-            } catch (err) { 
-                console.error("Error al guardar herramienta:", err);
-                setStatusMessage(toolStatus, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-        
-        toolImageEditorInput.addEventListener('change', async (event) => {
-            if (!editingToolId) return; 
-            const file = event.target.files[0];
-            if (!file) return; 
-            const originalButtonText = "Editar Foto"; 
-            const editButton = document.querySelector(`button[onclick="editToolImage('${editingToolId}')"]`);
-            if(editButton) editButton.textContent = "Subiendo..."; 
-            try {
-                const newImageUrl = await uploadImage(file);
-                if (!newImageUrl) { throw new Error("La función de subida no devolvió una URL."); }
-                const { error } = await supabase.from(TOOLS_TABLE).update({ image_url: newImageUrl }).eq('id', editingToolId);
-                if (error) throw error;
-                alert('✅ Imagen actualizada correctamente.');
-            } catch (error) {
-                console.error('Error al actualizar la imagen de la herramienta:', error);
-                alert('❌ Error: ' + error.message);
-            } finally {
-                editingToolId = null; 
-                toolImageEditorInput.value = ''; 
-                if(editButton) editButton.textContent = originalButtonText; 
-            }
-        });
-        // Modificación para que el menú móvil use toggleView (y se auto-cierre)
-        document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', (e) => {
-            // Previene el doble click en el botón de escritorio
-            if (!isMobile() && e.target.closest('#mobile-menu-dropdown')) return; 
-            toggleView(btn.dataset.view);
-        }));
-
-        // --- Lógica de Impresión y Descarga de Etiquetas ---
-        function populateLabelCategories(products) {
-            const categories = new Set();
-            products.forEach(p => {
-                if (p.category) categories.add(p.category); 
-            });
-            const sortedCategories = Array.from(categories).sort();
-            const currentCategory = labelsCategorySelect.value;
-            labelsCategorySelect.innerHTML = '<option value="all">Todas las Categorías</option>';
-            sortedCategories.forEach(cat => {
-                const option = document.createElement('option');
-                option.value = cat;
-                option.textContent = cat;
-                labelsCategorySelect.appendChild(option);
-            });
-            labelsCategorySelect.value = sortedCategories.includes(currentCategory) ? currentCategory : 'all';
-        }
-        labelsLocationSelect.addEventListener('change', updateLabelView);
-        labelsCategorySelect.addEventListener('change', updateLabelView);
-        function updateLabelView() {
-            const location = labelsLocationSelect.value;
-            let selectedProducts = [];
-            if (location === 'main') {
-                selectedProducts = allProducts;
-            } else if (location === 'bodega') { 
-                selectedProducts = allProductsBodega;
-            } else {
-                labelsCountSpan.textContent = `0 Productos seleccionados (Error de ubicación)`;
-                return;
-            }
-
-            populateLabelCategories(selectedProducts);
-            const categoryFilter = labelsCategorySelect.value;
-            const filtered = selectedProducts.filter(p => categoryFilter === 'all' || p.category === categoryFilter);
-            labelsCountSpan.textContent = `${filtered.length} Productos seleccionados`;
-            if (labelsOutputDiv.children.length === 0 || labelsOutputDiv.children[0].tagName === 'P') {
-                labelsOutputDiv.innerHTML = `<p class="p-4 text-gray-400">Selecciona el inventario y presiona "Generar e Imprimir Etiquetas" o "Descargar QRs".</p>`;
-            }
-        }
-        
-        window.generateAndPrintLabels = function() {
-            if (typeof QRCode === 'undefined') {
-                return alert("❌ Error: La librería QRCode no está cargada.");
-            }
-            const location = labelsLocationSelect.value;
-            const categoryFilter = labelsCategorySelect.value;
-            
-            let selectedProducts = [];
-            if (location === 'main') {
-                selectedProducts = allProducts;
-            } else if (location === 'bodega') { 
-                selectedProducts = allProductsBodega;
-            } else {
-                return alert("Error de ubicación de inventario.");
-            }
-
-            const productsToPrint = selectedProducts.filter(p => 
-                categoryFilter === 'all' || p.category === categoryFilter
-            );
-            if (productsToPrint.length === 0) {
-                return alert("No hay productos que coincidan con el filtro seleccionado.");
-            }
-            labelsOutputDiv.innerHTML = '';
-            labelsOutputDiv.classList.add('labels-container');
-            const qrPromises = [];
-            productsToPrint.forEach((product, index) => {
-                const label = document.createElement('div');
-                // Aseguramos el fondo blanco de la etiqueta en la previsualización del DOM
-                label.className = 'label-tag border border-gray-400 p-1 flex items-center justify-start'; 
-                label.style.backgroundColor = 'white'; 
-                
-                const tempDiv = document.createElement('div');
-                const infoBox = document.createElement('div');
-                infoBox.className = 'flex-grow text-xs text-black';
-                infoBox.style.color = '#000';
-                infoBox.style.fontFamily = 'sans-serif';
-                const productName = product.name.length > 30 ? product.name.substring(0, 27) + '...' : product.name;
-                infoBox.innerHTML = `
-                    <p style="font-weight: bold; font-size: 11px; margin: 0;">${productName}</p>
-                    <p style="font-size: 10px; margin: 0;">Cat: ${product.category || 'N/A'}</p>
-                    <p style="font-weight: bold; color: #10b981; font-size: 11px; margin: 0;">$${Number(product.price).toFixed(2)}</p>
-                    <p style="font-size: 9px; margin: 0;">Caja: ${product.box_number || 'N/A'}</p>
-                `;
-                const qrPromise = new Promise(resolve => {
-                    // Limpiamos el ID antes de generar el QR
-                    const cleanProductId = String(product.id).trim(); 
-
-                    const qr = new QRCode(tempDiv, {
-                        text: cleanProductId, // Usamos el ID limpio
-                        width: 100, 
-                        height: 100,
-                        colorDark : "#000000",
-                        colorLight : "#ffffff", // Fondo blanco para impresión
-                        correctLevel : QRCode.CorrectLevel.L
-                    });
-                    setTimeout(() => {
-                        const canvas = tempDiv.querySelector('canvas');
-                        if (canvas) {
-                            const imgUrl = canvas.toDataURL("image/png");
-                            const imgBox = document.createElement('div');
-                            imgBox.className = 'qr-box mr-2';
-                            const img = document.createElement('img');
-                            img.src = imgUrl;
-                            img.style.width = '30mm';
-                            img.style.height = '30mm';
-                            imgBox.appendChild(img);
-                            label.appendChild(infoBox); // Asegurar que el QR va primero
-                            label.appendChild(imgBox);
-                            labelsOutputDiv.appendChild(label);
-                        }
-                        resolve();
-                    }, 100); 
-                });
-                qrPromises.push(qrPromise);
-            });
-            Promise.all(qrPromises).then(() => {
-                console.log("Todos los QR generados. Abriendo diálogo de impresión.");
-                window.print();
-                labelsOutputDiv.classList.remove('labels-container'); 
-            });
-        };
-
-        // --- FUNCIÓN: Descarga de Etiquetas Masivas como ZIP ---
-        window.downloadAllLabelsAsZip = async function() {
-            // Verificar si las librerías necesarias están disponibles (Se cargaron en el HEAD)
-            if (typeof QRCode === 'undefined' || typeof JSZip === 'undefined' || typeof saveAs === 'undefined') {
-                 return alert("❌ Error: Las librerías JSZip y FileSaver son necesarias para la descarga ZIP y no se han cargado. Asegúrate que las etiquetas <script> en el HEAD estén correctas.");
-            }
-
-            const location = labelsLocationSelect.value;
-            const categoryFilter = labelsCategorySelect.value;
-            
-            let selectedProducts = [];
-            if (location === 'main') {
-                selectedProducts = allProducts;
-            } else if (location === 'bodega') { 
-                selectedProducts = allProductsBodega;
-            } else {
-                return alert("Error de ubicación de inventario.");
-            }
-
-            const productsToPrint = selectedProducts.filter(p => 
-                categoryFilter === 'all' || p.category === categoryFilter
-            );
-
-            if (productsToPrint.length === 0) {
-                return alert("No hay productos que coincidan con el filtro seleccionado para descargar.");
-            }
-
-            const zip = new JSZip();
-            const loadingButton = document.querySelector('button[onclick="downloadAllLabelsAsZip()"]');
-            loadingButton.disabled = true;
-            const originalText = loadingButton.textContent;
-            loadingButton.textContent = 'Generando ZIP... Por favor espere.';
-
-            try {
-                for (const product of productsToPrint) {
-                    // 1. Generar el QR
-                    const tempDiv = document.createElement('div');
-                    const cleanProductId = String(product.id).trim();
-
-                    // Generamos el QR en un elemento temporal
-                    new QRCode(tempDiv, {
-                        text: cleanProductId,
-                        width: 256,
-                        height: 256,
-                        colorDark: "#000000",
-                        colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-
-                    // Esperar un micro ciclo para que el canvas se dibuje (necesario para QRCode.js)
-                    await new Promise(resolve => setTimeout(resolve, 50)); 
-                    
-                    const canvas = tempDiv.querySelector('canvas');
-                    if (canvas) {
-                        // 2. Obtener la base64 de la imagen PNG y convertirla a binario para JSZip
-                        const dataURL = canvas.toDataURL("image/png");
-                        const base64Data = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-
-                        // 3. Añadir al ZIP
-                        const filename = `${product.name.replace(/[^a-zA-Z0-9]/g, '_')}_${cleanProductId.substring(0, 8)}.png`;
-                        zip.file(filename, base64Data, { base64: true });
-                    }
-                }
-
-                // 4. Generar y descargar el archivo ZIP
-                const zipContent = await zip.generateAsync({ type: "blob" });
-                saveAs(zipContent, `CellSmar_QR_Etiquetas_${new Date().toISOString().split('T')[0]}.zip`);
-                
-                alert(`✅ ${productsToPrint.length} QRs descargados en formato ZIP.`);
-
-            } catch (error) {
-                console.error("Error al generar o descargar el ZIP:", error);
-                alert("❌ Error: Falló la generación del archivo ZIP. Revisa la consola para más detalles.");
-            } finally {
-                loadingButton.disabled = false;
-                loadingButton.textContent = originalText;
-            }
-        };
-        
-        // --- Evento de Carga Principal (MODIFICADO para incluir Bodega) ---
         async function loadAppDataAndInitialize() {
-            
             saleDateIn.value = new Date().toISOString().split('T')[0];
-            
             showSkeletonLoaders(); 
-            
-            // Cargar Logo (independiente de Supabase)
             await loadLogo(); 
-            
-            // NUEVA LÓGICA DE VISTA: Recuperar la última vista al cargar
-            let viewToLoad = 'inventory';
-            try {
-                const lastView = localStorage.getItem('lastView');
-                if (lastView && views[lastView]) {
-                    viewToLoad = lastView;
-                }
-            } catch (e) {
-                console.warn("No se pudo leer la última vista de localStorage.", e);
-            }
-            toggleView(viewToLoad);
-
+            const lastView = localStorage.getItem('lastView') || 'inventory';
+            toggleView(lastView);
             if (supabase) {
-                try {
-                    // Carga de datos inicial (se eliminó fetchProductsET y fetchSalesElTransito)
-                    await Promise.all([
-                        fetchProducts(), 
-                        fetchProductsBodega(), 
-                        fetchSales(), 
-                        fetchMissingProducts(),
-                        fetchTools() 
-                    ]);
-                    updateLabelView(); 
-                    initializeRealtimeSubscriptions();
-                } catch (error) {
-                    console.error("Error crítico durante la carga de datos inicial:", error);
-                }
-            } else {
-                alert("Error Crítico: No se pudo cargar Supabase. La aplicación no funcionará correctamente.");
+                await Promise.all([fetchProducts(), fetchProductsBodega(), fetchSales(), fetchMissingProducts(), fetchTools()]);
+                updateLabelView(); 
+                initializeRealtimeSubscriptions();
             }
         }
-        
-        // --- ADICIÓN CRÍTICA: Lógica de Restauración en Dispositivos Móviles ---
-        document.addEventListener('visibilitychange', async () => {
-            // Esta función detecta cuando el usuario regresa a la pestaña (página)
-            if (document.visibilityState === 'visible') {
-                console.log('👀 Página visible: Comprobando sesión de Supabase...');
-                
-                if (!supabase) return;
 
-                // Forzar la obtención del estado de la sesión más reciente
-                const { data: { session }, error } = await supabase.auth.getSession();
-
-                if (error) {
-                    console.error('Error al obtener la sesión en el regreso:', error);
-                    return;
-                }
-
-                if (session) {
-                    // Si hay sesión, el usuario está autenticado. 
-                    // Aseguramos que el DOM de la app esté visible y se reinicialicen los datos.
-                    if (appContentWrapper.classList.contains('hidden')) {
-                        authModal.classList.add('hidden');
-                        appContentWrapper.classList.remove('hidden');
-                        console.log('🔄 Reinicializando datos de la aplicación...');
-                        await loadAppDataAndInitialize(); 
-                    }
-                } else {
-                    // Si no hay sesión, aseguramos que se muestre el modal de autenticación
-                    if (appContentWrapper && !appContentWrapper.classList.contains('hidden')) {
-                        authModal.classList.remove('hidden');
-                        appContentWrapper.classList.add('hidden');
-                        console.log('🚪 Sesión expirada. Mostrando modal de autenticación.');
-                    }
-                }
-            }
-        });
-        
-        window.addEventListener("load", async () => {
-            // Aplicar el tema guardado o predeterminado al cargar
-            const initialTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
-            applyTheme(initialTheme); 
-            
-            // 1. Iniciar el escuchador de autenticación
-            setupAuthListener();
-            
-            // Nota: loadAppDataAndInitialize() es llamado desde setupAuthListener() cuando el usuario está autenticado.
-        });
+        window.addEventListener("load", loadAppDataAndInitialize);
     </script>
 </body>
 </html>
