@@ -335,19 +335,12 @@
         })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Se mantiene QRCode.js porque el escáner de ventas lo necesita para detectar códigos QR -->
-    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 <body class="">
-    
-    <!-- SE ELIMINA COMPLETAMENTE EL MODAL DE AUTENTICACIÓN -->
-    <!-- La aplicación ahora se muestra directamente sin requerir login visual -->
 
     <div id="app-content-wrapper">
-    
+
     <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
         <div class="flex items-center space-x-4">
             <img 
@@ -409,22 +402,218 @@
                         <input type="file" id="logo-upload" title="Sube una nueva imagen para tu logo" accept="image/*" />
                     </div>
                     <button id="logo-save-button" class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed text-sm w-full shadow-md" disabled>Guardar Logo</button>
-                    <!-- Se elimina el botón de cerrar sesión -->
                 </div>
             </div>
         </div>
     </header>
 
     <div class="container mx-auto px-4 py-6">
-        <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario Principal</p>        <!-- SE ELIMINA COMPLETAMENTE LA VISTA DE ETIQUETAS QR (labels-view) -->
-        <!-- Ya no existe la sección de generar/imprimir etiquetas masivas -->
+        <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario Principal</p>        <div class="container mx-auto px-4 py-6">
+            <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario Principal</p>
 
-        <div id="inventory-view" class="view-section hidden">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (Inventario Principal)</h2>
-                <form id="product-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-                    <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Flex de Botones" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
+            <div id="inventory-view" class="view-section">
+                <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+                    <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (Inventario Principal)</h2>
+                    <form id="product-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+                        <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Flex de Botones" /></div>
+                        <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
+                            <option value="">Seleccionar</option>
+                            <option value="Pantallas">Pantallas</option>
+                            <option value="Jacks de Carga">Jacks de Carga</option>
+                            <option value="Flex Main">Flex Main</option>
+                            <option value="Placas de Carga">Placas de Carga</option>
+                            <option value="Botones Fisicos">Botones Fisicos</option>
+                            <option value="Botones Internos">Botones Internos</option>
+                            <option value="Tapaderas de Iphone">Tapaderas de Iphone</option>
+                            <option value="Bandejas SIM">Bandejas SIM</option>
+                            <option value="Flex de Iphone">Flex de Iphone</option>
+                            <option value="Tapaderas">Tapaderas</option>
+                            <option value="Accesorios">Accesorios</option>
+                            <option value="Otros">Otros</option>
+                        </select></div>
+                        <div><label class="block text-sm font-medium text-gray-300">Caja N°</label><input id="box-number" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: A-01" /></div>
+                        <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="12.50" /></div>
+                        <div><label class="block text-sm font-medium text-gray-300">Cantidad</label><input id="quantity" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
+                        <div><label class="block text-sm font-medium text-gray-300">Imagen</label><input id="image" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" /></div>
+                        <div class="md:col-span-6 text-right"><button id="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
+                    </form>
+                    <p id="status" class="text-sm text-gray-400 mt-3"></p>
+                </section>
+                <section>
+                    <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">📦 Inventario Principal por Categoría</h2><span id="total-count" class="text-gray-400 text-sm"></span></div>
+                    <div class="mb-6 flex items-center space-x-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" id="search-input" placeholder="Buscar por nombre o categoría..." class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" /></div>
+                    <div id="products-loader" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+                    <div id="products"></div>
+                </section>
+            </div>
+            
+            <div id="inventory-bodega-view" class="view-section hidden">
+                <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+                    <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (Nuevo Inventario)</h2>
+                    <form id="product-form-bodega" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+                        <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name-bodega" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Batería iPhone 11" /></div>
+                        <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select-bodega" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
+                            <option value="">Seleccionar</option>
+                            <option value="Pantallas">Pantallas</option>
+                            <option value="Jacks de Carga">Jacks de Carga</option>
+                            <option value="Flex Main">Flex Main</option>
+                            <option value="Placas de Carga">Placas de Carga</option>
+                            <option value="Botones Fisicos">Botones Fisicos</option>
+                            <option value="Botones Internos">Botones Internos</option>
+                            <option value="Tapaderas de Iphone">Tapaderas de Iphone</option>
+                            <option value="Bandejas SIM">Bandejas SIM</option>
+                            <option value="Flex de Iphone">Flex de Iphone</option>
+                            <option value="Tapaderas">Tapaderas</option>
+                            <option value="Accesorios">Accesorios</option>
+                            <option value="Otros">Otros</option>
+                        </select></div>
+                        <div><label class="block text-sm font-medium text-gray-300">Caja N°</label><input id="box-number-bodega" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: C-03" /></div>
+                        <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="price-bodega" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="20.00" /></div>
+                        <div><label class="block text-sm font-medium text-gray-300">Cantidad</label><input id="quantity-bodega" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
+                        <div><label class="block text-sm font-medium text-gray-300">Imagen</label><input id="image-bodega" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" /></div>
+                        <div class="md:col-span-6 text-right"><button id="submit-bodega" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
+                    </form>
+                    <p id="status-bodega" class="text-sm text-gray-400 mt-3"></p>
+                </section>
+                <section>
+                    <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">🏠 Nuevo Inventario por Categoría</h2><span id="total-count-bodega" class="text-gray-400 text-sm"></span></div>
+                    <div class="mb-6 flex items-center space-x-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" id="search-input-bodega" placeholder="Buscar por nombre o categoría..." class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" /></div>
+                    <div id="products-loader-bodega" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+                    <div id="products-bodega"></div>
+                </section>
+            </div>
+            
+            <div id="sales-view" class="view-section hidden">
+                <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-indigo-300">✍️ Registrar Nueva Venta</h2>
+                        <button id="sales-scan-button" onclick="openScannerModal()" class="hidden md:flex text-white py-2 px-4 rounded-lg bg-green-600 hover:bg-green-700 transition duration-300 shadow-md text-sm items-center space-x-1" title="Escanear Producto y Registrar Venta">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
+                            </svg>
+                            <span>Escanear QR</span>
+                        </button>
+                    </div>
+                    <form id="sale-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+                        <div><label class="block text-sm font-medium text-gray-300">Nombre de Destinatario</label><input id="recipient-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Juan Pérez" /></div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300">Producto Vendido</label>
+                            <input id="product-name-sold" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Pantalla Samsung A32" list="inventory-suggestions" />
+                            <datalist id="inventory-suggestions"></datalist>
+                        </div>
+                        <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="sale-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="25.99" /></div>
+                        <div><label class="block text-sm font-medium text-gray-300">Fecha de Venta</label><input id="sale-date" type="date" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
+                        <div><label class="block text-sm font-medium text-gray-300">Estado</label><select id="sale-status-input" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="Pendiente">Pendiente</option><option value="Pagado">Pagado</option><option value="Devuelto">Devuelto</option></select></div>
+                        <div class="text-right"><button id="sale-submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow w-full">Registrar Venta</button></div>
+                    </form>
+                    <p id="sale-status" class="text-sm text-gray-400 mt-3"></p>
+                </section>
+                <section>
+                    <div class="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex-grow min-w-[250px]">
+                            <label for="search-sales-input" class="block text-sm font-medium text-gray-300 mb-1">🔍 Buscar por Nombre o Producto</label>
+                            <input type="text" id="search-sales-input" placeholder="Ej: Juan Pérez o Pantalla A32..." class="p-2 border rounded-md w-full focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" />
+                        </div>
+                        <div class="flex items-center pt-6">
+                            <input type="checkbox" id="pending-only-checkbox" class="h-4 w-4 text-indigo-600 border-gray-500 rounded bg-gray-600 focus:ring-indigo-500">
+                            <label for="pending-only-checkbox" class="ml-2 block text-sm font-medium text-gray-200">🔔 Mostrar solo pendientes</label>
+                        </div>
+                        <button onclick="downloadSalesPDF(true)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow w-full md:w-auto mt-4 md:mt-0">
+                            Descargar PDF 📄
+                        </button>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
+                        <h2 class="text-xl font-semibold text-indigo-300">📊 Historial de Ventas</h2>
+                        <span id="total-sales-count" class="text-gray-400 text-sm"></span>
+                    </div>
+                    <div id="sales-list-loader" class="space-y-2"></div>
+                    <div id="sales-list-container"></div>
+                </section>
+            </div>            <div id="missing-view" class="view-section hidden">
+                <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 max-w-4xl mx-auto">
+                    <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Registrar Producto Faltante</h2>
+                    <form id="missing-product-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300">Nombre del Producto</label>
+                            <input id="missing-product-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Batería para iPhone X" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300">Notas (Opcional)</label>
+                            <input id="missing-product-notes" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Pedir al proveedor A" />
+                        </div>
+                        <div>
+                            <button id="missing-product-submit" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded shadow w-full">Agregar a la Lista</button>
+                        </div>
+                    </form>
+                    <p id="missing-product-status" class="text-sm text-gray-400 mt-3"></p>
+                </section>
+                <section class="max-w-4xl mx-auto">
+                    <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">📋 Lista de Productos Faltantes</h2><span id="total-missing-count" class="text-gray-400 text-sm"></span></div>
+                    <div id="missing-list-loader" class="space-y-2"></div>
+                    <div id="missing-list" class="bg-gray-800 rounded-lg shadow overflow-hidden"></div>
+                </section>
+            </div>
+            
+            <div id="tools-view" class="view-section hidden">
+                <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+                    <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar Nueva Herramienta / Tutorial</h2>
+                    <form id="tool-form" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300">Título</label>
+                                <input id="tool-title" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Test Point iPhone 12" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300">Descripción / Pasos</label>
+                                <textarea id="tool-description" rows="4" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Describe los pasos o información relevante aquí..."></textarea>
+                            </div>
+                        </div>
+                         <div>
+                            <label class="block text-sm font-medium text-gray-300">Imagen (Tutorial)</label>
+                            <input id="tool-image" type="file" accept="image/*" class="mt-1 block w-full p-1.5 border rounded-md bg-gray-600 border-gray-500 text-white" />
+                            <p class="text-xs text-gray-400 mt-2">Sube una imagen clara que ilustre el procedimiento.</p>
+                        </div>
+                        <div class="md:col-span-2 text-right">
+                            <button id="tool-submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow-lg">Guardar Herramienta</button>
+                        </div>
+                    </form>
+                    <p id="tool-status" class="text-sm text-gray-400 mt-3"></p>
+                </section>
+                <section>
+                     <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-indigo-300">📚 Base de Conocimiento de Herramientas</h2>
+                        <span id="total-tools-count" class="text-gray-400 text-sm"></span>
+                     </div>
+                     <div id="tools-loader" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+                     <div id="tools-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </section>
+            </div>
+            
+            <footer class="mt-10 text-center text-gray-400 text-sm">
+                <p>Panel de Inventario — Cell Smar</p>
+                <p>&copy; 2025 Derechos Reservados. Desarrollado por Freddy Granados.</p>
+            </footer>
+        </div>
+        
+        <!-- MODAL DE EDITOR DE PRODUCTO -->
+        <div id="product-editor-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+          <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeProductEditorModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-gray-700">
+              <div class="bg-gray-800 px-4 py-5 sm:px-6">
+                <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">Editar Producto</h3>
+              </div>
+              <div class="bg-gray-700 px-4 py-5 sm:p-6">
+                <form id="modal-product-form">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-300">Nombre</label>
+                      <input id="modal-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-300">Categoría</label>
+                      <select id="modal-category" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
                         <option value="">Seleccionar</option>
                         <option value="Pantallas">Pantallas</option>
                         <option value="Jacks de Carga">Jacks de Carga</option>
@@ -438,263 +627,65 @@
                         <option value="Tapaderas">Tapaderas</option>
                         <option value="Accesorios">Accesorios</option>
                         <option value="Otros">Otros</option>
-                    </select></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Caja N°</label><input id="box-number" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: A-01" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="12.50" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Cantidad</label><input id="quantity" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Imagen</label><input id="image" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" /></div>
-                    <div class="md:col-span-6 text-right"><button id="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
-                </form>
-                <p id="status" class="text-sm text-gray-400 mt-3"></p>
-            </section>
-            <section>
-                <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">📦 Inventario Principal por Categoría</h2><span id="total-count" class="text-gray-400 text-sm"></span></div>
-                <div class="mb-6 flex items-center space-x-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" id="search-input" placeholder="Buscar por nombre o categoría..." class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" /></div>
-                <div id="products-loader" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
-                <div id="products"></div>
-            </section>
-        </div>
-        
-        <div id="inventory-bodega-view" class="view-section hidden">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (Nuevo Inventario)</h2>
-                <form id="product-form-bodega" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-                    <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name-bodega" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Batería iPhone 11" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select-bodega" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
-                        <option value="">Seleccionar</option>
-                        <option value="Pantallas">Pantallas</option>
-                        <option value="Jacks de Carga">Jacks de Carga</option>
-                        <option value="Flex Main">Flex Main</option>
-                        <option value="Placas de Carga">Placas de Carga</option>
-                        <option value="Botones Fisicos">Botones Fisicos</option>
-                        <option value="Botones Internos">Botones Internos</option>
-                        <option value="Tapaderas de Iphone">Tapaderas de Iphone</option>
-                        <option value="Bandejas SIM">Bandejas SIM</option>
-                        <option value="Flex de Iphone">Flex de Iphone</option>
-                        <option value="Tapaderas">Tapaderas</option>
-                        <option value="Accesorios">Accesorios</option>
-                        <option value="Otros">Otros</option>
-                    </select></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Caja N°</label><input id="box-number-bodega" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: C-03" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="price-bodega" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="20.00" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Cantidad</label><input id="quantity-bodega" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Imagen</label><input id="image-bodega" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" /></div>
-                    <div class="md:col-span-6 text-right"><button id="submit-bodega" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
-                </form>
-                <p id="status-bodega" class="text-sm text-gray-400 mt-3"></p>
-            </section>
-            <section>
-                <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">🏠 Nuevo Inventario por Categoría</h2><span id="total-count-bodega" class="text-gray-400 text-sm"></span></div>
-                <div class="mb-6 flex items-center space-x-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" id="search-input-bodega" placeholder="Buscar por nombre o categoría..." class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" /></div>
-                <div id="products-loader-bodega" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
-                <div id="products-bodega"></div>
-            </section>
-        </div>
-        
-        <div id="sales-view" class="view-section hidden">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-semibold text-indigo-300">✍️ Registrar Nueva Venta</h2>
-                    <button id="sales-scan-button" onclick="openScannerModal()" class="hidden md:flex text-white py-2 px-4 rounded-lg bg-green-600 hover:bg-green-700 transition duration-300 shadow-md text-sm items-center space-x-1" title="Escanear Producto y Registrar Venta">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
-                        </svg>
-                        <span>Escanear QR</span>
-                    </button>
-                </div>
-                <form id="sale-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-                    <div><label class="block text-sm font-medium text-gray-300">Nombre de Destinatario</label><input id="recipient-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Juan Pérez" /></div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300">Producto Vendido</label>
-                        <input id="product-name-sold" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Pantalla Samsung A32" list="inventory-suggestions" />
-                        <datalist id="inventory-suggestions"></datalist>
-                    </div>
-                    <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="sale-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="25.99" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Fecha de Venta</label><input id="sale-date" type="date" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
-                    <div><label class="block text-sm font-medium text-gray-300">Estado</label><select id="sale-status-input" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="Pendiente">Pendiente</option><option value="Pagado">Pagado</option><option value="Devuelto">Devuelto</option></select></div>
-                    <div class="text-right"><button id="sale-submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow w-full">Registrar Venta</button></div>
-                </form>
-                <p id="sale-status" class="text-sm text-gray-400 mt-3"></p>
-            </section>
-            <section>
-                <div class="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex flex-wrap items-center justify-between gap-4">
-                    <div class="flex-grow min-w-[250px]">
-                        <label for="search-sales-input" class="block text-sm font-medium text-gray-300 mb-1">🔍 Buscar por Nombre o Producto</label>
-                        <input type="text" id="search-sales-input" placeholder="Ej: Juan Pérez o Pantalla A32..." class="p-2 border rounded-md w-full focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" />
-                    </div>
-                    <div class="flex items-center pt-6">
-                        <input type="checkbox" id="pending-only-checkbox" class="h-4 w-4 text-indigo-600 border-gray-500 rounded bg-gray-600 focus:ring-indigo-500">
-                        <label for="pending-only-checkbox" class="ml-2 block text-sm font-medium text-gray-200">🔔 Mostrar solo pendientes</label>
-                    </div>
-                    <button onclick="downloadSalesPDF(true)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow w-full md:w-auto mt-4 md:mt-0">
-                        Descargar PDF 📄
-                    </button>
-                </div>
-                <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
-                    <h2 class="text-xl font-semibold text-indigo-300">📊 Historial de Ventas</h2>
-                    <span id="total-sales-count" class="text-gray-400 text-sm"></span>
-                </div>
-                <div id="sales-list-loader" class="space-y-2"></div>
-                <div id="sales-list-container"></div>
-            </section>
-        </div>        <div id="missing-view" class="view-section hidden">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 max-w-4xl mx-auto">
-                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Registrar Producto Faltante</h2>
-                <form id="missing-product-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300">Nombre del Producto</label>
-                        <input id="missing-product-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Batería para iPhone X" />
+                      </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-300">Notas (Opcional)</label>
-                        <input id="missing-product-notes" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Pedir al proveedor A" />
+                      <label class="block text-sm font-medium text-gray-300">Precio (USD)</label>
+                      <input id="modal-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
                     </div>
                     <div>
-                        <button id="missing-product-submit" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded shadow w-full">Agregar a la Lista</button>
+                      <label class="block text-sm font-medium text-gray-300">Cantidad</label>
+                      <input id="modal-quantity" type="number" min="0" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
                     </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-300">Caja N°</label>
+                      <input id="modal-box-number" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-300">Ubicación</label>
+                      <p id="modal-location" class="mt-1 text-white font-medium"></p>
+                    </div>
+                  </div>
+                  <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-300">Imagen Actual</label>
+                    <img id="modal-image-preview" src="" alt="Preview" class="mt-2 max-h-48 rounded border border-gray-600" onerror="this.src='https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen'" />
+                  </div>
+                  <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-300">Cambiar Imagen</label>
+                    <input id="modal-image-upload" type="file" accept="image/*" class="mt-1 block w-full p-1.5 border rounded-md bg-gray-600 border-gray-500 text-white" />
+                  </div>
+                  <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" onclick="closeProductEditorModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">Cancelar</button>
+                    <button type="submit" id="modal-save-button" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">Guardar Cambios</button>
+                  </div>
+                  <p id="modal-status" class="mt-4 text-sm text-gray-400"></p>
                 </form>
-                <p id="missing-product-status" class="text-sm text-gray-400 mt-3"></p>
-            </section>
-            <section class="max-w-4xl mx-auto">
-                <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">📋 Lista de Productos Faltantes</h2><span id="total-missing-count" class="text-gray-400 text-sm"></span></div>
-                <div id="missing-list-loader" class="space-y-2"></div>
-                <div id="missing-list" class="bg-gray-800 rounded-lg shadow overflow-hidden"></div>
-            </section>
+              </div>
+            </div>
+          </div>
         </div>
         
-        <div id="tools-view" class="view-section hidden">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar Nueva Herramienta / Tutorial</h2>
-                <form id="tool-form" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Título</label>
-                            <input id="tool-title" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Test Point iPhone 12" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Descripción / Pasos</label>
-                            <textarea id="tool-description" rows="4" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Describe los pasos o información relevante aquí..."></textarea>
-                        </div>
-                    </div>
-                     <div>
-                        <label class="block text-sm font-medium text-gray-300">Imagen (Tutorial)</label>
-                        <input id="tool-image" type="file" accept="image/*" class="mt-1 block w-full p-1.5 border rounded-md bg-gray-600 border-gray-500 text-white" />
-                        <p class="text-xs text-gray-400 mt-2">Sube una imagen clara que ilustre el procedimiento.</p>
-                    </div>
-                    <div class="md:col-span-2 text-right">
-                        <button id="tool-submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow-lg">Guardar Herramienta</button>
-                    </div>
-                </form>
-                <p id="tool-status" class="text-sm text-gray-400 mt-3"></p>
-            </section>
-            <section>
-                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold text-indigo-300">📚 Base de Conocimiento de Herramientas</h2>
-                    <span id="total-tools-count" class="text-gray-400 text-sm"></span>
-                 </div>
-                 <div id="tools-loader" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
-                 <div id="tools-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-            </section>
-        </div>
-        
-        <footer class="mt-10 text-center text-gray-400 text-sm">
-            <p>Panel de Inventario — Cell Smar</p>
-            <p>&copy; 2025 Derechos Reservados. Desarrollado por Freddy Granados.</p>
-        </footer>
-    </div>
-    
-    <!-- MODAL DE EDITOR DE PRODUCTO (se mantiene, pero se elimina toda referencia a QR individual) -->
-    <div id="product-editor-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeProductEditorModal()"></div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-gray-700">
-          <div class="bg-gray-800 px-4 py-5 sm:px-6">
-            <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">Editar Producto</h3>
-          </div>
-          <div class="bg-gray-700 px-4 py-5 sm:p-6">
-            <form id="modal-product-form">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-300">Nombre</label>
-                  <input id="modal-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-300">Categoría</label>
-                  <select id="modal-category" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
-                    <option value="">Seleccionar</option>
-                    <option value="Pantallas">Pantallas</option>
-                    <option value="Jacks de Carga">Jacks de Carga</option>
-                    <option value="Flex Main">Flex Main</option>
-                    <option value="Placas de Carga">Placas de Carga</option>
-                    <option value="Botones Fisicos">Botones Fisicos</option>
-                    <option value="Botones Internos">Botones Internos</option>
-                    <option value="Tapaderas de Iphone">Tapaderas de Iphone</option>
-                    <option value="Bandejas SIM">Bandejas SIM</option>
-                    <option value="Flex de Iphone">Flex de Iphone</option>
-                    <option value="Tapaderas">Tapaderas</option>
-                    <option value="Accesorios">Accesorios</option>
-                    <option value="Otros">Otros</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-300">Precio (USD)</label>
-                  <input id="modal-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-300">Cantidad</label>
-                  <input id="modal-quantity" type="number" min="0" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-300">Caja N°</label>
-                  <input id="modal-box-number" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-300">Ubicación</label>
-                  <p id="modal-location" class="mt-1 text-white font-medium"></p>
-                </div>
+        <!-- MODAL DEL ESCÁNER -->
+        <div id="scanner-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="scanner-modal-title" role="dialog" aria-modal="true">
+          <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-90 transition-opacity" aria-hidden="true" onclick="closeScannerModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content">
+              <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <h3 class="text-2xl leading-6 font-bold text-center mb-4" id="scanner-modal-title">📱 Escanear Código QR</h3>
+                <div id="reader" class="w-full"></div>
+                <p class="text-center mt-4 text-lg" id="scanner-status">Esperando código QR o de barras...</p>
               </div>
-              <div class="mt-4">
-                <label class="block text-sm font-medium text-gray-300">Imagen Actual</label>
-                <img id="modal-image-preview" src="" alt="Preview" class="mt-2 max-h-48 rounded border border-gray-600" />
+              <div class="bg-gray-100 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button onclick="closeScannerModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 sm:ml-3 sm:w-auto sm:text-sm">
+                  Cerrar Escáner
+                </button>
               </div>
-              <div class="mt-4">
-                <label class="block text-sm font-medium text-gray-300">Cambiar Imagen</label>
-                <input id="modal-image-upload" type="file" accept="image/*" class="mt-1 block w-full p-1.5 border rounded-md bg-gray-600 border-gray-500 text-white" />
-              </div>
-              <div class="mt-6 flex justify-end space-x-3">
-                <button type="button" onclick="closeProductEditorModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">Cancelar</button>
-                <button type="submit" id="modal-save-button" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">Guardar Cambios</button>
-              </div>
-              <p id="modal-status" class="mt-4 text-sm text-gray-400"></p>
-            </form>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-    
-    <!-- SE ELIMINA EL MODAL DE QR INDIVIDUAL (qr-modal) -->
-    
-    <!-- MODAL DEL ESCÁNER (se mantiene porque se usa para ventas rápidas) -->
-    <div id="scanner-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="scanner-modal-title" role="dialog" aria-modal="true">
-      <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-900 bg-opacity-90 transition-opacity" aria-hidden="true" onclick="closeScannerModal()"></div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content">
-          <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <h3 class="text-2xl leading-6 font-bold text-center mb-4" id="scanner-modal-title">📱 Escanear Código QR</h3>
-            <div id="reader" class="w-full"></div>
-            <p class="text-center mt-4 text-lg" id="scanner-status">Esperando código QR o de barras...</p>
-          </div>
-          <div class="bg-gray-100 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-            <button onclick="closeScannerModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 sm:ml-3 sm:w-auto sm:text-sm">
-              Cerrar Escáner
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-</div> <!-- Fin de app-content-wrapper -->    <script>
+    </div> <!-- Fin de app-content-wrapper -->
+</div>    <script>
         const supabaseUrl = 'https://ftcjaadsjpnzbckxevxq.supabase.co';
         const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
@@ -948,6 +939,14 @@
             renderTools(allTools);
         }
 
+        async function fetchSales() {
+            if (!supabase) return;
+            const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
+            if (error) { console.error("Error cargando ventas:", error); return; }
+            allSales = data;
+            filterAndRenderSales();
+        }
+
         function filterAndRenderProducts() {
             const term = searchInput.value.toLowerCase();
             const filtered = allProducts.filter(p => 
@@ -979,7 +978,7 @@
                 card.dataset.id = product.id;
                 const imgSrc = product.image_url || 'https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen';
                 card.innerHTML = `
-                    <img src="${imgSrc}" alt="${product.name}" class="w-full h-48 object-cover" onerror="this.src='https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen'">
+                    <img src="${imgSrc}" alt="${product.name}" class="w-full h-48 object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen'">
                     <div class="p-4">
                         <p class="text-lg font-semibold text-white truncate">${product.name}</p>
                         <p class="text-sm text-gray-300"><strong>Categoría:</strong> ${product.category || 'N/A'}</p>
@@ -1065,7 +1064,7 @@
                 card.dataset.id = tool.id;
                 const imgSrc = tool.image_url || 'https://via.placeholder.com/300x200/4f46e5/ffffff?text=Herramienta';
                 card.innerHTML = `
-                    <img src="${imgSrc}" alt="${tool.title}" class="w-full h-64 object-cover" onerror="this.src='https://via.placeholder.com/300x200/4f46e5/ffffff?text=Herramienta'">
+                    <img src="${imgSrc}" alt="${tool.title}" class="w-full h-64 object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200/4f46e5/ffffff?text=Herramienta'">
                     <div class="p-4">
                         <h3 class="text-xl font-bold text-white">${tool.title}</h3>
                         <p class="text-gray-300 mt-2 whitespace-pre-wrap">${tool.description || 'Sin descripción'}</p>
@@ -1226,14 +1225,6 @@
                 .on('postgres_changes', { event: '*', schema: 'public', table: TOOLS_TABLE },
                     (payload) => handleRealtimePayload(payload, allTools, renderTools, false, false, false, 'id')
                 ).subscribe();
-        }
-
-        async function fetchSales() {
-            if (!supabase) return;
-            const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando ventas:", error); return; }
-            allSales = data;
-            filterAndRenderSales();
         }
 
         window.openProductEditorModal = function(productId, locationKey) { 
