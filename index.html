@@ -45,39 +45,10 @@
         @keyframes pulse { 50% { opacity: .4; } }
         
         /********************************/
-        /* Estilos para impresión de QR */
+        /* Estilos para impresión */
         /********************************/
         @media print {
-            body > *:not(.labels-container):not(#qr-modal) { display: none !important; }
-            
-            /* Contenedor principal de etiquetas: Forzar blanco */
-            .labels-container { 
-                display: flex !important;
-                flex-wrap: wrap;
-                width: 100%;
-                min-height: 100vh;
-                margin: 0;
-                padding: 0;
-                background-color: white !important;
-            }
-            .labels-container > div {
-                width: 100mm; /* Ancho deseado de la etiqueta */
-                height: 35mm; /* Alto deseado de la etiqueta */
-                box-sizing: border-box;
-                border: 1px solid #ccc;
-                margin: 2mm;
-                padding: 5px;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: flex-start;
-                page-break-after: avoid;
-                /* Asegurar que el fondo de cada etiqueta es blanco */
-                background-color: white !important;
-                color: black !important; /* Texto de etiqueta en negro */
-            }
-            .labels-container .qr-box { margin-right: 10px; width: 35mm; height: 35mm; display: flex; justify-content: center; align-items: center; }
-            .labels-container canvas, .labels-container img { width: 30mm !important; height: 30mm !important; }
+            body > *:not(#qr-modal) { display: none !important; }
             
             /* Modal de QR individual (para asegurar fondo blanco en impresión) */
             #qr-modal {
@@ -166,72 +137,8 @@
         .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
         .theme-gold .product-card:hover, .theme-gold .tool-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
         .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
-        .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
-        
-        /********************************/
-        /* TEMA 4: Navidad (Snowfall) */
-        /********************************/
-        .theme-christmas {
-            --bg-primary: #102e4d; /* Azul medianoche */
-            --bg-secondary: #0a1f33; /* Azul más oscuro */
-            --bg-header: rgba(16, 46, 77, 0.9);
-            --text-primary: #e6f7ff;
-            --text-secondary: #b3d9ff;
-            --text-muted: #80bfff;
-            --border-color: #2a5b8e;
-            --accent-color: #ff4545; /* Rojo Festivo */
-            --accent-color-dark: #cc3737; 
-            --font-main: 'Poppins', sans-serif;
-            --font-headings: 'Lora', serif; /* Fuente más elegante */
-            --pastel-bg: #fffafa; /* Nieve */
-            --pastel-text: #102e4d;
-        }
-        .theme-christmas {
-            background: linear-gradient(180deg, #0f1c2b 0%, #102e4d 100%);
-            /* Asegura que la nieve esté sobre el fondo principal */
-            position: relative;
-            z-index: 1; 
-        }
-        /* La animación de nieve se aplica al body::before */
-        .theme-christmas body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 9999;
-            /* Animation de Nieve (Basado en multiple box-shadows) */
-            background-image:
-                /* Nieve lejana, pequeña y rápida */
-                radial-gradient(4px 4px at 20px 30px, var(--text-primary) 50%, transparent 50%),
-                radial-gradient(2px 2px at 40px 70px, var(--text-primary) 50%, transparent 50%),
-                radial-gradient(3px 3px at 60px 20px, var(--text-primary) 50%, transparent 50%),
-                radial-gradient(2px 2px at 80px 50px, var(--text-primary) 50%, transparent 50%),
-                /* Más grande y lenta */
-                radial-gradient(5px 5px at 100px 80px, var(--text-secondary) 50%, transparent 50%),
-                radial-gradient(4px 4px at 120px 40px, var(--text-secondary) 50%, transparent 50%),
-                /* Capa delantera, grande y más lenta */
-                radial-gradient(6px 6px at 140px 10px, var(--text-secondary) 50%, transparent 50%),
-                radial-gradient(5px 5px at 160px 60px, var(--text-secondary) 50%, transparent 50%);
-            background-size: 175px 175px; 
-            animation: snowfall 15s linear infinite;
-        }
-        @keyframes snowfall {
-            0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
-            100% { background-position: 0 175px, 0 175px, 0 175px, 0 175px, 0 175px, 0 175px, 0 175px, 0 175px; }
-        }
-        .theme-christmas .bg-indigo-500, .theme-christmas .hover\:bg-indigo-600:hover { 
-            background-color: var(--accent-color); 
-            box-shadow: 0 0 10px rgba(255, 69, 0, 0.5); /* Sutil brillo rojo */
-        }
-        .theme-christmas .text-indigo-400, .theme-christmas .text-indigo-300 { 
-            color: var(--accent-color); 
-        }
-
-        /********************************/
-        /* TEMA 5: Blue Neon */
+        .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }        /********************************/
+        /* TEMA 4: Blue Neon */
         /********************************/
         .theme-blue-neon {
             --bg-primary: #080a1c; /* Azul muy oscuro/negro */
@@ -309,7 +216,9 @@
             outline: none;
         }
         .bg-blue-600, .bg-green-600 { background-color: var(--accent-color-dark); }
-        .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover { background-color: var(--accent-color); }/********************************/
+        .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover { background-color: var(--accent-color); }
+        
+        /********************************/
         /* ESTILOS FIJOS PARA ESTADOS DE VENTA */
         /********************************/
         .status-paid {
@@ -446,9 +355,8 @@
     <script>
         (function() {
             try {
-                // Se agregan los nuevos temas a la lista de temas válidos
                 const theme = localStorage.getItem('selectedTheme');
-                if (theme && ['theme-dark', 'theme-infernal', 'theme-gold', 'theme-christmas', 'theme-blue-neon'].includes(theme)) {
+                if (theme && ['theme-dark', 'theme-infernal', 'theme-gold', 'theme-blue-neon'].includes(theme)) {
                     document.documentElement.className = theme;
                 } else {
                     document.documentElement.className = 'theme-dark';
@@ -459,12 +367,11 @@
         })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
-<body class="" onclick=""> 
+<body class="">
     
     <div id="app-content-wrapper">
     
@@ -485,7 +392,6 @@
             <div id="view-buttons" class="flex items-center space-x-2 bg-black/20 p-1 rounded-lg border border-gray-700">
                 <button data-view="inventory" class="view-btn bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg text-sm shadow-md transition duration-300">📦 Inventario Principal</button>
                 <button data-view="inventory_bodega" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🏠 Nuevo Inventario</button>
-                <button data-view="labels" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🖨️ Etiquetas QR</button>
                 <button data-view="sales" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">💰 Ventas</button>
                 <button data-view="missing" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🔔 Faltantes</button>
                 <button data-view="tools" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🛠️ Herramientas</button>
@@ -496,16 +402,9 @@
                 </svg>
             </button>
             <div id="mobile-menu-dropdown" class="rounded-md shadow-lg divide-y divide-gray-300 z-50 hidden">
-                 <button id="mobile-scan-button" onclick="openScannerModal()" class="text-sm font-medium flex items-center space-x-2">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
-                     </svg>
-                     <span>Escanear QR (Venta)</span>
-                 </button>
                 <button data-view="inventory" class="view-btn text-sm">📦 Inventario Principal</button>
                 <button data-view="inventory_bodega" class="view-btn text-sm">🏠 Nuevo Inventario</button>
                 <button data-view="sales" class="view-btn text-sm">💰 Ventas</button>
-                <button data-view="labels" class="view-btn text-sm">🖨️ Etiquetas QR</button>
                 <button data-view="missing" class="view-btn text-sm">🔔 Faltantes</button>
                 <button data-view="tools" class="view-btn text-sm">🛠️ Herramientas</button>
             </div>
@@ -523,7 +422,6 @@
                             <option value="theme-dark">Predeterminado</option>
                             <option value="theme-infernal">Fuego Infernal</option>
                             <option value="theme-gold">Luxury Gold</option>
-                            <option value="theme-christmas">🎄 Navidad (Snowfall)</option>
                             <option value="theme-blue-neon">💙 Neón Azul</option>
                         </select>
                     </div>
@@ -537,41 +435,6 @@
         </div>
     </header><div class="container mx-auto px-4 py-6">
         <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario Principal</p>
-        <div id="labels-view" class="view-section hidden">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-indigo-300">🖨️ Generar e Imprimir Etiquetas QR Masivas</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="labels-location" class="block text-sm font-medium text-gray-300">Seleccionar Inventario</label>
-                        <select id="labels-location" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
-                            <option value="main">Inventario Principal</option>
-                            <option value="bodega">Nuevo Inventario</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="labels-category" class="block text-sm font-medium text-gray-300">Filtrar por Categoría (Opcional)</label>
-                        <select id="labels-category" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
-                            <option value="all">Todas las Categorías</option>
-                            </select>
-                    </div>
-                </div>
-                <div class="mt-6 flex justify-between items-center">
-                    <span id="labels-count" class="text-sm text-gray-400">0 Productos seleccionados</span>
-                    <div class="flex space-x-3">
-                        <button onclick="downloadAllLabelsAsZip()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow-lg disabled:bg-gray-500">
-                            Descargar todos los QRs (.zip) 💾
-                        </button>
-                        <button onclick="generateAndPrintLabels()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 rounded shadow-lg disabled:bg-gray-500">
-                            Generar e Imprimir Etiquetas 🖨️
-                        </button>
-                    </div>
-                </div>
-                <p class="text-sm text-gray-400 mt-3">Recuerda: Cada etiqueta QR representa **un tipo de producto** (una ficha) y debe colocarse en la caja de ese artículo, no en cada unidad.</p>
-            </section>
-            <div id="labels-output" class="labels-container flex flex-wrap gap-4 mt-8">
-                <p class="p-4 text-gray-400">Selecciona el inventario y presiona "Generar e Imprimir Etiquetas" o "Descargar QRs".</p>
-            </div>
-        </div>
         
         <div id="inventory-view" class="view-section hidden">
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
@@ -647,12 +510,6 @@
             <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-semibold text-indigo-300">✍️ Registrar Nueva Venta</h2>
-                    <button id="sales-scan-button" onclick="openScannerModal()" class="hidden md:flex text-white py-2 px-4 rounded-lg bg-green-600 hover:bg-green-700 transition duration-300 shadow-md text-sm items-center space-x-1" title="Escanear Producto y Registrar Venta">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
-                        </svg>
-                        <span>Escanear QR</span>
-                    </button>
                 </div>
                 <form id="sale-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                     <div><label class="block text-sm font-medium text-gray-300">Nombre de Destinatario</label><input id="recipient-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Juan Pérez" /></div>
@@ -753,537 +610,1138 @@
             <p>&copy; 2025 Derechos Reservados. Desarrollado por Freddy Granados.</p>
         </footer>
     </div>
+    
     <div id="product-editor-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeProductEditorModal()"></div>
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
         <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-gray-700">
-          <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <div class="sm:flex sm:items-start">
-              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                <h3 class="text-xl leading-6 font-medium text-white border-b border-indigo-500 pb-2 mb-4" id="modal-title">
-                  ✍️ Editar Producto (<span id="modal-location"></span>)
-                </h3>
-                <form id="modal-product-form" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-4">
-                        <label class="block text-sm font-medium text-gray-300">Imagen Actual</label>
-                        <div class="h-40 bg-gray-600 rounded flex items-center justify-center overflow-hidden border-2 border-gray-600">
-                            <img id="modal-image-preview" src="" class="object-contain h-full w-full" alt="Previsualización" />
-                        </div>
-                        <label for="modal-image-upload" class="block text-sm font-medium text-gray-300">Subir Nueva Imagen</label>
-                        <input type="file" id="modal-image-upload" accept="image/*" class="mt-1 block w-full p-1.5 border rounded-md bg-gray-600 border-gray-500 text-white text-sm" />
-                    </div>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Nombre</label>
-                            <input id="modal-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Categoría</label>
-                            <select id="modal-category" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
-                                <option value="Pantallas">Pantallas</option>
-                                <option value="Jacks de Carga">Jacks de Carga</option>
-                                <option value="Flex Main">Flex Main</option>
-                                <option value="Placas de Carga">Placas de Carga</option>
-                                <option value="Botones Fisicos">Botones Fisicos</option>
-                                <option value="Botones Internos">Botones Internos</option>
-                                <option value="Tapaderas de Iphone">Tapaderas de Iphone</option>
-                                <option value="Bandejas SIM">Bandejas SIM</option>
-                                <option value="Flex de Iphone">Flex de Iphone</option>
-                                <option value="Tapaderas">Tapaderas</option>
-                                <option value="Accesorios">Accesorios</option>
-                                <option value="Otros">Otros</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Precio (USD)</label>
-                            <input id="modal-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Cantidad Disponible</label>
-                            <input id="modal-quantity" type="number" min="0" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Caja Número</label>
-                            <input id="modal-box-number" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: B-05" />
-                        </div>
-                        <p id="modal-status" class="text-sm text-gray-400 mt-3"></p>
-                    </div>
-                </form>
-              </div>
-            </div>
+          <div class="bg-gray-800 px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">Editar Producto - <span id="modal-location"></span></h3>
           </div>
-          <div class="bg-gray-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse justify-between border-t border-gray-700">
-              <div class="flex items-center space-x-2">
-                <button type="button" onclick="openQrModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 sm:w-auto sm:text-sm transition mt-2 sm:mt-0">
-                    Generar QR para Imprimir 🖨️
+          <div class="px-4 py-5 sm:p-6">
+            <form id="modal-product-form">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-300">Nombre</label>
+                  <input id="modal-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-300">Categoría</label>
+                  <select id="modal-category" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
+                    <option value="">Seleccionar</option>
+                    <option value="Pantallas">Pantallas</option>
+                    <option value="Jacks de Carga">Jacks de Carga</option>
+                    <option value="Flex Main">Flex Main</option>
+                    <option value="Placas de Carga">Placas de Carga</option>
+                    <option value="Botones Fisicos">Botones Fisicos</option>
+                    <option value="Botones Internos">Botones Internos</option>
+                    <option value="Tapaderas de Iphone">Tapaderas de Iphone</option>
+                    <option value="Bandejas SIM">Bandejas SIM</option>
+                    <option value="Flex de Iphone">Flex de Iphone</option>
+                    <option value="Tapaderas">Tapaderas</option>
+                    <option value="Accesorios">Accesorios</option>
+                    <option value="Otros">Otros</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-300">Precio (USD)</label>
+                  <input id="modal-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-300">Cantidad</label>
+                  <input id="modal-quantity" type="number" min="0" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-300">Caja N°</label>
+                  <input id="modal-box-number" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-300">Imagen Actual</label>
+                  <img id="modal-image-preview" src="" alt="Previsualización" class="mt-1 w-full h-48 object-contain bg-gray-700 rounded" />
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-300">Cambiar Imagen</label>
+                  <input id="modal-image-upload" type="file" accept="image/*" class="mt-1 block w-full p-1.5 border rounded-md bg-gray-600 border-gray-500 text-white" />
+                </div>
+              </div>
+              <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
+                <button id="modal-save-button" type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+                  Guardar Cambios
                 </button>
-                <button type="button" onclick="downloadQrCode()" id="download-qr-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-500 text-base font-medium text-white hover:bg-indigo-600 sm:w-auto sm:text-sm transition mt-2 sm:mt-0">
-                    Descargar QR 💾
+                <button type="button" onclick="closeProductEditorModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-700 text-base font-medium text-gray-300 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                  Cancelar
                 </button>
-             </div>
-            <div class="flex flex-col sm:flex-row-reverse">
-                <button type="submit" form="modal-product-form" id="modal-save-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-500 text-base font-medium text-white hover:bg-indigo-600 sm:ml-3 sm:w-auto sm:text-sm transition">
-                    Guardar Cambios
-                </button>
-                <button type="button" onclick="closeProductEditorModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-700 text-base font-medium text-gray-200 hover:bg-gray-600 sm:mt-0 sm:w-auto sm:text-sm transition">
-                    Cancelar
-                </button>
-            </div>
+              </div>
+              <p id="modal-status" class="text-sm text-gray-400 mt-4 text-center"></p>
+            </form>
           </div>
         </div>
       </div>
-    </div>
-    <div id="qr-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="qr-modal-title" role="dialog" aria-modal="true">
+    </div>    <div id="scanner-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="scanner-modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-white bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeQrModal()"></div>
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-90 transition-opacity" aria-hidden="true"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-gray-300">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <h3 class="text-lg leading-6 font-medium text-black mb-4 border-b border-purple-500 pb-2" id="qr-modal-title">Código QR para Impresión</h3>
-                    <div id="qr-code-container" class="flex justify-center p-4 bg-white rounded">
+            <div class="inline-block align-bottom rounded-lg text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content">
+                <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start flex-col">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
+                            </svg>
                         </div>
-                    <p id="qr-product-info" class="text-black text-center mt-3 text-sm"></p>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-2xl leading-6 font-bold mb-4" id="scanner-modal-title">
+                                Escanear Código QR para Venta Rápida
+                            </h3>
+                            <div id="reader" class="w-full"></div>
+                            <p class="text-sm text-center mt-4" id="scanner-status">Esperando código QR o de barras...</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-gray-100 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" onclick="window.print()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-500 text-base font-medium text-white hover:bg-indigo-600 sm:ml-3 sm:w-auto sm:text-sm transition print:hidden">
-                        Imprimir Etiqueta
-                    </button>
-                    <button type="button" onclick="closeQrModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-400 text-base font-medium text-black hover:bg-gray-300 sm:mt-0 sm:w-auto sm:text-sm transition print:hidden">
-                        Cerrar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="scanner-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="scanner-modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeScannerModal(true)"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-700 modal-content">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <h3 class="text-lg leading-6 font-medium text-black mb-4 border-b border-green-500 pb-2" id="scanner-modal-title">Escanear Producto para Venta</h3>
-                    <div id="reader" style="width: 100%;"></div>
-                    <p id="scanner-status" class="text-black text-sm mt-3">Esperando código QR o de barras...</p>
-                </div>
-                <div class="bg-gray-100 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" onclick="closeScannerModal(true)" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-700 text-base font-medium text-gray-200 hover:bg-gray-600 sm:mt-0 sm:w-auto sm:text-sm transition">
-                        Cancelar Escaneo
+                <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button onclick="closeScannerModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 sm:ml-3 sm:w-auto sm:text-sm transition">
+                        Cerrar Escáner
                     </button>
                 </div>
             </div>
         </div>
-    </div>
-    <input type="file" id="tool-image-editor-input" class="hidden" accept="image/*" />
-    
     </div>
 
     <script>
-        // =================================================================================
-        // == Configuración de Supabase y Edge Function para R2                       ==
-        // =================================================================================
-        const createClient = window.supabase ? window.supabase.createClient : null;
-        const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
-        let supabase = null;
-        if (createClient) {
-            supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } else {
-            console.error("Error Crítico: La librería Supabase no se ha cargado.");
-        }
-        const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
-        
-        // --- INICIO: Definición de Constantes de Tablas y Estilos ---
-        const PRODUCTS_TABLE = "products";
-        const PRODUCTS_BODEGA_TABLE = "products_nuevo"; // ACTUALIZADO: Nombre de la tabla de Bodega
-        const SALES_TABLE = "sales";
-        const MISSING_PRODUCTS_TABLE = "missing_products";
-        const TOOLS_TABLE = "tools"; 
-        const CONFIG_TABLE = "config"; 
-        const STATUS_COLORS = { 
-            'Pagado': 'status-paid', 
-            'Pendiente': 'status-pending', 
-            'Devuelto': 'status-returned' 
-        };
-        // --- FIN: Definición de Constantes de Tablas y Estilos ---
+        const supabaseUrl = 'https://tu-proyecto.supabase.co';
+        const supabaseAnonKey = 'tu-anon-key';
+        const supabase = Supabase.createClient(supabaseUrl, supabaseAnonKey);
 
-        // ============================================================================
-        // == II. INICIALIZACIÓN DE VARIABLES GLOBALES Y ELEMENTOS DEL DOM (CRÍTICO) ==
-        // ============================================================================
+        const PRODUCTS_TABLE = 'products';
+        const PRODUCTS_BODEGA_TABLE = 'products_nuevo';
+        const SALES_TABLE = 'sales';
+        const MISSING_PRODUCTS_TABLE = 'missing_products';
+        const TOOLS_TABLE = 'tools';
 
-        // --- Variables de Estado ---
-        let allProducts = [], allProductsBodega = [], allSales = [], allMissingProducts = [], allTools = [], selectedLogoFile = null;
-        let editingToolId = null; 
+        let allProducts = [];
+        let allProductsBodega = [];
+        let allSales = [];
+        let allMissingProducts = [];
+        let allTools = [];
         let currentEditingProduct = null;
-        let isMainInventory = true;
-        let selectedProductImageFile = null; 
-        
-        // --- ADICIÓN: Variables para almacenar totales por categoría ---
-        let categoryTotals = {};
-        let categoryTotalsBodega = {}; 
-        
-        // --- ADICIÓN: Elementos para mostrar los totales ---
-        const categoryTotalsEl = document.createElement("div"); 
-        categoryTotalsEl.id = "category-totals";
-        categoryTotalsEl.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
-        
-        const categoryTotalsElBodega = document.createElement("div"); 
-        categoryTotalsElBodega.id = "category-totals-bodega";
-        categoryTotalsElBodega.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
+        let selectedProductImageFile = null;
+        let editingToolId = null;
+        let html5QrcodeScanner = null;
+        let isScannerRunning = false;
+        let scanSuccessHandled = false;
 
-        // --- Elementos de Configuración General ---
-        const themeSelector = document.getElementById('theme-selector');
-        const root = document.documentElement;
-        const settingsDropdown = document.getElementById('settings-dropdown');
-        const settingsButton = document.getElementById('settings-button');
-        const logoUpload = document.getElementById("logo-upload"), businessLogo = document.getElementById("business-logo"), logoSaveButton = document.getElementById("logo-save-button");
-        const currentViewTitle = document.getElementById("current-view-title");
-        const toolImageEditorInput = document.getElementById('tool-image-editor-input'); 
+        const appContentWrapper = document.getElementById('app-content-wrapper');
+        const viewSections = document.querySelectorAll('.view-section');
+        const currentViewTitle = document.getElementById('current-view-title');
 
-        // --- Elementos de Inventario Principal ---
-        const form = document.getElementById("product-form"), nameIn = document.getElementById("name"), categoryIn = document.getElementById("category-select"), priceIn = document.getElementById("price"), qtyIn = document.getElementById("quantity"), imageIn = document.getElementById("image"), status = document.getElementById("status"), productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader"), boxNumberIn = document.getElementById("box-number");
+        const form = document.getElementById('product-form');
+        const nameIn = document.getElementById('name');
+        const categoryIn = document.getElementById('category-select');
+        const boxNumberIn = document.getElementById('box-number');
+        const priceIn = document.getElementById('price');
+        const qtyIn = document.getElementById('quantity');
+        const imageIn = document.getElementById('image');
+        const status = document.getElementById('status');
+        const searchInput = document.getElementById('search-input');
+        const productsEl = document.getElementById('products');
+        const productsLoader = document.getElementById('products-loader');
+        const totalCount = document.getElementById('total-count');
 
-        // --- Elementos de Nuevo Inventario (Bodega) ---
-        const formBodega = document.getElementById("product-form-bodega"), nameInBodega = document.getElementById("name-bodega"), categoryInBodega = document.getElementById("category-select-bodega"), priceInBodega = document.getElementById("price-bodega"), qtyInBodega = document.getElementById("quantity-bodega"), imageInBodega = document.getElementById("image-bodega"), statusBodega = document.getElementById("status-bodega"), productsElBodega = document.getElementById("products-bodega"), totalCountBodega = document.getElementById("total-count-bodega"), searchInputBodega = document.getElementById("search-input-bodega"), productsLoaderBodega = document.getElementById("products-loader-bodega"), boxNumberInBodega = document.getElementById("box-number-bodega");// --- Elementos de Ventas ---
-        const salesForm = document.getElementById("sale-form"), recipientNameIn = document.getElementById("recipient-name"), productNameSoldIn = document.getElementById("product-name-sold"), salePriceIn = document.getElementById("sale-price"), saleDateIn = document.getElementById("sale-date"), saleStatusInput = document.getElementById("sale-status-input"), salesListContainer = document.getElementById("sales-list-container"), saleStatus = document.getElementById("sale-status"), totalSalesCount = document.getElementById("total-sales-count"), salesListLoader = document.getElementById("sales-list-loader"), searchSalesInput = document.getElementById("search-sales-input"), pendingOnlyCheckbox = document.getElementById("pending-only-checkbox");
+        const formBodega = document.getElementById('product-form-bodega');
+        const nameInBodega = document.getElementById('name-bodega');
+        const categoryInBodega = document.getElementById('category-select-bodega');
+        const boxNumberInBodega = document.getElementById('box-number-bodega');
+        const priceInBodega = document.getElementById('price-bodega');
+        const qtyInBodega = document.getElementById('quantity-bodega');
+        const imageInBodega = document.getElementById('image-bodega');
+        const statusBodega = document.getElementById('status-bodega');
+        const searchInputBodega = document.getElementById('search-input-bodega');
+        const productsBodegaEl = document.getElementById('products-bodega');
+        const productsLoaderBodega = document.getElementById('products-loader-bodega');
+        const totalCountBodega = document.getElementById('total-count-bodega');
+
+        const salesForm = document.getElementById('sale-form');
+        const recipientNameIn = document.getElementById('recipient-name');
+        const productNameSoldIn = document.getElementById('product-name-sold');
+        const salePriceIn = document.getElementById('sale-price');
+        const saleDateIn = document.getElementById('sale-date');
+        const saleStatusInput = document.getElementById('sale-status-input');
+        const saleStatus = document.getElementById('sale-status');
+        const searchSalesInput = document.getElementById('search-sales-input');
+        const pendingOnlyCheckbox = document.getElementById('pending-only-checkbox');
+        const salesListContainer = document.getElementById('sales-list-container');
+        const salesListLoader = document.getElementById('sales-list-loader');
+        const totalSalesCount = document.getElementById('total-sales-count');
         const inventorySuggestions = document.getElementById('inventory-suggestions');
 
-        // --- Elementos de Etiquetas QR (Labels) ---
-        const labelsLocationSelect = document.getElementById('labels-location');
-        const labelsCategorySelect = document.getElementById('labels-category');
-        const labelsOutputDiv = document.getElementById('labels-output');
-        const labelsCountSpan = document.getElementById('labels-count');
+        const missingProductForm = document.getElementById('missing-product-form');
+        const missingProductNameIn = document.getElementById('missing-product-name');
+        const missingProductNotesIn = document.getElementById('missing-product-notes');
+        const missingProductStatus = document.getElementById('missing-product-status');
+        const missingList = document.getElementById('missing-list');
+        const missingListLoader = document.getElementById('missing-list-loader');
+        const totalMissingCount = document.getElementById('total-missing-count');
 
-        // --- Elementos de Faltantes ---
-        const missingProductForm = document.getElementById("missing-product-form"), missingProductNameIn = document.getElementById("missing-product-name"), missingProductNotesIn = document.getElementById("missing-product-notes"), missingProductStatus = document.getElementById("missing-product-status"), missingListEl = document.getElementById("missing-list"), totalMissingCount = document.getElementById("total-missing-count"), missingListLoader = document.getElementById("missing-list-loader");
-        
-        // --- Elementos de Herramientas ---
-        const toolForm = document.getElementById("tool-form"), toolTitleIn = document.getElementById("tool-title"), toolDescriptionIn = document.getElementById("tool-description"), toolImageIn = document.getElementById("tool-image"), toolStatus = document.getElementById("tool-status"), toolsListEl = document.getElementById("tools-list"), totalToolsCount = document.getElementById("total-tools-count"), toolsLoader = document.getElementById("tools-loader");
+        const toolForm = document.getElementById('tool-form');
+        const toolTitleIn = document.getElementById('tool-title');
+        const toolDescriptionIn = document.getElementById('tool-description');
+        const toolImageIn = document.getElementById('tool-image');
+        const toolStatus = document.getElementById('tool-status');
+        const toolsListEl = document.getElementById('tools-list');
+        const toolsLoader = document.getElementById('tools-loader');
+        const totalToolsCount = document.getElementById('total-tools-count');
+        const toolImageEditorInput = document.createElement('input');
+        toolImageEditorInput.type = 'file';
+        toolImageEditorInput.accept = 'image/*';
+        toolImageEditorInput.style.display = 'none';
+        document.body.appendChild(toolImageEditorInput);
 
-        // --- Elementos de Modales y QR/Scanner ---
         const modal = document.getElementById('product-editor-modal');
-        const qrModal = document.getElementById('qr-modal');
-        const qrCodeContainer = document.getElementById('qr-code-container');
-        const qrProductInfo = document.getElementById('qr-product-info');
-        let currentQrCanvas = null;
-        const scannerModal = document.getElementById('scanner-modal');
-        const scannerStatusEl = document.getElementById('scanner-status');
-        let html5QrcodeScanner = null;
-        let scanSuccessHandled = false;
-        let isScannerRunning = false;
-        
-        // --- Elementos del Modal de Edición de Producto ---
         const modalProductForm = document.getElementById('modal-product-form');
         const modalName = document.getElementById('modal-name');
         const modalCategory = document.getElementById('modal-category');
         const modalPrice = document.getElementById('modal-price');
         const modalQuantity = document.getElementById('modal-quantity');
         const modalBoxNumber = document.getElementById('modal-box-number');
-        const modalLocation = document.getElementById('modal-location');
         const modalImagePreview = document.getElementById('modal-image-preview');
         const modalImageUpload = document.getElementById('modal-image-upload');
+        const modalLocation = document.getElementById('modal-location');
         const modalStatus = document.getElementById('modal-status');
-        
-        // --- ADICIÓN: Elementos de Menú Móvil ---
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenuDropdown = document.getElementById('mobile-menu-dropdown');
-        const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
-        
-        // --- ADICIÓN: Variable global para rastrear la vista actual antes de la recarga
-        let currentView = 'inventory'; // Valor predeterminado
 
-        // ============================================================================
-        // == IV. LÓGICA DE TEMAS Y DROPDOWN                                      ==
-        // ============================================================================
+        const scannerModal = document.getElementById('scanner-modal');
+        const scannerStatusEl = document.getElementById('scanner-status');
 
-        function applyTheme(theme) {
-            root.className = theme;
-            localStorage.setItem('selectedTheme', theme);
-            themeSelector.value = theme;
-            
-            if (theme === 'theme-christmas') {
-                document.body.classList.add('theme-christmas');
-            } else {
-                document.body.classList.remove('theme-christmas');
-            }
+        const businessLogo = document.getElementById('business-logo');
+        const logoUpload = document.getElementById('logo-upload');
+        const logoSaveButton = document.getElementById('logo-save-button');
+
+        const themeSelector = document.getElementById('theme-selector');
+
+        function setStatusMessage(el, msg, success = true) {
+            el.textContent = msg;
+            el.style.color = success ? '#10b981' : '#ef4444';
         }
-        themeSelector.addEventListener('change', (e) => {
-            applyTheme(e.target.value);
-        });
-        window.toggleSettingsDropdown = function(event) {
-            event.stopPropagation(); 
-            settingsDropdown.classList.toggle('hidden');
-            mobileMenuDropdown.classList.add('hidden');
-        };
-        
-        window.toggleMobileMenu = function(event) {
-            event.stopPropagation(); 
-            mobileMenuDropdown.classList.toggle('hidden');
-            settingsDropdown.classList.add('hidden');
-        };
-        
-        document.body.addEventListener('click', (event) => {
-            if (settingsDropdown && !settingsDropdown.classList.contains('hidden')) {
-                if (!settingsDropdown.contains(event.target) && !settingsButton.contains(event.target)) {
-                    settingsDropdown.classList.add('hidden');
-                }
-            }
-             if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden')) {
-                if (!mobileMenuDropdown.contains(event.target) && !mobileMenuButton.contains(event.target)) {
-                   mobileMenuDropdown.classList.add('hidden');
-                }
-             }
+
+        function isMobile() {
+            return window.innerWidth <= 768;
+        }
+
+        function toggleMobileMenu(event) {
+            event.stopPropagation();
+            document.getElementById('mobile-menu-dropdown').classList.toggle('hidden');
+        }
+
+        function toggleSettingsDropdown(event) {
+            event.stopPropagation();
+            document.getElementById('settings-dropdown').classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', () => {
+            document.getElementById('mobile-menu-dropdown').classList.add('hidden');
+            document.getElementById('settings-dropdown').classList.add('hidden');
         });
 
-        // ============================================================================
-        // == V. UTILIDADES Y LÓGICA COMPARTIDA                                     ==
-        // ============================================================================
-
-        function setStatusMessage(el, msg, success = true) { 
-            el.textContent = msg; 
-            el.className = `text-sm mt-3 ${success ? 'text-green-400' : 'text-red-400'}`; 
-            setTimeout(() => (el.textContent = ""), 3000); 
+        function toggleView(viewName) {
+            viewSections.forEach(sec => sec.classList.add('hidden'));
+            const target = document.getElementById(viewName + '-view');
+            if (target) target.classList.remove('hidden');
+            const btnText = document.querySelector(`[data-view="${viewName}"]`)?.textContent.trim() || viewName;
+            currentViewTitle.textContent = `Vista: ${btnText}`;
+            localStorage.setItem('lastView', viewName);
         }
-        
-        function getCleanProductName(inputName) {
-            const match = inputName.match(/^(.*?)\s+\((.*?)$/);
-            if (match) {
-                return match[1].trim();
-            }
-            return inputName.trim();
+
+        function applyTheme(themeClass) {
+            document.documentElement.className = themeClass;
+            localStorage.setItem('selectedTheme', themeClass);
         }
 
         async function uploadImage(file) {
-            if (!file || !supabase) return null;
-            const formData = new FormData();
-            formData.append('file', file);
-            const response = await fetch(SUPABASE_FUNCTION_URL, {
-                method: 'POST',
-                body: formData
-            });
-            const data = await response.json();
-            if (!response.ok || !data.success) {
-                throw new Error(data.error || 'La subida del archivo falló.');
-            }
-            return data.url; 
+            if (!file) return null;
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+            const { error } = await supabase.storage.from('product-images').upload(fileName, file);
+            if (error) throw error;
+            const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(fileName);
+            return publicUrl;
         }
 
-        function updateAutocompleteList(productsArray, datalistElement) {
-            datalistElement.innerHTML = '';
-            const combinedProducts = [...allProducts, ...allProductsBodega];
-            const sortedProducts = [...combinedProducts].sort((a, b) => a.name.localeCompare(b.name));
-            const uniqueNames = new Set();
-            sortedProducts.filter(p => p.quantity > 0).forEach(product => {
-                const nameWithCategory = product.name + (product.category ? ` (${product.category})` : '');
-                if (!uniqueNames.has(nameWithCategory)) {
-                    const option = document.createElement('option');
-                    option.value = nameWithCategory;
-                    datalistElement.appendChild(option);
-                    uniqueNames.add(nameWithCategory);
+        async function loadLogo() {
+            try {
+                const { data } = supabase.storage.from('logos').getPublicUrl('business-logo.png');
+                if (data?.publicUrl) {
+                    businessLogo.src = data.publicUrl + '?t=' + new Date().getTime();
+                }
+            } catch (e) {}
+        }
+
+        logoUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            logoSaveButton.disabled = false;
+            logoSaveButton.onclick = async () => {
+                try {
+                    await supabase.storage.from('logos').upload('business-logo.png', file, { upsert: true });
+                    await loadLogo();
+                    alert('Logo actualizado');
+                    logoSaveButton.disabled = true;
+                } catch (err) {
+                    alert('Error logo: ' + err.message);
+                }
+            };
+        });
+
+        themeSelector.addEventListener('change', (e) => applyTheme(e.target.value));
+
+        function showSkeletonLoaders() {
+            [productsLoader, productsLoaderBodega, salesListLoader, missingListLoader, toolsLoader].forEach(loader => {
+                loader.innerHTML = '';
+                for (let i = 0; i < 8; i++) {
+                    const sk = document.createElement('div');
+                    sk.className = 'skeleton-card';
+                    sk.innerHTML = `<div class="h-48 skeleton-line mb-4"></div><div class="h-6 skeleton-line mb-2"></div><div class="h-4 skeleton-line w-3/4 mb-2"></div><div class="h-4 skeleton-line w-1/2"></div>`;
+                    loader.appendChild(sk);
                 }
             });
+        }
+
+        function calculateCategoryTotals(products, isMain = true, isSales = false, isBodega = false) {
+            const countEl = isMain ? totalCount : totalCountBodega;
+            if (!countEl) return;
+            const total = products.length;
+            const totalValue = products.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+            countEl.textContent = `${total} productos | Valor total: $${totalValue.toFixed(2)} USD`;
+        }
+
+        function updateProductCardInDOM(product, isMain = true, isSales = false, isBodega = false) {
+            const container = isMain ? productsEl : productsBodegaEl;
+            const existingCard = Array.from(container.children).find(card => card.querySelector('h3')?.textContent === product.name);
+            if (existingCard) {
+                const newCard = renderProductCard(product, isMain, isBodega);
+                container.replaceChild(newCard, existingCard);
+            }
+        }
+
+        function renderProductCard(product, isMain = true, isBodega = false) {
+            const card = document.createElement('div');
+            card.className = 'product-card bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700';
+            const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : 'https://via.placeholder.com/300x200/4f46e5/ffffff?text=Sin+Imagen';
+            card.innerHTML = `
+                <img src="${imageUrl}" alt="${product.name}" class="w-full h-48 object-cover" onerror="this.src='https://via.placeholder.com/300x200/4f46e5/ffffff?text=Sin+Imagen'" />
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-white mb-2">${product.name}</h3>
+                    <p class="text-sm text-gray-400 mb-1">Categoría: ${product.category || 'N/A'}</p>
+                    <p class="text-sm text-gray-400 mb-1">Caja: ${product.box_number || 'N/A'}</p>
+                    <p class="text-xl font-bold text-green-400 mb-3">$${Number(product.price).toFixed(2)}</p>
+                    <p class="text-sm ${product.quantity > 0 ? 'text-green-400' : 'text-red-400'} font-bold mb-4">Stock: ${product.quantity}</p>
+                    <div class="flex space-x-2">
+                        <button onclick="openProductEditorModal('${product.id}', '${isMain ? 'main' : 'bodega'}')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded">Editar</button>
+                        <button onclick="deleteProduct('${product.id}', '${isMain ? 'main' : 'bodega'}')" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded">Eliminar</button>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        function getCleanProductName(nameWithCategory) {
+            return nameWithCategory.replace(/\s*\([^)]*\)$/, '').trim();
         }
 
         async function updateProductStock(productName, table, localArray, delta) {
-            const cleanProductName = getCleanProductName(productName);
-            const productToUpdate = localArray.find(p => getCleanProductName(p.name).trim() === cleanProductName);
+            const cleanName = getCleanProductName(productName);
+            const product = localArray.find(p => getCleanProductName(p.name) === cleanName);
+            if (!product || product.quantity + delta < 0) return false;
+            const newQty = product.quantity + delta;
+            const { error } = await supabase.from(table).update({ quantity: newQty }).eq('id', product.id);
+            if (error) throw error;
+            product.quantity = newQty;
+            return true;
+        }
 
-            if (productToUpdate) {
-                const currentQty = parseInt(productToUpdate.quantity) || 0;
-                const newQty = Math.max(0, currentQty + delta);
-                const isMain = (table === PRODUCTS_TABLE); 
-                const isBodega = (table === PRODUCTS_BODEGA_TABLE);
-
-                if (delta < 0 && currentQty <= 0) return;
-                
-                productToUpdate.quantity = newQty;
-                updateProductCardInDOM(productToUpdate, isMain, false, isBodega); 
-                updateAutocompleteList(localArray, inventorySuggestions);
-                calculateCategoryTotals(localArray, isMain, false, isBodega);
-
-                if(isMain) renderProducts(allProducts.filter(p => true)); 
-                else renderProductsBodega(allProductsBodega.filter(p => true)); 
-                
-                if (!supabase) return;
-                const { error: updateError } = await supabase.from(table).update({ quantity: newQty }).eq("id", productToUpdate.id);
-                
-                if (updateError) {
-                    productToUpdate.quantity = currentQty;
-                    updateProductCardInDOM(productToUpdate, isMain, false, isBodega);
-                    calculateCategoryTotals(localArray, isMain, false, isBodega);
-                    alert(`❌ Error al actualizar stock.`);
-                }
+        async function deleteProduct(id, locationKey) {
+            if (!confirm("¿Eliminar este producto permanentemente?")) return;
+            const table = locationKey === 'main' ? PRODUCTS_TABLE : PRODUCTS_BODEGA_TABLE;
+            const localArray = locationKey === 'main' ? allProducts : allProductsBodega;
+            const { error } = await supabase.from(table).delete().eq('id', id);
+            if (error) {
+                alert("Error al eliminar: " + error.message);
+            } else {
+                const index = localArray.findIndex(p => p.id === id);
+                if (index !== -1) localArray.splice(index, 1);
+                locationKey === 'main' ? filterAndRenderProducts() : filterAndRenderProductsBodega();
             }
         }
-        
-        const LOGO_CONFIG_KEY = "current_logo_url";
-        async function loadLogo() {
-            if (!supabase) return;
-            try {
-                const { data, error } = await supabase.from(CONFIG_TABLE).select("value").eq("key", LOGO_CONFIG_KEY).single();
-                if (error || !data || !data.value) return; 
-                businessLogo.src = `${data.value}?t=${new Date().getTime()}`; 
-            } catch (err) {}
-        }
-        
-        function calculateCategoryTotals(productsArray, isMain, isET, isBodega) {
-            const totals = productsArray.reduce((acc, p) => {
-                const cat = p.category || 'Otros';
-                acc[cat] = (acc[cat] || 0) + parseInt(p.quantity || 0);
-                return acc;
-            }, {});
-            if (isMain) categoryTotals = totals;
-            else if (isBodega) categoryTotalsBodega = totals;
-            return totals;
+
+        function updateAutocompleteList() {
+            inventorySuggestions.innerHTML = '';
+            const allNames = [...allProducts, ...allProductsBodega].map(p => p.name + (p.category ? ` (${p.category})` : ''));
+            allNames.forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                inventorySuggestions.appendChild(opt);
+            });
         }
 
-        const views = { 
-            inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario Principal' }, 
-            inventory_bodega: { el: document.getElementById('inventory-bodega-view'), title: 'Vista: Nuevo Inventario' }, 
-            labels: { el: document.getElementById('labels-view'), title: 'Vista: Generación de Etiquetas QR' },
-            sales: { el: document.getElementById('sales-view'), title: 'Vista: Ventas Registradas' },
-            missing: { el: document.getElementById('missing-view'), title: 'Vista: Productos Faltantes' },
-            tools: { el: document.getElementById('tools-view'), title: 'Vista: Herramientas y Tutoriales' } 
-        };
-        
-        function toggleView(viewName) { 
-            Object.keys(views).forEach(key => { 
-                const isCurrent = key === viewName; 
-                views[key].el.classList.toggle('hidden', !isCurrent); 
-                const btn = document.querySelector(`#view-buttons .view-btn[data-view="${key}"]`); 
-                if (btn) {
-                    btn.classList.toggle('bg-indigo-500', isCurrent); 
-                    btn.classList.toggle('text-white', isCurrent); 
-                    btn.classList.toggle('bg-transparent', !isCurrent); 
+        async function fetchProducts() {
+            const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category").order("created_at", { ascending: false });
+            if (error) { console.error(error); return; }
+            allProducts = data || [];
+            filterAndRenderProducts();
+            updateAutocompleteList();
+        }
+
+        async function fetchProductsBodega() {
+            const { data, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).select("*").order("category").order("created_at", { ascending: false });
+            if (error) { console.error(error); return; }
+            allProductsBodega = data || [];
+            filterAndRenderProductsBodega();
+            updateAutocompleteList();
+        }
+
+        function filterAndRenderProducts() {
+            productsEl.innerHTML = '';
+            let filtered = allProducts;
+            const term = searchInput.value.toLowerCase();
+            if (term) {
+                filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term)));
+            }
+            filtered.forEach(p => productsEl.appendChild(renderProductCard(p, true)));
+            calculateCategoryTotals(filtered, true);
+        }
+
+        function filterAndRenderProductsBodega() {
+            productsBodegaEl.innerHTML = '';
+            let filtered = allProductsBodega;
+            const term = searchInputBodega.value.toLowerCase();
+            if (term) {
+                filtered = allProductsBodega.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term)));
+            }
+            filtered.forEach(p => productsBodegaEl.appendChild(renderProductCard(p, false, true)));
+            calculateCategoryTotals(filtered, false, false, true);
+        }
+
+        async function fetchSales() {
+            const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
+            if (error) { console.error(error); return; }
+            allSales = data || [];
+            filterAndRenderSales();
+        }
+
+        function filterAndRenderSales() {
+            salesListContainer.innerHTML = '';
+            let filtered = allSales;
+            const term = searchSalesInput.value.toLowerCase();
+            if (term) {
+                filtered = filtered.filter(s => s.recipient_name.toLowerCase().includes(term) || s.product_name_sold.toLowerCase().includes(term));
+            }
+            if (pendingOnlyCheckbox.checked) {
+                filtered = filtered.filter(s => s.status === 'Pendiente');
+            }
+            totalSalesCount.textContent = `${filtered.length} ventas`;
+            if (filtered.length === 0) {
+                salesListContainer.innerHTML = '<p class="text-center text-gray-400 py-8">No hay ventas que coincidan con los filtros.</p>';
+                return;
+            }
+            const table = document.createElement('table');
+            table.className = 'sales-list-table w-full text-sm text-left text-gray-300';
+            table.innerHTML = `
+                <thead class="text-xs uppercase bg-gray-700">
+                    <tr>
+                        <th class="px-6 py-3">Fecha</th>
+                        <th class="px-6 py-3">Cliente</th>
+                        <th class="px-6 py-3">Producto</th>
+                        <th class="px-6 py-3">Precio</th>
+                        <th class="px-6 py-3">Estado</th>
+                        <th class="px-6 py-3">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-gray-800 divide-y divide-gray-700">
+                </tbody>
+            `;
+            const tbody = table.querySelector('tbody');
+            filtered.forEach(sale => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td data-label="Fecha" class="px-6 py-4">${sale.sale_date}</td>
+                    <td data-label="Cliente" class="px-6 py-4">${sale.recipient_name}</td>
+                    <td data-label="Producto" class="px-6 py-4">${sale.product_name_sold}</td>
+                    <td data-label="Precio" class="px-6 py-4">$${Number(sale.price).toFixed(2)}</td>
+                    <td data-label="Estado" class="px-6 py-4">
+                        <select onchange="updateSaleStatus('${sale.id}', this.value)" class="bg-gray-700 border border-gray-600 rounded px-2 py-1">
+                            <option value="Pendiente" ${sale.status === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                            <option value="Pagado" ${sale.status === 'Pagado' ? 'selected' : ''}>Pagado</option>
+                            <option value="Devuelto" ${sale.status === 'Devuelto' ? 'selected' : ''}>Devuelto</option>
+                        </select>
+                    </td>
+                    <td data-label="Acciones" class="px-6 py-4">
+                        <button onclick="deleteSale('${sale.id}')" class="text-red-400 hover:text-red-300">Eliminar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            salesListContainer.appendChild(table);
+        }
+
+        async function updateSaleStatus(id, newStatus) {
+            const { error } = await supabase.from(SALES_TABLE).update({ status: newStatus }).eq('id', id);
+            if (error) {
+                alert("Error al actualizar estado: " + error.message);
+            }
+        }
+
+        async function deleteSale(id) {
+            if (!confirm("¿Eliminar esta venta?")) return;
+            const { error } = await supabase.from(SALES_TABLE).delete().eq('id', id);
+            if (error) {
+                alert("Error al eliminar venta: " + error.message);
+            } else {
+                allSales = allSales.filter(s => s.id !== id);
+                filterAndRenderSales();
+            }
+        }
+
+        async function downloadSalesPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(20);
+            doc.text('Reporte de Ventas - Cell Smar', 105, 15, { align: 'center' });
+            doc.setFontSize(12);
+            doc.text(`Generado: ${new Date().toLocaleDateString('es-ES')}`, 105, 25, { align: 'center' });
+            let y = 40;
+            allSales.forEach((sale, i) => {
+                if (y > 280) {
+                    doc.addPage();
+                    y = 20;
                 }
-                 const mobileBtn = document.querySelector(`#mobile-menu-dropdown .view-btn[data-view="${key}"]`);
-                 if (mobileBtn) mobileBtn.classList.toggle('bg-indigo-500', isCurrent); 
-            }); 
-            currentViewTitle.textContent = views[viewName].title; 
-            currentView = viewName;
-            localStorage.setItem('lastView', viewName);
-            if (viewName === 'labels') updateLabelView();
-            if (isMobile()) mobileMenuDropdown.classList.add('hidden');
+                doc.text(`${i+1}. ${sale.sale_date} | ${sale.recipient_name} | ${sale.product_name_sold} | $${sale.price} | ${sale.status}`, 10, y);
+                y += 10;
+            });
+            doc.save(`Ventas_CellSmar_${new Date().toISOString().split('T')[0]}.pdf`);
         }
 
-        function showSkeletonLoaders() { 
-            const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div></div>`).join('');
-            productsLoader.innerHTML = cardSkeleton;
-            productsLoaderBodega.innerHTML = cardSkeleton; 
-            toolsLoader.innerHTML = cardSkeleton;
-            const tableSkeleton = Array(3).fill('').map(() => `<div class="h-12 skeleton-line"></div>`).join(''); 
-            salesListLoader.innerHTML = tableSkeleton; 
-            missingListLoader.innerHTML = tableSkeleton; 
+        async function fetchMissingProducts() {
+            const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false });
+            if (error) { console.error(error); return; }
+            allMissingProducts = data || [];
+            renderMissingProducts(allMissingProducts);
         }
 
-        async function fetchProducts() { 
-            if (!supabase) return;
-            const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category", { ascending: true }); 
-            if (error) return; 
-            allProducts = data; 
-            calculateCategoryTotals(allProducts, true, false, false); 
-            filterAndRenderProducts(); 
-            updateAutocompleteList(allProducts, inventorySuggestions);
+        function renderMissingProducts(list) {
+            missingList.innerHTML = '';
+            totalMissingCount.textContent = `${list.length} faltantes`;
+            if (list.length === 0) {
+                missingList.innerHTML = '<p class="text-center text-gray-400 py-8">No hay productos faltantes registrados.</p>';
+                return;
+            }
+            const table = document.createElement('table');
+            table.className = 'w-full text-sm text-left text-gray-300';
+            table.innerHTML = `
+                <thead class="text-xs uppercase bg-gray-700">
+                    <tr><th class="px-6 py-3">Producto</th><th class="px-6 py-3">Notas</th><th class="px-6 py-3">Acciones</th></tr>
+                </thead>
+                <tbody class="bg-gray-800 divide-y divide-gray-700"></tbody>
+            `;
+            const tbody = table.querySelector('tbody');
+            list.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-6 py-4">${item.product_name}</td>
+                    <td class="px-6 py-4">${item.notes || '—'}</td>
+                    <td class="px-6 py-4"><button onclick="deleteMissing('${item.id}')" class="text-red-400 hover:text-red-300">Eliminar</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            missingList.appendChild(table);
         }
 
-        function filterAndRenderProducts() { 
-            const term = (searchInput.value || "").toLowerCase().trim(); 
-            const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); 
-            renderProducts(filtered); 
+        async function deleteMissing(id) {
+            if (!confirm("¿Eliminar de la lista de faltantes?")) return;
+            const { error } = await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq('id', id);
+            if (error) {
+                alert("Error: " + error.message);
+            } else {
+                allMissingProducts = allMissingProducts.filter(m => m.id !== id);
+                renderMissingProducts(allMissingProducts);
+            }
         }
 
-        function renderProducts(items) { 
-            productsLoader.innerHTML = ""; 
-            productsEl.innerHTML = ""; 
-            totalCount.textContent = `${items.length} productos`; 
-            categoryTotalsEl.innerHTML = `<span class="font-bold text-indigo-300">Total por Categoría:</span> ${Object.keys(categoryTotals).sort().map(cat => `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotals[cat]}</span></span>`).join('')}`;
-            productsEl.appendChild(categoryTotalsEl);
-            const grouped = items.reduce((acc, p) => { 
-                const cat = p.category || 'Sin Categoría'; 
-                if (!acc[cat]) acc[cat] = []; 
-                acc[cat].push(p); 
-                return acc; 
-            }, {}); 
-            Object.keys(grouped).sort().forEach(category => { 
-                const section = document.createElement("div"); 
-                section.className = "mb-10"; 
-                section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase">${category}</h2>`; 
-                const grid = document.createElement("div"); 
-                grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
-                grouped[category].forEach(p => { 
-                    const card = document.createElement("div");
-                    card.id = `product-card-${p.id}`; 
-                    card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
-                    const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100?text=Sin+Imagen`; 
-                    card.innerHTML = `<button onclick="openProductEditorModal('${p.id}', 'main')" class="absolute top-2 right-2 text-gray-400 p-1 bg-gray-700/70 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" id="product-img-${p.id}" class="object-contain h-full w-full"></div><h3 id="product-name-${p.id}" class="font-semibold text-white">${p.name}</h3><p id="product-category-${p.id}" class="text-xs text-gray-400">${p.category || 'Otros'}</p><p id="product-price-${p.id}" class="text-green-400 font-bold mt-2">$${Number(p.price).toFixed(2)}</p><p id="product-stock-${p.id}" class="text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex-grow"></div><div class="flex justify-end mt-4 pt-3 border-t border-gray-700"><button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 text-white text-sm">Eliminar</button></div>`; 
-                    grid.appendChild(card); 
-                }); 
-                section.appendChild(grid); 
-                productsEl.appendChild(section); 
-            }); 
+        async function fetchTools() {
+            const { data, error } = await supabase.from(TOOLS_TABLE).select("*").order("created_at", { ascending: false });
+            if (error) { console.error(error); return; }
+            allTools = data || [];
+            renderTools(allTools);
         }
 
-        async function fetchProductsBodega() { 
-            if (!supabase) return;
-            const { data, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).select("*"); 
-            if (error) return; 
-            allProductsBodega = data; 
-            calculateCategoryTotals(allProductsBodega, false, false, true); 
-            filterAndRenderProductsBodega(); 
-            updateAutocompleteList(allProducts, inventorySuggestions);
+        function renderTools(list) {
+            toolsListEl.innerHTML = '';
+            totalToolsCount.textContent = `${list.length} herramientas`;
+            if (list.length === 0) {
+                toolsListEl.innerHTML = '<p class="text-center text-gray-400 col-span-full py-8">No hay herramientas registradas.</p>';
+                return;
+            }
+            list.forEach(tool => {
+                const card = document.createElement('div');
+                card.className = 'tool-card bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700';
+                const imgUrl = tool.image_url ? `${tool.image_url}?t=${new Date().getTime()}` : 'https://via.placeholder.com/300x200/4f46e5/ffffff?text=Herramienta';
+                card.innerHTML = `
+                    <img src="${imgUrl}" alt="${tool.title}" class="w-full h-48 object-cover" onerror="this.src='https://via.placeholder.com/300x200/4f46e5/ffffff?text=Herramienta'" />
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-white mb-2">${tool.title}</h3>
+                        <p class="text-sm text-gray-300 mb-4">${tool.description || 'Sin descripción.'}</p>
+                        <div class="flex space-x-2">
+                            <button onclick="editToolImage('${tool.id}')" class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded">Editar Foto</button>
+                            <button onclick="deleteTool('${tool.id}')" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded">Eliminar</button>
+                        </div>
+                    </div>
+                `;
+                toolsListEl.appendChild(card);
+            });
         }
 
-        function filterAndRenderProductsBodega() { 
-            const term = (searchInputBodega.value || "").toLowerCase().trim(); 
-            const filtered = allProductsBodega.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); 
-            renderProductsBodega(filtered); 
+        window.editToolImage = async function(id) {
+            editingToolId = id;
+            toolImageEditorInput.click();
         }
 
-        function renderProductsBodega(items) { 
-            productsLoaderBodega.innerHTML = ""; 
-            productsElBodega.innerHTML = ""; 
-            totalCountBodega.textContent = `${items.length} productos`; 
-            categoryTotalsElBodega.innerHTML = `<span class="font-bold text-indigo-300">Total (Bodega):</span> ${Object.keys(categoryTotalsBodega).sort().map(cat => `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotalsBodega[cat]}</span></span>`).join('')}`;
-            productsElBodega.appendChild(categoryTotalsElBodega);
-            const grouped = items.reduce((acc, p) => { 
-                const cat = p.category || 'Sin Categoría'; 
-                if (!acc[cat]) acc[cat] = []; 
-                acc[cat].push(p); 
-                return acc; 
-            }, {}); 
-            Object.keys(grouped).sort().forEach(category => { 
-                const section = document.createElement("div"); 
-                section.className = "mb-10"; 
-                section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase">${category}</h2>`; 
-                const grid = document.createElement("div"); 
-                grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
-                grouped[category].forEach(p => { 
-                    const card = document.createElement("div"); 
-                    card.id = `product-card-bodega-${p.id}`;
-                    card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
-                    const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100?text=Sin+Imagen`; 
-                    card.innerHTML = `<button onclick="openProductEditorModal('${p.id}', 'bodega')" class="absolute top-2 right-2 text-gray-400 p-1 bg-gray-700/70 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${imageUrl}" id="product-img-bodega-${p.id}" class="object-contain h-full w-full"></div><h3 id="product-name-bodega-${p.id}" class="font-semibold text-white">${p.name}</h3><p id="product-category-bodega-${p.id}" class="text-xs text-gray-400">${p.category || 'N/A'}</p><p id="product-price-bodega-${p.id}" class="text-green-400 font-bold mt-2">$${Number(p.price).toFixed(2)}</p><p id="product-stock-bodega-${p.id}" class="text-sm text-gray-400">Stock: ${p.quantity}</p><div class="flex-grow"></div><div class="flex justify-end mt-4 pt-3 border-t border-gray-700"><button onclick="deleteProductBodega('${p.id}')" class="px-3 py-1 rounded bg-red-600 text-white text-sm">Eliminar</button></div>`; 
-                    grid.appendChild(card); 
-                }); 
-                section.appendChild(grid); 
-                productsElBodega.appendChild(section); 
-            }); 
+        window.deleteTool = async function(id) {
+            if (!confirm("¿Estás seguro de que quieres eliminar esta herramienta?")) return;
+            const { error } = await supabase.from(TOOLS_TABLE).delete().eq("id", id);
+            if (error) {
+                alert("Error al eliminar: " + error.message);
+            } else {
+                allTools = allTools.filter(t => t.id !== id);
+                renderTools(allTools);
+            }
         }
+
+        function handleRealtimePayload(payload, localArray, renderFunction, isMainProducts = false, isBodegaProducts = false, isSales = false, idKey = 'id') {
+            const { eventType, new: newRecord, old: oldRecord } = payload;
+            const recordId = (eventType === 'DELETE') ? oldRecord[idKey] : newRecord[idKey];
+            if (!recordId) return;
+            let index = localArray.findIndex(item => item[idKey] === recordId);
+            
+            if (isSales) { 
+                let needsFullRender = false; 
+                switch (eventType) {
+                    case 'INSERT':
+                        if (index === -1) { 
+                            localArray.unshift(newRecord); 
+                            needsFullRender = true; 
+                        }
+                        break;
+                    case 'UPDATE':
+                        if (index !== -1) {
+                            Object.assign(localArray[index], newRecord);
+                            needsFullRender = true; 
+                        }
+                        break;
+                    case 'DELETE':
+                        if (index !== -1) {
+                            localArray.splice(index, 1); 
+                            needsFullRender = true;
+                        }
+                        break;
+                }
+                if (needsFullRender) filterAndRenderSales();
+                return; 
+            }
+            
+            if (isMainProducts || isBodegaProducts) { 
+                let needsFullRender = false;
+                switch (eventType) {
+                    case 'INSERT':
+                        if (index === -1) {
+                            localArray.unshift(newRecord);
+                        }
+                        needsFullRender = true; 
+                        break;
+                    case 'UPDATE':
+                        if (index !== -1) {
+                            const oldQuantity = localArray[index].quantity; 
+                            Object.assign(localArray[index], newRecord); 
+                            if (oldQuantity !== newRecord.quantity) { 
+                                needsFullRender = true;
+                            } else {
+                                updateProductCardInDOM(newRecord, isMainProducts, false, isBodegaProducts); 
+                            }
+                        }
+                        break;
+                    case 'DELETE':
+                        if (index !== -1) {
+                            localArray.splice(index, 1);
+                            needsFullRender = true; 
+                        }
+                        break;
+                }
+                calculateCategoryTotals(localArray, isMainProducts, false, isBodegaProducts);
+                if (needsFullRender) {
+                    if (isMainProducts) filterAndRenderProducts(); 
+                    else filterAndRenderProductsBodega(); 
+                }
+                updateAutocompleteList();
+                return; 
+            }
+            
+            if (eventType === 'UPDATE' && index !== -1) {
+                 Object.assign(localArray[index], newRecord);
+            } else {
+                switch (eventType) {
+                    case 'INSERT':
+                        if (index === -1) localArray.unshift(newRecord);
+                        break;
+                    case 'DELETE':
+                        if (index !== -1) localArray.splice(index, 1);
+                        break;
+                }
+            }
+            renderFunction(localArray); 
+        }
+
+        function initializeRealtimeSubscriptions() {
+            supabase.channel('public:' + PRODUCTS_TABLE)
+                .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_TABLE },
+                    (payload) => handleRealtimePayload(payload, allProducts, filterAndRenderProducts, true)
+                ).subscribe();
+
+            supabase.channel('public:' + PRODUCTS_BODEGA_TABLE) 
+                .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_BODEGA_TABLE },
+                    (payload) => handleRealtimePayload(payload, allProductsBodega, filterAndRenderProductsBodega, false, true)
+                ).subscribe();
+
+            supabase.channel('public:' + SALES_TABLE)
+                .on('postgres_changes', { event: '*', schema: 'public', table: SALES_TABLE },
+                    (payload) => handleRealtimePayload(payload, allSales, filterAndRenderSales, false, false, true) 
+                ).subscribe();
+
+            supabase.channel('public:' + MISSING_PRODUCTS_TABLE)
+                .on('postgres_changes', { event: '*', schema: 'public', table: MISSING_PRODUCTS_TABLE },
+                    (payload) => handleRealtimePayload(payload, allMissingProducts, renderMissingProducts)
+                ).subscribe();
+
+            supabase.channel('public:' + TOOLS_TABLE)
+                .on('postgres_changes', { event: '*', schema: 'public', table: TOOLS_TABLE },
+                    (payload) => handleRealtimePayload(payload, allTools, renderTools)
+                ).subscribe();
+        }
+
+        window.openProductEditorModal = function(productId, locationKey) { 
+            currentEditingProduct = null;
+            selectedProductImageFile = null;
+            modalStatus.textContent = '';
+            
+            let productArray = locationKey === 'main' ? allProducts : allProductsBodega;
+            let displayName = locationKey === 'main' ? 'Inventario Principal' : 'Nuevo Inventario';
+
+            let product = productArray.find(p => String(p.id).trim() === String(productId).trim());
+
+            if (!product) {
+                const all = [...allProducts, ...allProductsBodega];
+                product = all.find(p => String(p.id).trim() === String(productId).trim());
+                if (product) {
+                    locationKey = allProducts.some(p => p.id === product.id) ? 'main' : 'bodega';
+                    displayName = locationKey === 'main' ? 'Inventario Principal' : 'Nuevo Inventario';
+                } else {
+                    alert("Producto no encontrado.");
+                    return;
+                }
+            }
+            
+            currentEditingProduct = product;
+
+            modalName.value = product.name;
+            modalCategory.value = product.category || ''; 
+            modalPrice.value = Number(product.price).toFixed(2);
+            modalQuantity.value = product.quantity;
+            modalBoxNumber.value = product.box_number || '';
+            modalLocation.textContent = displayName;
+
+            const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : 'https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen';
+            modalImagePreview.src = imageUrl;
+            
+            modalImageUpload.value = '';
+            modal.classList.remove('hidden');
+        }
+
+        window.closeProductEditorModal = function() {
+            modal.classList.add('hidden');
+            modalProductForm.reset();
+            selectedProductImageFile = null;
+        }
+
+        modalImageUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                selectedProductImageFile = file;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    modalImagePreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        modalProductForm.addEventListener('submit', async (ev) => {
+            ev.preventDefault();
+            const saveButton = document.getElementById('modal-save-button');
+            saveButton.disabled = true;
+            modalStatus.textContent = 'Guardando...';
+
+            if (!currentEditingProduct) {
+                modalStatus.textContent = 'Error: producto no cargado.';
+                saveButton.disabled = false;
+                return;
+            }
+            
+            let table = PRODUCTS_TABLE;
+            let localArray = allProducts;
+            let isMain = true, isBodega = false;
+
+            if (allProducts.some(p => p.id === currentEditingProduct.id)) {
+                table = PRODUCTS_TABLE;
+                localArray = allProducts;
+                isMain = true; isBodega = false;
+            } else if (allProductsBodega.some(p => p.id === currentEditingProduct.id)) {
+                table = PRODUCTS_BODEGA_TABLE;
+                localArray = allProductsBodega;
+                isMain = false; isBodega = true;
+            }
+
+            let newImageUrl = currentEditingProduct.image_url;
+
+            try {
+                if (selectedProductImageFile) {
+                    modalStatus.textContent = 'Subiendo imagen...';
+                    newImageUrl = await uploadImage(selectedProductImageFile);
+                }
+
+                const updatePayload = {
+                    name: modalName.value,
+                    category: modalCategory.value,
+                    price: parseFloat(modalPrice.value),
+                    quantity: parseInt(modalQuantity.value),
+                    box_number: modalBoxNumber.value.trim() || null,
+                    image_url: newImageUrl
+                };
+                
+                const { error } = await supabase
+                    .from(table)
+                    .update(updatePayload)
+                    .eq('id', currentEditingProduct.id);
+                
+                if (error) throw error;
+
+                Object.assign(currentEditingProduct, updatePayload);
+                updateProductCardInDOM(currentEditingProduct, isMain, false, isBodega);
+                
+                calculateCategoryTotals(localArray, isMain, false, isBodega);
+                if(isMain) filterAndRenderProducts();
+                else filterAndRenderProductsBodega();
+                
+                modalStatus.textContent = 'Actualizado ✅';
+                setTimeout(closeProductEditorModal, 1000);
+
+            } catch (err) {
+                modalStatus.textContent = 'Error: ' + err.message;
+            } finally {
+                saveButton.disabled = false;
+            }
+        });
+
+        async function registerScannedSale(product) {
+            const recipientName = recipientNameIn.value.trim() || 'Cliente Rápido';
+            const productNameSold = product.name + (product.category ? ` (${product.category})` : '');
+            const salePrice = Number(product.price);
+            const saleDate = new Date().toISOString().split('T')[0];
+            const saleStatusValue = 'Pagado'; 
+
+            const newSale = {
+                recipient_name: recipientName,
+                product_name_sold: productNameSold,
+                price: salePrice,
+                sale_date: saleDate,
+                status: saleStatusValue
+            };
+            
+            setStatusMessage(saleStatus, `Registrando venta de ${product.name}...`, true);
+            
+            try { 
+                const { error: saleError } = await supabase.from(SALES_TABLE).insert(newSale);
+                if (saleError) throw saleError;
+                
+                let updateTable = null;
+                let updateArray = null;
+
+                if (allProducts.some(p => p.id === product.id)) {
+                    updateTable = PRODUCTS_TABLE;
+                    updateArray = allProducts;
+                } else if (allProductsBodega.some(p => p.id === product.id)) {
+                    updateTable = PRODUCTS_BODEGA_TABLE;
+                    updateArray = allProductsBodega;
+                }
+
+                if (updateTable && updateArray) {
+                    await updateProductStock(product.name, updateTable, updateArray, -1);
+                }
+                
+                productNameSoldIn.value = ''; 
+                salePriceIn.value = ''; 
+                saleDateIn.value = new Date().toISOString().split('T')[0]; 
+                saleStatusInput.value = 'Pagado';
+                
+                alert(`Venta de "${product.name}" registrada y stock descontado.`);
+                setStatusMessage(saleStatus, `Venta registrada y stock descontado ✅`, true); 
+                
+            } catch (err) { 
+                setStatusMessage(saleStatus, "Error: " + err.message, false); 
+            }
+        }
+
+        window.openScannerModal = async function() {
+            if (isScannerRunning) return;
+            if (typeof Html5QrcodeScanner === 'undefined') {
+                alert("Error: librería de escaneo no cargada.");
+                return;
+            }
+
+            scannerModal.classList.remove('hidden');
+            scannerStatusEl.textContent = 'Iniciando cámara...';
+            scanSuccessHandled = false;
+            isScannerRunning = true;
+
+            if (html5QrcodeScanner) {
+                try {
+                    await html5QrcodeScanner.clear();
+                } catch (e) {}
+                html5QrcodeScanner = null;
+            }
+
+            html5QrcodeScanner = new Html5QrcodeScanner(
+                "reader", { 
+                    fps: 10, 
+                    qrbox: {width: 250, height: 250},
+                    rememberLastUsedCamera: true
+                },
+                false
+            );
+
+            const onScanSuccess = async (decodedText) => {
+                if (scanSuccessHandled) return;
+                
+                try {
+                    const scannedId = String(decodedText).trim();
+                    if (!scannedId) throw new Error(`Código inválido.`);
+                    
+                    scanSuccessHandled = true; 
+                    await closeScannerModal(true); 
+
+                    const product = allProducts.find(p => String(p.id).trim() === scannedId) || 
+                                     allProductsBodega.find(p => String(p.id).trim() === scannedId); 
+                    
+                    if (!product) throw new Error(`Producto ID "${scannedId}" no encontrado.`);
+                    if (parseInt(product.quantity) <= 0) throw new Error(`Sin stock: "${product.name}"`);
+
+                    toggleView('sales');
+                    productNameSoldIn.value = product.name + (product.category ? ` (${product.category})` : '');
+                    salePriceIn.value = Number(product.price).toFixed(2);
+                    saleDateIn.value = new Date().toISOString().split('T')[0];
+                    saleStatusInput.value = 'Pagado';
+                    
+                    await registerScannedSale(product);
+                    
+                } catch (error) {
+                    scanSuccessHandled = false; 
+                    alert(`Error: ${error.message}`);
+                    openScannerModal();
+                }
+            };
+
+            const onScanError = () => {};
+
+            html5QrcodeScanner.render(onScanSuccess, onScanError);
+        };
+
+        window.closeScannerModal = async function(hideModal = true) {
+            if (hideModal) scannerModal.classList.add('hidden');
+            scannerStatusEl.textContent = 'Esperando código...';
+            
+            if (html5QrcodeScanner) {
+                if (isScannerRunning) {
+                    try { await html5QrcodeScanner.stop(); } catch (error) {}
+                }
+                try { await html5QrcodeScanner.clear(); } catch (e) {}
+                html5QrcodeScanner = null;
+            } 
+            
+            isScannerRunning = false;
+            scanSuccessHandled = false; 
+        };
+
+        searchInput.addEventListener("input", filterAndRenderProducts);
+        searchInputBodega.addEventListener("input", filterAndRenderProductsBodega); 
+        searchSalesInput.addEventListener("input", filterAndRenderSales);
+        pendingOnlyCheckbox.addEventListener("change", filterAndRenderSales);
+
+        form.addEventListener("submit", async (ev) => { 
+            ev.preventDefault(); 
+            const submitBtn = document.getElementById("submit"); 
+            submitBtn.disabled = true; 
+            setStatusMessage(status, "Guardando...", true); 
+            try { 
+                const imageUrl = imageIn.files[0] ? await uploadImage(imageIn.files[0]) : null; 
+                const newProduct = { name: nameIn.value, category: categoryIn.value, price: parseFloat(priceIn.value), quantity: parseInt(qtyIn.value), image_url: imageUrl, box_number: boxNumberIn.value.trim() || null };
+                const { error: insertError } = await supabase.from(PRODUCTS_TABLE).insert(newProduct);
+                if (insertError) throw insertError; 
+                form.reset(); qtyIn.value = 1; 
+                setStatusMessage(status, "Producto agregado ✅", true); 
+            } catch (err) { 
+                setStatusMessage(status, "Error: " + err.message, false); 
+            } finally { 
+                submitBtn.disabled = false; 
+            } 
+        });
+        
+        formBodega.addEventListener("submit", async (ev) => { 
+            ev.preventDefault(); 
+            const submitBtn = document.getElementById("submit-bodega"); 
+            submitBtn.disabled = true; 
+            setStatusMessage(statusBodega, "Guardando...", true); 
+            try { 
+                const imageUrl = imageInBodega.files[0] ? await uploadImage(imageInBodega.files[0]) : null; 
+                const newProductBodega = { name: nameInBodega.value, category: categoryInBodega.value, price: parseFloat(priceInBodega.value), quantity: parseInt(qtyInBodega.value), image_url: imageUrl, box_number: boxNumberInBodega.value.trim() || null };
+                const { error } = await supabase.from(PRODUCTS_BODEGA_TABLE).insert(newProductBodega);
+                if (error) throw error; 
+                formBodega.reset(); qtyInBodega.value = 1; 
+                setStatusMessage(statusBodega, "Producto agregado (Nuevo Inventario) ✅", true); 
+            } catch (err) { 
+                setStatusMessage(statusBodega, "Error: " + err.message, false); 
+            } finally { 
+                submitBtn.disabled = false; 
+            } 
+        });
+
+        salesForm.addEventListener("submit", async (ev) => { 
+            ev.preventDefault(); 
+            const submitBtn = document.getElementById("sale-submit"); 
+            submitBtn.disabled = true; 
+            const soldProductWithCategory = productNameSoldIn.value.trim();
+            const soldProductName = getCleanProductName(soldProductWithCategory); 
+            try { 
+                const newSale = {
+                    recipient_name: recipientNameIn.value,
+                    product_name_sold: soldProductWithCategory,
+                    price: parseFloat(salePriceIn.value),
+                    sale_date: saleDateIn.value,
+                    status: saleStatusInput.value
+                };
+                const { error: saleError } = await supabase.from(SALES_TABLE).insert(newSale);
+                if (saleError) throw saleError;
+                
+                if (newSale.status === 'Pagado') {
+                    let updateTable = null, updateArray = null;
+                    if (allProducts.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
+                        updateTable = PRODUCTS_TABLE;
+                        updateArray = allProducts;
+                    } else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
+                        updateTable = PRODUCTS_BODEGA_TABLE;
+                        updateArray = allProductsBodega;
+                    }
+
+                    if (updateTable && updateArray) {
+                         await updateProductStock(soldProductName, updateTable, updateArray, -1);
+                    }
+                }
+
+                salesForm.reset(); 
+                saleDateIn.value = new Date().toISOString().split('T')[0]; 
+                setStatusMessage(saleStatus, "Venta registrada ✅", true); 
+            } catch (err) { 
+                setStatusMessage(saleStatus, "Error: " + err.message, false); 
+            } finally { 
+                submitBtn.disabled = false; 
+            } 
+        });
+        
+        missingProductForm.addEventListener("submit", async (ev) => { 
+            ev.preventDefault(); 
+            const submitBtn = document.getElementById("missing-product-submit"); 
+            submitBtn.disabled = true; 
+            try { 
+                const newMissing = { product_name: missingProductNameIn.value, notes: missingProductNotesIn.value || null };
+                const { error } = await supabase.from(MISSING_PRODUCTS_TABLE).insert(newMissing);
+                if (error) throw error;
+                missingProductForm.reset(); 
+                setStatusMessage(missingProductStatus, "Agregado a faltantes ✅", true); 
+            } catch (err) { 
+                setStatusMessage(missingProductStatus, "Error: " + err.message, false); 
+            } finally { 
+                submitBtn.disabled = false; 
+            } 
+        });
+
+        toolForm.addEventListener("submit", async (ev) => { 
+            ev.preventDefault(); 
+            const submitBtn = document.getElementById("tool-submit"); 
+            submitBtn.disabled = true; 
+            setStatusMessage(toolStatus, "Guardando...", true); 
+            try { 
+                const imageUrl = toolImageIn.files[0] ? await uploadImage(toolImageIn.files[0]) : null; 
+                const newTool = { title: toolTitleIn.value, description: toolDescriptionIn.value || null, image_url: imageUrl };
+                const { error } = await supabase.from(TOOLS_TABLE).insert(newTool);
+                if (error) throw error; 
+                toolForm.reset(); 
+                setStatusMessage(toolStatus, "Herramienta guardada ✅", true); 
+            } catch (err) { 
+                setStatusMessage(toolStatus, "Error: " + err.message, false); 
+            } finally { 
+                submitBtn.disabled = false; 
+            } 
+        });
+        
+        toolImageEditorInput.addEventListener('change', async (event) => {
+            if (!editingToolId) return; 
+            const file = event.target.files[0];
+            if (!file) return; 
+            try {
+                const newImageUrl = await uploadImage(file);
+                const { error } = await supabase.from(TOOLS_TABLE).update({ image_url: newImageUrl }).eq('id', editingToolId);
+                if (error) throw error;
+                alert('Imagen actualizada.');
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                editingToolId = null; 
+                toolImageEditorInput.value = ''; 
+            }
+        });
+
+        document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', () => toggleView(btn.dataset.view)));
 
         async function loadAppDataAndInitialize() {
             saleDateIn.value = new Date().toISOString().split('T')[0];
             showSkeletonLoaders(); 
             await loadLogo(); 
-            const lastView = localStorage.getItem('lastView') || 'inventory';
-            toggleView(lastView);
-            if (supabase) {
-                await Promise.all([fetchProducts(), fetchProductsBodega(), fetchSales(), fetchMissingProducts(), fetchTools()]);
-                updateLabelView(); 
-                initializeRealtimeSubscriptions();
-            }
+            let viewToLoad = 'inventory';
+            try {
+                const lastView = localStorage.getItem('lastView');
+                if (lastView) viewToLoad = lastView;
+            } catch (e) {}
+            toggleView(viewToLoad);
+
+            await Promise.all([
+                fetchProducts(), 
+                fetchProductsBodega(), 
+                fetchSales(), 
+                fetchMissingProducts(),
+                fetchTools() 
+            ]);
+            initializeRealtimeSubscriptions();
         }
 
-        window.addEventListener("load", loadAppDataAndInitialize);
+        window.addEventListener("load", async () => {
+            const initialTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
+            applyTheme(initialTheme); 
+            await loadAppDataAndInitialize();
+        });
     </script>
 </body>
 </html>
