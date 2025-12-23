@@ -16,23 +16,19 @@
         /********************************/
         /* Estilos Base (Comunes a todos los temas) */
         /********************************/
-        html {
-            height: 100%;
-        }
+        html { height: 100%; }
         body {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             transition: background-color 0.5s ease;
-            position: relative; 
-            overflow-x: hidden; 
+            position: relative;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
-        .container.mx-auto {
-            flex-grow: 1;
-        }
+        .container.mx-auto { flex-grow: 1; }
         .product-card, .tool-card { transition: transform 0.2s, box-shadow 0.3s; }
         .product-card:hover, .tool-card:hover { transform: translateY(-5px); }
-        /* El input file del logo debe ser invisible pero accesible */
         #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
         .hidden { display: none; }
         .skeleton-card { background-color: transparent; border-radius: 0.5rem; padding: 1rem; display: flex; flex-direction: column; }
@@ -49,44 +45,19 @@
         /********************************/
         @media print {
             body > *:not(.labels-container):not(#qr-modal) { display: none !important; }
-            
-            /* Contenedor principal de etiquetas: Forzar blanco */
             .labels-container { 
-                display: flex !important;
-                flex-wrap: wrap;
-                width: 100%;
-                min-height: 100vh;
-                margin: 0;
-                padding: 0;
-                background-color: white !important;
+                display: flex !important; flex-wrap: wrap; width: 100%; min-height: 100vh; margin: 0; padding: 0; background-color: white !important;
             }
             .labels-container > div {
-                width: 100mm; /* Ancho deseado de la etiqueta */
-                height: 35mm; /* Alto deseado de la etiqueta */
-                box-sizing: border-box;
-                border: 1px solid #ccc;
-                margin: 2mm;
-                padding: 5px;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: flex-start;
-                page-break-after: avoid;
-                /* Asegurar que el fondo de cada etiqueta es blanco */
-                background-color: white !important;
-                color: black !important; /* Texto de etiqueta en negro */
+                width: 100mm; height: 35mm; box-sizing: border-box; border: 1px solid #ccc; margin: 2mm; padding: 5px;
+                display: flex; flex-direction: row; align-items: center; justify-content: flex-start; page-break-after: avoid;
+                background-color: white !important; color: black !important;
             }
             .labels-container .qr-box { margin-right: 10px; width: 35mm; height: 35mm; display: flex; justify-content: center; align-items: center; }
             .labels-container canvas, .labels-container img { width: 30mm !important; height: 30mm !important; }
             
-            /* Modal de QR individual (para asegurar fondo blanco en impresión) */
             #qr-modal {
-                display: flex !important;
-                position: fixed;
-                top: 0; left: 0; right: 0; bottom: 0;
-                background: white;
-                align-items: center;
-                justify-content: center;
+                display: flex !important; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: white; align-items: center; justify-content: center;
             }
             #qr-modal .bg-gray-800, #qr-modal .bg-gray-900 { background-color: white !important; }
             #qr-modal .text-white, #qr-modal .text-gray-300 { color: black !important; }
@@ -94,301 +65,135 @@
             #qr-modal .print\:hidden { display: none !important; }
         }
         
-        /********************************/
-        /* TEMA 1: Dark (Predeterminado) */
-        /********************************/
+        /* TEMA 1: Dark */
         .theme-dark {
-            --bg-primary: #1f2937;
-            --bg-secondary: #374151;
-            --bg-header: rgba(31, 41, 55, 0.8);
-            --text-primary: #e5e7eb;
-            --text-secondary: #d1d5db;
-            --text-muted: #9ca3af;
-            --border-color: #4b5563;
-            --accent-color: #818cf8;
-            --accent-color-dark: #6366f1;
-            --font-main: 'Poppins', sans-serif;
-            --font-headings: 'Poppins', sans-serif;
-            --pastel-bg: #e0f2f1; /* Verde pastel claro para móvil */
-            --pastel-text: #1f2937;
+            --bg-primary: #1f2937; --bg-secondary: #374151; --bg-header: rgba(31, 41, 55, 0.8);
+            --text-primary: #e5e7eb; --text-secondary: #d1d5db; --text-muted: #9ca3af;
+            --border-color: #4b5563; --accent-color: #818cf8; --accent-color-dark: #6366f1;
+            --font-main: 'Poppins', sans-serif; --font-headings: 'Poppins', sans-serif;
+            --pastel-bg: #e0f2f1; --pastel-text: #1f2937;
         }
         
-        /********************************/
         /* Fondo del Escáner siempre blanco */
-        /********************************/
-        #scanner-modal .modal-content {
-            background-color: white !important;
-            color: black !important;
-        }
-        #scanner-modal .modal-content h3, #scanner-modal .modal-content p {
-            color: black !important;
-        }
+        #scanner-modal .modal-content { background-color: white !important; color: black !important; }
+        #scanner-modal .modal-content h3, #scanner-modal .modal-content p { color: black !important; }
         
-        /********************************/
         /* TEMA 2: Fuego Infernal */
-        /********************************/
         .theme-infernal {
-            --bg-primary: #000000;
-            --bg-secondary: #2d1a1a;
-            --bg-header: rgba(17, 7, 0, 0.6);
-            --text-primary: #f9fafb;
-            --text-secondary: #d1d5db;
-            --text-muted: #9ca3af;
-            --border-color: #571e1e;
-            --accent-color: #ff4500;
-            --accent-color-dark: #e63e00;
-            --font-main: 'Roboto', sans-serif;
-            --font-headings: 'Roboto', sans-serif;
-            --pastel-bg: #ffccbc; /* Naranja/Melocotón pastel */
-            --pastel-text: #2d1a1a;
+            --bg-primary: #000000; --bg-secondary: #2d1a1a; --bg-header: rgba(17, 7, 0, 0.6);
+            --text-primary: #f9fafb; --text-secondary: #d1d5db; --text-muted: #9ca3af;
+            --border-color: #571e1e; --accent-color: #ff4500; --accent-color-dark: #e63e00;
+            --font-main: 'Roboto', sans-serif; --font-headings: 'Roboto', sans-serif;
+            --pastel-bg: #ffccbc; --pastel-text: #2d1a1a;
         }
         .theme-infernal { background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
         .theme-infernal .product-card:hover, .theme-infernal .tool-card:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.5); border-color: rgba(255, 69, 0, 0.7); }
         
-        /********************************/
         /* TEMA 3: Luxury Gold */
-        /********************************/
         .theme-gold {
-            --bg-primary: #121212;
-            --bg-secondary: #2b2b2b;
-            --bg-header: rgba(18, 18, 18, 0.85);
-            --text-primary: #f1f1f1;
-            --text-secondary: #cccccc;
-            --text-muted: #a0a0a0;
-            --border-color: #444444;
-            --accent-color: #D4AF37;
-            --accent-color-dark: #B8860B;
-            --font-main: 'Poppins', sans-serif;
-            --font-headings: 'Playfair Display', serif;
-            --pastel-bg: #faf3e0; /* Crema pastel */
-            --pastel-text: #121212;
+            --bg-primary: #121212; --bg-secondary: #2b2b2b; --bg-header: rgba(18, 18, 18, 0.85);
+            --text-primary: #f1f1f1; --text-secondary: #cccccc; --text-muted: #a0a0a0;
+            --border-color: #444444; --accent-color: #D4AF37; --accent-color-dark: #B8860B;
+            --font-main: 'Poppins', sans-serif; --font-headings: 'Playfair Display', serif;
+            --pastel-bg: #faf3e0; --pastel-text: #121212;
         }
         .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
         .theme-gold .product-card:hover, .theme-gold .tool-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
         .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
         .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
         
-        /* TEMA NAVIDAD ELIMINADO COMPLETAMENTE */
+        /* TEMA NAVIDAD ELIMINADO */
 
-        /********************************/
         /* TEMA 5: Blue Neon */
-        /********************************/
         .theme-blue-neon {
-            --bg-primary: #080a1c; /* Azul muy oscuro/negro */
-            --bg-secondary: #12183b; /* Azul oscuro */
-            --bg-header: rgba(8, 10, 28, 0.9);
-            --text-primary: #e0f7fa; /* Cyan claro */
-            --text-secondary: #99eeff;
-            --text-muted: #4dd0e1;
-            --border-color: #00bcd4; /* Azul Neón */
-            --accent-color: #00e5ff; /* Neón brillante */
-            --accent-color-dark: #00aacd;
-            --font-main: 'Roboto', sans-serif;
-            --font-headings: 'Roboto Mono', monospace; /* Fuente de código */
-            --pastel-bg: #e1f5fe; /* Azul pastel */
-            --pastel-text: #080a1c;
+            --bg-primary: #080a1c; --bg-secondary: #12183b; --bg-header: rgba(8, 10, 28, 0.9);
+            --text-primary: #e0f7fa; --text-secondary: #99eeff; --text-muted: #4dd0e1;
+            --border-color: #00bcd4; --accent-color: #00e5ff; --accent-color-dark: #00aacd;
+            --font-main: 'Roboto', sans-serif; --font-headings: 'Roboto Mono', monospace;
+            --pastel-bg: #e1f5fe; --pastel-text: #080a1c;
         }
-        .theme-blue-neon {
-            background-image: url('data:image/svg+xml,%3Csvg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%231a1a3a" fill-opacity="0.4"%3E%3Cpath d="M0 0h80v80H0zM20 20v40h40V20H20zM30 30h20v20H30V30z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); /* Fondo de circuito/malla */
-        }
-        .theme-blue-neon .product-card:hover, .theme-blue-neon .tool-card:hover {
-            box-shadow: 0 0 20px var(--accent-color);
-            border-color: var(--accent-color);
-        }
-        .theme-blue-neon .text-indigo-400, .theme-blue-neon .text-indigo-300 {
-            color: var(--accent-color);
-            text-shadow: 0 0 8px var(--accent-color); /* Efecto neón */
-        }
-        .theme-blue-neon .bg-indigo-500, .theme-blue-neon .hover\:bg-indigo-600:hover, 
-        .theme-blue-neon .bg-blue-600, .theme-blue-neon .hover\:bg-blue-700:hover,
-        .theme-blue-neon .bg-green-600, .theme-blue-neon .hover\:bg-green-700:hover {
-            background-color: var(--accent-color-dark);
-            box-shadow: 0 0 10px var(--border-color);
-        }
-        .theme-blue-neon .bg-indigo-500:hover, .theme-blue-neon .hover\:bg-indigo-600 {
-            background-color: var(--accent-color);
-        }
+        .theme-blue-neon { background-image: url('data:image/svg+xml,%3Csvg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%231a1a3a" fill-opacity="0.4"%3E%3Cpath d="M0 0h80v80H0zM20 20v40h40V20H20zM30 30h20v20H30V30z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
+        .theme-blue-neon .product-card:hover, .theme-blue-neon .tool-card:hover { box-shadow: 0 0 20px var(--accent-color); border-color: var(--accent-color); }
+        .theme-blue-neon .text-indigo-400, .theme-blue-neon .text-indigo-300 { color: var(--accent-color); text-shadow: 0 0 8px var(--accent-color); }
+        .theme-blue-neon .bg-indigo-500, .theme-blue-neon .hover\:bg-indigo-600:hover { background-color: var(--accent-color-dark); box-shadow: 0 0 10px var(--border-color); }
+        .theme-blue-neon .bg-indigo-500:hover, .theme-blue-neon .hover\:bg-indigo-600 { background-color: var(--accent-color); }
         
-        /********************************/
         /* Aplicación de Variables CSS */
-        /********************************/
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            font-family: var(--font-main);
-        }
+        body { background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-main); }
         h1, h2, h3, h4, h5, h6 { font-family: var(--font-headings); }
         
-        /* Aplicación de colores para fondo de headers y cards */
         .bg-gray-800, .bg-gray-900\/50 {
-            background-color: var(--bg-header);
-            border: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
-            backdrop-filter: blur(10px);
-            color: var(--text-primary); /* Restaurar color de texto */
+            background-color: var(--bg-header); border: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent); backdrop-filter: blur(10px); color: var(--text-primary);
         }
-        
-        /* Asegurar que el fondo secundario de inputs y selectores es visible */
         .bg-gray-600 { background-color: var(--bg-secondary) !important; }
         .bg-gray-700\/50 { background-color: var(--bg-secondary); }
-
         .text-gray-300 { color: var(--text-secondary); }
         .text-gray-400 { color: var(--text-muted); }
-        
         .border-gray-500, .border-gray-600, .border-gray-700 { border-color: var(--border-color); }
         
-        /* Acentos */
         .text-indigo-400, .text-indigo-300 { color: var(--accent-color); }
         .border-indigo-500 { border-color: var(--accent-color); }
         .bg-indigo-500 { background-color: var(--accent-color-dark); color: var(--text-primary); }
         .hover\:bg-indigo-600:hover { background-color: var(--accent-color); }
         .focus\:ring-indigo-500:focus { --tw-ring-color: var(--accent-color); }
         
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--accent-color) !important;
-            box-shadow: 0 0 0 1px var(--accent-color);
-            outline: none;
-        }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent-color) !important; box-shadow: 0 0 0 1px var(--accent-color); outline: none; }
         .bg-blue-600, .bg-green-600 { background-color: var(--accent-color-dark); }
         .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover { background-color: var(--accent-color); }
         
-        /********************************/
         /* ESTILOS FIJOS PARA ESTADOS DE VENTA */
-        /********************************/
-        .status-paid {
-            background-color: #16a34a !important; /* Verde */
-            color: #ffffff !important;
-            border-color: #15803d !important;
-        }
-        .status-pending {
-            background-color: #f59e0b !important; /* Naranja/Amarillo */
-            color: #1f2937 !important;
-            border-color: #d97706 !important;
-        }
-        .status-returned {
-            background-color: #dc2626 !important; /* Rojo */
-            color: #ffffff !important;
-            border-color: #b91c1c !important;
-        }
+        .status-paid { background-color: #16a34a !important; color: #ffffff !important; border-color: #15803d !important; }
+        .status-pending { background-color: #f59e0b !important; color: #1f2937 !important; border-color: #d97706 !important; }
+        .status-returned { background-color: #dc2626 !important; color: #ffffff !important; border-color: #b91c1c !important; }
 
-        /********************************/
         /* ESTILOS MÓVIL (Menú de Hamburguesa y Columnas) */
-        /********************************/
-        #mobile-menu-button {
-            display: none; 
-        }
-        
+        #mobile-menu-button { display: none; }
         @media (min-width: 769px) {
-            #mobile-scan-button {
-                display: none !important;
-            }
-            .sales-list-table {
-                /* Asegura que la tabla se comporte como tabla en escritorio */
-                display: table;
-            }
+            #mobile-scan-button { display: none !important; }
+            .sales-list-table { display: table; }
         }
-        
         @media (max-width: 768px) {
-            #view-buttons {
-                display: none !important; 
-            }
-            #mobile-menu-button {
-                display: block; 
-            }
-            /* Inventario en 2 columnas en móvil */
-            #products .grid, #products-bodega .grid, #products-loader, #products-loader-bodega, #tools-list {
-                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-            }
+            #view-buttons { display: none !important; }
+            #mobile-menu-button { display: block; }
+            #products .grid, #products-bodega .grid, #products-loader, #products-loader-bodega, #tools-list { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 
             #mobile-menu-dropdown {
-                position: absolute;
-                right: 0;
-                top: 100%; 
-                width: 250px;
-                background-color: var(--pastel-bg); 
-                color: var(--pastel-text);
-                border: 1px solid var(--border-color);
-                border-top: none;
-                z-index: 40;
+                position: absolute; right: 0; top: 100%; width: 250px;
+                background-color: var(--pastel-bg); color: var(--pastel-text);
+                border: 1px solid var(--border-color); border-top: none; z-index: 40;
                 box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
             }
             #mobile-menu-dropdown button {
-                width: 100%;
-                text-align: left;
-                padding: 0.75rem 1rem;
-                font-weight: 500;
-                color: var(--pastel-text);
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                width: 100%; text-align: left; padding: 0.75rem 1rem; font-weight: 500;
+                color: var(--pastel-text); border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             }
-            #mobile-menu-dropdown button:hover {
-                background-color: rgba(0, 0, 0, 0.05);
-            }
-             /* Estilo para el botón activo en el menú móvil */
+            #mobile-menu-dropdown button:hover { background-color: rgba(0, 0, 0, 0.05); }
             #mobile-menu-dropdown .bg-indigo-500 {
-                background-color: var(--accent-color) !important;
-                color: var(--text-primary) !important;
-                font-weight: bold;
+                background-color: var(--accent-color) !important; color: var(--text-primary) !important; font-weight: bold;
             }
             #mobile-menu-dropdown #mobile-scan-button {
-                background-color: var(--pastel-bg); 
-                color: var(--pastel-text);
-                font-weight: bold;
-                padding: 0.75rem 1rem;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                background-color: var(--pastel-bg); color: var(--pastel-text); font-weight: bold;
+                padding: 0.75rem 1rem; border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             }
 
             /* Estilos para transformar la tabla de ventas en tarjetas */
-            .sales-list-table, .sales-list-table thead, .sales-list-table tbody, .sales-list-table th, .sales-list-table td, .sales-list-table tr { 
-                display: block; 
-            }
-            .sales-list-table thead {
-                display: none; /* Oculta la cabecera en móvil */
-            }
-            .sales-list-table tr {
-                margin-bottom: 0.75rem;
-                border: 1px solid var(--border-color);
-                border-radius: 0.5rem;
-                overflow: hidden;
-            }
+            .sales-list-table, .sales-list-table thead, .sales-list-table tbody, .sales-list-table th, .sales-list-table td, .sales-list-table tr { display: block; }
+            .sales-list-table thead { display: none; }
+            .sales-list-table tr { margin-bottom: 0.75rem; border: 1px solid var(--border-color); border-radius: 0.5rem; overflow: hidden; }
             .sales-list-table td {
-                /* Hace que cada celda ocupe el ancho completo */
-                border-bottom: 1px solid var(--border-color);
-                position: relative;
-                padding-left: 50%;
-                text-align: right;
-                word-wrap: break-word; /* Para prevenir desbordamiento de palabras largas */
+                border-bottom: 1px solid var(--border-color); position: relative; padding-left: 50%; text-align: right; word-wrap: break-word;
             }
             .sales-list-table td:before {
-                /* Usa el atributo data-label para mostrar el nombre de la columna */
-                content: attr(data-label);
-                position: absolute;
-                left: 0;
-                width: 45%;
-                padding-left: 10px;
-                white-space: nowrap;
-                text-align: left;
-                font-weight: 600;
-                color: var(--text-muted);
+                content: attr(data-label); position: absolute; left: 0; width: 45%; padding-left: 10px; white-space: nowrap; text-align: left; font-weight: 600; color: var(--text-muted);
             }
-            /* La última celda (Eliminar) y el select de estado no necesitan padding extra */
-            .sales-list-table td:last-child {
-                border-bottom: none;
-                text-align: center;
-                padding-left: 0;
-            }
-            .sales-list-table td:last-child:before {
-                content: none;
-            }
-            /* Ajustar el select de estado para que se vea correctamente */
-            .sales-list-table select {
-                display: inline-block;
-                max-width: 100%;
-            }
+            .sales-list-table td:last-child { border-bottom: none; text-align: center; padding-left: 0; }
+            .sales-list-table td:last-child:before { content: none; }
+            .sales-list-table select { display: inline-block; max-width: 100%; }
         }
     </style>
     <script>
         (function() {
             try {
-                // Se agregan los nuevos temas a la lista de temas válidos
                 const theme = localStorage.getItem('selectedTheme');
                 if (theme && ['theme-dark', 'theme-infernal', 'theme-gold', 'theme-blue-neon'].includes(theme)) {
                     document.documentElement.className = theme;
@@ -862,19 +667,19 @@
     
     <input type="file" id="tool-image-editor-input" class="hidden" accept="image/*" /><script>
         // =================================================================================
-        // == 1. CONFIGURACIÓN SUPABASE                                                   ==
+        // == 1. CONFIGURACIÓN SUPABASE E INICIALIZACIÓN INMEDIATA                        ==
         // =================================================================================
         
-        // Inicialización inmediata para evitar errores en PC o Móvil
         const SUPABASE_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
         const SUPABASE_FUNCTION_URL = "https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2"; 
         
+        // Inicializar inmediatamente para evitar errores en PC
         let supabase = null;
         if (window.supabase) {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } else {
-            alert("Error Crítico: No se pudo cargar Supabase. Revise su conexión.");
+            console.error("Error Crítico: Supabase no cargó. Revise su conexión.");
         }
         
         // Constantes de Tablas
@@ -904,14 +709,6 @@
         let categoryTotals = {};
         let categoryTotalsBodega = {}; 
         
-        // Elementos DOM Globales
-        const authModal = document.getElementById('auth-modal');
-        const appContentWrapper = document.getElementById('app-content-wrapper');
-        const authForm = document.getElementById('auth-form');
-        const emailInput = document.getElementById('email-input');
-        const passwordInput = document.getElementById('password-input');
-        const authStatus = document.getElementById('auth-status');
-        
         // Elementos para mostrar totales
         const categoryTotalsEl = document.createElement("div"); 
         categoryTotalsEl.id = "category-totals";
@@ -925,6 +722,10 @@
         // == 3. LÓGICA DE AUTENTICACIÓN (LOGIN ARREGLADO)                           ==
         // ============================================================================
 
+        const authModal = document.getElementById('auth-modal');
+        const appContentWrapper = document.getElementById('app-content-wrapper');
+        const authStatus = document.getElementById('auth-status');
+
         function setAuthStatus(msg, success = true) {
              authStatus.textContent = msg;
              authStatus.className = `text-sm mt-3 text-center ${success ? 'text-green-400' : 'text-red-400'}`;
@@ -933,8 +734,12 @@
         async function handleLogin(event) {
             event.preventDefault();
             const loginButton = document.getElementById('login-button');
+            const emailInput = document.getElementById('email-input');
+            const passwordInput = document.getElementById('password-input');
+
             loginButton.disabled = true;
-            setAuthStatus('Iniciando sesión...', true);
+            loginButton.textContent = "Verificando...";
+            setAuthStatus('Conectando...', true);
 
             if (!supabase) {
                 setAuthStatus('Error: Supabase no cargó.', false);
@@ -942,32 +747,30 @@
                 return;
             }
 
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-
             try {
                 // 1. Intentar Login en la API
                 const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password,
+                    email: emailInput.value.trim(),
+                    password: passwordInput.value,
                 });
 
                 if (error) throw error;
                 
                 // 2. ÉXITO: FORZAR ENTRADA INMEDIATAMENTE
-                // No esperamos al evento onAuthStateChange que suele fallar en móviles.
+                // No esperamos al evento del navegador que falla en móviles.
                 setAuthStatus('¡Éxito! Entrando...', true);
                 
                 authModal.classList.add('hidden');
                 appContentWrapper.classList.remove('hidden');
                 
-                // Cargar datos
+                // 3. Cargar datos
                 loadAppDataAndInitialize();
 
             } catch (error) {
                 console.error("Error Login:", error);
                 setAuthStatus('Correo o contraseña incorrectos.', false); 
                 loginButton.disabled = false;
+                loginButton.textContent = "Entrar";
             }
         }
 
@@ -982,32 +785,30 @@
             }
         }
 
-        // Listener de respaldo (útil si recargas la página ya logueado)
+        // Listener de respaldo (útil si recargas la página ya logueado en PC)
         function setupAuthListener() {
             if (!supabase) return;
             supabase.auth.onAuthStateChange((event, session) => {
                 if (session) {
-                    // Si ya estamos dentro, no hacemos nada. Si estamos fuera, entramos.
                     if (authModal.classList.contains('hidden') === false) {
                         authModal.classList.add('hidden');
                         appContentWrapper.classList.remove('hidden');
                         loadAppDataAndInitialize(); 
                     }
                 } else {
-                    // Si no hay sesión, asegurar que se vea el login
-                    authModal.classList.remove('hidden');
-                    appContentWrapper.classList.add('hidden');
+                    if(appContentWrapper.classList.contains('hidden')){
+                        authModal.classList.remove('hidden');
+                    }
                 }
             });
         }
         
-        authForm.addEventListener('submit', handleLogin);
+        document.getElementById('auth-form').addEventListener('submit', handleLogin);
 
         // ============================================================================
         // == 4. LÓGICA DE UI Y UTILIDADES                                           ==
         // ============================================================================
 
-        // Temas
         function applyTheme(theme) {
             document.documentElement.className = theme;
             localStorage.setItem('selectedTheme', theme);
@@ -1039,6 +840,13 @@
         });
 
         // Utilidades
+        function setStatusMessage(el, msg, success = true) { 
+            if(!el) return;
+            el.textContent = msg; 
+            el.className = `text-sm mt-3 ${success ? 'text-green-400' : 'text-red-400'}`; 
+            setTimeout(() => (el.textContent = ""), 3000); 
+        }
+        
         function getCleanProductName(inputName) {
             const match = inputName.match(/^(.*?)\s+\((.*?)$/);
             return match ? match[1].trim() : inputName.trim();
@@ -1120,6 +928,16 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function showSkeletonLoaders() { 
+            const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div><div class="h-4 w-1/2 skeleton-line"></div><div class="h-8 w-1/4 skeleton-line"></div></div>`).join('');
+            document.getElementById("products-loader").innerHTML = cardSkeleton;
+            document.getElementById("products-loader-bodega").innerHTML = cardSkeleton; 
+            document.getElementById("tools-loader").innerHTML = cardSkeleton;
+            const tableSkeleton = Array(3).fill('').map(() => `<div class="h-12 skeleton-line"></div>`).join(''); 
+            document.getElementById("sales-list-loader").innerHTML = tableSkeleton; 
+            document.getElementById("missing-list-loader").innerHTML = tableSkeleton; 
+        }
+
         // ============================================================================
         // == 5. GESTIÓN DE DATOS (CRUD)                                            ==
         // ============================================================================
@@ -1128,11 +946,12 @@
         async function fetchProducts() { 
             if (!supabase) return;
             const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("created_at", { ascending: false }); 
-            if (error) { console.error(error); return; } 
-            allProducts = data; 
-            calculateCategoryTotals(allProducts, true, false); 
-            filterAndRenderProducts(); 
-            updateAutocompleteList();
+            if (!error) {
+                allProducts = data; 
+                calculateCategoryTotals(allProducts, true, false); 
+                filterAndRenderProducts(); 
+                updateAutocompleteList();
+            }
         }
         function filterAndRenderProducts() { 
             const term = document.getElementById("search-input").value.toLowerCase().trim(); 
@@ -1145,7 +964,8 @@
             container.innerHTML = ""; 
             document.getElementById("total-count").textContent = `${items.length} productos`; 
 
-            categoryTotalsEl.innerHTML = `<span class="font-bold text-indigo-300">Total:</span> ` + Object.keys(categoryTotals).sort().map(cat => `<span class="text-gray-300 ml-2">${cat}: <b class="text-white">${categoryTotals[cat]}</b></span>`).join(' | ');
+            // Totales
+            categoryTotalsEl.innerHTML = `<span class="font-bold text-indigo-300">Total por Categoría:</span> ` + Object.keys(categoryTotals).sort().map(cat => `<span class="text-gray-300 ml-2">${cat}: <b class="text-white">${categoryTotals[cat]}</b></span>`).join(' | ');
             container.appendChild(categoryTotalsEl);
 
             if (items.length === 0) { container.innerHTML += `<p class="p-4 text-gray-400">Sin resultados.</p>`; return; } 
@@ -1176,11 +996,12 @@
         async function fetchProductsBodega() { 
             if (!supabase) return;
             const { data, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).select("*").order("created_at", { ascending: false }); 
-            if (error) { console.error(error); return; } 
-            allProductsBodega = data; 
-            calculateCategoryTotals(allProductsBodega, false, true); 
-            filterAndRenderProductsBodega(); 
-            updateAutocompleteList();
+            if (!error) {
+                allProductsBodega = data; 
+                calculateCategoryTotals(allProductsBodega, false, true); 
+                filterAndRenderProductsBodega(); 
+                updateAutocompleteList();
+            }
         }
         function filterAndRenderProductsBodega() { 
             const term = document.getElementById("search-input-bodega").value.toLowerCase().trim(); 
@@ -1250,12 +1071,16 @@
 
             const grouped = items.reduce((acc, s) => { (acc[s.sale_date] = acc[s.sale_date] || []).push(s); return acc; }, {});
             Object.keys(grouped).sort().reverse().forEach(date => {
-                const totalDia = grouped[date].reduce((sum, s) => sum + (s.status==='Pagado'?s.price:0), 0);
+                const totalDia = grouped[date].reduce((sum, s) => sum + (s.status==='Pagado'?Number(s.price):0), 0);
                 let html = `<div class="mt-6"><h3 class="text-white font-bold border-b border-gray-600 mb-2 flex justify-between"><span>${date}</span> <span class="text-green-400">$${totalDia.toFixed(2)}</span></h3>`;
-                html += `<table class="min-w-full divide-y divide-gray-700 shadow-md sales-list-table"><thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase">Cliente</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase">Producto</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase">Estado</th><th></th></tr></thead><tbody class="bg-gray-800 divide-y divide-gray-700">`;
+                // Tabla Original
+                html += `<table class="min-w-full divide-y divide-gray-700 shadow-md sales-list-table">
+                        <thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6" data-label="Destinatario">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Producto Vendido">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Precio">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Estado">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead>
+                        <tbody class="bg-gray-800 divide-y divide-gray-700">`;
+                
                 grouped[date].forEach(s => {
                     const statusClass = STATUS_COLORS[s.status] || STATUS_COLORS['Pendiente'];
-                    html += `<tr class="hover:bg-gray-700/50"><td class="px-6 py-4 text-sm text-gray-300" data-label="Cliente">${s.recipient_name}</td><td class="px-6 py-4 text-sm text-gray-300" data-label="Producto">${s.product_name_sold}</td><td class="px-6 py-4 text-sm font-bold text-green-500" data-label="Precio">$${Number(s.price).toFixed(2)}</td><td class="px-6 py-4 text-sm" data-label="Estado"><select onchange="changeSaleStatus('${s.id}', this.value, '${s.product_name_sold}')" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${s.status==='Pagado'?'selected':''}>Pagado</option><option value="Pendiente" ${s.status==='Pendiente'?'selected':''}>Pendiente</option><option value="Devuelto" ${s.status==='Devuelto'?'selected':''}>Devuelto</option></select></td><td class="px-6 py-4 text-right"><button onclick="deleteSale('${s.id}')" class="text-red-500 text-sm">Eliminar</button></td></tr>`;
+                    html += `<tr class="hover:bg-gray-700/50 transition duration-150"><td class="px-6 py-4 text-sm text-gray-300" data-label="Destinatario">${s.recipient_name}</td><td class="px-6 py-4 text-sm text-gray-300" data-label="Producto">${s.product_name_sold}</td><td class="px-6 py-4 text-sm font-bold text-green-500" data-label="Precio">$${Number(s.price).toFixed(2)} <button onclick="editSalePrice('${s.id}', ${s.price})" class="ml-2 text-indigo-400 text-xs">(Editar)</button></td><td class="px-6 py-4 text-sm" data-label="Estado"><select onchange="changeSaleStatus('${s.id}', this.value, '${s.product_name_sold}')" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${s.status==='Pagado'?'selected':''}>Pagado</option><option value="Pendiente" ${s.status==='Pendiente'?'selected':''}>Pendiente</option><option value="Devuelto" ${s.status==='Devuelto'?'selected':''}>Devuelto</option></select></td><td class="px-6 py-4 text-right text-sm font-medium"><button onclick="deleteSale('${s.id}')" class="text-red-500">Eliminar</button></td></tr>`;
                 });
                 html += "</tbody></table></div>";
                 container.innerHTML += html;
@@ -1280,6 +1105,15 @@
                 fetchSales(); fetchProducts(); fetchProductsBodega();
             } catch(e) { alert(e.message); }
         };
+        window.editSalePrice = function(id, currentPrice) {
+            const newPriceStr = prompt(`Ingresa el nuevo precio:`, currentPrice);
+            if (newPriceStr) {
+                const newPrice = parseFloat(newPriceStr);
+                if (!isNaN(newPrice)) {
+                    supabase.from(SALES_TABLE).update({ price: newPrice }).eq("id", id).then(() => fetchSales());
+                }
+            }
+        };
 
         // --- Modales Logic ---
         window.openProductEditorModal = (id, type) => {
@@ -1291,7 +1125,7 @@
             document.getElementById('modal-price').value = p.price;
             document.getElementById('modal-quantity').value = p.quantity;
             document.getElementById('modal-box-number').value = p.box_number || '';
-            document.getElementById('modal-location').innerText = type === 'main' ? 'Principal' : 'Bodega';
+            document.getElementById('modal-location').innerText = type === 'main' ? 'Inventario Principal' : 'Nuevo Inventario';
             document.getElementById('modal-image-preview').src = p.image_url || '';
             modal.classList.remove('hidden');
         };
@@ -1364,7 +1198,7 @@
                 await supabase.from(table).insert(payload);
                 e.target.reset();
                 reloadFn();
-                alert("Guardado");
+                alert("Guardado exitosamente");
             } catch(err) { alert("Error: " + err.message); }
             btn.disabled = false;
         }
@@ -1405,11 +1239,35 @@
             btn.disabled = false;
         });
 
+        // --- Faltantes y Herramientas ---
+        async function fetchMissingProducts() {
+            const { data } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false });
+            if(data) document.getElementById('missing-list').innerHTML = data.map(m => `<div class="bg-gray-800 p-3 rounded flex justify-between border-b border-gray-700"><div><p class="font-medium">${m.product_name}</p><p class="text-xs text-gray-400">${m.notes||''}</p></div><button onclick="delMissing('${m.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs">OK</button></div>`).join('');
+        }
+        window.delMissing = async (id) => { await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq('id', id); fetchMissingProducts(); };
+        
+        async function fetchTools() {
+            const { data } = await supabase.from(TOOLS_TABLE).select("*").order("created_at", { ascending: false });
+            if(data) document.getElementById('tools-list').innerHTML = data.map(t => `<div class="bg-gray-800 p-4 rounded shadow border border-gray-700"><div class="h-48 bg-gray-700 mb-2 overflow-hidden"><img src="${t.image_url}" class="h-full w-full object-contain"></div><h3 class="font-bold text-white">${t.title}</h3><p class="text-xs text-gray-400">${t.description}</p><button onclick="delTool('${t.id}')" class="mt-2 text-red-500 text-xs">Eliminar</button></div>`).join('');
+        }
+        window.delTool = async (id) => { if(confirm("Eliminar?")) await supabase.from(TOOLS_TABLE).delete().eq('id', id); fetchTools(); };
+
+        document.getElementById("missing-product-form").addEventListener("submit", (e) => handleFormSubmit(e, MISSING_PRODUCTS_TABLE, ['missing-product-name', 'missing-product-notes'], fetchMissingProducts));
+        document.getElementById("tool-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const f = e.target;
+            let url = null;
+            if(f.querySelector('#tool-image').files[0]) url = await uploadImage(f.querySelector('#tool-image').files[0]);
+            await supabase.from(TOOLS_TABLE).insert({title: f.querySelector('#tool-title').value, description: f.querySelector('#tool-description').value, image_url: url});
+            f.reset(); fetchTools();
+        });
+
         // --- Inicialización ---
         async function loadAppDataAndInitialize() {
             document.getElementById('sale-date').value = new Date().toISOString().split('T')[0];
+            showSkeletonLoaders();
             await loadLogo();
-            await Promise.all([ fetchProducts(), fetchProductsBodega(), fetchSales() ]);
+            await Promise.all([ fetchProducts(), fetchProductsBodega(), fetchSales(), fetchMissingProducts(), fetchTools() ]);
         }
         
         // Carga Logo
@@ -1422,11 +1280,8 @@
 
         // --- Evento de Carga de Ventana ---
         window.onload = function() {
-            // Aplicar tema
             const theme = localStorage.getItem('selectedTheme') || 'theme-dark';
             applyTheme(theme);
-            
-            // Iniciar listener de Auth
             setupAuthListener();
             
             // Listeners de búsqueda
@@ -1434,12 +1289,84 @@
             document.getElementById("search-input-bodega").addEventListener("input", filterAndRenderProductsBodega);
             document.getElementById("search-sales-input").addEventListener("input", filterAndRenderSales);
             
-            // Asignar eventos de botones de vista
             document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', (e) => {
                 if (!window.matchMedia("(max-width: 768px)").matches && e.target.closest('#mobile-menu-dropdown')) return; 
                 toggleView(btn.dataset.view);
             }));
         };
+        
+        // Funciones PDF y ZIP
+        window.downloadSalesPDF = async function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const el = document.getElementById("sales-list-container").cloneNode(true);
+            el.style.width = '800px'; el.style.background = 'white'; el.style.color='black';
+            el.querySelectorAll('button, select').forEach(b => b.remove());
+            document.body.appendChild(el);
+            const canvas = await html2canvas(el);
+            doc.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 10, 190, 0);
+            doc.save('ventas.pdf');
+            document.body.removeChild(el);
+        };
+        
+        window.downloadAllLabelsAsZip = async function() {
+            const zip = new JSZip();
+            const loc = document.getElementById('labels-location').value;
+            const items = loc==='main' ? allProducts : allProductsBodega;
+            for(const p of items) {
+                const div = document.createElement('div');
+                new QRCode(div, { text: String(p.id), width: 256, height: 256 });
+                await new Promise(r=>setTimeout(r,50));
+                const url = div.querySelector('canvas').toDataURL().split(',')[1];
+                zip.file(`${p.name}.png`, url, {base64:true});
+            }
+            const blob = await zip.generateAsync({type:"blob"});
+            saveAs(blob, "qrs.zip");
+        };
+        
+        // Labels
+        const labelsLocationSelect = document.getElementById('labels-location');
+        const labelsCategorySelect = document.getElementById('labels-category');
+        const labelsOutputDiv = document.getElementById('labels-output');
+        const labelsCountSpan = document.getElementById('labels-count');
+        
+        function updateLabelView() {
+            const loc = labelsLocationSelect.value;
+            const items = loc === 'main' ? allProducts : allProductsBodega;
+            const cats = new Set(items.map(p => p.category));
+            labelsCategorySelect.innerHTML = '<option value="all">Todas</option>';
+            cats.forEach(c => { if(c) labelsCategorySelect.innerHTML += `<option value="${c}">${c}</option>`; });
+            const catFilter = labelsCategorySelect.value;
+            const filtered = items.filter(p => catFilter === 'all' || p.category === catFilter);
+            labelsCountSpan.textContent = filtered.length + " seleccionados";
+        }
+        labelsLocationSelect.addEventListener('change', updateLabelView);
+        labelsCategorySelect.addEventListener('change', updateLabelView);
+        
+        window.generateAndPrintLabels = () => {
+            const loc = labelsLocationSelect.value;
+            const items = loc === 'main' ? allProducts : allProductsBodega;
+            const catFilter = labelsCategorySelect.value;
+            const filtered = items.filter(p => catFilter === 'all' || p.category === catFilter);
+            labelsOutputDiv.innerHTML = "";
+            filtered.forEach(p => {
+                const div = document.createElement('div');
+                div.innerHTML = `<div style="width:70%; font-size:12px;"><b>${p.name}</b><br>${p.category}<br><b>$${p.price}</b></div><div id="qr-${p.id}"></div>`;
+                labelsOutputDiv.appendChild(div);
+                new QRCode(document.getElementById(`qr-${p.id}`), { text: String(p.id), width: 80, height: 80 });
+            });
+            setTimeout(window.print, 500);
+        };
+        
+        // QR Modal
+        window.openQrModal = () => {
+            if (!currentEditingProduct) return;
+            const id = currentEditingProduct.id;
+            document.getElementById('qr-code-container').innerHTML = "";
+            new QRCode(document.getElementById('qr-code-container'), { text: String(id), width: 128, height: 128 });
+            document.getElementById('qr-modal').classList.remove('hidden');
+        };
+        window.closeQrModal = () => document.getElementById('qr-modal').classList.add('hidden');
     </script>
 </body>
 </html>
