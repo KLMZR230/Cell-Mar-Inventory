@@ -1,1811 +1,1421 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Cell Smar</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700;900&family=Lora:wght@700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<html lang="es"> <head> <meta charset="utf-8" /> <meta name="viewport" content="width=device-width,initial-scale=1" /> <title>Cell Smar</title> <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700;900&family=Lora:wght@700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<script src="[https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js](https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js)"></script>
+<script src="[https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js](https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js)"></script>
+
+<style>
+    /********************************/
+    /* Estilos Base (Comunes a todos los temas) */
+    /********************************/
+    html {
+        height: 100%;
+    }
+    body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        transition: background-color 0.5s ease;
+        position: relative;
+        overflow-x: hidden;
+    }
+    .container.mx-auto {
+        flex-grow: 1;
+    }
+    .product-card, .tool-card { transition: transform 0.2s, box-shadow 0.3s; }
+    .product-card:hover, .tool-card:hover { transform: translateY(-5px); }
+    /* El input file del logo debe ser invisible pero accesible */
+    #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
+    .hidden { display: none; }
+    .skeleton-card { background-color: transparent; border-radius: 0.5rem; padding: 1rem; display: flex; flex-direction: column; }
+    .skeleton-line {
+        background-color: var(--bg-secondary);
+        opacity: 0.7;
+        border-radius: 0.25rem;
+        animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse { 50% { opacity: .4; } }
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    /********************************/
+    /* TEMA 1: Dark (Predeterminado) */
+    /********************************/
+    .theme-dark {
+        --bg-primary: #1f2937;
+        --bg-secondary: #374151;
+        --bg-header: rgba(31, 41, 55, 0.8);
+        --text-primary: #e5e7eb;
+        --text-secondary: #d1d5db;
+        --text-muted: #9ca3af;
+        --border-color: #4b5563;
+        --accent-color: #818cf8;
+        --accent-color-dark: #6366f1;
+        --font-main: 'Poppins', sans-serif;
+        --font-headings: 'Poppins', sans-serif;
+        --pastel-bg: #e0f2f1; /* Verde pastel claro para móvil */
+        --pastel-text: #1f2937;
+    }
+    
+    /********************************/
+    /* Fondo del Escáner siempre blanco */
+    /********************************/
+    #scanner-modal .modal-content {
+        background-color: white !important;
+        color: black !important;
+    }
+    #scanner-modal .modal-content h3, #scanner-modal .modal-content p {
+        color: black !important;
+    }
+    
+    /********************************/
+    /* TEMA 2: Fuego Infernal */
+    /********************************/
+    .theme-infernal {
+        --bg-primary: #000000;
+        --bg-secondary: #2d1a1a;
+        --bg-header: rgba(17, 7, 0, 0.6);
+        --text-primary: #f9fafb;
+        --text-secondary: #d1d5db;
+        --text-muted: #9ca3af;
+        --border-color: #571e1e;
+        --accent-color: #ff4500;
+        --accent-color-dark: #e63e00;
+        --font-main: 'Roboto', sans-serif;
+        --font-headings: 'Roboto', sans-serif;
+        --pastel-bg: #ffccbc; /* Naranja/Melocotón pastel */
+        --pastel-text: #2d1a1a;
+    }
+    .theme-infernal { background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
+    .theme-infernal .product-card:hover, .theme-infernal .tool-card:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.5); border-color: rgba(255, 69, 0, 0.7); }
+    
+    /********************************/
+    /* TEMA 3: Luxury Gold */
+    /********************************/
+    .theme-gold {
+        --bg-primary: #121212;
+        --bg-secondary: #2b2b2b;
+        --bg-header: rgba(18, 18, 18, 0.85);
+        --text-primary: #f1f1f1;
+        --text-secondary: #cccccc;
+        --text-muted: #a0a0a0;
+        --border-color: #444444;
+        --accent-color: #D4AF37;
+        --accent-color-dark: #B8860B;
+        --font-main: 'Poppins', sans-serif;
+        --font-headings: 'Playfair Display', serif;
+        --pastel-bg: #faf3e0; /* Crema pastel */
+        --pastel-text: #121212;
+    }
+    .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
+    .theme-gold .product-card:hover, .theme-gold .tool-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
+    .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
+    .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
+    
+    /********************************/
+    /* TEMA 4: Blue Neon */
+    /********************************/
+    .theme-blue-neon {
+        --bg-primary: #080a1c; /* Azul muy oscuro/negro */
+        --bg-secondary: #12183b; /* Azul oscuro */
+        --bg-header: rgba(8, 10, 28, 0.9);
+        --text-primary: #e0f7fa; /* Cyan claro */
+        --text-secondary: #99eeff;
+        --text-muted: #4dd0e1;
+        --border-color: #00bcd4; /* Azul Neón */
+        --accent-color: #00e5ff; /* Neón brillante */
+        --accent-color-dark: #00aacd;
+        --font-main: 'Roboto', sans-serif;
+        --font-headings: 'Roboto Mono', monospace; /* Fuente de código */
+        --pastel-bg: #e1f5fe; /* Azul pastel */
+        --pastel-text: #080a1c;
+    }
+    .theme-blue-neon {
+        background-image: url('data:image/svg+xml,%3Csvg width="80" height="80" viewBox="0 0 80 80" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%231a1a3a" fill-opacity="0.4"%3E%3Cpath d="M0 0h80v80H0zM20 20v40h40V20H20zM30 30h20v20H30V30z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); /* Fondo de circuito/malla */
+    }
+    .theme-blue-neon .product-card:hover, .theme-blue-neon .tool-card:hover {
+        box-shadow: 0 0 20px var(--accent-color);
+        border-color: var(--accent-color);
+    }
+    .theme-blue-neon .text-indigo-400, .theme-blue-neon .text-indigo-300 {
+        color: var(--accent-color);
+        text-shadow: 0 0 8px var(--accent-color); /* Efecto neón */
+    }
+    .theme-blue-neon .bg-indigo-500, .theme-blue-neon .hover\:bg-indigo-600:hover, 
+    .theme-blue-neon .bg-blue-600, .theme-blue-neon .hover\:bg-blue-700:hover,
+    .theme-blue-neon .bg-green-600, .theme-blue-neon .hover\:bg-green-700:hover {
+        background-color: var(--accent-color-dark);
+        box-shadow: 0 0 10px var(--border-color);
+    }
+    .theme-blue-neon .bg-indigo-500:hover, .theme-blue-neon .hover\:bg-indigo-600 {
+        background-color: var(--accent-color);
+    }
+    
+    /********************************/
+    /* Aplicación de Variables CSS */
+    /********************************/
+    body {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        font-family: var(--font-main);
+    }
+    h1, h2, h3, h4, h5, h6 { font-family: var(--font-headings); }
+    
+    /* Aplicación de colores para fondo de headers y cards */
+    .bg-gray-800, .bg-gray-900\/50 {
+        background-color: var(--bg-header);
+        border: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+        backdrop-filter: blur(10px);
+        color: var(--text-primary); /* Restaurar color de texto */
+    }
+    
+    /* Asegurar que el fondo secundario de inputs y selectores es visible */
+    .bg-gray-600 { background-color: var(--bg-secondary) !important; }
+    .bg-gray-700\/50 { background-color: var(--bg-secondary); }
 
-    <style>
-        /********************************/
-        /* Estilos Base (Comunes a todos los temas) */
-        /********************************/
-        html {
-            height: 100%;
-        }
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            transition: background-color 0.5s ease;
-            position: relative;
-            overflow-x: hidden;
-        }
-        .container.mx-auto {
-            flex-grow: 1;
-        }
-        .product-card, .tool-card { transition: transform 0.2s, box-shadow 0.3s; }
-        .product-card:hover, .tool-card:hover { transform: translateY(-5px); }
-        #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
-        .hidden { display: none; }
-        .skeleton-card { background-color: transparent; border-radius: 0.5rem; padding: 1rem; display: flex; flex-direction: column; }
-        .skeleton-line {
-            background-color: var(--bg-secondary);
-            opacity: 0.7;
-            border-radius: 0.25rem;
-            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes pulse { 50% { opacity: .4; } }
-        
-        /* Fondo del Escáner siempre blanco */
-        #scanner-modal .modal-content {
-            background-color: white !important;
-            color: black !important;
-        }
-        #scanner-modal .modal-content h3, #scanner-modal .modal-content p {
-            color: black !important;
-        }
-        
-        /********************************/
-        /* TEMA 1: Dark (Predeterminado) */
-        /********************************/
-        .theme-dark {
-            --bg-primary: #1f2937;
-            --bg-secondary: #374151;
-            --bg-header: rgba(31, 41, 55, 0.8);
-            --text-primary: #e5e7eb;
-            --text-secondary: #d1d5db;
-            --text-muted: #9ca3af;
-            --border-color: #4b5563;
-            --accent-color: #818cf8;
-            --accent-color-dark: #6366f1;
-            --font-main: 'Poppins', sans-serif;
-            --font-headings: 'Poppins', sans-serif;
-            --pastel-bg: #e0f2f1;
-            --pastel-text: #1f2937;
-        }
-        
-        /********************************/
-        /* TEMA 2: Fuego Infernal */
-        /********************************/
-        .theme-infernal {
-            --bg-primary: #000000;
-            --bg-secondary: #2d1a1a;
-            --bg-header: rgba(17, 7, 0, 0.6);
-            --text-primary: #f9fafb;
-            --text-secondary: #d1d5db;
-            --text-muted: #9ca3af;
-            --border-color: #571e1e;
-            --accent-color: #ff4500;
-            --accent-color-dark: #e63e00;
-            --font-main: 'Roboto', sans-serif;
-            --font-headings: 'Roboto', sans-serif;
-            --pastel-bg: #ffccbc;
-            --pastel-text: #2d1a1a;
-        }
-        .theme-infernal { background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
-        .theme-infernal .product-card:hover, .theme-infernal .tool-card:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.5); border-color: rgba(255, 69, 0, 0.7); }
-        
-        /********************************/
-        /* TEMA 3: Luxury Gold */
-        /********************************/
-        .theme-gold {
-            --bg-primary: #121212;
-            --bg-secondary: #2b2b2b;
-            --bg-header: rgba(18, 18, 18, 0.85);
-            --text-primary: #f1f1f1;
-            --text-secondary: #cccccc;
-            --text-muted: #a0a0a0;
-            --border-color: #444444;
-            --accent-color: #D4AF37;
-            --accent-color-dark: #B8860B;
-            --font-main: 'Poppins', sans-serif;
-            --font-headings: 'Playfair Display', serif;
-            --pastel-bg: #faf3e0;
-            --pastel-text: #121212;
-        }
-        .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
-        .theme-gold .product-card:hover, .theme-gold .tool-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
-        .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
-        .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
-        
-        /********************************/
-        /* TEMA 5: Blue Neon */
-        /********************************/
-        .theme-blue-neon {
-            --bg-primary: #080a1c;
-            --bg-secondary: #12183b;
-            --bg-header: rgba(8, 10, 28, 0.9);
-            --text-primary: #e0f7fa;
-            --text-secondary: #99eeff;
-            --text-muted: #4dd0e1;
-            --border-color: #00bcd4;
-            --accent-color: #00e5ff;
-            --accent-color-dark: #00aacd;
-            --font-main: 'Roboto', sans-serif;
-            --font-headings: 'Roboto Mono', monospace;
-            --pastel-bg: #e1f5fe;
-            --pastel-text: #080a1c;
-        }
-        .theme-blue-neon {
-            background-image: url('data:image/svg+xml,%3Csvg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%231a1a3a" fill-opacity="0.4"%3E%3Cpath d="M0 0h80v80H0zM20 20v40h40V20H20zM30 30h20v20H30V30z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
-        }
-        .theme-blue-neon .product-card:hover, .theme-blue-neon .tool-card:hover {
-            box-shadow: 0 0 20px var(--accent-color);
-            border-color: var(--accent-color);
-        }
-        .theme-blue-neon .text-indigo-400, .theme-blue-neon .text-indigo-300 {
-            color: var(--accent-color);
-            text-shadow: 0 0 8px var(--accent-color);
-        }
-        .theme-blue-neon .bg-indigo-500, .theme-blue-neon .hover\:bg-indigo-600:hover, 
-        .theme-blue-neon .bg-blue-600, .theme-blue-neon .hover\:bg-blue-700:hover,
-        .theme-blue-neon .bg-green-600, .theme-blue-neon .hover\:bg-green-700:hover {
-            background-color: var(--accent-color-dark);
-            box-shadow: 0 0 10px var(--border-color);
-        }
-        .theme-blue-neon .bg-indigo-500:hover, .theme-blue-neon .hover\:bg-indigo-600 {
-            background-color: var(--accent-color);
-        }
-        
-        /********************************/
-        /* Aplicación de Variables CSS */
-        /********************************/
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            font-family: var(--font-main);
-        }
-        h1, h2, h3, h4, h5, h6 { font-family: var(--font-headings); }
-        
-        .bg-gray-800, .bg-gray-900\/50 {
-            background-color: var(--bg-header);
-            border: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
-            backdrop-filter: blur(10px);
-            color: var(--text-primary);
-        }
-        
-        .bg-gray-600 { background-color: var(--bg-secondary) !important; }
-        .bg-gray-700\/50 { background-color: var(--bg-secondary); }
+    .text-gray-300 { color: var(--text-secondary); }
+    .text-gray-400 { color: var(--text-muted); }
+    
+    .border-gray-500, .border-gray-600, .border-gray-700 { border-color: var(--border-color); }
+    
+    /* Acentos */
+    .text-indigo-400, .text-indigo-300 { color: var(--accent-color); }
+    .border-indigo-500 { border-color: var(--accent-color); }
+    .bg-indigo-500 { background-color: var(--accent-color-dark); color: var(--text-primary); }
+    .hover\:bg-indigo-600:hover { background-color: var(--accent-color); }
+    .focus\:ring-indigo-500:focus { --tw-ring-color: var(--accent-color); }
+    
+    input:focus, select:focus, textarea:focus {
+        border-color: var(--accent-color) !important;
+        box-shadow: 0 0 0 1px var(--accent-color);
+        outline: none;
+    }
+    .bg-blue-600, .bg-green-600 { background-color: var(--accent-color-dark); }
+    .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover { background-color: var(--accent-color); }
+    
+    /********************************/
+    /* ESTILOS FIJOS PARA ESTADOS DE VENTA */
+    /********************************/
+    .status-paid {
+        background-color: #16a34a !important; /* Verde */
+        color: #ffffff !important;
+        border-color: #15803d !important;
+    }
+    .status-pending {
+        background-color: #f59e0b !important; /* Naranja/Amarillo */
+        color: #1f2937 !important;
+        border-color: #d97706 !important;
+    }
+    .status-returned {
+        background-color: #dc2626 !important; /* Rojo */
+        color: #ffffff !important;
+        border-color: #b91c1c !important;
+    }
 
-        .text-gray-300 { color: var(--text-secondary); }
-        .text-gray-400 { color: var(--text-muted); }
-        
-        .border-gray-500, .border-gray-600, .border-gray-700 { border-color: var(--border-color); }
-        
-        .text-indigo-400, .text-indigo-300 { color: var(--accent-color); }
-        .border-indigo-500 { border-color: var(--accent-color); }
-        .bg-indigo-500 { background-color: var(--accent-color-dark); color: var(--text-primary); }
-        .hover\:bg-indigo-600:hover { background-color: var(--accent-color); }
-        .focus\:ring-indigo-500:focus { --tw-ring-color: var(--accent-color); }
-        
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--accent-color) !important;
-            box-shadow: 0 0 0 1px var(--accent-color);
-            outline: none;
+    /********************************/
+    /* ESTILOS MÓVIL (Menú de Hamburguesa y Columnas) */
+    /********************************/
+    #mobile-menu-button {
+        display: none; 
+    }
+    
+    @media (min-width: 769px) {
+        #mobile-scan-button {
+            display: none !important;
         }
-        .bg-blue-600, .bg-green-600 { background-color: var(--accent-color-dark); }
-        .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover { background-color: var(--accent-color); }
-        
-        /********************************/
-        /* ESTILOS FIJOS PARA ESTADOS DE VENTA */
-        /********************************/
-        .status-paid {
-            background-color: #16a34a !important;
-            color: #ffffff !important;
-            border-color: #15803d !important;
+        .sales-list-table {
+            /* Asegura que la tabla se comporte como tabla en escritorio */
+            display: table;
         }
-        .status-pending {
-            background-color: #f59e0b !important;
-            color: #1f2937 !important;
-            border-color: #d97706 !important;
+    }
+    
+    @media (max-width: 768px) {
+        #view-buttons {
+            display: none !important; 
         }
-        .status-returned {
-            background-color: #dc2626 !important;
-            color: #ffffff !important;
-            border-color: #b91c1c !important;
-        }
-
-        /********************************/
-        /* ESTILOS MÓVIL */
-        /********************************/
         #mobile-menu-button {
-            display: none; 
+            display: block; 
         }
-        
-        @media (min-width: 769px) {
-            #mobile-scan-button {
-                display: none !important;
-            }
-            .sales-list-table {
-                display: table;
-            }
+        /* Inventario en 2 columnas en móvil */
+        #products .grid, #products-bodega .grid, #products-loader, #products-loader-bodega, #tools-list {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         }
-        
-        @media (max-width: 768px) {
-            #view-buttons {
-                display: none !important; 
-            }
-            #mobile-menu-button {
-                display: block; 
-            }
-            #products .grid, #products-bodega .grid, #products-loader, #products-loader-bodega, #tools-list {
-                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-            }
 
-            #mobile-menu-dropdown {
-                position: absolute;
-                right: 0;
-                top: 100%; 
-                width: 250px;
-                background-color: var(--pastel-bg); 
-                color: var(--pastel-text);
-                border: 1px solid var(--border-color);
-                border-top: none;
-                z-index: 40;
-                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            }
-            #mobile-menu-dropdown button {
-                width: 100%;
-                text-align: left;
-                padding: 0.75rem 1rem;
-                font-weight: 500;
-                color: var(--pastel-text);
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            }
-            #mobile-menu-dropdown button:hover {
-                background-color: rgba(0, 0, 0, 0.05);
-            }
-            #mobile-menu-dropdown .bg-indigo-500 {
-                background-color: var(--accent-color) !important;
-                color: var(--text-primary) !important;
-                font-weight: bold;
-            }
-            #mobile-menu-dropdown #mobile-scan-button {
-                background-color: var(--pastel-bg); 
-                color: var(--pastel-text);
-                font-weight: bold;
-                padding: 0.75rem 1rem;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            }
-
-            .sales-list-table, .sales-list-table thead, .sales-list-table tbody, .sales-list-table th, .sales-list-table td, .sales-list-table tr { 
-                display: block; 
-            }
-            .sales-list-table thead {
-                display: none;
-            }
-            .sales-list-table tr {
-                margin-bottom: 0.75rem;
-                border: 1px solid var(--border-color);
-                border-radius: 0.5rem;
-                overflow: hidden;
-            }
-            .sales-list-table td {
-                border-bottom: 1px solid var(--border-color);
-                position: relative;
-                padding-left: 50%;
-                text-align: right;
-                word-wrap: break-word;
-            }
-            .sales-list-table td:before {
-                content: attr(data-label);
-                position: absolute;
-                left: 0;
-                width: 45%;
-                padding-left: 10px;
-                white-space: nowrap;
-                text-align: left;
-                font-weight: 600;
-                color: var(--text-muted);
-            }
-            .sales-list-table td:last-child {
-                border-bottom: none;
-                text-align: center;
-                padding-left: 0;
-            }
-            .sales-list-table td:last-child:before {
-                content: none;
-            }
-            .sales-list-table select {
-                display: inline-block;
-                max-width: 100%;
-            }
+        #mobile-menu-dropdown {
+            position: absolute;
+            right: 0;
+            top: 100%; 
+            width: 250px;
+            background-color: var(--pastel-bg); 
+            color: var(--pastel-text);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            z-index: 40;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
-    </style>
-    <script>
-        (function() {
-            try {
-                const theme = localStorage.getItem('selectedTheme');
-                const validThemes = ['theme-dark', 'theme-infernal', 'theme-gold', 'theme-blue-neon'];
-                if (theme && validThemes.includes(theme)) {
-                    document.documentElement.className = theme;
-                } else {
-                    document.documentElement.className = 'theme-dark';
-                }
-            } catch (e) {
+        #mobile-menu-dropdown button {
+            width: 100%;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            color: var(--pastel-text);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        #mobile-menu-dropdown button:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+         /* Estilo para el botón activo en el menú móvil */
+        #mobile-menu-dropdown .bg-indigo-500 {
+            background-color: var(--accent-color) !important;
+            color: var(--text-primary) !important;
+            font-weight: bold;
+        }
+        #mobile-menu-dropdown #mobile-scan-button {
+            background-color: var(--pastel-bg); 
+            color: var(--pastel-text);
+            font-weight: bold;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilos para transformar la tabla de ventas en tarjetas */
+        .sales-list-table, .sales-list-table thead, .sales-list-table tbody, .sales-list-table th, .sales-list-table td, .sales-list-table tr { 
+            display: block; 
+        }
+        .sales-list-table thead {
+            display: none; /* Oculta la cabecera en móvil */
+        }
+        .sales-list-table tr {
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .sales-list-table td {
+            /* Hace que cada celda ocupe el ancho completo */
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            padding-left: 50%;
+            text-align: right;
+            word-wrap: break-word; /* Para prevenir desbordamiento de palabras largas */
+        }
+        .sales-list-table td:before {
+            /* Usa el atributo data-label para mostrar el nombre de la columna */
+            content: attr(data-label);
+            position: absolute;
+            left: 0;
+            width: 45%;
+            padding-left: 10px;
+            white-space: nowrap;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        /* La última celda (Eliminar) y el select de estado no necesitan padding extra */
+        .sales-list-table td:last-child {
+            border-bottom: none;
+            text-align: center;
+            padding-left: 0;
+        }
+        .sales-list-table td:last-child:before {
+            content: none;
+        }
+        /* Ajustar el select de estado para que se vea correctamente */
+        .sales-list-table select {
+            display: inline-block;
+            max-width: 100%;
+        }
+    }
+</style>
+<script>
+    (function() {
+        try {
+            // Se eliminó el tema de navidad de la lista de temas válidos
+            const theme = localStorage.getItem('selectedTheme');
+            if (theme && ['theme-dark', 'theme-infernal', 'theme-gold', 'theme-blue-neon'].includes(theme)) {
+                document.documentElement.className = theme;
+            } else {
                 document.documentElement.className = 'theme-dark';
             }
-        })();
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
-</head>
-<body class="">
+        } catch (e) {
+            document.documentElement.className = 'theme-dark';
+        }
+    })();
+</script>
+<script src="[https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2](https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2)"></script>
+<script src="[https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js](https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js)"></script>
+<script src="[https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js](https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js)"></script>
+</head> <body class="" onclick="">
 
-    <div id="app-content-wrapper">
+<div id="app-content-wrapper">
 
-    <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
-        <div class="flex items-center space-x-4">
-            <img 
-                id="business-logo" 
-                src="https://via.placeholder.com/60/4f46e5/ffffff?text=CS" 
-                alt="Logo negocio" 
-                class="h-20 w-20 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105"
-                onerror="this.onerror=null; this.src='https://via.placeholder.com/60/4f46e5/ffffff?text=CS';"
-            />
-            <h1 class="text-3xl font-extrabold tracking-tight">
-                <span class="text-indigo-400">Cell Smar</span>
-            </h1>
+<header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700">
+    <div class="flex items-center space-x-4">
+        <img 
+            id="business-logo" 
+            src="[https://via.placeholder.com/60/4f46e5/ffffff?text=CS](https://via.placeholder.com/60/4f46e5/ffffff?text=CS)" 
+            alt="Logo negocio" 
+            class="h-20 w-20 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105"
+            onerror="this.onerror=null; this.src='[https://via.placeholder.com/60/4f46e5/ffffff?text=CS](https://via.placeholder.com/60/4f46e5/ffffff?text=CS)';"
+        />
+        <h1 class="text-3xl font-extrabold tracking-tight">
+            <span class="text-indigo-400">Cell Smar</span>
+        </h1>
+    </div>
+    <div class="flex items-center space-x-4 relative">
+        <div id="view-buttons" class="flex items-center space-x-2 bg-black/20 p-1 rounded-lg border border-gray-700">
+            <button data-view="inventory" class="view-btn bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg text-sm shadow-md transition duration-300">📦 Inventario Principal</button>
+            <button data-view="inventory_bodega" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🏠 Nuevo Inventario</button>
+            <button data-view="sales" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">💰 Ventas</button>
+            <button data-view="missing" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🔔 Faltantes</button>
+            <button data-view="tools" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🛠️ Herramientas</button>
         </div>
-        <div class="flex items-center space-x-4 relative">
-            <div id="view-buttons" class="flex items-center space-x-2 bg-black/20 p-1 rounded-lg border border-gray-700">
-                <button data-view="inventory" class="view-btn bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg text-sm shadow-md transition duration-300">📦 Inventario Principal</button>
-                <button data-view="inventory_bodega" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🏠 Nuevo Inventario</button>
-                <button data-view="sales" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">💰 Ventas</button>
-                <button data-view="missing" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🔔 Faltantes</button>
-                <button data-view="tools" class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🛠️ Herramientas</button>
-            </div>
-             <button id="mobile-menu-button" onclick="toggleMobileMenu(event)" class="text-gray-300 hover:text-indigo-400 p-2 rounded-full bg-gray-700/50 transition duration-300 shadow-md" title="Menú">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
-            </button>
-            <div id="mobile-menu-dropdown" class="rounded-md shadow-lg divide-y divide-gray-300 z-50 hidden">
-                 <button id="mobile-scan-button" onclick="openScannerModal()" class="text-sm font-medium flex items-center space-x-2">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
-                     </svg>
-                     <span>Escanear QR (Venta)</span>
-                 </button>
-                <button data-view="inventory" class="view-btn text-sm">📦 Inventario Principal</button>
-                <button data-view="inventory_bodega" class="view-btn text-sm">🏠 Nuevo Inventario</button>
-                <button data-view="sales" class="view-btn text-sm">💰 Ventas</button>
-                <button data-view="missing" class="view-btn text-sm">🔔 Faltantes</button>
-                <button data-view="tools" class="view-btn text-sm">🛠️ Herramientas</button>
-            </div>
-             <button id="settings-button" onclick="toggleSettingsDropdown(event)" class="text-gray-300 hover:text-indigo-400 p-2 rounded-full bg-gray-700/50 transition duration-300 shadow-md" title="Configuración">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.313.823 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.823 3.313-2.37-2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.313-.823-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.823 3.313 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-            </button>
-            <div id="settings-dropdown" class="absolute right-0 mt-2 w-72 origin-top-right rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 divide-y divide-gray-700 z-50 hidden">
-                <div class="py-1 px-3 space-y-3">
-                    <div class="flex items-center space-x-2 pt-2">
-                        <label for="theme-selector" class="text-sm text-gray-400">🎨 Tema Visual:</label>
-                        <select id="theme-selector" class="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg p-1.5 flex-grow">
-                            <option value="theme-dark">Predeterminado</option>
-                            <option value="theme-infernal">Fuego Infernal</option>
-                            <option value="theme-gold">Luxury Gold</option>
-                            <option value="theme-blue-neon">💙 Neón Azul</option>
-                        </select>
-                    </div>
-                    <div class="flex items-center space-x-2 pt-2">
-                        <label for="logo-upload" class="bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 transition duration-300 cursor-pointer text-sm shadow-sm flex-grow text-center">Subir Nuevo Logo 🖼️</label>
-                        <input type="file" id="logo-upload" title="Sube una nueva imagen para tu logo" accept="image/*" />
-                    </div>
-                    <button id="logo-save-button" class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed text-sm w-full shadow-md" disabled>Guardar Logo</button>
+         <button id="mobile-menu-button" onclick="toggleMobileMenu(event)" class="text-gray-300 hover:text-indigo-400 p-2 rounded-full bg-gray-700/50 transition duration-300 shadow-md" title="Menú">
+            <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+        </button>
+        <div id="mobile-menu-dropdown" class="rounded-md shadow-lg divide-y divide-gray-300 z-50 hidden">
+            <button data-view="inventory" class="view-btn text-sm">📦 Inventario Principal</button>
+            <button data-view="inventory_bodega" class="view-btn text-sm">🏠 Nuevo Inventario</button>
+            <button data-view="sales" class="view-btn text-sm">💰 Ventas</button>
+            <button data-view="missing" class="view-btn text-sm">🔔 Faltantes</button>
+            <button data-view="tools" class="view-btn text-sm">🛠️ Herramientas</button>
+        </div><button id="settings-button" onclick="toggleSettingsDropdown(event)" class="text-gray-300 hover:text-indigo-400 p-2 rounded-full bg-gray-700/50 transition duration-300 shadow-md" title="Configuración">
+            <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.313.823 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.823 3.313-2.37-2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.313-.823-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.823 3.313 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        </button>
+        <div id="settings-dropdown" class="absolute right-0 mt-2 w-72 origin-top-right rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 divide-y divide-gray-700 z-50 hidden">
+            <div class="py-1 px-3 space-y-3">
+                <div class="flex items-center space-x-2 pt-2">
+                    <label for="theme-selector" class="text-sm text-gray-400">🎨 Tema Visual:</label>
+                    <select id="theme-selector" class="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg p-1.5 flex-grow">
+                        <option value="theme-dark">Predeterminado</option>
+                        <option value="theme-infernal">Fuego Infernal</option>
+                        <option value="theme-gold">Luxury Gold</option>
+                        <option value="theme-blue-neon">💙 Neón Azul</option>
+                    </select>
                 </div>
+                <div class="flex items-center space-x-2 pt-2">
+                    <label for="logo-upload" class="bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 transition duration-300 cursor-pointer text-sm shadow-sm flex-grow text-center">Subir Nuevo Logo 🖼️</label>
+                    <input type="file" id="logo-upload" title="Sube una nueva imagen para tu logo" accept="image/*" />
+                </div>
+                <button id="logo-save-button" class="bg-green-500 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-green-600 transition duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed text-sm w-full shadow-md" disabled>Guardar Logo</button>
             </div>
         </div>
-    </header>
-
-    <div class="container mx-auto px-4 py-6">
-        <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario Principal</p>        <div class="container mx-auto px-4 py-6">
-            <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario Principal</p>
-
-            <div id="inventory-view" class="view-section">
-                <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                    <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (Inventario Principal)</h2>
-                    <form id="product-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-                        <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Flex de Botones" /></div>
-                        <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
-                            <option value="">Seleccionar</option>
-                            <option value="Pantallas">Pantallas</option>
-                            <option value="Jacks de Carga">Jacks de Carga</option>
-                            <option value="Flex Main">Flex Main</option>
-                            <option value="Placas de Carga">Placas de Carga</option>
-                            <option value="Botones Fisicos">Botones Fisicos</option>
-                            <option value="Botones Internos">Botones Internos</option>
-                            <option value="Tapaderas de Iphone">Tapaderas de Iphone</option>
-                            <option value="Bandejas SIM">Bandejas SIM</option>
-                            <option value="Flex de Iphone">Flex de Iphone</option>
-                            <option value="Tapaderas">Tapaderas</option>
-                            <option value="Accesorios">Accesorios</option>
-                            <option value="Otros">Otros</option>
-                        </select></div>
-                        <div><label class="block text-sm font-medium text-gray-300">Caja N°</label><input id="box-number" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: A-01" /></div>
-                        <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="12.50" /></div>
-                        <div><label class="block text-sm font-medium text-gray-300">Cantidad</label><input id="quantity" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
-                        <div><label class="block text-sm font-medium text-gray-300">Imagen</label><input id="image" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" /></div>
-                        <div class="md:col-span-6 text-right"><button id="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
-                    </form>
-                    <p id="status" class="text-sm text-gray-400 mt-3"></p>
-                </section>
-                <section>
-                    <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">📦 Inventario Principal por Categoría</h2><span id="total-count" class="text-gray-400 text-sm"></span></div>
-                    <div class="mb-6 flex items-center space-x-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" id="search-input" placeholder="Buscar por nombre o categoría..." class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" /></div>
-                    <div id="products-loader" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
-                    <div id="products"></div>
-                </section>
+    </div>
+</header>
+<div class="container mx-auto px-4 py-6">
+    <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario Principal</p>
+    
+    <div id="inventory-view" class="view-section hidden">
+        <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (Inventario Principal)</h2>
+            <form id="product-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+                <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Flex de Botones" /></div>
+                <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
+                    <option value="">Seleccionar</option>
+                    <option value="Pantallas">Pantallas</option>
+                    <option value="Jacks de Carga">Jacks de Carga</option>
+                    <option value="Flex Main">Flex Main</option>
+                    <option value="Placas de Carga">Placas de Carga</option>
+                    <option value="Botones Fisicos">Botones Fisicos</option>
+                    <option value="Botones Internos">Botones Internos</option>
+                    <option value="Tapaderas de Iphone">Tapaderas de Iphone</option>
+                    <option value="Bandejas SIM">Bandejas SIM</option>
+                    <option value="Flex de Iphone">Flex de Iphone</option>
+                    <option value="Tapaderas">Tapaderas</option>
+                    <option value="Accesorios">Accesorios</option>
+                    <option value="Otros">Otros</option>
+                </select></div>
+                <div><label class="block text-sm font-medium text-gray-300">Caja N°</label><input id="box-number" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: A-01" /></div>
+                <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="12.50" /></div>
+                <div><label class="block text-sm font-medium text-gray-300">Cantidad</label><input id="quantity" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
+                <div><label class="block text-sm font-medium text-gray-300">Imagen</label><input id="image" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" /></div>
+                <div class="md:col-span-6 text-right"><button id="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
+            </form>
+            <p id="status" class="text-sm text-gray-400 mt-3"></p>
+        </section>
+        <section>
+            <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">📦 Inventario Principal por Categoría</h2><span id="total-count" class="text-gray-400 text-sm"></span></div>
+            <div class="mb-6 flex items-center space-x-3"><svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" id="search-input" placeholder="Buscar por nombre o categoría..." class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" /></div>
+            <div id="products-loader" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+            <div id="products"></div>
+        </section>
+    </div>
+    <div id="inventory-bodega-view" class="view-section hidden">
+        <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (Nuevo Inventario)</h2>
+            <form id="product-form-bodega" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+                <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name-bodega" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Batería iPhone 11" /></div>
+                <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select-bodega" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
+                    <option value="">Seleccionar</option>
+                    <option value="Pantallas">Pantallas</option>
+                    <option value="Jacks de Carga">Jacks de Carga</option>
+                    <option value="Flex Main">Flex Main</option>
+                    <option value="Placas de Carga">Placas de Carga</option>
+                    <option value="Botones Fisicos">Botones Fisicos</option>
+                    <option value="Botones Internos">Botones Internos</option>
+                    <option value="Tapaderas de Iphone">Tapaderas de Iphone</option>
+                    <option value="Bandejas SIM">Bandejas SIM</option>
+                    <option value="Flex de Iphone">Flex de Iphone</option>
+                    <option value="Tapaderas">Tapaderas</option>
+                    <option value="Accesorios">Accesorios</option>
+                    <option value="Otros">Otros</option>
+                </select></div>
+                <div><label class="block text-sm font-medium text-gray-300">Caja N°</label><input id="box-number-bodega" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: C-03" /></div>
+                <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="price-bodega" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="20.00" /></div>
+                <div><label class="block text-sm font-medium text-gray-300">Cantidad</label><input id="quantity-bodega" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
+                <div><label class="block text-sm font-medium text-gray-300">Imagen</label><input id="image-bodega" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" /></div>
+                <div class="md:col-span-6 text-right"><button id="submit-bodega" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
+            </form>
+            <p id="status-bodega" class="text-sm text-gray-400 mt-3"></p>
+        </section>
+        <section>
+            <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">🏠 Nuevo Inventario por Categoría</h2><span id="total-count-bodega" class="text-gray-400 text-sm"></span></div>
+            <div class="mb-6 flex items-center space-x-3"><svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" id="search-input-bodega" placeholder="Buscar por nombre o categoría..." class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" /></div>
+            <div id="products-loader-bodega" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+            <div id="products-bodega"></div>
+        </section>
+    </div><div id="sales-view" class="view-section hidden">
+        <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-indigo-300">✍️ Registrar Nueva Venta</h2>
             </div>
-            
-            <div id="inventory-bodega-view" class="view-section hidden">
-                <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                    <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto (Nuevo Inventario)</h2>
-                    <form id="product-form-bodega" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-                        <div><label class="block text-sm font-medium text-gray-300">Nombre</label><input id="name-bodega" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Batería iPhone 11" /></div>
-                        <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="category-select-bodega" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
-                            <option value="">Seleccionar</option>
-                            <option value="Pantallas">Pantallas</option>
-                            <option value="Jacks de Carga">Jacks de Carga</option>
-                            <option value="Flex Main">Flex Main</option>
-                            <option value="Placas de Carga">Placas de Carga</option>
-                            <option value="Botones Fisicos">Botones Fisicos</option>
-                            <option value="Botones Internos">Botones Internos</option>
-                            <option value="Tapaderas de Iphone">Tapaderas de Iphone</option>
-                            <option value="Bandejas SIM">Bandejas SIM</option>
-                            <option value="Flex de Iphone">Flex de Iphone</option>
-                            <option value="Tapaderas">Tapaderas</option>
-                            <option value="Accesorios">Accesorios</option>
-                            <option value="Otros">Otros</option>
-                        </select></div>
-                        <div><label class="block text-sm font-medium text-gray-300">Caja N°</label><input id="box-number-bodega" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: C-03" /></div>
-                        <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="price-bodega" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="20.00" /></div>
-                        <div><label class="block text-sm font-medium text-gray-300">Cantidad</label><input id="quantity-bodega" type="number" min="0" value="1" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
-                        <div><label class="block text-sm font-medium text-gray-300">Imagen</label><input id="image-bodega" type="file" accept="image/*" class="mt-1 block w-full p-1 border rounded-md bg-gray-600 border-gray-500 text-white" /></div>
-                        <div class="md:col-span-6 text-right"><button id="submit-bodega" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Agregar Producto</button></div>
-                    </form>
-                    <p id="status-bodega" class="text-sm text-gray-400 mt-3"></p>
-                </section>
-                <section>
-                    <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">🏠 Nuevo Inventario por Categoría</h2><span id="total-count-bodega" class="text-gray-400 text-sm"></span></div>
-                    <div class="mb-6 flex items-center space-x-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" id="search-input-bodega" placeholder="Buscar por nombre o categoría..." class="p-2 border rounded-md w-full max-w-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" /></div>
-                    <div id="products-loader-bodega" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
-                    <div id="products-bodega"></div>
-                </section>
-            </div>
-            
-            <div id="sales-view" class="view-section hidden">
-                <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-semibold text-indigo-300">✍️ Registrar Nueva Venta</h2>
-                        <button id="sales-scan-button" onclick="openScannerModal()" class="hidden md:flex text-white py-2 px-4 rounded-lg bg-green-600 hover:bg-green-700 transition duration-300 shadow-md text-sm items-center space-x-1" title="Escanear Producto y Registrar Venta">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 12v.01M12 20v.01M18 4v.01M18 12v.01M18 20v.01M6 4v.01M6 12v.01M6 20v.01M4 4h.01M4 12h.01M4 20h.01M20 4h.01M20 12h.01M20 20h.01" />
-                            </svg>
-                            <span>Escanear QR</span>
-                        </button>
-                    </div>
-                    <form id="sale-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-                        <div><label class="block text-sm font-medium text-gray-300">Nombre de Destinatario</label><input id="recipient-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Juan Pérez" /></div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Producto Vendido</label>
-                            <input id="product-name-sold" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Pantalla Samsung A32" list="inventory-suggestions" />
-                            <datalist id="inventory-suggestions"></datalist>
-                        </div>
-                        <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="sale-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="25.99" /></div>
-                        <div><label class="block text-sm font-medium text-gray-300">Fecha de Venta</label><input id="sale-date" type="date" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
-                        <div><label class="block text-sm font-medium text-gray-300">Estado</label><select id="sale-status-input" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="Pendiente">Pendiente</option><option value="Pagado">Pagado</option><option value="Devuelto">Devuelto</option></select></div>
-                        <div class="text-right"><button id="sale-submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow w-full">Registrar Venta</button></div>
-                    </form>
-                    <p id="sale-status" class="text-sm text-gray-400 mt-3"></p>
-                </section>
-                <section>
-                    <div class="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex flex-wrap items-center justify-between gap-4">
-                        <div class="flex-grow min-w-[250px]">
-                            <label for="search-sales-input" class="block text-sm font-medium text-gray-300 mb-1">🔍 Buscar por Nombre o Producto</label>
-                            <input type="text" id="search-sales-input" placeholder="Ej: Juan Pérez o Pantalla A32..." class="p-2 border rounded-md w-full focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" />
-                        </div>
-                        <div class="flex items-center pt-6">
-                            <input type="checkbox" id="pending-only-checkbox" class="h-4 w-4 text-indigo-600 border-gray-500 rounded bg-gray-600 focus:ring-indigo-500">
-                            <label for="pending-only-checkbox" class="ml-2 block text-sm font-medium text-gray-200">🔔 Mostrar solo pendientes</label>
-                        </div>
-                        <button onclick="downloadSalesPDF(true)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow w-full md:w-auto mt-4 md:mt-0">
-                            Descargar PDF 📄
-                        </button>
-                    </div>
-                    <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
-                        <h2 class="text-xl font-semibold text-indigo-300">📊 Historial de Ventas</h2>
-                        <span id="total-sales-count" class="text-gray-400 text-sm"></span>
-                    </div>
-                    <div id="sales-list-loader" class="space-y-2"></div>
-                    <div id="sales-list-container"></div>
-                </section>
-            </div>            <div id="missing-view" class="view-section hidden">
-                <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 max-w-4xl mx-auto">
-                    <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Registrar Producto Faltante</h2>
-                    <form id="missing-product-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Nombre del Producto</label>
-                            <input id="missing-product-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Batería para iPhone X" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300">Notas (Opcional)</label>
-                            <input id="missing-product-notes" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Pedir al proveedor A" />
-                        </div>
-                        <div>
-                            <button id="missing-product-submit" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded shadow w-full">Agregar a la Lista</button>
-                        </div>
-                    </form>
-                    <p id="missing-product-status" class="text-sm text-gray-400 mt-3"></p>
-                </section>
-                <section class="max-w-4xl mx-auto">
-                    <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">📋 Lista de Productos Faltantes</h2><span id="total-missing-count" class="text-gray-400 text-sm"></span></div>
-                    <div id="missing-list-loader" class="space-y-2"></div>
-                    <div id="missing-list" class="bg-gray-800 rounded-lg shadow overflow-hidden"></div>
-                </section>
-            </div>
-            
-            <div id="tools-view" class="view-section hidden">
-                <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-                    <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar Nueva Herramienta / Tutorial</h2>
-                    <form id="tool-form" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-300">Título</label>
-                                <input id="tool-title" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Test Point iPhone 12" />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-300">Descripción / Pasos</label>
-                                <textarea id="tool-description" rows="4" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Describe los pasos o información relevante aquí..."></textarea>
-                            </div>
-                        </div>
-                         <div>
-                            <label class="block text-sm font-medium text-gray-300">Imagen (Tutorial)</label>
-                            <input id="tool-image" type="file" accept="image/*" class="mt-1 block w-full p-1.5 border rounded-md bg-gray-600 border-gray-500 text-white" />
-                            <p class="text-xs text-gray-400 mt-2">Sube una imagen clara que ilustre el procedimiento.</p>
-                        </div>
-                        <div class="md:col-span-2 text-right">
-                            <button id="tool-submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow-lg">Guardar Herramienta</button>
-                        </div>
-                    </form>
-                    <p id="tool-status" class="text-sm text-gray-400 mt-3"></p>
-                </section>
-                <section>
-                     <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-indigo-300">📚 Base de Conocimiento de Herramientas</h2>
-                        <span id="total-tools-count" class="text-gray-400 text-sm"></span>
-                     </div>
-                     <div id="tools-loader" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
-                     <div id="tools-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-                </section>
-            </div>
-            
-            <footer class="mt-10 text-center text-gray-400 text-sm">
-                <p>Panel de Inventario — Cell Smar</p>
-                <p>&copy; 2025 Derechos Reservados. Desarrollado por Freddy Granados.</p>
-            </footer>
-        </div>
-        
-        <!-- MODAL DE EDITOR DE PRODUCTO -->
-        <div id="product-editor-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeProductEditorModal()"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-gray-700">
-              <div class="bg-gray-800 px-4 py-5 sm:px-6">
-                <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">Editar Producto</h3>
-              </div>
-              <div class="bg-gray-700 px-4 py-5 sm:p-6">
-                <form id="modal-product-form">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label class="block text-sm font-medium text-gray-300">Nombre</label>
-                      <input id="modal-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-gray-300">Categoría</label>
-                      <select id="modal-category" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
-                        <option value="">Seleccionar</option>
-                        <option value="Pantallas">Pantallas</option>
-                        <option value="Jacks de Carga">Jacks de Carga</option>
-                        <option value="Flex Main">Flex Main</option>
-                        <option value="Placas de Carga">Placas de Carga</option>
-                        <option value="Botones Fisicos">Botones Fisicos</option>
-                        <option value="Botones Internos">Botones Internos</option>
-                        <option value="Tapaderas de Iphone">Tapaderas de Iphone</option>
-                        <option value="Bandejas SIM">Bandejas SIM</option>
-                        <option value="Flex de Iphone">Flex de Iphone</option>
-                        <option value="Tapaderas">Tapaderas</option>
-                        <option value="Accesorios">Accesorios</option>
-                        <option value="Otros">Otros</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-gray-300">Precio (USD)</label>
-                      <input id="modal-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-gray-300">Cantidad</label>
-                      <input id="modal-quantity" type="number" min="0" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-gray-300">Caja N°</label>
-                      <input id="modal-box-number" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-gray-300">Ubicación</label>
-                      <p id="modal-location" class="mt-1 text-white font-medium"></p>
-                    </div>
-                  </div>
-                  <div class="mt-4">
-                    <label class="block text-sm font-medium text-gray-300">Imagen Actual</label>
-                    <img id="modal-image-preview" src="" alt="Preview" class="mt-2 max-h-48 rounded border border-gray-600" onerror="this.src='https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen'" />
-                  </div>
-                  <div class="mt-4">
-                    <label class="block text-sm font-medium text-gray-300">Cambiar Imagen</label>
-                    <input id="modal-image-upload" type="file" accept="image/*" class="mt-1 block w-full p-1.5 border rounded-md bg-gray-600 border-gray-500 text-white" />
-                  </div>
-                  <div class="mt-6 flex justify-end space-x-3">
-                    <button type="button" onclick="closeProductEditorModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">Cancelar</button>
-                    <button type="submit" id="modal-save-button" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">Guardar Cambios</button>
-                  </div>
-                  <p id="modal-status" class="mt-4 text-sm text-gray-400"></p>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- MODAL DEL ESCÁNER -->
-        <div id="scanner-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="scanner-modal-title" role="dialog" aria-modal="true">
-          <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-900 bg-opacity-90 transition-opacity" aria-hidden="true" onclick="closeScannerModal()"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content">
-              <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <h3 class="text-2xl leading-6 font-bold text-center mb-4" id="scanner-modal-title">📱 Escanear Código QR</h3>
-                <div id="reader" class="w-full"></div>
-                <p class="text-center mt-4 text-lg" id="scanner-status">Esperando código QR o de barras...</p>
-              </div>
-              <div class="bg-gray-100 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button onclick="closeScannerModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 sm:ml-3 sm:w-auto sm:text-sm">
-                  Cerrar Escáner
+            <form id="sale-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+                <div><label class="block text-sm font-medium text-gray-300">Nombre de Destinatario</label><input id="recipient-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Juan Pérez" /></div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300">Producto Vendido</label>
+                    <input id="product-name-sold" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Pantalla Samsung A32" list="inventory-suggestions" />
+                    <datalist id="inventory-suggestions"></datalist>
+                </div>
+                <div><label class="block text-sm font-medium text-gray-300">Precio (USD)</label><input id="sale-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="25.99" /></div>
+                <div><label class="block text-sm font-medium text-gray-300">Fecha de Venta</label><input id="sale-date" type="date" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
+                <div><label class="block text-sm font-medium text-gray-300">Estado</label><select id="sale-status-input" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"><option value="Pendiente">Pendiente</option><option value="Pagado">Pagado</option><option value="Devuelto">Devuelto</option></select></div>
+                <div class="text-right"><button id="sale-submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow w-full">Registrar Venta</button></div>
+            </form>
+            <p id="sale-status" class="text-sm text-gray-400 mt-3"></p>
+        </section>
+        <section>
+            <div class="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex-grow min-w-[250px]">
+                    <label for="search-sales-input" class="block text-sm font-medium text-gray-300 mb-1">🔍 Buscar por Nombre o Producto</label>
+                    <input type="text" id="search-sales-input" placeholder="Ej: Juan Pérez o Pantalla A32..." class="p-2 border rounded-md w-full focus:ring-indigo-500 focus:border-indigo-500 bg-gray-800 border-gray-600 text-white" />
+                </div>
+                <div class="flex items-center pt-6">
+                    <input type="checkbox" id="pending-only-checkbox" class="h-4 w-4 text-indigo-600 border-gray-500 rounded bg-gray-600 focus:ring-indigo-500">
+                    <label for="pending-only-checkbox" class="ml-2 block text-sm font-medium text-gray-200">🔔 Mostrar solo pendientes</label>
+                </div>
+                <button onclick="downloadSalesPDF(true)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow w-full md:w-auto mt-4 md:mt-0">
+                    Descargar PDF 📄
                 </button>
-              </div>
             </div>
+            <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
+                <h2 class="text-xl font-semibold text-indigo-300">📊 Historial de Ventas</h2>
+                <span id="total-sales-count" class="text-gray-400 text-sm"></span>
+            </div>
+            <div id="sales-list-loader" class="space-y-2"></div>
+            <div id="sales-list-container"></div>
+        </section>
+    </div>
+    <div id="missing-view" class="view-section hidden">
+        <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 max-w-4xl mx-auto">
+            <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Registrar Producto Faltante</h2>
+            <form id="missing-product-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300">Nombre del Producto</label>
+                    <input id="missing-product-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Batería para iPhone X" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300">Notas (Opcional)</label>
+                    <input id="missing-product-notes" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Pedir al proveedor A" />
+                </div>
+                <div>
+                    <button id="missing-product-submit" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded shadow w-full">Agregar a la Lista</button>
+                </div>
+            </form>
+            <p id="missing-product-status" class="text-sm text-gray-400 mt-3"></p>
+        </section>
+        <section class="max-w-4xl mx-auto">
+            <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">📋 Lista de Productos Faltantes</h2><span id="total-missing-count" class="text-gray-400 text-sm"></span></div>
+            <div id="missing-list-loader" class="space-y-2"></div>
+            <div id="missing-list" class="bg-gray-800 rounded-lg shadow overflow-hidden"></div>
+        </section>
+    </div>
+    <div id="tools-view" class="view-section hidden">
+        <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar Nueva Herramienta / Tutorial</h2>
+            <form id="tool-form" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Título</label>
+                        <input id="tool-title" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: Test Point iPhone 12" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Descripción / Pasos</label>
+                        <textarea id="tool-description" rows="4" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Describe los pasos o información relevante aquí..."></textarea>
+                    </div>
+                </div>
+                 <div>
+                    <label class="block text-sm font-medium text-gray-300">Imagen (Tutorial)</label>
+                    <input id="tool-image" type="file" accept="image/*" class="mt-1 block w-full p-1.5 border rounded-md bg-gray-600 border-gray-500 text-white" />
+                    <p class="text-xs text-gray-400 mt-2">Sube una imagen clara que ilustre el procedimiento.</p>
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button id="tool-submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow-lg">Guardar Herramienta</button>
+                </div>
+            </form>
+            <p id="tool-status" class="text-sm text-gray-400 mt-3"></p>
+        </section>
+        <section>
+             <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-indigo-300">📚 Base de Conocimiento de Herramientas</h2>
+                <span id="total-tools-count" class="text-gray-400 text-sm"></span>
+             </div>
+             <div id="tools-loader" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+             <div id="tools-list" class="grid grid-cols-1 md:col-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+    </div>
+    <footer class="mt-10 text-center text-gray-400 text-sm">
+        <p>Panel de Inventario — Cell Smar</p>
+        <p>&copy; 2025 Derechos Reservados. Desarrollado por Freddy Granados.</p>
+    </footer>
+</div>
+<div id="product-editor-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeProductEditorModal()"></div>
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+    <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-gray-700">
+      <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+            <h3 class="text-xl leading-6 font-medium text-white border-b border-indigo-500 pb-2 mb-4" id="modal-title">
+              ✍️ Editar Producto (<span id="modal-location"></span>)
+            </h3>
+            <form id="modal-product-form" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-300">Imagen Actual</label>
+                    <div class="h-40 bg-gray-600 rounded flex items-center justify-center overflow-hidden border-2 border-gray-600">
+                        <img id="modal-image-preview" src="" class="object-contain h-full w-full" alt="Previsualización" />
+                    </div>
+                    <label for="modal-image-upload" class="block text-sm font-medium text-gray-300">Subir Nueva Imagen</label>
+                    <input type="file" id="modal-image-upload" accept="image/*" class="mt-1 block w-full p-1.5 border rounded-md bg-gray-600 border-gray-500 text-white text-sm" />
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Nombre</label>
+                        <input id="modal-name" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Categoría</label>
+                        <select id="modal-category" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white">
+                            <option value="Pantallas">Pantallas</option>
+                            <option value="Jacks de Carga">Jacks de Carga</option>
+                            <option value="Flex Main">Flex Main</option>
+                            <option value="Placas de Carga">Placas de Carga</option>
+                            <option value="Botones Fisicos">Botones Fisicos</option>
+                            <option value="Botones Internos">Botones Internos</option>
+                            <option value="Tapaderas de Iphone">Tapaderas de Iphone</option>
+                            <option value="Bandejas SIM">Bandejas SIM</option>
+                            <option value="Flex de Iphone">Flex de Iphone</option>
+                            <option value="Tapaderas">Tapaderas</option>
+                            <option value="Accesorios">Accesorios</option>
+                            <option value="Otros">Otros</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Precio (USD)</label>
+                        <input id="modal-price" type="number" step="0.01" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Cantidad Disponible</label>
+                        <input id="modal-quantity" type="number" min="0" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Caja Número</label>
+                        <input id="modal-box-number" type="text" class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" placeholder="Ej: B-05" />
+                    </div>
+                    <p id="modal-status" class="text-sm text-gray-400 mt-3"></p>
+                </div>
+            </form>
           </div>
         </div>
-    </div> <!-- Fin de app-content-wrapper -->
-</div>    <script>
-        const supabaseUrl = 'https://ftcjaadsjpnzbckxevxq.supabase.co';
-        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+      </div>
+      <div class="bg-gray-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse justify-between border-t border-gray-700">
+        <div class="flex flex-col sm:flex-row-reverse">
+            <button type="submit" form="modal-product-form" id="modal-save-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-500 text-base font-medium text-white hover:bg-indigo-600 sm:ml-3 sm:w-auto sm:text-sm transition">
+                Guardar Cambios
+            </button>
+            <button type="button" onclick="closeProductEditorModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-700 text-base font-medium text-gray-200 hover:bg-gray-600 sm:mt-0 sm:w-auto sm:text-sm transition">
+                Cancelar
+            </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<input type="file" id="tool-image-editor-input" class="hidden" accept="image/*" />
 
-        const PRODUCTS_TABLE = 'products';
-        const PRODUCTS_BODEGA_TABLE = 'products_nuevo';
-        const SALES_TABLE = 'sales';
-        const MISSING_PRODUCTS_TABLE = 'missing_products';
-        const TOOLS_TABLE = 'tools';
+</div><script>
+    // =================================================================================
+    // == Configuración de Supabase y Edge Function para R2                       ==
+    // =================================================================================
+    const createClient = window.supabase ? window.supabase.createClient : null;
+    const SUPABASE_URL = "[https://ftcjaadsjpnzbckxevxq.supabase.co](https://ftcjaadsjpnzbckxevxq.supabase.co)";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0Y2phYWRzanBuemJja3hldnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDgwMTksImV4cCI6MjA3NDgyNDAxOX0.gYDhzM46oQRgly9FyVbdDCvVBaXzd3lmQJaNOVd1g3M";
+    let supabase = null;
+    if (createClient) {
+        supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } else {
+        console.error("Error Crítico: La librería Supabase no se ha cargado.");
+    }
+    const SUPABASE_FUNCTION_URL = "[https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2](https://ftcjaadsjpnzbckxevxq.supabase.co/functions/v1/upload-to-r2)"; 
+    
+    // --- INICIO: Definición de Constantes de Tablas y Estilos ---
+    const PRODUCTS_TABLE = "products";
+    const PRODUCTS_BODEGA_TABLE = "products_nuevo";
+    const SALES_TABLE = "sales";
+    const MISSING_PRODUCTS_TABLE = "missing_products";
+    const TOOLS_TABLE = "tools"; 
+    const CONFIG_TABLE = "config"; 
+    const STATUS_COLORS = { 
+        'Pagado': 'status-paid', 
+        'Pendiente': 'status-pending', 
+        'Devuelto': 'status-returned' 
+    };
 
-        let allProducts = [];
-        let allProductsBodega = [];
-        let allSales = [];
-        let allMissingProducts = [];
-        let allTools = [];
-        let currentEditingProduct = null;
-        let selectedProductImageFile = null;
-        let html5QrcodeScanner = null;
-        let isScannerRunning = false;
-        let scanSuccessHandled = false;
-        let editingToolId = null;
+    // ============================================================================
+    // == II. INICIALIZACIÓN DE VARIABLES GLOBALES Y ELEMENTOS DEL DOM (CRÍTICO) ==
+    // ============================================================================
 
-        const appContentWrapper = document.getElementById('app-content-wrapper');
-        const productForm = document.getElementById('product-form');
-        const productFormBodega = document.getElementById('product-form-bodega');
-        const salesForm = document.getElementById('sale-form');
-        const missingProductForm = document.getElementById('missing-product-form');
-        const toolForm = document.getElementById('tool-form');
+    let allProducts = [], allProductsBodega = [], allSales = [], allMissingProducts = [], allTools = [], selectedLogoFile = null;
+    let editingToolId = null; 
+    let currentEditingProduct = null;
+    let isMainInventory = true;
+    let selectedProductImageFile = null; 
+    
+    let categoryTotals = {};
+    let categoryTotalsBodega = {}; 
+    
+    const categoryTotalsEl = document.createElement("div"); 
+    categoryTotalsEl.id = "category-totals";
+    categoryTotalsEl.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
+    
+    const categoryTotalsElBodega = document.createElement("div"); 
+    categoryTotalsElBodega.id = "category-totals-bodega";
+    categoryTotalsElBodega.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-gray-700 flex flex-wrap gap-4 items-center justify-start text-sm";
 
-        const nameIn = document.getElementById('name');
-        const categoryIn = document.getElementById('category-select');
-        const priceIn = document.getElementById('price');
-        const qtyIn = document.getElementById('quantity');
-        const imageIn = document.getElementById('image');
-        const boxNumberIn = document.getElementById('box-number');
-        const status = document.getElementById('status');
+    const themeSelector = document.getElementById('theme-selector');
+    const root = document.documentElement;
+    const settingsDropdown = document.getElementById('settings-dropdown');
+    const settingsButton = document.getElementById('settings-button');
+    const logoUpload = document.getElementById("logo-upload"), businessLogo = document.getElementById("business-logo"), logoSaveButton = document.getElementById("logo-save-button");
+    const currentViewTitle = document.getElementById("current-view-title");
+    const toolImageEditorInput = document.getElementById('tool-image-editor-input'); 
 
-        const nameInBodega = document.getElementById('name-bodega');
-        const categoryInBodega = document.getElementById('category-select-bodega');
-        const priceInBodega = document.getElementById('price-bodega');
-        const qtyInBodega = document.getElementById('quantity-bodega');
-        const imageInBodega = document.getElementById('image-bodega');
-        const boxNumberInBodega = document.getElementById('box-number-bodega');
-        const statusBodega = document.getElementById('status-bodega');
+    const form = document.getElementById("product-form"), nameIn = document.getElementById("name"), categoryIn = document.getElementById("category-select"), priceIn = document.getElementById("price"), qtyIn = document.getElementById("quantity"), imageIn = document.getElementById("image"), status = document.getElementById("status"), productsEl = document.getElementById("products"), totalCount = document.getElementById("total-count"), searchInput = document.getElementById("search-input"), productsLoader = document.getElementById("products-loader"), boxNumberIn = document.getElementById("box-number");
 
-        const recipientNameIn = document.getElementById('recipient-name');
-        const productNameSoldIn = document.getElementById('product-name-sold');
-        const salePriceIn = document.getElementById('sale-price');
-        const saleDateIn = document.getElementById('sale-date');
-        const saleStatusInput = document.getElementById('sale-status-input');
-        const saleStatus = document.getElementById('sale-status');
+    const formBodega = document.getElementById("product-form-bodega"), nameInBodega = document.getElementById("name-bodega"), categoryInBodega = document.getElementById("category-select-bodega"), priceInBodega = document.getElementById("price-bodega"), qtyInBodega = document.getElementById("quantity-bodega"), imageInBodega = document.getElementById("image-bodega"), statusBodega = document.getElementById("status-bodega"), productsElBodega = document.getElementById("products-bodega"), totalCountBodega = document.getElementById("total-count-bodega"), searchInputBodega = document.getElementById("search-input-bodega"), productsLoaderBodega = document.getElementById("products-loader-bodega"), boxNumberInBodega = document.getElementById("box-number-bodega");
+    
+    const salesForm = document.getElementById("sale-form"), recipientNameIn = document.getElementById("recipient-name"), productNameSoldIn = document.getElementById("product-name-sold"), salePriceIn = document.getElementById("sale-price"), saleDateIn = document.getElementById("sale-date"), saleStatusInput = document.getElementById("sale-status-input"), salesListContainer = document.getElementById("sales-list-container"), saleStatus = document.getElementById("sale-status"), totalSalesCount = document.getElementById("total-sales-count"), salesListLoader = document.getElementById("sales-list-loader"), searchSalesInput = document.getElementById("search-sales-input"), pendingOnlyCheckbox = document.getElementById("pending-only-checkbox");
+    const inventorySuggestions = document.getElementById('inventory-suggestions');
 
-        const missingProductNameIn = document.getElementById('missing-product-name');
-        const missingProductNotesIn = document.getElementById('missing-product-notes');
-        const missingProductStatus = document.getElementById('missing-product-status');
+    const missingProductForm = document.getElementById("missing-product-form"), missingProductNameIn = document.getElementById("missing-product-name"), missingProductNotesIn = document.getElementById("missing-product-notes"), missingProductStatus = document.getElementById("missing-product-status"), missingListEl = document.getElementById("missing-list"), totalMissingCount = document.getElementById("total-missing-count"), missingListLoader = document.getElementById("missing-list-loader");
+    
+    const toolForm = document.getElementById("tool-form"), toolTitleIn = document.getElementById("tool-title"), toolDescriptionIn = document.getElementById("tool-description"), toolImageIn = document.getElementById("tool-image"), toolStatus = document.getElementById("tool-status"), toolsListEl = document.getElementById("tools-list"), totalToolsCount = document.getElementById("total-tools-count"), toolsLoader = document.getElementById("tools-loader");
 
-        const toolTitleIn = document.getElementById('tool-title');
-        const toolDescriptionIn = document.getElementById('tool-description');
-        const toolImageIn = document.getElementById('tool-image');
-        const toolStatus = document.getElementById('tool-status');
+    const modal = document.getElementById('product-editor-modal');
+    const modalProductForm = document.getElementById('modal-product-form');
+    const modalName = document.getElementById('modal-name');
+    const modalCategory = document.getElementById('modal-category');
+    const modalPrice = document.getElementById('modal-price');
+    const modalQuantity = document.getElementById('modal-quantity');
+    const modalBoxNumber = document.getElementById('modal-box-number');
+    const modalLocation = document.getElementById('modal-location');
+    const modalImagePreview = document.getElementById('modal-image-preview');
+    const modalImageUpload = document.getElementById('modal-image-upload');
+    const modalStatus = document.getElementById('modal-status');
+    
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenuDropdown = document.getElementById('mobile-menu-dropdown');
+    const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
+    
+    let currentView = 'inventory'; 
 
-        const searchInput = document.getElementById('search-input');
-        const searchInputBodega = document.getElementById('search-input-bodega');
-        const searchSalesInput = document.getElementById('search-sales-input');
-        const pendingOnlyCheckbox = document.getElementById('pending-only-checkbox');
+    // ============================================================================
+    // == IV. LÓGICA DE TEMAS Y DROPDOWN                                      ==
+    // ============================================================================
 
-        const productsContainer = document.getElementById('products');
-        const productsContainerBodega = document.getElementById('products-bodega');
-        const salesListContainer = document.getElementById('sales-list-container');
-        const missingList = document.getElementById('missing-list');
-        const toolsListEl = document.getElementById('tools-list');
-        const inventorySuggestions = document.getElementById('inventory-suggestions');
-
-        const modal = document.getElementById('product-editor-modal');
-        const modalProductForm = document.getElementById('modal-product-form');
-        const modalName = document.getElementById('modal-name');
-        const modalCategory = document.getElementById('modal-category');
-        const modalPrice = document.getElementById('modal-price');
-        const modalQuantity = document.getElementById('modal-quantity');
-        const modalBoxNumber = document.getElementById('modal-box-number');
-        const modalLocation = document.getElementById('modal-location');
-        const modalImagePreview = document.getElementById('modal-image-preview');
-        const modalImageUpload = document.getElementById('modal-image-upload');
-        const modalStatus = document.getElementById('modal-status');
-
-        const scannerModal = document.getElementById('scanner-modal');
-        const scannerStatusEl = document.getElementById('scanner-status');
-
-        const toolImageEditorInput = document.createElement('input');
-        toolImageEditorInput.type = 'file';
-        toolImageEditorInput.accept = 'image/*';
-        toolImageEditorInput.style.display = 'none';
-        document.body.appendChild(toolImageEditorInput);
-
-        function setStatusMessage(el, msg, success = true) {
-            if (!el) return;
-            el.textContent = msg;
-            el.className = success ? 'text-sm text-green-400 mt-3' : 'text-sm text-red-400 mt-3';
+    function applyTheme(theme) {
+        root.className = theme;
+        localStorage.setItem('selectedTheme', theme);
+        themeSelector.value = theme;
+    }
+    themeSelector.addEventListener('change', (e) => {
+        applyTheme(e.target.value);
+    });
+    window.toggleSettingsDropdown = function(event) {
+        event.stopPropagation(); 
+        settingsDropdown.classList.toggle('hidden');
+        mobileMenuDropdown.classList.add('hidden');
+    };
+    
+    window.toggleMobileMenu = function(event) {
+        event.stopPropagation(); 
+        mobileMenuDropdown.classList.toggle('hidden');
+        settingsDropdown.classList.add('hidden');
+    };
+    
+    document.body.addEventListener('click', (event) => {
+        if (settingsDropdown && !settingsDropdown.classList.contains('hidden')) {
+            if (!settingsDropdown.contains(event.target) && !settingsButton.contains(event.target)) {
+                settingsDropdown.classList.add('hidden');
+            }
         }
+         if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden')) {
+            if (!mobileMenuDropdown.contains(event.target) && !mobileMenuButton.contains(event.target)) {
+               mobileMenuDropdown.classList.add('hidden');
+            }
+         }
+    });
 
-        async function uploadImage(file) {
-            if (!supabase) throw new Error("Supabase no inicializado");
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-            const filePath = `products/${fileName}`;
+    // ============================================================================
+    // == V. UTILIDADES Y LÓGICA COMPARTIDA                                     ==
+    // ============================================================================
 
-            const { error: uploadError } = await supabase.storage.from('product-images').upload(filePath, file);
-            if (uploadError) throw uploadError;
-
-            const { data } = supabase.storage.from('product-images').getPublicUrl(filePath);
-            return data.publicUrl;
+    function setStatusMessage(el, msg, success = true) { 
+        el.textContent = msg; 
+        el.className = `text-sm mt-3 ${success ? 'text-green-400' : 'text-red-400'}`; 
+        setTimeout(() => (el.textContent = ""), 3000); 
+    }
+    
+    function getCleanProductName(inputName) {
+        const match = inputName.match(/^(.*?)\s+\((.*?)$/);
+        if (match) {
+            return match[1].trim();
         }
+        return inputName.trim();
+    }
 
-        async function loadLogo() {
-            const logoInput = document.getElementById('logo-upload');
-            const logoImg = document.getElementById('business-logo');
-            const saveBtn = document.getElementById('logo-save-button');
-
-            logoInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) saveBtn.disabled = false;
-            });
-
-            saveBtn.addEventListener('click', async () => {
-                const file = logoInput.files[0];
-                if (!file) return;
-                saveBtn.disabled = true;
-                saveBtn.textContent = 'Subiendo...';
-                try {
-                    const url = await uploadImage(file);
-                    logoImg.src = url;
-                    localStorage.setItem('customLogo', url);
-                    alert('Logo actualizado correctamente');
-                } catch (err) {
-                    alert('Error al subir logo: ' + err.message);
-                } finally {
-                    saveBtn.disabled = false;
-                    saveBtn.textContent = 'Guardar Logo';
-                }
-            });
-
-            const savedLogo = localStorage.getItem('customLogo');
-            if (savedLogo) logoImg.src = savedLogo;
-        }
-
-        function applyTheme(themeClass) {
-            document.documentElement.className = themeClass;
-            localStorage.setItem('selectedTheme', themeClass);
-            document.getElementById('theme-selector').value = themeClass;
-        }
-
-        document.getElementById('theme-selector').addEventListener('change', (e) => {
-            applyTheme(e.target.value);
+    async function uploadImage(file) {
+        if (!file || !supabase) return null;
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await fetch(SUPABASE_FUNCTION_URL, {
+            method: 'POST',
+            body: formData
         });
-
-        function getCleanProductName(nameWithCategory) {
-            return nameWithCategory.replace(/\s*\([^)]*\)\s*$/, '').trim();
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || 'La subida del archivo falló.');
         }
+        return data.url; 
+    }
 
-        async function updateProductStock(productName, table, localArray, change) {
-            const cleanName = getCleanProductName(productName);
-            const product = localArray.find(p => getCleanProductName(p.name) === cleanName);
-            if (!product || product.quantity + change < 0) return;
-
-            const newQuantity = product.quantity + change;
-            const { error } = await supabase.from(table).update({ quantity: newQuantity }).eq('id', product.id);
-            if (error) throw error;
-
-            product.quantity = newQuantity;
-        }
-
-        function showSkeletonLoaders() {
-            document.getElementById('products-loader').innerHTML = Array(8).fill().map(() => `
-                <div class="skeleton-card">
-                    <div class="skeleton-line h-48 w-full"></div>
-                    <div class="skeleton-line h-4 w-3/4 mt-4"></div>
-                    <div class="skeleton-line h-4 w-1/2 mt-2"></div>
-                </div>
-            `).join('');
-            document.getElementById('products-loader-bodega').innerHTML = document.getElementById('products-loader').innerHTML;
-            document.getElementById('tools-loader').innerHTML = document.getElementById('products-loader').innerHTML;
-        }
-
-        function calculateCategoryTotals(products, isMain = true, isTools = false, isBodega = false) {
-            const totals = {};
-            products.forEach(p => {
-                const cat = p.category || 'Sin Categoría';
-                totals[cat] = (totals[cat] || 0) + p.quantity;
-            });
-            const totalEl = isMain ? document.getElementById('total-count') : document.getElementById('total-count-bodega');
-            const totalCount = products.reduce((sum, p) => sum + p.quantity, 0);
-            totalEl.textContent = `Total unidades: ${totalCount}`;
-        }
-
-        function updateAutocompleteList() {
-            const all = [...allProducts, ...allProductsBodega];
-            inventorySuggestions.innerHTML = '';
-            all.forEach(p => {
+    function updateAutocompleteList(productsArray, datalistElement) {
+        datalistElement.innerHTML = '';
+        const combinedProducts = [...allProducts, ...allProductsBodega];
+        const sortedProducts = [...combinedProducts].sort((a, b) => a.name.localeCompare(b.name));
+        
+        const uniqueNames = new Set();
+        sortedProducts.filter(p => p.quantity > 0).forEach(product => {
+            const nameWithCategory = product.name + (product.category ? ` (${product.category})` : '');
+            if (!uniqueNames.has(nameWithCategory)) {
                 const option = document.createElement('option');
-                option.value = p.name + (p.category ? ` (${p.category})` : '');
-                inventorySuggestions.appendChild(option);
-            });
-        }
-
-        function updateProductCardInDOM(product, isMain, isTools = false, isBodega = false) {
-            const container = isMain ? productsContainer : productsContainerBodega;
-            const card = container.querySelector(`[data-id="${product.id}"]`);
-            if (!card) return;
-            const imgSrc = product.image_url || 'https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen';
-            card.querySelector('img').src = imgSrc;
-            card.querySelectorAll('p')[0].textContent = product.name;
-            card.querySelectorAll('p')[1].innerHTML = `<strong>Categoría:</strong> ${product.category || 'N/A'}`;
-            card.querySelectorAll('p')[2].innerHTML = `<strong>Precio:</strong> $${Number(product.price).toFixed(2)}`;
-            card.querySelectorAll('p')[3].innerHTML = `<strong>Cantidad:</strong> ${product.quantity}`;
-            card.querySelectorAll('p')[4].innerHTML = `<strong>Caja:</strong> ${product.box_number || 'N/A'}`;
-        }
-
-        async function fetchProducts() {
-            if (!supabase) return;
-            const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category").order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando productos principales:", error); return; }
-            allProducts = data;
-            filterAndRenderProducts();
-            calculateCategoryTotals(allProducts, true, false, false);
-            updateAutocompleteList();
-        }
-
-        async function fetchProductsBodega() {
-            if (!supabase) return;
-            const { data, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).select("*").order("category").order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando productos bodega:", error); return; }
-            allProductsBodega = data;
-            filterAndRenderProductsBodega();
-            calculateCategoryTotals(allProductsBodega, false, false, true);
-            updateAutocompleteList();
-        }
-
-        async function fetchMissingProducts() {
-            if (!supabase) return;
-            const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando faltantes:", error); return; }
-            allMissingProducts = data;
-            renderMissingProducts(allMissingProducts);
-        }
-
-        async function fetchTools() {
-            if (!supabase) return;
-            const { data, error } = await supabase.from(TOOLS_TABLE).select("*").order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando herramientas:", error); return; }
-            allTools = data;
-            renderTools(allTools);
-        }
-
-        async function fetchSales() {
-            if (!supabase) return;
-            const { data, error } = await supabase.from(SALES_TABLE).select("*").order("sale_date", { ascending: false }).order("created_at", { ascending: false });
-            if (error) { console.error("Error cargando ventas:", error); return; }
-            allSales = data;
-            filterAndRenderSales();
-        }
-
-        function filterAndRenderProducts() {
-            const term = searchInput.value.toLowerCase();
-            const filtered = allProducts.filter(p => 
-                p.name.toLowerCase().includes(term) || 
-                (p.category && p.category.toLowerCase().includes(term))
-            );
-            renderProducts(filtered, true);
-        }
-
-        function filterAndRenderProductsBodega() {
-            const term = searchInputBodega.value.toLowerCase();
-            const filtered = allProductsBodega.filter(p => 
-                p.name.toLowerCase().includes(term) || 
-                (p.category && p.category.toLowerCase().includes(term))
-            );
-            renderProducts(filtered, false, true);
-        }
-
-        function renderProducts(products, isMain = true, isBodega = false) {
-            const container = isMain ? productsContainer : productsContainerBodega;
-            container.innerHTML = '';
-            if (products.length === 0) {
-                container.innerHTML = '<p class="text-gray-400 col-span-full text-center">No hay productos.</p>';
-                return;
-            }
-            products.forEach(product => {
-                const card = document.createElement('div');
-                card.className = 'product-card bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700';
-                card.dataset.id = product.id;
-                const imgSrc = product.image_url || 'https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen';
-                card.innerHTML = `
-                    <img src="${imgSrc}" alt="${product.name}" class="w-full h-48 object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen'">
-                    <div class="p-4">
-                        <p class="text-lg font-semibold text-white truncate">${product.name}</p>
-                        <p class="text-sm text-gray-300"><strong>Categoría:</strong> ${product.category || 'N/A'}</p>
-                        <p class="text-sm text-gray-300"><strong>Precio:</strong> $${Number(product.price).toFixed(2)}</p>
-                        <p class="text-sm text-gray-300"><strong>Cantidad:</strong> ${product.quantity}</p>
-                        <p class="text-sm text-gray-300"><strong>Caja:</strong> ${product.box_number || 'N/A'}</p>
-                        <div class="mt-4 flex space-x-2">
-                            <button onclick="openProductEditorModal('${product.id}', '${isMain ? 'main' : 'bodega'}')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded">Editar</button>
-                            <button onclick="deleteProduct('${product.id}', '${isMain ? 'main' : 'bodega'}')" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded">Eliminar</button>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        window.deleteProduct = async function(id, locationKey) {
-            if (!confirm("¿Eliminar este producto permanentemente?")) return;
-            const table = locationKey === 'main' ? PRODUCTS_TABLE : PRODUCTS_BODEGA_TABLE;
-            const localArray = locationKey === 'main' ? allProducts : allProductsBodega;
-            const { error } = await supabase.from(table).delete().eq("id", id);
-            if (error) {
-                alert("Error al eliminar: " + error.message);
-            } else {
-                allProducts = allProducts.filter(p => p.id !== id);
-                allProductsBodega = allProductsBodega.filter(p => p.id !== id);
-                if (locationKey === 'main') filterAndRenderProducts();
-                else filterAndRenderProductsBodega();
-            }
-        }
-
-        function renderMissingProducts(products) {
-            missingList.innerHTML = '';
-            document.getElementById('total-missing-count').textContent = `${products.length} faltantes`;
-            if (products.length === 0) {
-                missingList.innerHTML = '<p class="text-gray-400 p-4 text-center">No hay productos faltantes registrados.</p>';
-                return;
-            }
-            const table = document.createElement('table');
-            table.className = 'w-full text-sm text-left text-gray-300';
-            table.innerHTML = `
-                <thead class="text-xs uppercase bg-gray-900">
-                    <tr>
-                        <th class="px-6 py-3">Producto</th>
-                        <th class="px-6 py-3">Notas</th>
-                        <th class="px-6 py-3">Fecha</th>
-                        <th class="px-6 py-3">Acción</th>
-                    </tr>
-                </thead>
-                <tbody>
-            `;
-            products.forEach(p => {
-                const tr = document.createElement('tr');
-                tr.className = 'border-b border-gray-700';
-                tr.innerHTML = `
-                    <td class="px-6 py-4">${p.product_name}</td>
-                    <td class="px-6 py-4">${p.notes || '-'}</td>
-                    <td class="px-6 py-4">${new Date(p.created_at).toLocaleDateString()}</td>
-                    <td class="px-6 py-4"><button onclick="deleteMissing('${p.id}')" class="text-red-400 hover:text-red-300">Eliminar</button></td>
-                `;
-                table.querySelector('tbody').appendChild(tr);
-            });
-            missingList.appendChild(table);
-        }
-
-        window.deleteMissing = async function(id) {
-            if (!confirm("¿Eliminar este faltante?")) return;
-            const { error } = await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq("id", id);
-            if (error) alert("Error: " + error.message);
-            else fetchMissingProducts();
-        }
-
-        function renderTools(tools) {
-            toolsListEl.innerHTML = '';
-            document.getElementById('total-tools-count').textContent = `${tools.length} herramientas`;
-            if (tools.length === 0) {
-                toolsListEl.innerHTML = '<p class="text-gray-400 col-span-full text-center">No hay herramientas registradas.</p>';
-                return;
-            }
-            tools.forEach(tool => {
-                const card = document.createElement('div');
-                card.className = 'tool-card bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700';
-                card.dataset.id = tool.id;
-                const imgSrc = tool.image_url || 'https://via.placeholder.com/300x200/4f46e5/ffffff?text=Herramienta';
-                card.innerHTML = `
-                    <img src="${imgSrc}" alt="${tool.title}" class="w-full h-64 object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200/4f46e5/ffffff?text=Herramienta'">
-                    <div class="p-4">
-                        <h3 class="text-xl font-bold text-white">${tool.title}</h3>
-                        <p class="text-gray-300 mt-2 whitespace-pre-wrap">${tool.description || 'Sin descripción'}</p>
-                        <div class="mt-4 flex space-x-2">
-                            <button onclick="editToolImage('${tool.id}')" class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded">Editar Foto</button>
-                            <button onclick="deleteTool('${tool.id}')" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded">Eliminar</button>
-                        </div>
-                    </div>
-                `;
-                toolsListEl.appendChild(card);
-            });
-        }
-
-        window.editToolImage = async function(id) {
-            editingToolId = id;
-            toolImageEditorInput.click();
-        }
-
-        window.deleteTool = async function(id) {
-            if (!confirm("¿Estás seguro de que quieres eliminar esta herramienta?")) return;
-            if (!supabase) return alert("Error: Supabase no está cargado.");
-            const { error } = await supabase.from(TOOLS_TABLE).delete().eq("id", id);
-            if (error) {
-                alert("Error al eliminar: " + error.message);
-            } else {
-                allTools = allTools.filter(t => t.id !== id);
-                renderTools(allTools);
-            }
-        }
-
-        function handleRealtimePayload(payload, localArray, renderFunction, isMainProducts = false, isBodegaProducts = false, isSales = false, idKey = 'id') {
-            if (!supabase) return;
-            const { eventType, new: newRecord, old: oldRecord } = payload;
-            const recordId = (eventType === 'DELETE') ? oldRecord[idKey] : newRecord[idKey];
-            if (!recordId) return;
-            let index = localArray.findIndex(item => item[idKey] === recordId);
-            
-            if (isSales) { 
-                let needsFullRender = false; 
-                switch (eventType) {
-                    case 'INSERT':
-                        if (index === -1) { 
-                            localArray.unshift(newRecord); 
-                            localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at)); 
-                            needsFullRender = true; 
-                        }
-                        break;
-                    case 'UPDATE':
-                        if (index !== -1) {
-                            Object.assign(localArray[index], newRecord);
-                            needsFullRender = true; 
-                        } else {
-                            localArray.unshift(newRecord); 
-                            localArray.sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date) || new Date(b.created_at) - new Date(a.created_at)); 
-                            needsFullRender = true;
-                        }
-                        break;
-                    case 'DELETE':
-                        if (index !== -1) {
-                            localArray.splice(index, 1); 
-                            needsFullRender = true;
-                        }
-                        break;
-                }
-                if (needsFullRender) {
-                    filterAndRenderSales();
-                }
-                return; 
-            }
-            
-            if (isMainProducts || isBodegaProducts) { 
-                let needsFullRender = false;
-                switch (eventType) {
-                    case 'INSERT':
-                        if (index === -1) {
-                            localArray.unshift(newRecord);
-                            localArray.sort((a, b) => (a.category || '').localeCompare(b.category || '') || new Date(b.created_at) - new Date(a.created_at));
-                        }
-                        needsFullRender = true; 
-                        break;
-                    case 'UPDATE':
-                        if (index !== -1) {
-                            const oldCategory = localArray[index].category;
-                            const newCategory = newRecord.category;
-                            const oldQuantity = localArray[index].quantity; 
-                            const newQuantity = newRecord.quantity; 
-                            Object.assign(localArray[index], newRecord); 
-                            if (oldCategory !== newCategory || oldQuantity !== newQuantity) { 
-                                needsFullRender = true;
-                            } else {
-                                updateProductCardInDOM(newRecord, isMainProducts, false, isBodegaProducts); 
-                            }
-                        } else {
-                            localArray.unshift(newRecord); 
-                            localArray.sort((a, b) => (a.category || '').localeCompare(b.category || '') || new Date(b.created_at) - new Date(a.created_at));
-                            needsFullRender = true;
-                        }
-                        break;
-                    case 'DELETE':
-                        if (index !== -1) {
-                            localArray.splice(index, 1);
-                            needsFullRender = true; 
-                        }
-                        break;
-                }
-                calculateCategoryTotals(localArray, isMainProducts, false, isBodegaProducts);
-                if (needsFullRender) {
-                    if (isMainProducts) filterAndRenderProducts(); 
-                    else filterAndRenderProductsBodega(); 
-                }
-                updateAutocompleteList();
-                return; 
-            }
-            
-            if (eventType === 'UPDATE' && index !== -1) {
-                 Object.assign(localArray[index], newRecord);
-            } else {
-                switch (eventType) {
-                    case 'INSERT':
-                        if (index === -1) localArray.unshift(newRecord);
-                        break;
-                    case 'DELETE':
-                        if (index !== -1) localArray.splice(index, 1);
-                        break;
-                }
-            }
-            if (renderFunction === renderMissingProducts || renderFunction === renderTools) {
-                localArray.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-            }
-            renderFunction(localArray); 
-        }
-
-        function initializeRealtimeSubscriptions() {
-            if (!supabase) return;
-            const channelOptions = { config: { broadcast: { ack: true } } };
-            
-            supabase.channel('public:' + PRODUCTS_TABLE, channelOptions)
-                .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_TABLE },
-                    (payload) => handleRealtimePayload(payload, allProducts, filterAndRenderProducts, true, false, false, 'id')
-                ).subscribe();
-
-            supabase.channel('public:' + PRODUCTS_BODEGA_TABLE, channelOptions) 
-                .on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_BODEGA_TABLE },
-                    (payload) => handleRealtimePayload(payload, allProductsBodega, filterAndRenderProductsBodega, false, true, false, 'id')
-                ).subscribe();
-
-            supabase.channel('public:' + SALES_TABLE, channelOptions)
-                .on('postgres_changes', { event: '*', schema: 'public', table: SALES_TABLE },
-                    (payload) => handleRealtimePayload(payload, allSales, filterAndRenderSales, false, false, true, 'id') 
-                ).subscribe();
-
-            supabase.channel('public:' + MISSING_PRODUCTS_TABLE, channelOptions)
-                .on('postgres_changes', { event: '*', schema: 'public', table: MISSING_PRODUCTS_TABLE },
-                    (payload) => handleRealtimePayload(payload, allMissingProducts, renderMissingProducts, false, false, false, 'id')
-                ).subscribe();
-
-            supabase.channel('public:' + TOOLS_TABLE, channelOptions)
-                .on('postgres_changes', { event: '*', schema: 'public', table: TOOLS_TABLE },
-                    (payload) => handleRealtimePayload(payload, allTools, renderTools, false, false, false, 'id')
-                ).subscribe();
-        }
-
-        window.openProductEditorModal = function(productId, locationKey) { 
-            currentEditingProduct = null;
-            selectedProductImageFile = null;
-            modalStatus.textContent = '';
-            
-            let productArray = locationKey === 'main' ? allProducts : allProductsBodega;
-            let product = productArray.find(p => String(p.id).trim() === String(productId).trim());
-
-            if (!product) {
-                const all = [...allProducts, ...allProductsBodega];
-                product = all.find(p => String(p.id).trim() === String(productId).trim());
-                if (!product) {
-                    alert("Error: Producto no encontrado.");
-                    return;
-                }
-            }
-            
-            currentEditingProduct = product;
-
-            modalName.value = product.name;
-            modalCategory.value = product.category || ''; 
-            modalPrice.value = Number(product.price).toFixed(2);
-            modalQuantity.value = product.quantity;
-            modalBoxNumber.value = product.box_number || '';
-            modalLocation.textContent = locationKey === 'main' ? 'Inventario Principal' : 'Nuevo Inventario';
-
-            const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
-            modalImagePreview.src = imageUrl;
-            
-            modalImageUpload.value = '';
-            modal.classList.remove('hidden');
-        }
-
-        window.closeProductEditorModal = function() {
-            modal.classList.add('hidden');
-            modalProductForm.reset();
-            selectedProductImageFile = null;
-        }
-
-        modalImageUpload.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                selectedProductImageFile = file;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    modalImagePreview.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
+                option.value = nameWithCategory;
+                datalistElement.appendChild(option);
+                uniqueNames.add(nameWithCategory);
             }
         });
+    }
 
-        modalProductForm.addEventListener('submit', async (ev) => {
-            ev.preventDefault();
-            const saveButton = document.getElementById('modal-save-button');
-            saveButton.disabled = true;
-            modalStatus.textContent = 'Guardando cambios...';
+    async function updateProductStock(productName, table, localArray, delta) {
+        const cleanProductName = getCleanProductName(productName);
+        const productToUpdate = localArray.find(p => getCleanProductName(p.name).trim() === cleanProductName);
 
-            if (!supabase || !currentEditingProduct) {
-                modalStatus.textContent = 'Error: Supabase o producto no cargado.';
-                saveButton.disabled = false;
+        if (productToUpdate) {
+            const currentQty = parseInt(productToUpdate.quantity) || 0;
+            const newQty = Math.max(0, currentQty + delta);
+            
+            const isMain = (table === PRODUCTS_TABLE); 
+            const isBodega = (table === PRODUCTS_BODEGA_TABLE);
+
+            if (delta < 0 && currentQty <= 0) {
+                console.warn(`⚠️ Advertencia: Stock de ${productName} ya es 0. No se puede descontar.`);
                 return;
             }
             
-            let table = PRODUCTS_TABLE;
-            let localArray = allProducts;
-            let isMain = true, isBodega = false;
+            productToUpdate.quantity = newQty;
+            updateProductCardInDOM(productToUpdate, isMain, false, isBodega); 
+            updateAutocompleteList(localArray, inventorySuggestions);
+            calculateCategoryTotals(localArray, isMain, false, isBodega);
 
-            if (allProducts.some(p => p.id === currentEditingProduct.id)) {
-                table = PRODUCTS_TABLE;
-                localArray = allProducts;
-                isMain = true; isBodega = false;
-            } else if (allProductsBodega.some(p => p.id === currentEditingProduct.id)) {
-                table = PRODUCTS_BODEGA_TABLE;
-                localArray = allProductsBodega;
-                isMain = false; isBodega = true;
-            } else {
-                 modalStatus.textContent = 'Error: No se puede determinar la ubicación del producto.';
-                 saveButton.disabled = false;
-                 return;
-            }
+            if(isMain) renderProducts(allProducts.filter(p => true)); 
+            else renderProductsBodega(allProductsBodega.filter(p => true)); 
+            
+            if (!supabase) return;
 
-            let newImageUrl = currentEditingProduct.image_url;
-            let updatePayload = {};
-
-            try {
-                if (selectedProductImageFile) {
-                    modalStatus.textContent = 'Subiendo nueva imagen...';
-                    newImageUrl = await uploadImage(selectedProductImageFile);
-                }
-
-                updatePayload = {
-                    name: modalName.value,
-                    category: modalCategory.value,
-                    price: parseFloat(modalPrice.value),
-                    quantity: parseInt(modalQuantity.value),
-                    box_number: modalBoxNumber.value.trim() || null,
-                    image_url: newImageUrl
-                };
-                
-                modalStatus.textContent = 'Actualizando registro...';
-                const { error } = await supabase
-                    .from(table)
-                    .update(updatePayload)
-                    .eq('id', currentEditingProduct.id);
-                
-                if (error) throw error;
-
-                Object.assign(currentEditingProduct, updatePayload);
-                updateProductCardInDOM(currentEditingProduct, isMain, false, isBodega);
-                
+            const { error: updateError } = await supabase
+                .from(table)
+                .update({ quantity: newQty })
+                .eq("id", productToUpdate.id);
+            
+            if (updateError) {
+                console.error("❌ Error al actualizar stock:", updateError.message);
+                productToUpdate.quantity = currentQty;
+                updateProductCardInDOM(productToUpdate, isMain, false, isBodega);
+                updateAutocompleteList(localArray, inventorySuggestions);
                 calculateCategoryTotals(localArray, isMain, false, isBodega);
-                if(isMain) filterAndRenderProducts();
-                else filterAndRenderProductsBodega();
-                
-                modalStatus.textContent = 'Producto actualizado con éxito. ✅';
-                setTimeout(closeProductEditorModal, 1000);
-
-            } catch (err) {
-                console.error("Error al guardar cambios del producto:", err);
-                modalStatus.textContent = 'Error al actualizar: ' + err.message;
-            } finally {
-                saveButton.disabled = false;
+                if(isMain) renderProducts(allProducts.filter(p => true)); 
+                else renderProductsBodega(allProductsBodega.filter(p => true));
             }
+        }
+    }
+    
+    const LOGO_CONFIG_KEY = "current_logo_url";
+    async function loadLogo() {
+        if (!supabase) return;
+        try {
+            const { data, error } = await supabase
+                .from(CONFIG_TABLE)
+                .select("value")
+                .eq("key", LOGO_CONFIG_KEY)
+                .single();
+            if (error || !data || !data.value) return; 
+            businessLogo.src = `${data.value}?t=${new Date().getTime()}`; 
+        } catch (err) {
+            console.error("Error en loadLogo:", err);
+        }
+    }
+    
+    // ============================================================================
+    // == VI. LÓGICA DE VISTAS Y RENDERS (Producto, Venta, Faltantes, Herramienta) ==
+    // ============================================================================
+
+    function calculateCategoryTotals(productsArray, isMain, isET, isBodega) {
+        const totals = productsArray.reduce((acc, p) => {
+            const cat = p.category || 'Otros';
+            acc[cat] = (acc[cat] || 0) + parseInt(p.quantity || 0);
+            return acc;
+        }, {});
+        if (isMain) categoryTotals = totals;
+        else if (isBodega) categoryTotalsBodega = totals;
+        return totals;
+    }
+
+    const views = { 
+        inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario Principal' }, 
+        inventory_bodega: { el: document.getElementById('inventory-bodega-view'), title: 'Vista: Nuevo Inventario' }, 
+        sales: { el: document.getElementById('sales-view'), title: 'Vista: Ventas Registradas' },
+        missing: { el: document.getElementById('missing-view'), title: 'Vista: Productos Faltantes' },
+        tools: { el: document.getElementById('tools-view'), title: 'Vista: Herramientas y Tutoriales' } 
+    };
+    
+    function toggleView(viewName) { 
+        Object.keys(views).forEach(key => { 
+            const isCurrent = key === viewName; 
+            views[key].el.classList.toggle('hidden', !isCurrent); 
+            const btn = document.querySelector(`#view-buttons .view-btn[data-view="${key}"]`); 
+            if (btn) {
+                btn.classList.toggle('bg-indigo-500', isCurrent); 
+                btn.classList.toggle('text-white', isCurrent); 
+                btn.classList.toggle('bg-transparent', !isCurrent); 
+                btn.classList.toggle('text-gray-300', !isCurrent); 
+            }
+             const mobileBtn = document.querySelector(`#mobile-menu-dropdown .view-btn[data-view="${key}"]`);
+             if (mobileBtn) {
+                 mobileBtn.classList.toggle('bg-indigo-500', isCurrent); 
+                 mobileBtn.classList.toggle('font-bold', isCurrent);
+               }
+        }); 
+        currentViewTitle.textContent = views[viewName].title; 
+        currentView = viewName;
+        try { localStorage.setItem('lastView', viewName); } catch (e) {}
+        if (isMobile() && !mobileMenuDropdown.classList.contains('hidden')) {
+            mobileMenuDropdown.classList.add('hidden');
+        }
+        if (viewName === 'sales' || viewName === 'inventory' || viewName === 'inventory_bodega') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    function showSkeletonLoaders() { 
+        const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div><div class="h-4 w-1/2 skeleton-line"></div><div class="h-8 w-1/4 skeleton-line"></div></div>`).join('');
+        productsLoader.innerHTML = cardSkeleton;
+        productsLoaderBodega.innerHTML = cardSkeleton; 
+        toolsLoader.innerHTML = cardSkeleton;
+        const tableSkeleton = Array(3).fill('').map(() => `<div class="h-12 skeleton-line"></div>`).join(''); 
+        salesListLoader.innerHTML = tableSkeleton; 
+        missingListLoader.innerHTML = tableSkeleton; 
+    }
+
+    async function fetchProducts() { 
+        if (!supabase) return;
+        const { data, error } = await supabase.from(PRODUCTS_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false }); 
+        if (error) { console.error(error); return; } 
+        allProducts = data; 
+        calculateCategoryTotals(allProducts, true, false, false); 
+        filterAndRenderProducts(); 
+        updateAutocompleteList(allProducts, inventorySuggestions);
+    }
+
+    function filterAndRenderProducts() { 
+        const term = (searchInput.value || "").toLowerCase().trim(); 
+        const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); 
+        renderProducts(filtered); 
+    }
+
+    function renderProducts(items) { 
+        productsLoader.innerHTML = ""; 
+        productsEl.innerHTML = ""; 
+        totalCount.textContent = `${items.length} productos`; 
+        categoryTotalsEl.innerHTML = `<span class="font-bold text-indigo-300">Total por Categoría:</span> ${Object.keys(categoryTotals).sort().map(cat => `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotals[cat]}</span> u.</span>`).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}`;
+        productsEl.appendChild(categoryTotalsEl);
+        if (items.length === 0) { productsEl.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos.</p>`; return; } 
+        const grouped = items.reduce((acc, p) => { 
+            const cat = p.category || 'Sin Categoría'; 
+            if (!acc[cat]) acc[cat] = []; 
+            acc[cat].push(p); 
+            return acc; 
+        }, {}); 
+        Object.keys(grouped).sort().forEach(category => { 
+            const section = document.createElement("div"); 
+            section.className = "mb-10"; 
+            section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; 
+            const grid = document.createElement("div"); 
+            grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
+            grouped[category].forEach(p => { 
+                const card = document.createElement("div");
+                card.id = `product-card-${p.id}`; 
+                card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
+                const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
+                card.innerHTML = `
+                    <button onclick="openProductEditorModal('${p.id}', 'main')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
+                        <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    </button>
+                    <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden">
+                        <img src="${imageUrl}" id="product-img-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}" onerror="this.onerror=null; this.src='[https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen](https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen)';">
+                    </div>
+                    <h3 id="product-name-${p.id}" class="font-semibold text-white">${p.name}</h3>
+                    <p id="product-category-${p.id}" class="text-xs text-gray-400 -mt-1">${p.category || 'Otros'}</p>
+                    <p id="product-price-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
+                    <p id="product-stock-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
+                    <p id="product-box-number-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
+                    <div class="flex-grow"></div>
+                    <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
+                        <button onclick="deleteProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
+                    </div>`; 
+                grid.appendChild(card); 
+            }); 
+            section.appendChild(grid); 
+            productsEl.appendChild(section); 
+        }); 
+    }
+
+    function updateProductCardInDOM(product, isMain, isET, isBodega) {
+        let idSuffix = isBodega ? '-bodega' : '';
+        const elementPrefix = 'product-';
+        const stockEl = document.getElementById(`${elementPrefix}stock${idSuffix}-${product.id}`);
+        const nameEl = document.getElementById(`${elementPrefix}name${idSuffix}-${product.id}`);
+        const priceEl = document.getElementById(`${elementPrefix}price${idSuffix}-${product.id}`);
+        const categoryEl = document.getElementById(`${elementPrefix}category${idSuffix}-${product.id}`);
+        const imgEl = document.getElementById(`${elementPrefix}img${idSuffix}-${product.id}`);
+        const boxNumberEl = document.getElementById(`${elementPrefix}box-number${idSuffix}-${product.id}`);
+        
+        if (boxNumberEl) boxNumberEl.querySelector('span').textContent = product.box_number || 'N/A';
+        if (stockEl) stockEl.textContent = `Stock: ${product.quantity}`;
+        if (nameEl) nameEl.textContent = product.name;
+        if (priceEl) priceEl.textContent = `$${Number(product.price).toFixed(2)}`; 
+        if (categoryEl) categoryEl.textContent = product.category;
+        if (imgEl) {
+            const newSrc = product.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`;
+            imgEl.src = `${newSrc}?t=${new Date().getTime()}`;
+        }
+    }
+
+    window.deleteProduct = async function(id) { 
+        if (!confirm("¿Eliminar este producto?")) return; 
+        if (!supabase) return;
+        const { error } = await supabase.from(PRODUCTS_TABLE).delete().eq("id", id); 
+        if (!error) {
+            allProducts = allProducts.filter(p => p.id !== id);
+            calculateCategoryTotals(allProducts, true, false, false); 
+            filterAndRenderProducts(); 
+            updateAutocompleteList(allProducts, inventorySuggestions);
+        }
+    }
+
+    async function fetchProductsBodega() { 
+        if (!supabase) return;
+        const { data, error } = await supabase.from(PRODUCTS_BODEGA_TABLE).select("*").order("created_at", { ascending: false }); 
+        if (error) { console.error(error); return; } 
+        allProductsBodega = data; 
+        calculateCategoryTotals(allProductsBodega, false, false, true); 
+        filterAndRenderProductsBodega(); 
+        updateAutocompleteList(allProducts, inventorySuggestions);
+    }
+
+    function filterAndRenderProductsBodega() { 
+        const term = (searchInputBodega.value || "").toLowerCase().trim(); 
+        const filtered = allProductsBodega.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term))); 
+        renderProductsBodega(filtered); 
+    }
+
+    function renderProductsBodega(items) { 
+        productsLoaderBodega.innerHTML = ""; 
+        productsElBodega.innerHTML = ""; 
+        totalCountBodega.textContent = `${items.length} productos`; 
+        categoryTotalsElBodega.innerHTML = `<span class="font-bold text-indigo-300">Total por Categoría (Nuevo Inventario):</span> ${Object.keys(categoryTotalsBodega).sort().map(cat => `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${categoryTotals[cat]}</span> u.</span>`).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}`;
+        productsElBodega.appendChild(categoryTotalsElBodega);
+        if (items.length === 0) { productsElBodega.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos.</p>`; return; } 
+        const grouped = items.reduce((acc, p) => { 
+            const cat = p.category || 'Sin Categoría'; 
+            if (!acc[cat]) acc[cat] = []; 
+            acc[cat].push(p); 
+            return acc; 
+        }, {}); 
+        Object.keys(grouped).sort().forEach(category => { 
+            const section = document.createElement("div"); 
+            section.className = "mb-10"; 
+            section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`; 
+            const grid = document.createElement("div"); 
+            grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"; 
+            grouped[category].forEach(p => { 
+                const card = document.createElement("div"); 
+                card.id = `product-card-bodega-${p.id}`;
+                card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative"; 
+                const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen`; 
+                card.innerHTML = `
+                    <button onclick="openProductEditorModal('${p.id}', 'bodega')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
+                        <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    </button>
+                    <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden">
+                        <img src="${imageUrl}" id="product-img-bodega-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}" onerror="this.onerror=null; this.src='[https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen](https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen)';">
+                    </div>
+                    <h3 id="product-name-bodega-${p.id}" class="font-semibold text-white">${p.name}</h3>
+                    <p id="product-category-bodega-${p.id}" class="text-xs text-gray-400 -mt-1">${p.category || 'N/A'}</p>
+                    <p id="product-price-bodega-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
+                    <p id="product-stock-bodega-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
+                    <p id="product-box-number-bodega-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">📦 Caja: <span class="font-normal text-indigo-300">${p.box_number || 'N/A'}</span></p>
+                    <div class="flex-grow"></div>
+                    <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
+                        <button onclick="deleteProductBodega('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
+                    </div>`; 
+                grid.appendChild(card); 
+            }); 
+            section.appendChild(grid); 
+            productsElBodega.appendChild(section); 
+        }); 
+    }
+
+    window.deleteProductBodega = async function(id) { 
+        if (!confirm("¿Eliminar este producto de Nuevo Inventario?")) return; 
+        if (!supabase) return;
+        const { error } = await supabase.from(PRODUCTS_BODEGA_TABLE).delete().eq("id", id); 
+        if (!error) {
+            allProductsBodega = allProductsBodega.filter(p => p.id !== id);
+            calculateCategoryTotals(allProductsBodega, false, false, true); 
+            filterAndRenderProductsBodega(); 
+            updateAutocompleteList(allProducts, inventorySuggestions);
+        }
+    }
+
+    function filterAndRenderSales() {
+        const term = (searchSalesInput.value || "").toLowerCase().trim();
+        const pendingOnly = pendingOnlyCheckbox.checked;
+        let filtered = [...allSales]; 
+        if (term) filtered = filtered.filter(s => (s.recipient_name || '').toLowerCase().includes(term) || (s.product_name_sold || '').toLowerCase().includes(term));
+        if (pendingOnly) filtered = filtered.filter(s => s.status === 'Pendiente');
+        renderSales(filtered);
+    }
+    
+    function updateGeneralTotals(filteredArray) {
+        const countEl = document.getElementById(`total-sales-count`);
+        if(countEl) countEl.textContent = `${filteredArray.length} de ${allSales.length} ventas`;
+    }
+    
+    function createSaleRowHTML(sale) {
+        const currentStatus = sale.status || 'Pendiente';
+        const statusClass = STATUS_COLORS[currentStatus] || STATUS_COLORS['Pendiente'];
+        const statusSelectHtml = `<select id="select-status-${sale.id}" onchange="changeSaleStatus('${sale.id}', this.value, '${sale.product_name_sold}')" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option><option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option><option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option></select>`;
+        return `<tr id="sale-row-${sale.id}" class="hover:bg-gray-700/50 transition duration-150"><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Destinatario">${sale.recipient_name}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Producto Vendido">${sale.product_name_sold || 'N/A'}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500" id="sale-price-cell-${sale.id}" data-label="Precio (USD)">$${Number(sale.price).toFixed(2)} <button onclick="editSalePrice('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button></td><td class="px-6 py-4 whitespace-nowrap text-sm" data-label="Estado">${statusSelectHtml}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="deleteSale('${sale.id}')" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td></tr>`;
+    }
+
+    function renderSales(items) {
+        salesListLoader.innerHTML = "";
+        salesListContainer.innerHTML = ""; 
+        updateGeneralTotals(items); 
+        if (items.length === 0) {
+            salesListContainer.innerHTML = `<p class="p-4 text-gray-400">No hay ventas registradas.</p>`;
+            return;
+        } 
+        const groupedByDate = items.reduce((acc, sale) => {
+            const saleDate = new Date(sale.sale_date).toISOString().split('T')[0];
+            if (!acc[saleDate]) acc[saleDate] = [];
+            acc[saleDate].push(sale);
+            return acc;
+        }, {});
+        const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
+        let fullHTML = '';
+        sortedDates.forEach(date => {
+            const dailySales = groupedByDate[date];
+            const dailyTotalSold = dailySales.reduce((sum, s) => sum + Number(s.price), 0);
+            const dailyTotalPaid = dailySales.filter(s => s.status === 'Pagado').reduce((sum, s) => sum + Number(s.price), 0);
+            const displayDate = new Date(date + 'T00:00:00Z').toLocaleDateString('es-SV', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+            const headerHTML = `<div class="bg-gray-900/70 p-3 rounded-t-lg mt-6 flex justify-between items-center border-t border-x border-gray-700"><h3 class="font-bold text-lg text-white">${displayDate}</h3><div class="text-sm font-semibold"><span class="mr-4 text-gray-400">Vendido (día): <span class="text-green-400">$${dailyTotalSold.toFixed(2)}</span></span><span class="text-gray-400">Pagado (día): <span class="text-green-500">$${dailyTotalPaid.toFixed(2)}</span></span></div></div>`;
+            const rowsHTML = dailySales.map(sale => createSaleRowHTML(sale)).join('');
+            const tableHTML = `<table class="min-w-full divide-y divide-gray-700 shadow-md sales-list-table"><thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6" data-label="Destinatario">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Producto Vendido">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Precio">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Estado">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead><tbody class="bg-gray-800 divide-y divide-gray-700">${rowsHTML}</tbody></table>`;
+            fullHTML += `<div>${headerHTML}${tableHTML}</div>`;
         });
-
-        async function registerScannedSale(product) {
-            if (!supabase) return alert("Error: Supabase no está cargado.");
-            const statusEl = saleStatus;
-            
-            const recipientName = recipientNameIn.value.trim() || 'Cliente Rápido QR'; 
-            
-            const productNameSold = product.name + (product.category ? ` (${product.category})` : '');
-            const salePrice = Number(product.price);
-            const saleDate = new Date().toISOString().split('T')[0];
-            const saleStatusValue = 'Pagado'; 
-
-            const newSale = {
-                recipient_name: recipientName,
-                product_name_sold: productNameSold,
-                price: salePrice,
-                sale_date: saleDate,
-                status: saleStatusValue
-            };
-            
-            setStatusMessage(statusEl, `Registrando venta de ${product.name}...`, true);
-            
-            try { 
-                const { error: saleError } = await supabase.from(SALES_TABLE).insert(newSale);
-                if (saleError) throw saleError;
-                
-                let updateTable = null;
-                let updateArray = null;
-
-                if (allProducts.some(p => p.id === product.id)) {
-                    updateTable = PRODUCTS_TABLE;
-                    updateArray = allProducts;
-                } else if (allProductsBodega.some(p => p.id === product.id)) {
-                    updateTable = PRODUCTS_BODEGA_TABLE;
-                    updateArray = allProductsBodega;
-                }
-
-                if (updateTable && updateArray) {
-                    await updateProductStock(product.name, updateTable, updateArray, -1);
-                }
-                
-                productNameSoldIn.value = ''; 
-                salePriceIn.value = ''; 
-                saleDateIn.value = new Date().toISOString().split('T')[0]; 
-                saleStatusInput.value = 'Pagado';
-                
-                alert(`Venta de "${product.name}" registrada con éxito para ${recipientName}. Stock descontado.`);
-                setStatusMessage(statusEl, `Venta registrada y stock descontado ✅`, true); 
-                
-            } catch (err) { 
-                console.error("Error al registrar venta escaneada:", err);
-                setStatusMessage(statusEl, "Error: " + err.message, false); 
+        salesListContainer.innerHTML = fullHTML;
+    }
+    
+    window.changeSaleStatus = async function(id, newStatus, productName) {
+        const sale = allSales.find(s => s.id === id);
+        if (!sale || !supabase) return;
+        const oldStatus = sale.status;
+        sale.status = newStatus;
+        const selectEl = document.getElementById(`select-status-${id}`);
+        if (selectEl) selectEl.className = `p-1 border rounded text-xs font-medium ${STATUS_COLORS[newStatus] || STATUS_COLORS['Pendiente']} cursor-pointer`;
+        try {
+            const { error } = await supabase.from(SALES_TABLE).update({ status: newStatus }).eq("id", id);
+            if (error) throw error;
+            const cleanName = getCleanProductName(productName);
+            let updateTable = null, updateArray = null;
+            if (allProducts.some(p => getCleanProductName(p.name).trim() === cleanName)) {
+                updateTable = PRODUCTS_TABLE; updateArray = allProducts;
+            } else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === cleanName)) {
+                updateTable = PRODUCTS_BODEGA_TABLE; updateArray = allProductsBodega;
             }
-        }
-
-        window.openScannerModal = async function() {
-            if (isScannerRunning) return;
-            if (typeof Html5QrcodeScanner === 'undefined') {
-                alert("Error: La librería de escaneo no se cargó.");
-                return;
+            if (updateTable && updateArray) {
+                if (oldStatus !== 'Pagado' && newStatus === 'Pagado') await updateProductStock(cleanName, updateTable, updateArray, -1);
+                else if (oldStatus === 'Pagado' && newStatus !== 'Pagado') await updateProductStock(cleanName, updateTable, updateArray, 1);
             }
-
-            scannerModal.classList.remove('hidden');
-            scannerStatusEl.textContent = 'Iniciando cámara...';
-            scanSuccessHandled = false;
-            isScannerRunning = true;
-
-            if (html5QrcodeScanner) {
-                try {
-                    await html5QrcodeScanner.clear();
-                } catch (e) {}
-                html5QrcodeScanner = null;
-            }
-
-            html5QrcodeScanner = new Html5QrcodeScanner(
-                "reader", { 
-                    fps: 10, 
-                    qrbox: {width: 250, height: 250},
-                    rememberLastUsedCamera: true
-                },
-                false
-            );
-
-            const onScanSuccess = async (decodedText, decodedResult) => {
-                if (scanSuccessHandled) return;
-                
-                try {
-                    const scannedId = String(decodedText).trim();
-                    if (!scannedId) throw new Error(`Código inválido.`);
-
-                    scanSuccessHandled = true; 
-                    await closeScannerModal(true); 
-
-                    const product = allProducts.find(p => String(p.id).trim() === scannedId) || 
-                                     allProductsBodega.find(p => String(p.id).trim() === scannedId); 
-                    
-                    if (!product) throw new Error(`Producto ID "${scannedId}" no encontrado.`);
-                    if (parseInt(product.quantity) <= 0) throw new Error(`Sin stock para "${product.name}".`);
-
-                    toggleView('sales');
-                    const productNameWithCategory = product.name + (product.category ? ` (${product.category})` : '');
-                    productNameSoldIn.value = productNameWithCategory;
-                    salePriceIn.value = Number(product.price).toFixed(2);
-                    saleDateIn.value = new Date().toISOString().split('T')[0];
-                    saleStatusInput.value = 'Pagado';
-                    
-                    await registerScannedSale(product);
-                    
-                } catch (error) {
-                    scanSuccessHandled = false; 
-                    alert(`Error en Escaneo: ${error.message}`);
-                    openScannerModal();
-                }
-            };
-
-            const onScanError = (errorMessage) => {
-                if (!scanSuccessHandled && !errorMessage.includes("code parse error")) {
-                    scannerStatusEl.textContent = 'Escaneando...';
-                }
-            };
-            
-            html5QrcodeScanner.render(onScanSuccess, onScanError);
-        };
-
-        window.closeScannerModal = async function(hideModal = true) {
-            if (hideModal) scannerModal.classList.add('hidden');
-            scannerStatusEl.textContent = 'Esperando código QR...';
-            
-            if (html5QrcodeScanner) {
-                if (isScannerRunning) {
-                    try { await html5QrcodeScanner.stop(); } catch (error) {}
-                }
-                try { await html5QrcodeScanner.clear(); } catch (e) {}
-                html5QrcodeScanner = null;
-            } 
-            isScannerRunning = false;
-            scanSuccessHandled = false; 
-        };
-
-        searchInput.addEventListener("input", filterAndRenderProducts);
-        searchInputBodega.addEventListener("input", filterAndRenderProductsBodega); 
-        searchSalesInput.addEventListener("input", filterAndRenderSales);
-        pendingOnlyCheckbox.addEventListener("change", filterAndRenderSales);
-
-        productForm.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("submit"); 
-            submitBtn.disabled = true; 
-            setStatusMessage(status, "Guardando...", true); 
-            if (!supabase) return alert("Error: Supabase no está cargado.");
-            try { 
-                const imageUrl = imageIn.files[0] ? await uploadImage(imageIn.files[0]) : null; 
-                const newProduct = { name: nameIn.value, category: categoryIn.value, price: parseFloat(priceIn.value), quantity: parseInt(qtyIn.value), image_url: imageUrl, box_number: boxNumberIn.value.trim() || null };
-                const { error: insertError } = await supabase.from(PRODUCTS_TABLE).insert(newProduct);
-                if (insertError) throw insertError; 
-                productForm.reset(); qtyIn.value = 1; 
-                setStatusMessage(status, "Producto agregado con éxito ✅", true); 
-            } catch (err) { 
-                setStatusMessage(status, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
+        } catch (error) {
+            sale.status = oldStatus;
+            if (selectEl) { selectEl.value = oldStatus; selectEl.className = `p-1 border rounded text-xs font-medium ${STATUS_COLORS[oldStatus] || STATUS_COLORS['Pendiente']} cursor-pointer`; }
+        } finally { filterAndRenderSales(); }
+    }
+    
+    window.editSalePrice = function(id, currentPrice) {
+        const newPriceStr = prompt(`Ingresa el nuevo precio:`, currentPrice.toFixed(2));
+        if (newPriceStr === null) return; 
+        const newPrice = parseFloat(newPriceStr.replace('$', '').trim());
+        if (isNaN(newPrice) || newPrice <= 0) return;
+        const sale = allSales.find(s => s.id === id);
+        if (!sale || !supabase) return;
+        const oldPrice = sale.price;
+        sale.price = newPrice;
+        supabase.from(SALES_TABLE).update({ price: newPrice }).eq("id", id).then(({ error }) => {
+            if (error) sale.price = oldPrice;
+            filterAndRenderSales();
         });
-
-        productFormBodega.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("submit-bodega"); 
-            submitBtn.disabled = true; 
-            setStatusMessage(statusBodega, "Guardando...", true); 
-            if (!supabase) return alert("Error: Supabase no está cargado.");
-            try { 
-                const imageUrl = imageInBodega.files[0] ? await uploadImage(imageInBodega.files[0]) : null; 
-                const newProductBodega = { name: nameInBodega.value, category: categoryInBodega.value, price: parseFloat(priceInBodega.value), quantity: parseInt(qtyInBodega.value), image_url: imageUrl, box_number: boxNumberInBodega.value.trim() || null };
-                const { error } = await supabase.from(PRODUCTS_BODEGA_TABLE).insert(newProductBodega);
-                if (error) throw error; 
-                productFormBodega.reset(); qtyInBodega.value = 1; 
-                setStatusMessage(statusBodega, "Producto agregado con éxito ✅", true); 
-            } catch (err) { 
-                setStatusMessage(statusBodega, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-
-        salesForm.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("sale-submit"); 
-            submitBtn.disabled = true; 
-            if (!supabase) return alert("Error: Supabase no está cargado.");
-            const soldProductWithCategory = productNameSoldIn.value.trim();
-            const soldProductName = getCleanProductName(soldProductWithCategory); 
-            try { 
-                const newSale = {
-                    recipient_name: recipientNameIn.value,
-                    product_name_sold: soldProductWithCategory,
-                    price: parseFloat(salePriceIn.value),
-                    sale_date: saleDateIn.value,
-                    status: saleStatusInput.value
-                };
-                const { error: saleError } = await supabase.from(SALES_TABLE).insert(newSale);
-                if (saleError) throw saleError;
-                
-                if (newSale.status === 'Pagado') {
-                    let updateTable = null, updateArray = null;
-                    if (allProducts.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
-                        updateTable = PRODUCTS_TABLE;
-                        updateArray = allProducts;
-                    } else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
-                        updateTable = PRODUCTS_BODEGA_TABLE;
-                        updateArray = allProductsBodega;
-                    }
-                    if (updateTable && updateArray) {
-                         await updateProductStock(soldProductName, updateTable, updateArray, -1);
-                    }
-                }
-
-                salesForm.reset(); 
-                saleDateIn.value = new Date().toISOString().split('T')[0]; 
-                setStatusMessage(saleStatus, "Venta registrada con éxito ✅", true); 
-            } catch (err) { 
-                setStatusMessage(saleStatus, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-
-        missingProductForm.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("missing-product-submit"); 
-            submitBtn.disabled = true; 
-            if (!supabase) return alert("Error: Supabase no está cargado.");
-            try { 
-                const newMissing = { product_name: missingProductNameIn.value, notes: missingProductNotesIn.value || null };
-                const { error } = await supabase.from(MISSING_PRODUCTS_TABLE).insert(newMissing);
-                if (error) throw error;
-                missingProductForm.reset(); 
-                setStatusMessage(missingProductStatus, "Producto agregado a la lista ✅", true); 
-            } catch (err) { 
-                setStatusMessage(missingProductStatus, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-
-        toolForm.addEventListener("submit", async (ev) => { 
-            ev.preventDefault(); 
-            const submitBtn = document.getElementById("tool-submit"); 
-            submitBtn.disabled = true; 
-            setStatusMessage(toolStatus, "Guardando herramienta...", true); 
-            if (!supabase) return alert("Error: Supabase no está cargado.");
-            try { 
-                const imageUrl = toolImageIn.files[0] ? await uploadImage(toolImageIn.files[0]) : null; 
-                const newTool = { title: toolTitleIn.value, description: toolDescriptionIn.value || null, image_url: imageUrl };
-                const { error } = await supabase.from(TOOLS_TABLE).insert(newTool);
-                if (error) throw error; 
-                toolForm.reset(); 
-                setStatusMessage(toolStatus, "Herramienta guardada con éxito ✅", true); 
-            } catch (err) { 
-                setStatusMessage(toolStatus, "Error: " + err.message, false); 
-            } finally { 
-                submitBtn.disabled = false; 
-            } 
-        });
-
-        toolImageEditorInput.addEventListener('change', async (event) => {
-            if (!editingToolId) return; 
-            const file = event.target.files[0];
-            if (!file) return; 
-            try {
-                const newImageUrl = await uploadImage(file);
-                const { error } = await supabase.from(TOOLS_TABLE).update({ image_url: newImageUrl }).eq('id', editingToolId);
-                if (error) throw error;
-                alert('Imagen actualizada correctamente.');
-                const tool = allTools.find(t => t.id === editingToolId);
-                if (tool) tool.image_url = newImageUrl;
-                renderTools(allTools);
-            } catch (error) {
-                alert('Error: ' + error.message);
-            } finally {
-                editingToolId = null; 
-                toolImageEditorInput.value = ''; 
+    }
+    
+    window.deleteSale = async function(id) {
+        if (!confirm("¿Eliminar registro?")) return;
+        if (!supabase) return;
+        const sale = allSales.find(s => s.id === id);
+        if (!sale) return;
+        if (sale.status === 'Pagado') {
+            let updateTable = null, updateArray = null;
+            const soldProductName = getCleanProductName(sale.product_name_sold);
+            if (allProducts.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
+                updateTable = PRODUCTS_TABLE; updateArray = allProducts;
+            } else if (allProductsBodega.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
+                updateTable = PRODUCTS_BODEGA_TABLE; updateArray = allProductsBodega;
             }
+            if (updateTable && updateArray) await updateProductStock(soldProductName, updateTable, updateArray, 1);
+        }
+        const { error } = await supabase.from(SALES_TABLE).delete().eq("id", id);
+        if (error) filterAndRenderSales();
+    }
+
+    window.downloadSalesPDF = async function(isMainSales) {
+        const tempExportDiv = document.createElement('div');
+        tempExportDiv.style.width = '1000px'; tempExportDiv.style.backgroundColor = '#fff'; tempExportDiv.style.color = '#000';
+        const clone = salesListContainer.cloneNode(true);
+        clone.querySelectorAll('button').forEach(b => b.style.display = 'none');
+        clone.querySelectorAll('select').forEach(s => { const sp = document.createElement('span'); sp.textContent = s.value; s.parentNode.insertBefore(sp, s); s.style.display = 'none'; });
+        tempExportDiv.appendChild(clone); document.body.appendChild(tempExportDiv);
+        html2canvas(tempExportDiv, { scale: 2 }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const doc = new window.jspdf.jsPDF('p', 'mm', 'a4');
+            doc.addImage(imgData, 'PNG', 10, 10, 190, canvas.height * 190 / canvas.width);
+            doc.save(`Ventas_${new Date().toISOString().split('T')[0]}.pdf`);
+            document.body.removeChild(tempExportDiv);
         });
+    };
 
-        function toggleView(view) {
-            document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
-            document.getElementById(view + '-view')?.classList.remove('hidden');
-            document.getElementById('current-view-title').textContent = 'Vista: ' + {
-                inventory: 'Inventario Principal',
-                inventory_bodega: 'Nuevo Inventario',
-                sales: 'Ventas',
-                missing: 'Faltantes',
-                tools: 'Herramientas'
-            }[view] || 'Inventario Principal';
-            localStorage.setItem('lastView', view);
-            document.querySelectorAll('.view-btn').forEach(btn => {
-                btn.classList.remove('bg-indigo-500', 'text-white');
-                btn.classList.add('bg-transparent', 'text-gray-300');
-                if (btn.dataset.view === view) {
-                    btn.classList.remove('bg-transparent', 'text-gray-300');
-                    btn.classList.add('bg-indigo-500', 'text-white');
-                }
-            });
-        }
+    async function fetchMissingProducts() {
+        if (!supabase) return;
+        const { data, error } = await supabase.from(MISSING_PRODUCTS_TABLE).select("*").order("created_at", { ascending: false });
+        if (!error) { allMissingProducts = data; renderMissingProducts(allMissingProducts); }
+    }
 
-        document.querySelectorAll('.view-btn').forEach(btn => btn.addEventListener('click', () => toggleView(btn.dataset.view)));
+    function renderMissingProducts(items) {
+        missingListLoader.innerHTML = ""; missingListEl.innerHTML = "";
+        totalMissingCount.textContent = `${items.length} productos`;
+        if (items.length === 0) { missingListEl.innerHTML = `<p class="p-4 text-gray-400">No hay faltantes.</p>`; return; }
+        missingListEl.innerHTML = items.map(p => `<div class="flex items-center justify-between p-4 border-b border-gray-700 hover:bg-gray-700/50 transition"><div><p class="font-medium text-white">${p.product_name}</p><p class="text-xs text-gray-400">${p.notes || ''}</p></div><button onclick="deleteMissingProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-sm">Comprado</button></div>`).join('');
+    }
 
-        function toggleMobileMenu(e) {
-            e.stopPropagation();
-            document.getElementById('mobile-menu-dropdown').classList.toggle('hidden');
-        }
+    window.deleteMissingProduct = async function(id) {
+        if (!confirm("¿Eliminar?")) return;
+        if (supabase) await supabase.from(MISSING_PRODUCTS_TABLE).delete().eq("id", id);
+    }
 
-        function toggleSettingsDropdown(e) {
-            e.stopPropagation();
-            document.getElementById('settings-dropdown').classList.toggle('hidden');
-        }
+    async function fetchTools() {
+        if (!supabase) return;
+        const { data, error } = await supabase.from(TOOLS_TABLE).select("*").order("created_at", { ascending: false });
+        if (!error) { allTools = data; renderTools(allTools); }
+    }
 
-        document.addEventListener('click', () => {
-            document.getElementById('mobile-menu-dropdown').classList.add('hidden');
-            document.getElementById('settings-dropdown').classList.add('hidden');
+    function renderTools(items) {
+        toolsLoader.innerHTML = ""; toolsListEl.innerHTML = "";
+        totalToolsCount.textContent = `${items.length} herramientas`;
+        items.forEach(tool => {
+            const card = document.createElement("div");
+            card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col tool-card border border-gray-700 relative";
+            card.innerHTML = `<div class="h-48 bg-gray-700 rounded flex items-center justify-center mb-3 overflow-hidden"><img src="${tool.image_url || 'https://via.placeholder.com/150x100/6366f1/ffffff?text=Tutorial'}" class="object-contain h-full w-full" alt="${tool.title}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150x100/6366f1/ffffff?text=Tutorial';"></div><h3 class="font-bold text-lg text-white">${tool.title}</h3><p class="text-gray-400 text-sm mt-2 flex-grow">${(tool.description || '').replace(/\n/g, '<br>')}</p><div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700"><button onclick="editToolImage('${tool.id}')" class="px-3 py-1 rounded bg-indigo-500 text-white text-sm mr-2">Foto</button><button onclick="deleteTool('${tool.id}')" class="px-3 py-1 rounded bg-red-600 text-white text-sm">Eliminar</button></div>`;
+            toolsListEl.appendChild(card);
         });
+    }
 
-        function filterAndRenderSales() {
-            let filtered = allSales;
-            const term = searchSalesInput.value.toLowerCase();
-            if (term) {
-                filtered = filtered.filter(s => 
-                    s.recipient_name.toLowerCase().includes(term) ||
-                    s.product_name_sold.toLowerCase().includes(term)
-                );
-            }
-            if (pendingOnlyCheckbox.checked) {
-                filtered = filtered.filter(s => s.status === 'Pendiente');
-            }
-            renderSales(filtered);
+    window.editToolImage = function(id) { editingToolId = id; toolImageEditorInput.click(); }
+    window.deleteTool = async function(id) {
+        if (confirm("¿Eliminar?")) {
+            const { error } = await supabase.from(TOOLS_TABLE).delete().eq("id", id);
+            if (!error) { allTools = allTools.filter(t => t.id !== id); renderTools(allTools); }
         }
+    }
 
-        function renderSales(sales) {
-            salesListContainer.innerHTML = '';
-            document.getElementById('total-sales-count').textContent = `${sales.length} ventas`;
-            if (sales.length === 0) {
-                salesListContainer.innerHTML = '<p class="text-gray-400 text-center p-4">No hay ventas registradas.</p>';
-                return;
-            }
-            const table = document.createElement('table');
-            table.className = 'w-full text-sm text-left sales-list-table';
-            table.innerHTML = `
-                <thead class="text-xs uppercase bg-gray-900">
-                    <tr>
-                        <th class="px-4 py-3">Fecha</th>
-                        <th class="px-4 py-3">Destinatario</th>
-                        <th class="px-4 py-3">Producto</th>
-                        <th class="px-4 py-3">Precio</th>
-                        <th class="px-4 py-3">Estado</th>
-                        <th class="px-4 py-3">Acción</th>
-                    </tr>
-                </thead>
-                <tbody>
-            `;
-            sales.forEach(s => {
-                const tr = document.createElement('tr');
-                tr.className = 'border-b border-gray-700';
-                tr.innerHTML = `
-                    <td class="px-4 py-4" data-label="Fecha">${new Date(s.sale_date).toLocaleDateString()}</td>
-                    <td class="px-4 py-4" data-label="Destinatario">${s.recipient_name}</td>
-                    <td class="px-4 py-4" data-label="Producto">${s.product_name_sold}</td>
-                    <td class="px-4 py-4" data-label="Precio">$${Number(s.price).toFixed(2)}</td>
-                    <td class="px-4 py-4" data-label="Estado">
-                        <select onchange="updateSaleStatus('${s.id}', this.value)" class="bg-gray-700 text-white rounded px-2 py-1">
-                            <option value="Pendiente" ${s.status==='Pendiente'?'selected':''}>Pendiente</option>
-                            <option value="Pagado" ${s.status==='Pagado'?'selected':''}>Pagado</option>
-                            <option value="Devuelto" ${s.status==='Devuelto'?'selected':''}>Devuelto</option>
-                        </select>
-                    </td>
-                    <td class="px-4 py-4" data-label="Acción">
-                        <button onclick="deleteSale('${s.id}')" class="text-red-400 hover:text-red-300">Eliminar</button>
-                    </td>
-                `;
-                table.querySelector('tbody').appendChild(tr);
-            });
-            salesListContainer.appendChild(table);
+    function handleRealtimePayload(payload, localArray, renderFunction, isMainProducts = false, isBodegaProducts = false, isSales = false, idKey = 'id') {
+        if (!supabase) return;
+        const { eventType, new: newRecord, old: oldRecord } = payload;
+        const recordId = (eventType === 'DELETE') ? oldRecord[idKey] : newRecord[idKey];
+        let index = localArray.findIndex(item => item[idKey] === recordId);
+        if (isSales) { 
+            if (eventType === 'INSERT') localArray.unshift(newRecord);
+            else if (eventType === 'UPDATE' && index !== -1) Object.assign(localArray[index], newRecord);
+            else if (eventType === 'DELETE' && index !== -1) localArray.splice(index, 1);
+            filterAndRenderSales(); return; 
         }
-
-        window.updateSaleStatus = async function(id, newStatus) {
-            const { error } = await supabase.from(SALES_TABLE).update({ status: newStatus }).eq('id', id);
-            if (error) alert("Error al actualizar estado: " + error.message);
+        if (isMainProducts || isBodegaProducts) { 
+            if (eventType === 'INSERT') localArray.unshift(newRecord);
+            else if (eventType === 'UPDATE' && index !== -1) Object.assign(localArray[index], newRecord);
+            else if (eventType === 'DELETE' && index !== -1) localArray.splice(index, 1);
+            calculateCategoryTotals(localArray, isMainProducts, false, isBodegaProducts);
+            if (isMainProducts) filterAndRenderProducts(); else filterAndRenderProductsBodega();
+            updateAutocompleteList(allProducts, inventorySuggestions); return; 
         }
+        if (eventType === 'INSERT') localArray.unshift(newRecord);
+        else if (eventType === 'UPDATE' && index !== -1) Object.assign(localArray[index], newRecord);
+        else if (eventType === 'DELETE' && index !== -1) localArray.splice(index, 1);
+        renderFunction(localArray); 
+    }
 
-        window.deleteSale = async function(id) {
-            if (!confirm("¿Eliminar esta venta?")) return;
-            const { error } = await supabase.from(SALES_TABLE).delete().eq('id', id);
-            if (error) alert("Error: " + error.message);
-            else fetchSales();
+    function initializeRealtimeSubscriptions() {
+        if (!supabase) return;
+        supabase.channel('public:' + PRODUCTS_TABLE).on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_TABLE }, (p) => handleRealtimePayload(p, allProducts, filterAndRenderProducts, true, false, false)).subscribe();
+        supabase.channel('public:' + PRODUCTS_BODEGA_TABLE).on('postgres_changes', { event: '*', schema: 'public', table: PRODUCTS_BODEGA_TABLE }, (p) => handleRealtimePayload(p, allProductsBodega, filterAndRenderProductsBodega, false, true, false)).subscribe();
+        supabase.channel('public:' + SALES_TABLE).on('postgres_changes', { event: '*', schema: 'public', table: SALES_TABLE }, (p) => handleRealtimePayload(p, allSales, filterAndRenderSales, false, false, true)).subscribe();
+        supabase.channel('public:' + MISSING_PRODUCTS_TABLE).on('postgres_changes', { event: '*', schema: 'public', table: MISSING_PRODUCTS_TABLE }, (p) => handleRealtimePayload(p, allMissingProducts, renderMissingProducts)).subscribe();
+        supabase.channel('public:' + TOOLS_TABLE).on('postgres_changes', { event: '*', schema: 'public', table: TOOLS_TABLE }, (p) => handleRealtimePayload(p, allTools, renderTools)).subscribe();
+    }
+
+    async function loadAppDataAndInitialize() {
+        saleDateIn.value = new Date().toISOString().split('T')[0];
+        showSkeletonLoaders(); await loadLogo(); 
+        let view = localStorage.getItem('lastView') || 'inventory';
+        toggleView(view);
+        if (supabase) {
+            await Promise.all([fetchProducts(), fetchProductsBodega(), fetchSales(), fetchMissingProducts(), fetchTools()]);
+            initializeRealtimeSubscriptions();
         }
+    }
 
-        window.downloadSalesPDF = async function(includeAll = false) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            let y = 20;
-            doc.setFontSize(20);
-            doc.text("Reporte de Ventas - Cell Smar", 105, y, { align: "center" });
-            y += 15;
-            doc.setFontSize(12);
-            doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 20, y);
-            y += 15;
+    window.openProductEditorModal = function(productId, locationKey) { 
+        let product = (locationKey === 'main' ? allProducts : allProductsBodega).find(p => String(p.id) === String(productId));
+        if (!product) return;
+        currentEditingProduct = product;
+        modalName.value = product.name; modalCategory.value = product.category || ''; 
+        modalPrice.value = Number(product.price).toFixed(2); modalQuantity.value = product.quantity;
+        modalBoxNumber.value = product.box_number || ''; modalLocation.textContent = (locationKey === 'main' ? 'Principal' : 'Nuevo');
+        modalImagePreview.src = product.image_url || '[https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen](https://via.placeholder.com/150x100/4f46e5/ffffff?text=Sin+Imagen)';
+        modal.classList.remove('hidden');
+    }
 
-            let salesToPrint = includeAll ? allSales : allSales.filter(s => s.status === 'Pendiente');
-            if (salesToPrint.length === 0) {
-                alert("No hay ventas para exportar.");
-                return;
-            }
+    window.closeProductEditorModal = function() { modal.classList.add('hidden'); modalProductForm.reset(); selectedProductImageFile = null; }
+    modalImageUpload.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if (f) { selectedProductImageFile = f; const r = new FileReader(); r.onload = (ev) => modalImagePreview.src = ev.target.result; r.readAsDataURL(f); }
+    });
 
-            salesToPrint.forEach((s, i) => {
-                if (y > 270) {
-                    doc.addPage();
-                    y = 20;
-                }
-                doc.text(`${i+1}. ${new Date(s.sale_date).toLocaleDateString()} - ${s.recipient_name} - ${s.product_name_sold} - $${s.price} - ${s.status}`, 20, y);
-                y += 10;
-            });
+    modalProductForm.addEventListener('submit', async (ev) => {
+        ev.preventDefault(); modalStatus.textContent = 'Guardando...';
+        let table = allProducts.some(p => p.id === currentEditingProduct.id) ? PRODUCTS_TABLE : PRODUCTS_BODEGA_TABLE;
+        try {
+            let url = selectedProductImageFile ? await uploadImage(selectedProductImageFile) : currentEditingProduct.image_url;
+            const payload = { name: modalName.value, category: modalCategory.value, price: parseFloat(modalPrice.value), quantity: parseInt(modalQuantity.value), box_number: modalBoxNumber.value.trim() || null, image_url: url };
+            await supabase.from(table).update(payload).eq('id', currentEditingProduct.id);
+            closeProductEditorModal();
+        } catch (err) { modalStatus.textContent = 'Error'; }
+    });
 
-            doc.save(`ventas_cellsmar_${new Date().toISOString().split('T')[0]}.pdf`);
+    searchInput.addEventListener("input", filterAndRenderProducts);
+    searchInputBodega.addEventListener("input", filterAndRenderProductsBodega); 
+    searchSalesInput.addEventListener("input", filterAndRenderSales);
+    pendingOnlyCheckbox.addEventListener("change", filterAndRenderSales);
+    
+    form.addEventListener("submit", async (e) => { 
+        e.preventDefault(); setStatusMessage(status, "Guardando...");
+        const url = imageIn.files[0] ? await uploadImage(imageIn.files[0]) : null; 
+        await supabase.from(PRODUCTS_TABLE).insert({ name: nameIn.value, category: categoryIn.value, price: parseFloat(priceIn.value), quantity: parseInt(qtyIn.value), image_url: url, box_number: boxNumberIn.value.trim() || null });
+        form.reset(); qtyIn.value = 1; 
+    });
+    
+    formBodega.addEventListener("submit", async (e) => { 
+        e.preventDefault(); setStatusMessage(statusBodega, "Guardando...");
+        const url = imageInBodega.files[0] ? await uploadImage(imageInBodega.files[0]) : null; 
+        await supabase.from(PRODUCTS_BODEGA_TABLE).insert({ name: nameInBodega.value, category: categoryInBodega.value, price: parseFloat(priceInBodega.value), quantity: parseInt(qtyInBodega.value), image_url: url, box_number: boxNumberInBodega.value.trim() || null });
+        formBodega.reset(); qtyInBodega.value = 1; 
+    });
+
+    salesForm.addEventListener("submit", async (e) => { 
+        e.preventDefault();
+        const payload = { recipient_name: recipientNameIn.value, product_name_sold: productNameSoldIn.value, price: parseFloat(salePriceIn.value), sale_date: saleDateIn.value, status: saleStatusInput.value };
+        await supabase.from(SALES_TABLE).insert(payload);
+        const clean = getCleanProductName(productNameSoldIn.value);
+        if (payload.status === 'Pagado') {
+            if (allProducts.some(p => getCleanProductName(p.name) === clean)) await updateProductStock(clean, PRODUCTS_TABLE, allProducts, -1);
+            else if (allProductsBodega.some(p => getCleanProductName(p.name) === clean)) await updateProductStock(clean, PRODUCTS_BODEGA_TABLE, allProductsBodega, -1);
         }
+        salesForm.reset(); saleDateIn.value = new Date().toISOString().split('T')[0];
+    });
+    
+    missingProductForm.addEventListener("submit", async (e) => { 
+        e.preventDefault();
+        await supabase.from(MISSING_PRODUCTS_TABLE).insert({ product_name: missingProductNameIn.value, notes: missingProductNotesIn.value || null });
+        missingProductForm.reset(); 
+    });
 
-        async function loadAppDataAndInitialize() {
-            saleDateIn.value = new Date().toISOString().split('T')[0];
-            showSkeletonLoaders(); 
-            await loadLogo(); 
+    toolForm.addEventListener("submit", async (e) => { 
+        e.preventDefault();
+        const url = toolImageIn.files[0] ? await uploadImage(toolImageIn.files[0]) : null; 
+        await supabase.from(TOOLS_TABLE).insert({ title: toolTitleIn.value, description: toolDescriptionIn.value, image_url: url });
+        toolForm.reset(); 
+    });
+    
+    toolImageEditorInput.addEventListener('change', async (e) => {
+        const url = await uploadImage(e.target.files[0]);
+        if (url) await supabase.from(TOOLS_TABLE).update({ image_url: url }).eq('id', editingToolId);
+    });
 
-            let viewToLoad = 'inventory';
-            try {
-                const lastView = localStorage.getItem('lastView');
-                if (lastView) viewToLoad = lastView;
-            } catch (e) {}
+    document.querySelectorAll('.view-btn').forEach(b => b.addEventListener('click', () => toggleView(b.dataset.view)));
 
-            toggleView(viewToLoad);
-
-            if (supabase) {
-                await Promise.all([
-                    fetchProducts(), 
-                    fetchProductsBodega(), 
-                    fetchSales(), 
-                    fetchMissingProducts(),
-                    fetchTools() 
-                ]);
-                initializeRealtimeSubscriptions();
-            }
-        }
-
-        window.addEventListener("load", async () => {
-            const initialTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
-            applyTheme(initialTheme);
-            appContentWrapper.classList.remove('hidden');
-            await loadAppDataAndInitialize();
-        });
-    </script>
-</body>
+    window.addEventListener("load", loadAppDataAndInitialize);
+</script>
+</body> 
 </html>
