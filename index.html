@@ -668,7 +668,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
-<body class="" onclick="">
+<body class="">
 
     <div id="auth-modal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="auth-modal-title" role="dialog"
         aria-modal="true">
@@ -739,6 +739,9 @@
                     <button data-view="inventory"
                         class="view-btn bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg text-sm shadow-md transition duration-300">📦
                         Inventario Principal</button>
+                    <button data-view="bodega"
+                        class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🏭
+                        Inventario Bodega</button>
                     <button data-view="sales"
                         class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">💰
                         Ventas</button>
@@ -760,6 +763,7 @@
                 </button>
                 <div id="mobile-menu-dropdown" class="rounded-md shadow-lg divide-y divide-gray-300 z-50 hidden">
                     <button data-view="inventory" class="view-btn text-sm">📦 Inventario Principal</button>
+                    <button data-view="bodega" class="view-btn text-sm">🏭 Inventario Bodega</button>
                     <button data-view="sales" class="view-btn text-sm">💰 Ventas</button>
                     <button data-view="missing" class="view-btn text-sm">🔔 Faltantes</button>
                     <button data-view="tools" class="view-btn text-sm">🛠️ Herramientas</button>
@@ -852,6 +856,48 @@
                 </div>
                 <div id="products" class="space-y-12"></div>
             </div>
+
+            <!-- Inventario Bodega -->
+            <div id="bodega-view" class="view-section hidden">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-black text-white tracking-tight">Inventario Bodega</h2>
+                        <p class="text-gray-500 text-sm mt-1">Productos almacenados en bodega</p>
+                    </div>
+                    <button onclick="openAddModal('bodega')"
+                        class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-purple-600/20 transition-all duration-300 font-bold w-full sm:w-auto transform hover:-translate-y-1 btn-primary-gold">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Agregar a Bodega
+                    </button>
+                </div>
+
+                <div class="flex items-center space-x-4 mb-8">
+                    <div class="relative flex-grow max-w-xl">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </span>
+                        <input id="search-bodega-input" type="text" placeholder="Buscar en bodega..."
+                            class="pl-10 block w-full bg-gray-800 border-gray-700 border rounded-xl py-3 px-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none" />
+                    </div>
+                    <span id="total-bodega-count"
+                        class="text-gray-400 font-medium px-4 py-2 bg-gray-800 rounded-lg border border-gray-700">0
+                        productos</span>
+                </div>
+
+                <div id="bodega-products-loader"
+                    class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                </div>
+                <div id="bodega-products" class="space-y-12"></div>
+            </div>
+
             <!-- Ventas -->
             <div id="sales-view" class="view-section hidden">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
@@ -1144,6 +1190,88 @@
             </div>
         </div>
 
+        <!-- MODAL: AGREGAR PRODUCTO BODEGA -->
+        <div id="add-bodega-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="fixed inset-0 bg-gray-900/95 backdrop-blur-sm transition-opacity"
+                    onclick="closeAddModal('bodega')"></div>
+                <div
+                    class="relative bg-gray-800 rounded-2xl shadow-2xl w-full max-w-xl border border-gray-700 overflow-hidden transform transition-all modal-glass">
+                    <div class="p-6 border-b border-gray-700 flex justify-between items-center bg-gray-800/50">
+                        <h3 class="text-xl font-bold text-white modal-header-luxury">🏭 Nuevo Producto Bodega</h3>
+                        <button onclick="closeAddModal('bodega')"
+                            class="text-gray-400 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <form id="bodega-product-form" class="p-6 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-400 mb-1">Nombre</label>
+                                <input id="bodega-name" type="text" required
+                                    class="w-full bg-gray-900 border-gray-700 border rounded-lg p-2.5 text-white focus:ring-2 focus:ring-purple-500 transition-all outline-none"
+                                    placeholder="Ej: Pantalla Samsung A32" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-1">Categoría</label>
+                                <select id="bodega-category-select" required
+                                    class="w-full bg-gray-900 border-gray-700 border rounded-lg p-2.5 text-white focus:ring-2 focus:ring-purple-500 transition-all outline-none">
+                                    <option value="">Seleccionar</option>
+                                    <option value="Pantallas">Pantallas</option>
+                                    <option value="Jacks de Carga">Jacks de Carga</option>
+                                    <option value="Flex Main">Flex Main</option>
+                                    <option value="Placas de Carga">Placas de Carga</option>
+                                    <option value="Botones Fisicos">Botones Fisicos</option>
+                                    <option value="Botones Internos">Botones Internos</option>
+                                    <option value="Tapaderas de Iphone">Tapaderas de Iphone</option>
+                                    <option value="Bandejas SIM">Bandejas SIM</option>
+                                    <option value="Flex de Iphone">Flex de Iphone</option>
+                                    <option value="Bocinas Repuesto">Bocinas Repuesto</option>
+                                    <option value="Mantenimiento">Mantenimiento</option>
+                                    <option value="Herramientas">Herramientas</option>
+                                    <option value="Insumos">Insumos</option>
+                                    <option value="Otros">Otros</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-1">Ubicación en Bodega</label>
+                                <input id="bodega-box-number" type="text"
+                                    class="w-full bg-gray-900 border-gray-700 border rounded-lg p-2.5 text-white focus:ring-2 focus:ring-purple-500 transition-all outline-none"
+                                    placeholder="Ej: Estante A-3" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-1">Precio (USD)</label>
+                                <input id="bodega-price" type="number" step="0.01" required
+                                    class="w-full bg-gray-900 border-gray-700 border rounded-lg p-2.5 text-white focus:ring-2 focus:ring-purple-500 transition-all outline-none"
+                                    placeholder="25.00" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-1">Cantidad Inicial</label>
+                                <input id="bodega-quantity" type="number" min="1" value="1" required
+                                    class="w-full bg-gray-900 border-gray-700 border rounded-lg p-2.5 text-white focus:ring-2 focus:ring-purple-500 transition-all outline-none" />
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-400 mb-1">Imagen del Producto</label>
+                                <input id="bodega-image" type="file" accept="image/*"
+                                    class="w-full bg-gray-900 border-gray-700 border rounded-lg p-2 text-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700 cursor-pointer" />
+                            </div>
+                        </div>
+                        <div class="pt-4 border-t border-gray-700 flex flex-col gap-3">
+                            <button id="bodega-submit" type="submit"
+                                class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-purple-600/20 transition-all">
+                                Guardar en Bodega
+                            </button>
+                            <p id="bodega-status" class="text-center text-sm font-medium"></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <!-- MODAL: REGISTRAR VENTA -->
         <div id="add-sale-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
             <div class="flex items-center justify-center min-h-screen p-4">
@@ -1326,6 +1454,7 @@
 
         // --- INICIO: Definición de Constantes de Tablas y Estilos ---
         const PRODUCTS_TABLE = "products";
+        const BODEGA_TABLE = "bodega_products";
         const SALES_TABLE = "sales";
         const MISSING_PRODUCTS_TABLE = "missing_products";
         const TOOLS_TABLE = "tools";
@@ -1342,9 +1471,10 @@
         // ============================================================================
 
         // --- Variables de Estado ---
-        let allProducts = [], allSales = [], allMissingProducts = [], allTools = [], selectedLogoFile = null;
+        let allProducts = [], allBodegaProducts = [], allSales = [], allMissingProducts = [], allTools = [], selectedLogoFile = null;
         let editingToolId = null;
         let currentEditingProduct = null;
+        let currentEditingBodegaProduct = null;
         let selectedProductImageFile = null;
 
         // --- ADICIÓN: Variables para almacenar totales por categoría ---
@@ -1389,6 +1519,10 @@
 
         // --- Elementos de Faltantes ---
         const missingProductForm = document.getElementById("missing-product-form"), missingProductNameIn = document.getElementById("missing-product-name"), missingProductNotesIn = document.getElementById("missing-product-notes"), missingProductStatus = document.getElementById("missing-product-status"), missingListEl = document.getElementById("missing-list"), totalMissingCount = document.getElementById("total-missing-count"), missingListLoader = document.getElementById("missing-list-loader");
+
+        // --- Elementos de Bodega ---
+        const bodegaProductForm = document.getElementById("bodega-product-form"), bodegaNameIn = document.getElementById("bodega-name"), bodegaCategoryIn = document.getElementById("bodega-category-select"), bodegaPriceIn = document.getElementById("bodega-price"), bodegaQtyIn = document.getElementById("bodega-quantity"), bodegaImageIn = document.getElementById("bodega-image"), bodegaStatus = document.getElementById("bodega-status"), bodegaProductsEl = document.getElementById("bodega-products"), totalBodegaCount = document.getElementById("total-bodega-count"), searchBodegaInput = document.getElementById("search-bodega-input"), bodegaProductsLoader = document.getElementById("bodega-products-loader"), bodegaBoxNumberIn = document.getElementById("bodega-box-number");
+        let bodegaCategoryTotals = {};
 
         // --- Elementos de Herramientas ---
         const toolForm = document.getElementById("tool-form"), toolTitleIn = document.getElementById("tool-title"), toolDescriptionIn = document.getElementById("tool-description"), toolImageIn = document.getElementById("tool-image"), toolStatus = document.getElementById("tool-status"), toolsListEl = document.getElementById("tools-list"), totalToolsCount = document.getElementById("total-tools-count"), toolsLoader = document.getElementById("tools-list-loader");
@@ -1846,7 +1980,7 @@
         // --- Funciones de Vistas ---
         const views = {
             inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario Principal' },
-
+            bodega: { el: document.getElementById('bodega-view'), title: 'Vista: Inventario Bodega' },
             sales: { el: document.getElementById('sales-view'), title: 'Vista: Ventas Registradas' },
             missing: { el: document.getElementById('missing-view'), title: 'Vista: Productos Faltantes' },
             tools: { el: document.getElementById('tools-view'), title: 'Vista: Herramientas y Tutoriales' }
@@ -1899,6 +2033,7 @@
         function showSkeletonLoaders() {
             const cardSkeleton = Array(4).fill('').map(() => `<div class="skeleton-card space-y-3"><div class="h-40 skeleton-line"></div><div class="h-6 w-3/4 skeleton-line"></div><div class="h-4 w-1/2 skeleton-line"></div><div class="h-8 w-1/4 skeleton-line"></div></div>`).join('');
             productsLoader.innerHTML = cardSkeleton;
+            bodegaProductsLoader.innerHTML = cardSkeleton;
             toolsLoader.innerHTML = cardSkeleton;
             const tableSkeleton = Array(3).fill('').map(() => `<div class="h-12 skeleton-line"></div>`).join('');
             salesListLoader.innerHTML = tableSkeleton;
@@ -2024,6 +2159,138 @@
                 updateAutocompleteList(allProducts, inventorySuggestions);
             }
         }
+
+        // --- Lógica de Inventario Bodega ---
+        function calculateBodegaCategoryTotals(productsArray) {
+            const totals = productsArray.reduce((acc, p) => {
+                const cat = p.category || 'Otros';
+                acc[cat] = (acc[cat] || 0) + parseInt(p.quantity || 0);
+                return acc;
+            }, {});
+            bodegaCategoryTotals = totals;
+            return totals;
+        }
+
+        async function fetchBodegaProducts() {
+            if (!supabase) return;
+            const { data, error } = await supabase.from(BODEGA_TABLE).select("*").order("category", { ascending: true }).order("created_at", { ascending: false });
+            if (error) { console.error("Error cargando productos de bodega:", error); totalBodegaCount.textContent = "Error al cargar"; bodegaProductsEl.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`; return; }
+            allBodegaProducts = data;
+            calculateBodegaCategoryTotals(allBodegaProducts);
+            filterAndRenderBodegaProducts();
+        }
+
+        function filterAndRenderBodegaProducts() {
+            const term = (searchBodegaInput.value || "").toLowerCase().trim();
+            const filtered = allBodegaProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category && p.category.toLowerCase().includes(term)));
+            renderBodegaProducts(filtered);
+        }
+
+        function renderBodegaProducts(items) {
+            bodegaProductsLoader.innerHTML = "";
+            bodegaProductsEl.innerHTML = "";
+            totalBodegaCount.textContent = `${items.length} productos`;
+
+            // Renderizar Totales de Categoría para Bodega
+            const bodegaTotalsEl = document.createElement("div");
+            bodegaTotalsEl.className = "bg-gray-900/50 p-4 rounded-lg shadow-inner mb-6 border border-purple-700/30 flex flex-wrap gap-4 items-center justify-start text-sm";
+            bodegaTotalsEl.innerHTML = `
+                <span class="font-bold text-purple-300">Total por Categoría:</span>
+                ${Object.keys(bodegaCategoryTotals).sort().map(cat =>
+                `<span class="text-gray-300 min-w-[120px]"><span class="font-medium text-gray-400">${cat}:</span> <span class="text-white font-bold">${bodegaCategoryTotals[cat]}</span> u.</span>`
+            ).join('<span class="text-gray-600 mx-2 hidden sm:inline">|</span>')}
+            `;
+            bodegaProductsEl.appendChild(bodegaTotalsEl);
+
+            if (items.length === 0) { bodegaProductsEl.innerHTML += `<p class="p-4 text-gray-400">No se encontraron productos en bodega${searchBodegaInput.value ? ' para "' + searchBodegaInput.value + '"' : ''}.</p>`; return; }
+
+            const grouped = items.reduce((acc, p) => {
+                const cat = p.category || 'Sin Categoría';
+                if (!acc[cat]) acc[cat] = [];
+                acc[cat].push(p);
+                return acc;
+            }, {});
+
+            Object.keys(grouped).sort().forEach(category => {
+                const section = document.createElement("div");
+                section.className = "mb-10";
+                section.innerHTML = `<h2 class="text-2xl font-bold text-gray-200 border-b-2 border-purple-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2>`;
+                const grid = document.createElement("div");
+                grid.className = "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6";
+                grouped[category].forEach(p => {
+                    const card = document.createElement("div");
+                    card.id = `bodega-card-${p.id}`;
+                    card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-purple-700/30 relative";
+                    const imageUrl = p.image_url ? `${p.image_url}?t=${new Date().getTime()}` : `https://placehold.co/150x100/9333ea/ffffff?text=Bodega`;
+                    card.innerHTML = `
+                        <button onclick="openBodegaEditorModal('${p.id}')" class="absolute top-2 right-2 text-gray-400 hover:text-purple-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar producto">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                        </button>
+                        <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden">
+                            <img src="${imageUrl}" id="bodega-img-${p.id}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}">
+                        </div>
+                        <h3 id="bodega-name-${p.id}" class="font-semibold text-white">${p.name}</h3>
+                        <p id="bodega-category-${p.id}" class="text-xs text-gray-400 -mt-1">${p.category || 'Otros'}</p>
+                        <p id="bodega-price-${p.id}" class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
+                        <p id="bodega-stock-${p.id}" class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
+                        <p id="bodega-box-number-${p.id}" class="mt-1 text-sm text-gray-300 font-medium">🏭 Ubicación: <span class="font-normal text-purple-300">${p.box_number || 'N/A'}</span></p>
+                        <div class="flex-grow"></div>
+                        <div class="flex justify-end items-center mt-4 pt-3 border-t border-gray-700">
+                            <button onclick="deleteBodegaProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
+                        </div>`;
+                    grid.appendChild(card);
+                });
+                section.appendChild(grid);
+                bodegaProductsEl.appendChild(section);
+            });
+        }
+
+        window.deleteBodegaProduct = async function (id) {
+            const confirmed = await showAppModal({
+                title: 'Eliminar de Bodega',
+                message: '¿Estás seguro de que quieres eliminar este producto de la bodega?',
+                type: 'danger',
+                showCancel: true,
+                confirmText: 'Eliminar',
+                cancelText: 'Cancelar'
+            });
+            if (!confirmed) return;
+
+            if (!supabase) return showAppModal({ title: 'Error', message: "❌ Error: Supabase no está cargado.", type: 'danger' });
+            const { error } = await supabase.from(BODEGA_TABLE).delete().eq("id", id);
+            if (error) {
+                showAppModal({ title: 'Error', message: "❌ Error al eliminar: " + error.message, type: 'danger' });
+            } else {
+                allBodegaProducts = allBodegaProducts.filter(p => p.id !== id);
+                calculateBodegaCategoryTotals(allBodegaProducts);
+                filterAndRenderBodegaProducts();
+            }
+        }
+
+        window.openBodegaEditorModal = function (productId) {
+            // For now, use an alert - can be expanded to a full modal later
+            const product = allBodegaProducts.find(p => String(p.id).trim() === String(productId).trim());
+            if (!product) {
+                alert("Error: Producto de bodega no encontrado.");
+                return;
+            }
+            currentEditingBodegaProduct = product;
+            // Reuse the same modal as main inventory but with different location text
+            modalName.value = product.name;
+            modalCategory.value = product.category || '';
+            modalPrice.value = Number(product.price).toFixed(2);
+            modalQuantity.value = product.quantity;
+            modalBoxNumber.value = product.box_number || '';
+            modalLocation.textContent = 'Inventario Bodega';
+
+            const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : `https://placehold.co/150x100/9333ea/ffffff?text=Bodega`;
+            modalImagePreview.src = imageUrl;
+            modalImageUpload.value = '';
+            currentEditingProduct = product; // Use the same variable for modal logic
+            currentEditingProduct._isBodega = true; // Flag to know which table to update
+            modal.classList.remove('hidden');
+        };
+
 
         // --- Lógica de Ventas ---
         function filterAndRenderSales() {
@@ -2570,7 +2837,11 @@
                     (payload) => handleRealtimePayload(payload, allProducts, filterAndRenderProducts, true, false, 'id')
                 ).subscribe((status, err) => console.log(`Canal ${PRODUCTS_TABLE}: ${status}`, err || ''));
 
-
+            // Inventario Bodega
+            supabase.channel('public:' + BODEGA_TABLE, channelOptions)
+                .on('postgres_changes', { event: '*', schema: 'public', table: BODEGA_TABLE },
+                    (payload) => handleBodegaRealtimePayload(payload)
+                ).subscribe((status, err) => console.log(`Canal ${BODEGA_TABLE}: ${status}`, err || ''));
 
             // Ventas
             supabase.channel('public:' + SALES_TABLE, channelOptions)
@@ -2589,6 +2860,37 @@
                 .on('postgres_changes', { event: '*', schema: 'public', table: TOOLS_TABLE },
                     (payload) => handleRealtimePayload(payload, allTools, renderTools, false, false, 'id')
                 ).subscribe((status, err) => console.log(`Canal ${TOOLS_TABLE}: ${status}`, err || ''));
+        }
+
+        // Handler para realtime de Bodega
+        function handleBodegaRealtimePayload(payload) {
+            const { eventType, new: newRecord, old: oldRecord } = payload;
+            const recordId = (eventType === 'DELETE') ? oldRecord.id : newRecord.id;
+            if (!recordId) return;
+            let index = allBodegaProducts.findIndex(item => item.id === recordId);
+
+            switch (eventType) {
+                case 'INSERT':
+                    if (index === -1) {
+                        allBodegaProducts.unshift(newRecord);
+                        allBodegaProducts.sort((a, b) => (a.category || '').localeCompare(b.category || '') || new Date(b.created_at) - new Date(a.created_at));
+                    }
+                    break;
+                case 'UPDATE':
+                    if (index !== -1) {
+                        Object.assign(allBodegaProducts[index], newRecord);
+                    } else {
+                        allBodegaProducts.unshift(newRecord);
+                    }
+                    break;
+                case 'DELETE':
+                    if (index !== -1) {
+                        allBodegaProducts.splice(index, 1);
+                    }
+                    break;
+            }
+            calculateBodegaCategoryTotals(allBodegaProducts);
+            filterAndRenderBodegaProducts();
         }
 
         // --- Lógica de Carga Inicial de Datos ---
@@ -2690,10 +2992,10 @@
                 return;
             }
 
-            // 1. Usar siempre la tabla de productos principal
-            const table = PRODUCTS_TABLE;
-            const localArray = allProducts;
-            const isMain = true;
+            // Detectar si es un producto de Bodega
+            const isBodega = currentEditingProduct._isBodega === true;
+            const table = isBodega ? BODEGA_TABLE : PRODUCTS_TABLE;
+            const localArray = isBodega ? allBodegaProducts : allProducts;
 
             let newImageUrl = currentEditingProduct.image_url;
             let updatePayload = {};
@@ -2724,13 +3026,19 @@
 
                 if (error) throw error;
 
-                // 5. Actualizar localmente y en el DOM 
+                // 5. Actualizar localmente
                 Object.assign(currentEditingProduct, updatePayload);
-                updateProductCardInDOM(currentEditingProduct, isMain);
+                delete currentEditingProduct._isBodega; // Limpiar flag
 
-                // ADICIÓN: Recalcular totales después de la actualización exitosa
-                calculateCategoryTotals(localArray);
-                filterAndRenderProducts();
+                // Recalcular totales y re-renderizar según el tipo
+                if (isBodega) {
+                    calculateBodegaCategoryTotals(localArray);
+                    filterAndRenderBodegaProducts();
+                } else {
+                    updateProductCardInDOM(currentEditingProduct, true);
+                    calculateCategoryTotals(localArray);
+                    filterAndRenderProducts();
+                }
 
                 modalStatus.textContent = 'Producto actualizado con éxito. ✅';
                 setTimeout(closeProductEditorModal, 1000);
@@ -2749,11 +3057,10 @@
 
         // --- Event Listeners ---
         searchInput.addEventListener("input", filterAndRenderProducts);
-        // Se elimina searchInputET
+        searchBodegaInput.addEventListener("input", filterAndRenderBodegaProducts);
 
         searchSalesInput.addEventListener("input", filterAndRenderSales);
         pendingOnlyCheckbox.addEventListener("change", filterAndRenderSales);
-        // Se eliminan searchSalesInputET y pendingOnlyCheckboxET
 
         // --- Forms Submit Logic (Inventario Principal) ---
         form.addEventListener("submit", async (ev) => {
@@ -2847,7 +3154,50 @@
             }
         });
 
-        // Se elimina salesFormET
+        // --- Forms Submit Logic (Bodega) ---
+        bodegaProductForm.addEventListener("submit", async (ev) => {
+            ev.preventDefault();
+            const submitBtn = document.getElementById("bodega-submit");
+            submitBtn.disabled = true;
+            setStatusMessage(bodegaStatus, "Guardando en bodega...", true);
+            if (!supabase) return alert("❌ Error: Supabase no está cargado.");
+            try {
+                const imageUrl = bodegaImageIn.files[0] ? await uploadImage(bodegaImageIn.files[0]) : null;
+                const newProduct = {
+                    name: bodegaNameIn.value,
+                    category: bodegaCategoryIn.value,
+                    price: parseFloat(bodegaPriceIn.value),
+                    quantity: parseInt(bodegaQtyIn.value),
+                    image_url: imageUrl,
+                    box_number: bodegaBoxNumberIn.value.trim() || null
+                };
+                const { data: insertedProduct, error: insertError } = await supabase.from(BODEGA_TABLE).insert(newProduct).select().single();
+                if (insertError) throw insertError;
+
+                // Reflejar el producto instantáneamente
+                if (insertedProduct) {
+                    const index = allBodegaProducts.findIndex(p => p.id === insertedProduct.id);
+                    if (index === -1) {
+                        allBodegaProducts.unshift(insertedProduct);
+                        allBodegaProducts.sort((a, b) => (a.category || '').localeCompare(b.category || '') || new Date(b.created_at) - new Date(a.created_at));
+                        calculateBodegaCategoryTotals(allBodegaProducts);
+                        filterAndRenderBodegaProducts();
+                    }
+                }
+
+                bodegaProductForm.reset(); bodegaQtyIn.value = 1;
+                setTimeout(() => {
+                    closeAddModal('bodega');
+                    setStatusMessage(bodegaStatus, "", true);
+                }, 1500);
+                setStatusMessage(bodegaStatus, "Producto agregado a bodega ✅", true);
+            } catch (err) {
+                console.error("Error al agregar producto a bodega:", err);
+                setStatusMessage(bodegaStatus, "Error: " + err.message, false);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
 
         missingProductForm.addEventListener("submit", async (ev) => {
             ev.preventDefault();
@@ -2961,9 +3311,10 @@
 
             if (supabase) {
                 try {
-                    // Carga de datos inicial (se eliminó fetchProductsET y fetchSalesElTransito)
+                    // Carga de datos inicial
                     await Promise.all([
                         fetchProducts(),
+                        fetchBodegaProducts(),
                         fetchSales(),
                         fetchMissingProducts(),
                         fetchTools()
