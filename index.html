@@ -741,7 +741,7 @@
                         Inventario Principal</button>
                     <button data-view="bodega"
                         class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">🏭
-                        Inventario Bodega</button>
+                        Inventario 1</button>
                     <button data-view="sales"
                         class="view-btn bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm">💰
                         Ventas</button>
@@ -763,7 +763,7 @@
                 </button>
                 <div id="mobile-menu-dropdown" class="rounded-md shadow-lg divide-y divide-gray-300 z-50 hidden">
                     <button data-view="inventory" class="view-btn text-sm">📦 Inventario Principal</button>
-                    <button data-view="bodega" class="view-btn text-sm">🏭 Inventario Bodega</button>
+                    <button data-view="bodega" class="view-btn text-sm">🏭 Inventario 1</button>
                     <button data-view="sales" class="view-btn text-sm">💰 Ventas</button>
                     <button data-view="missing" class="view-btn text-sm">🔔 Faltantes</button>
                     <button data-view="tools" class="view-btn text-sm">🛠️ Herramientas</button>
@@ -857,11 +857,11 @@
                 <div id="products" class="space-y-12"></div>
             </div>
 
-            <!-- Inventario Bodega -->
+            <!-- Inventario 1 -->
             <div id="bodega-view" class="view-section hidden">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                     <div>
-                        <h2 class="text-3xl font-black text-white tracking-tight">Inventario Bodega</h2>
+                        <h2 class="text-3xl font-black text-white tracking-tight">Inventario 1</h2>
                         <p class="text-gray-500 text-sm mt-1">Productos almacenados en bodega</p>
                     </div>
                     <button onclick="openAddModal('bodega')"
@@ -1980,7 +1980,7 @@
         // --- Funciones de Vistas ---
         const views = {
             inventory: { el: document.getElementById('inventory-view'), title: 'Vista: Inventario Principal' },
-            bodega: { el: document.getElementById('bodega-view'), title: 'Vista: Inventario Bodega' },
+            bodega: { el: document.getElementById('bodega-view'), title: 'Vista: Inventario 1' },
             sales: { el: document.getElementById('sales-view'), title: 'Vista: Ventas Registradas' },
             missing: { el: document.getElementById('missing-view'), title: 'Vista: Productos Faltantes' },
             tools: { el: document.getElementById('tools-view'), title: 'Vista: Herramientas y Tutoriales' }
@@ -2281,7 +2281,7 @@
             modalPrice.value = Number(product.price).toFixed(2);
             modalQuantity.value = product.quantity;
             modalBoxNumber.value = product.box_number || '';
-            modalLocation.textContent = 'Inventario Bodega';
+            modalLocation.textContent = 'Inventario 1';
 
             const imageUrl = product.image_url ? `${product.image_url}?t=${new Date().getTime()}` : `https://placehold.co/150x100/9333ea/ffffff?text=Bodega`;
             modalImagePreview.src = imageUrl;
