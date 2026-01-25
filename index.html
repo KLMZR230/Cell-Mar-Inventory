@@ -2317,18 +2317,29 @@
         }
 
         function createSaleRowHTML(sale) {
-            // Se elimina idSuffix ya que solo hay una tabla de ventas
             const currentStatus = sale.status || 'Pendiente';
             const statusClass = STATUS_COLORS[currentStatus] || STATUS_COLORS['Pendiente'];
             const changeFn = 'changeSaleStatus';
             const editFn = 'editSalePrice';
             const deleteFn = 'deleteSale';
+
+            // REPARACIÓN: Si sale.category es nulo, intentamos extraerlo del nombre "Producto (Categoría)"
+            let displayCategory = sale.category;
+            if (!displayCategory && sale.product_name_sold) {
+                const catMatch = sale.product_name_sold.match(/\(([^)]+)\)$/);
+                if (catMatch) displayCategory = catMatch[1];
+            }
+            if (!displayCategory) displayCategory = 'Otros';
+
+            // Limpiamos el nombre del producto para no repetir la categoría en la vista de tabla
+            const cleanName = getCleanProductName(sale.product_name_sold || 'N/A');
+
             const statusSelectHtml = `<select id="select-status-${sale.id}" onchange="${changeFn}('${sale.id}', this.value, '${sale.product_name_sold}')" class="p-1 border rounded text-xs font-medium ${statusClass} cursor-pointer"><option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option><option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option><option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option></select>`;
             return `
                 <tr id="sale-row-${sale.id}" class="hover:bg-gray-700/50 transition duration-150">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Destinatario">${sale.recipient_name}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 italic" data-label="Categoría">${sale.category || 'Otros'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Producto Vendido">${sale.product_name_sold || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 italic" data-label="Categoría">${displayCategory}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Producto Vendido">${cleanName}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500" id="sale-price-cell-${sale.id}" data-label="Precio (USD)">$${Number(sale.price).toFixed(2)} <button onclick="${editFn}('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button></td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm" data-label="Estado">${statusSelectHtml}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><button onclick="${deleteFn}('${sale.id}')" class="text-red-500 hover:text-red-300 transition">Eliminar</button></td>
