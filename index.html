@@ -2327,6 +2327,7 @@
             return `
                 <tr id="sale-row-${sale.id}" class="hover:bg-gray-700/50 transition duration-150">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Destinatario">${sale.recipient_name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 italic" data-label="Categoría">${sale.category || 'Otros'}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" data-label="Producto Vendido">${sale.product_name_sold || 'N/A'}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500" id="sale-price-cell-${sale.id}" data-label="Precio (USD)">$${Number(sale.price).toFixed(2)} <button onclick="${editFn}('${sale.id}', ${sale.price})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button></td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm" data-label="Estado">${statusSelectHtml}</td>
@@ -2363,10 +2364,9 @@
                             <span class="text-gray-400">Pagado (día): <span class="text-green-500" id="daily-paid-${date}">$${dailyTotalPaid.toFixed(2)}</span></span>
                         </div>
                     </div>`;
-                const rowsHTML = dailySales.map(sale => createSaleRowHTML(sale)).join('');
                 const tableHTML = `
                     <table class="min-w-full divide-y divide-gray-700 shadow-md sales-list-table">
-                        <thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6" data-label="Destinatario">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Producto Vendido">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Precio">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Estado">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead>
+                        <thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6" data-label="Destinatario">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Categoría">Categoría</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Producto Vendido">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Precio">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Estado">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead>
                         <tbody id="sales-tbody-${date}" class="bg-gray-800 divide-y divide-gray-700">
                             ${rowsHTML}
                         </tbody>
@@ -2386,9 +2386,9 @@
             sale.status = newStatus; // Optimistic update (for status select color)
 
             // Update status select color immediately
-            const selectEl = document.getElementById(`select-status-${id}`);
+            const selectEl = document.getElementById(`select - status - ${id} `);
             if (selectEl) {
-                selectEl.className = `p-1 border rounded text-xs font-medium ${STATUS_COLORS[newStatus] || STATUS_COLORS['Pendiente']} cursor-pointer`;
+                selectEl.className = `p - 1 border rounded text - xs font - medium ${STATUS_COLORS[newStatus] || STATUS_COLORS['Pendiente']} cursor - pointer`;
             }
 
             try {
@@ -2427,7 +2427,7 @@
                 sale.status = oldStatus;
                 if (selectEl) {
                     selectEl.value = oldStatus;
-                    selectEl.className = `p-1 border rounded text-xs font-medium ${STATUS_COLORS[oldStatus] || STATUS_COLORS['Pendiente']} cursor-pointer`;
+                    selectEl.className = `p - 1 border rounded text - xs font - medium ${STATUS_COLORS[oldStatus] || STATUS_COLORS['Pendiente']} cursor - pointer`;
                 }
             } finally {
                 // Force a full sales list refresh to update totals
@@ -2457,7 +2457,7 @@
             const oldPrice = sale.price;
             sale.price = newPrice; // Optimistic update
 
-            const priceCell = document.getElementById(`sale-price-cell-${id}`);
+            const priceCell = document.getElementById(`sale - price - cell - ${id} `);
             if (priceCell) {
                 priceCell.innerHTML = `$${newPrice.toFixed(2)} <button onclick="editSalePrice('${id}', ${newPrice})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button>`;
             }
@@ -2611,21 +2611,21 @@
             missingListEl.innerHTML = "";
             totalMissingCount.textContent = `${items.length} productos pendientes`;
             if (items.length === 0) {
-                missingListEl.innerHTML = `<p class="p-4 text-gray-400">¡Genial! No hay productos faltantes en la lista.</p>`;
+                missingListEl.innerHTML = `< p class="p-4 text-gray-400" >¡Genial! No hay productos faltantes en la lista.</p > `;
                 return;
             }
             const listItems = items.map(p => {
                 const date = new Date(p.created_at).toLocaleDateString('es-SV', { day: 'numeric', month: 'short' });
                 return `
-                    <div id="missing-row-${p.id}" class="flex items-center justify-between p-4 border-b border-gray-700 hover:bg-gray-700/50 transition">
+                    < div id = "missing-row-${p.id}" class="flex items-center justify-between p-4 border-b border-gray-700 hover:bg-gray-700/50 transition" >
                         <div>
                             <p class="font-medium text-white">${p.product_name}</p>
                             <p class="text-xs text-gray-400">${p.notes || 'Sin notas'}</p>
                             <p class="text-xs text-indigo-400 mt-1">Registrado el ${date}</p>
                         </div>
                         <button onclick="deleteMissingProduct('${p.id}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Comprado</button>
-                    </div>
-                `;
+                    </div >
+                    `;
             }).join('');
             missingListEl.innerHTML = listItems;
         }
@@ -2667,13 +2667,13 @@
             toolsListEl.innerHTML = "";
             totalToolsCount.textContent = `${items.length} herramientas`;
             if (items.length === 0) {
-                toolsListEl.innerHTML = `<p class="text-gray-400 md:col-span-3">No hay herramientas o tutoriales guardados.</p>`;
+                toolsListEl.innerHTML = `< p class="text-gray-400 md:col-span-3" > No hay herramientas o tutoriales guardados.</p > `;
                 return;
             }
             items.forEach(tool => {
                 const card = document.createElement("div");
                 card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col tool-card border border-gray-700 relative";
-                const imageUrl = tool.image_url ? `${tool.image_url}?t=${new Date().getTime()}` : `https://placehold.co/150x100/6366f1/ffffff?text=Tutorial`;
+                const imageUrl = tool.image_url ? `${tool.image_url}?t = ${new Date().getTime()} ` : `https://placehold.co/150x100/6366f1/ffffff?text=Tutorial`;
                 const descriptionHtml = tool.description ? `<p class="text-gray-400 text-sm mt-2 flex-grow">${tool.description.replace(/\n/g, '<br>')}</p>` : '<div class="flex-grow"></div>';
                 card.innerHTML = `
                     <div class="h-48 bg-gray-700 rounded flex items-center justify-center mb-3 overflow-hidden">
@@ -3108,7 +3108,7 @@
             if (!supabase) return alert("❌ Error: Supabase no está cargado.");
             const soldProductWithCategory = productNameSoldIn.value.trim();
             const soldProductName = getCleanProductName(soldProductWithCategory);
-            
+
             // ARREGLO: Extraer la categoría del producto para guardarla en la venta
             let saleCategory = null;
             // Primero intentamos extraerla del texto entre paréntesis: "Producto (Categoría)"
@@ -3123,7 +3123,7 @@
                     saleCategory = matchedProduct.category;
                 }
             }
-            
+
             try {
                 const newSale = {
                     recipient_name: recipientNameIn.value,
