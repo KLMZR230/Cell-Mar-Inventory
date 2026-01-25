@@ -2364,6 +2364,7 @@
                             <span class="text-gray-400">Pagado (día): <span class="text-green-500" id="daily-paid-${date}">$${dailyTotalPaid.toFixed(2)}</span></span>
                         </div>
                     </div>`;
+                const rowsHTML = dailySales.map(sale => createSaleRowHTML(sale)).join('');
                 const tableHTML = `
                     <table class="min-w-full divide-y divide-gray-700 shadow-md sales-list-table">
                         <thead><tr><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-1/6" data-label="Destinatario">Destinatario</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Categoría">Categoría</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Producto Vendido">Producto Vendido</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Precio">Precio</th><th class="px-6 py-3 bg-gray-700/50 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-label="Estado">Estado</th><th class="px-6 py-3 bg-gray-700/50"></th></tr></thead>
