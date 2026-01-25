@@ -3108,13 +3108,30 @@
             if (!supabase) return alert("❌ Error: Supabase no está cargado.");
             const soldProductWithCategory = productNameSoldIn.value.trim();
             const soldProductName = getCleanProductName(soldProductWithCategory);
+            
+            // ARREGLO: Extraer la categoría del producto para guardarla en la venta
+            let saleCategory = null;
+            // Primero intentamos extraerla del texto entre paréntesis: "Producto (Categoría)"
+            const categoryMatch = soldProductWithCategory.match(/\(([^)]+)\)$/);
+            if (categoryMatch) {
+                saleCategory = categoryMatch[1].trim();
+            }
+            // Si no la encontramos así, buscamos en allProducts
+            if (!saleCategory) {
+                const matchedProduct = allProducts.find(p => getCleanProductName(p.name).toLowerCase() === soldProductName.toLowerCase());
+                if (matchedProduct && matchedProduct.category) {
+                    saleCategory = matchedProduct.category;
+                }
+            }
+            
             try {
                 const newSale = {
                     recipient_name: recipientNameIn.value,
                     product_name_sold: soldProductWithCategory,
                     price: parseFloat(salePriceIn.value),
                     sale_date: saleDateIn.value,
-                    status: saleStatusInput.value
+                    status: saleStatusInput.value,
+                    category: saleCategory
                 };
                 const { data: insertedSale, error: saleError } = await supabase.from(SALES_TABLE).insert(newSale).select().single();
                 if (saleError) throw saleError;
