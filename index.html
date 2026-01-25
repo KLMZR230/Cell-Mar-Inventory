@@ -2611,13 +2611,13 @@
             missingListEl.innerHTML = "";
             totalMissingCount.textContent = `${items.length} productos pendientes`;
             if (items.length === 0) {
-                missingListEl.innerHTML = `< p class="p-4 text-gray-400" >¡Genial! No hay productos faltantes en la lista.</p > `;
+                missingListEl.innerHTML = `<p class="p-4 text-gray-400">¡Genial! No hay productos faltantes en la lista.</p>`;
                 return;
             }
             const listItems = items.map(p => {
                 const date = new Date(p.created_at).toLocaleDateString('es-SV', { day: 'numeric', month: 'short' });
                 return `
-                    < div id = "missing-row-${p.id}" class="flex items-center justify-between p-4 border-b border-gray-700 hover:bg-gray-700/50 transition" >
+                    <div id="missing-row-${p.id}" class="flex items-center justify-between p-4 border-b border-gray-700 hover:bg-gray-700/50 transition">
                         <div>
                             <p class="font-medium text-white">${p.product_name}</p>
                             <p class="text-xs text-gray-400">${p.notes || 'Sin notas'}</p>
@@ -2667,7 +2667,7 @@
             toolsListEl.innerHTML = "";
             totalToolsCount.textContent = `${items.length} herramientas`;
             if (items.length === 0) {
-                toolsListEl.innerHTML = `< p class="text-gray-400 md:col-span-3" > No hay herramientas o tutoriales guardados.</p > `;
+                toolsListEl.innerHTML = `<p class="text-gray-400 md:col-span-3">No hay herramientas o tutoriales guardados.</p>`;
                 return;
             }
             items.forEach(tool => {
