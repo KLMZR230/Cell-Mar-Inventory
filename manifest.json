@@ -2,7 +2,7 @@
   "name": "Cell Smar",
   "short_name": "CellSmar",
   "description": "Sistema de gestión de inventario y ventas para Cell Smar",
-  "start_url": "./index cell smar.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#111827",
   "theme_color": "#4f46e5",

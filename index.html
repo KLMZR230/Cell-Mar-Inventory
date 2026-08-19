@@ -1899,7 +1899,12 @@
                 // ADICIÓN: Recalcular totales después de la actualización local optimista
                 calculateCategoryTotals(localArray);
 
-                if (isMain) renderProducts(allProducts);
+                if (isMain) {
+                    renderProducts(allProducts);
+                } else {
+                    calculateBodegaCategoryTotals(allBodegaProducts);
+                    filterAndRenderBodegaProducts();
+                }
 
                 if (!supabase) return console.error("❌ Error: Supabase no está cargado para actualizar stock.");
 
@@ -1916,7 +1921,12 @@
                     updateProductCardInDOM(productToUpdate, isMain);
                     updateAutocompleteList(localArray, inventorySuggestions);
                     calculateCategoryTotals(localArray);
-                    if (isMain) renderProducts(allProducts);
+                    if (isMain) {
+                        renderProducts(allProducts);
+                    } else {
+                        calculateBodegaCategoryTotals(allBodegaProducts);
+                        filterAndRenderBodegaProducts();
+                    }
 
                     alert(`❌ Error al actualizar stock de ${productName}. El stock local ha sido revertido.`);
                 } else {
@@ -2113,7 +2123,7 @@
         }
         function updateProductCardInDOM(product, isMain) {
             let idSuffix = '';
-            const elementPrefix = 'product-';
+            const elementPrefix = isMain ? 'product-' : 'bodega-';
             const stockEl = document.getElementById(`${elementPrefix}stock${idSuffix}-${product.id}`);
             const nameEl = document.getElementById(`${elementPrefix}name${idSuffix}-${product.id}`);
             const priceEl = document.getElementById(`${elementPrefix}price${idSuffix}-${product.id}`);
@@ -2398,9 +2408,9 @@
             sale.status = newStatus; // Optimistic update (for status select color)
 
             // Update status select color immediately
-            const selectEl = document.getElementById(`select - status - ${id} `);
+            const selectEl = document.getElementById(`select-status-${id}`);
             if (selectEl) {
-                selectEl.className = `p - 1 border rounded text - xs font - medium ${STATUS_COLORS[newStatus] || STATUS_COLORS['Pendiente']} cursor - pointer`;
+                selectEl.className = `p-1 border rounded text-xs font-medium ${STATUS_COLORS[newStatus] || STATUS_COLORS['Pendiente']} cursor-pointer`;
             }
 
             try {
@@ -2413,10 +2423,15 @@
                 let updateTable = null;
                 let updateArray = null;
 
-                // Buscar en el inventario para ajustar stock
+                // Buscar en inventario principal primero
                 if (allProducts.some(p => getCleanProductName(p.name).trim() === cleanName)) {
                     updateTable = PRODUCTS_TABLE;
                     updateArray = allProducts;
+                }
+                // Si no se encuentra, buscar en bodega
+                if (!updateTable && allBodegaProducts.some(p => getCleanProductName(p.name).trim() === cleanName)) {
+                    updateTable = BODEGA_TABLE;
+                    updateArray = allBodegaProducts;
                 }
 
                 if (updateTable && updateArray) {
@@ -2439,7 +2454,7 @@
                 sale.status = oldStatus;
                 if (selectEl) {
                     selectEl.value = oldStatus;
-                    selectEl.className = `p - 1 border rounded text - xs font - medium ${STATUS_COLORS[oldStatus] || STATUS_COLORS['Pendiente']} cursor - pointer`;
+                    selectEl.className = `p-1 border rounded text-xs font-medium ${STATUS_COLORS[oldStatus] || STATUS_COLORS['Pendiente']} cursor-pointer`;
                 }
             } finally {
                 // Force a full sales list refresh to update totals
@@ -2469,7 +2484,7 @@
             const oldPrice = sale.price;
             sale.price = newPrice; // Optimistic update
 
-            const priceCell = document.getElementById(`sale - price - cell - ${id} `);
+            const priceCell = document.getElementById(`sale-price-cell-${id}`);
             if (priceCell) {
                 priceCell.innerHTML = `$${newPrice.toFixed(2)} <button onclick="editSalePrice('${id}', ${newPrice})" class="ml-2 text-indigo-400 hover:text-indigo-200 transition text-xs font-normal">(Editar)</button>`;
             }
@@ -2511,6 +2526,8 @@
                 const soldProductName = getCleanProductName(sale.product_name_sold);
                 if (allProducts.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
                     await updateProductStock(soldProductName, PRODUCTS_TABLE, allProducts, 1);
+                } else if (allBodegaProducts.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
+                    await updateProductStock(soldProductName, BODEGA_TABLE, allBodegaProducts, 1);
                 }
             }
 
@@ -3142,9 +3159,11 @@
                     product_name_sold: soldProductWithCategory,
                     price: parseFloat(salePriceIn.value),
                     sale_date: saleDateIn.value,
-                    status: saleStatusInput.value,
-                    category: saleCategory
+                    status: saleStatusInput.value
                 };
+                if (saleCategory) {
+                    newSale.category = saleCategory;
+                }
                 const { data: insertedSale, error: saleError } = await supabase.from(SALES_TABLE).insert(newSale).select().single();
                 if (saleError) throw saleError;
 
@@ -3163,6 +3182,8 @@
                 if (newSale.status === 'Pagado') {
                     if (allProducts.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
                         await updateProductStock(soldProductName, PRODUCTS_TABLE, allProducts, -1);
+                    } else if (allBodegaProducts.some(p => getCleanProductName(p.name).trim() === soldProductName)) {
+                        await updateProductStock(soldProductName, BODEGA_TABLE, allBodegaProducts, -1);
                     } else {
                         console.warn(`Producto vendido (${soldProductName}) no encontrado en el inventario para descontar stock.`);
                     }
